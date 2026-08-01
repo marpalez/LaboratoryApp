@@ -1,0 +1,144 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0-windows7.0": {
+      "LumNotas.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/LumNotas.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/LumNotas.Core.dll": {}
+        }
+      },
+      "LumNotas.Report/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "LumNotas.Core": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/LumNotas.Report.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/LumNotas.Report.dll": {}
+        }
+      },
+      "LumNotas.Storage/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "dependencies": {
+          "LumNotas.Core": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/LumNotas.Storage.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/LumNotas.Storage.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "LumNotas.Core/1.0.0": {
+      "type": "project",
+      "path": "../LumNotas.Core/LumNotas.Core.csproj",
+      "msbuildProject": "../LumNotas.Core/LumNotas.Core.csproj"
+    },
+    "LumNotas.Report/1.0.0": {
+      "type": "project",
+      "path": "../LumNotas.Report/LumNotas.Report.csproj",
+      "msbuildProject": "../LumNotas.Report/LumNotas.Report.csproj"
+    },
+    "LumNotas.Storage/1.0.0": {
+      "type": "project",
+      "path": "../LumNotas.Storage/LumNotas.Storage.csproj",
+      "msbuildProject": "../LumNotas.Storage/LumNotas.Storage.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0-windows7.0": [
+      "LumNotas.Core >= 1.0.0",
+      "LumNotas.Report >= 1.0.0",
+      "LumNotas.Storage >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Invitado\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\Invitado\\Desktop\\Archivos windows\\Desarrollo de aplicaciones\\AplicacionTomaNotas\\src\\LumNotas.App\\LumNotas.App.csproj",
+      "projectName": "LumNotas.App",
+      "projectPath": "C:\\Users\\Invitado\\Desktop\\Archivos windows\\Desarrollo de aplicaciones\\AplicacionTomaNotas\\src\\LumNotas.App\\LumNotas.App.csproj",
+      "packagesPath": "C:\\Users\\Invitado\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Invitado\\Desktop\\Archivos windows\\Desarrollo de aplicaciones\\AplicacionTomaNotas\\src\\LumNotas.App\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\Invitado\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0-windows"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0-windows7.0": {
+          "targetAlias": "net8.0-windows",
+          "projectReferences": {
+            "C:\\Users\\Invitado\\Desktop\\Archivos windows\\Desarrollo de aplicaciones\\AplicacionTomaNotas\\src\\LumNotas.Core\\LumNotas.Core.csproj": {
+              "projectPath": "C:\\Users\\Invitado\\Desktop\\Archivos windows\\Desarrollo de aplicaciones\\AplicacionTomaNotas\\src\\LumNotas.Core\\LumNotas.Core.csproj"
+            },
+            "C:\\Users\\Invitado\\Desktop\\Archivos windows\\Desarrollo de aplicaciones\\AplicacionTomaNotas\\src\\LumNotas.Report\\LumNotas.Report.csproj": {
+              "projectPath": "C:\\Users\\Invitado\\Desktop\\Archivos windows\\Desarrollo de aplicaciones\\AplicacionTomaNotas\\src\\LumNotas.Report\\LumNotas.Report.csproj"
+            },
+            "C:\\Users\\Invitado\\Desktop\\Archivos windows\\Desarrollo de aplicaciones\\AplicacionTomaNotas\\src\\LumNotas.Storage\\LumNotas.Storage.csproj": {
+              "projectPath": "C:\\Users\\Invitado\\Desktop\\Archivos windows\\Desarrollo de aplicaciones\\AplicacionTomaNotas\\src\\LumNotas.Storage\\LumNotas.Storage.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.300"
+    },
+    "frameworks": {
+      "net8.0-windows7.0": {
+        "targetAlias": "net8.0-windows",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          },
+          "Microsoft.WindowsDesktop.App.WPF": {
+            "privateAssets": "none"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.311/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

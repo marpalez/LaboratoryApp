@@ -1,0 +1,952 @@
+{
+  "meta": {
+    "id": "62031",
+    "titulo": "Módulos LED — EN/IEC 62031",
+    "tituloCorto": "Módulos LED",
+    "normasCompatibles": ["60529", "62262"],
+    "notaCompatibles": "El laboratorio no fijó esta lista; se admiten IP e IK porque la 62031 no los lleva dentro. Pendiente de confirmar.",
+    "version": "1.0.0",
+    "generadoEl": "2026-07-31",
+    "origen": "TomaDeNotasExcelCompleta.xlsx v2.1 — hojas «RESUMEN 62031», «Toma de notas 62031» y «Datos ensayos 62031»",
+    "reglasDocumentadasEn": "docs/REGLAS-NEGOCIO.md v2.2",
+    "alcance": {
+      "incluye": ["IEC 62031:2018", "EN IEC 62031:2020 + A11:2021"],
+      "excluye": ["IP (60529) e IK (62262), que son tomas de notas aparte"]
+    },
+    "nota": "Los apartados citan entre paréntesis la cláusula de IEC/EN 61347-1 o 60598-1 de la que toman el método.",
+    "catalogoEquipos": "equipos-62031.v1.json"
+  },
+
+  "proyecto": {
+    "campos": [
+      { "id": "codigoServicio", "etiqueta": "Código de servicio", "tipo": "texto", "formato": "NNNNNAAAA", "obligatorio": true, "origenExcel": "RESUMEN 62031!D3" },
+      { "id": "tecnico1", "etiqueta": "Técnico 1", "tipo": "texto", "obligatorio": true, "origenExcel": "RESUMEN 62031!C5" },
+      { "id": "tecnico2", "etiqueta": "Técnico 2", "tipo": "texto", "origenExcel": "RESUMEN 62031!C6" },
+      { "id": "numeroMuestras", "etiqueta": "Nº de muestras", "tipo": "entero", "min": 1, "max": 30, "obligatorio": true, "origenExcel": "RESUMEN 62031!D8" },
+      { "id": "tc", "etiqueta": "Tc", "tipo": "numero", "unidad": "ºC", "obligatorio": true, "origenExcel": "RESUMEN 62031!C9",
+        "nota": "La 62031 declara la temperatura de cápsula Tc, no la Ta de las luminarias." },
+      { "id": "clasificacionModulo", "etiqueta": "Clasificación del módulo LED", "tipo": "seleccion", "obligatorio": true,
+        "opciones": ["Independiente", "A incorporar", "Integrado"],
+        "origenExcel": "RESUMEN 62031!C15",
+        "nota": "En el Excel es «Marcar UNA opción» (RESUMEN 62031!C20)." },
+      { "id": "inicioNumeracion", "etiqueta": "Iniciar numeración en", "tipo": "entero", "porDefecto": 1, "origenExcel": "RESUMEN 62031!F32" },
+      { "id": "comentariosGenerales", "etiqueta": "Comentarios y notas generales del proyecto", "tipo": "textoLargo", "origenExcel": "RESUMEN 62031!H2" }
+    ],
+    "reglas": [
+      { "id": "R-PROY-completo", "tipo": "predicado", "nombre": "proyectoCompleto",
+        "etiqueta": "La cabecera del proyecto está completa",
+        "descripcion": "Exige código de servicio, técnico 1, nº de muestras, Tc y la clasificación del módulo.",
+        "origenExcel": "RESUMEN 62031!B10" }
+    ]
+  },
+
+  "muestras": {
+    "min": 1,
+    "max": 30,
+    "nota": "El Excel admitía 8 como máximo; el laboratorio pidió 30 en todas las tomas de notas.",
+    "identificador": { "patron": "EBP_SAFE{codigoServicio}", "origenExcel": "RESUMEN 62031!C34:C41" },
+    "campos": [
+      { "id": "numero", "etiqueta": "Nº", "tipo": "entero" },
+      { "id": "observaciones", "etiqueta": "Comentarios y observaciones de la muestra", "tipo": "textoLargo", "origenExcel": "RESUMEN 62031!G32" }
+    ]
+  },
+
+  "secciones": [
+    {
+      "codigo": "generales",
+      "titulo": "Ratings y otros datos generales",
+      "bloques": [
+        {
+          "id": "62031.generales",
+          "codigo": "generales",
+          "titulo": "Ratings y otros datos generales",
+          "origenExcel": "Toma de notas 62031!B2:N21",
+          "pesoAvance": 4,
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D3:F3" },
+          "comentarios": true,
+          "campos": [
+            { "id": "uout", "etiqueta": "Uout", "tipo": "numero", "unidad": "V", "porMuestra": true, "origenExcel": "Toma de notas 62031!F6" },
+            { "id": "valorTc", "etiqueta": "Valor tc", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 62031!F7" },
+            { "id": "tension1", "etiqueta": "Ratings del módulo — tensión 1", "tipo": "grupoRepetido", "elementos": 1, "porMuestra": true,
+              "origenExcel": "Toma de notas 62031!D9:F12",
+              "campos": [
+                { "id": "tension", "etiqueta": "Tensión", "tipo": "numero", "unidad": "V" },
+                { "id": "corriente", "etiqueta": "Corriente", "tipo": "numero", "unidad": "A" },
+                { "id": "potencia", "etiqueta": "Potencia", "tipo": "numero", "unidad": "W" },
+                { "id": "factorPotencia", "etiqueta": "Fact. Pot (PF)", "tipo": "numero" }
+              ] },
+            { "id": "tension2", "etiqueta": "Ratings del módulo — tensión 2 (si procede)", "tipo": "grupoRepetido", "elementos": 1, "porMuestra": true, "opcional": true,
+              "origenExcel": "Toma de notas 62031!D14:F17",
+              "campos": [
+                { "id": "tension", "etiqueta": "Tensión", "tipo": "numero", "unidad": "V" },
+                { "id": "corriente", "etiqueta": "Corriente", "tipo": "numero", "unidad": "A" },
+                { "id": "potencia", "etiqueta": "Potencia", "tipo": "numero", "unidad": "W" },
+                { "id": "factorPotencia", "etiqueta": "Fact. Pot (PF)", "tipo": "numero" }
+              ] },
+            { "id": "tamano", "etiqueta": "Tamaño de las muestras", "tipo": "grupoRepetido", "elementos": 1, "porMuestra": true,
+              "origenExcel": "Toma de notas 62031!D19:F21",
+              "campos": [
+                { "id": "alto", "etiqueta": "Alto", "tipo": "numero", "unidad": "cm" },
+                { "id": "ancho", "etiqueta": "Ancho", "tipo": "numero", "unidad": "cm" },
+                { "id": "profundo", "etiqueta": "Profundo", "tipo": "numero", "unidad": "cm" }
+              ] }
+          ],
+          "checklists": [
+            { "id": "aptoPara", "etiqueta": "Apto para", "modo": "libre", "origenExcel": "Toma de notas 62031!B9",
+              "opciones": [
+                { "id": "montajeSuperficie", "etiqueta": "Montaje en superficie" },
+                { "id": "montajeEmpotrado", "etiqueta": "Montaje empotrado" },
+                { "id": "usoIndependiente", "etiqueta": "Uso independiente" }
+              ] }
+          ],
+          "reglas": [
+            { "id": "R-62031-gen-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F3" },
+            { "id": "R-62031-gen-02", "tipo": "recuentoDatos", "campo": "tension1", "umbralPorMuestra": 4,
+              "etiqueta": "Tensión, corriente, potencia y factor de potencia de cada muestra", "origenExcel": "Toma de notas 62031!F9:F12" },
+            { "id": "R-62031-gen-03", "tipo": "recuentoDatos", "campo": "tamano", "umbralPorMuestra": 3,
+              "etiqueta": "Alto, ancho y profundo de cada muestra", "origenExcel": "Toma de notas 62031!F19:F21" },
+            { "id": "R-62031-gen-cierre", "tipo": "faltanDatos",
+              "faltanSi": ["R-62031-gen-01", "!R-62031-gen-02", "!R-62031-gen-03"] },
+            { "id": "R-62031-gen-peso", "tipo": "peso", "valor": 4, "finSiNo": "R-62031-gen-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "partesActivas",
+      "titulo": "Verificación partes activas",
+      "bloques": [
+        {
+          "id": "62031.partesActivas",
+          "equipos": "partesActivas",
+          "codigo": "partesActivas",
+          "titulo": "Verificación de partes activas",
+          "origenExcel": "Toma de notas 62031!B24:N41",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D25:F25" },
+          "comentarios": true,
+          "campos": [
+            { "id": "medidas", "etiqueta": "Medidas para determinar si es parte activa", "tipo": "grupoRepetido", "elementos": 1, "porMuestra": true,
+              "origenExcel": "Toma de notas 62031!D31:F33",
+              "campos": [
+                { "id": "vac", "etiqueta": "Vac", "tipo": "numero", "unidad": "V" },
+                { "id": "vdc", "etiqueta": "Vdc", "tipo": "numero", "unidad": "V" },
+                { "id": "uoutDriver", "etiqueta": "Uout (driver)", "tipo": "numero", "unidad": "V" }
+              ] }
+          ],
+          "checklists": [
+            { "id": "selv", "etiqueta": "¿Es SELV?", "modo": "exactamenteUna", "origenExcel": "Toma de notas 62031!C27",
+              "opciones": [
+                { "id": "si", "etiqueta": "Sí" },
+                { "id": "no", "etiqueta": "No" }
+              ] },
+            { "id": "parteActiva", "etiqueta": "¿Es parte activa?", "modo": "exactamenteUna", "origenExcel": "Toma de notas 62031!C31",
+              "opciones": [
+                { "id": "si", "etiqueta": "Sí" },
+                { "id": "no", "etiqueta": "No" }
+              ] }
+          ],
+          "reglas": [
+            { "id": "R-62031-pa-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F25" },
+            { "id": "R-62031-pa-02", "tipo": "exactamenteUna", "checklist": "selv", "etiqueta": "Selección de SELV coherente" },
+            { "id": "R-62031-pa-03", "tipo": "exactamenteUna", "checklist": "parteActiva", "etiqueta": "Selección de parte activa coherente" },
+            { "id": "R-62031-pa-esSelv", "tipo": "opcion", "checklist": "selv", "opcion": "si" },
+            { "id": "R-62031-pa-04", "tipo": "recuentoDatos", "campo": "medidas", "umbralPorMuestra": 2, "soloSi": "!R-62031-pa-esSelv",
+              "etiqueta": "Medidas de tensión cuando el módulo no es SELV", "origenExcel": "Toma de notas 62031!F31:F33" },
+            { "id": "R-62031-pa-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-pa-01", "!R-62031-pa-02", "!R-62031-pa-03", "!R-62031-pa-04"] },
+            { "id": "R-62031-pa-peso", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-62031-pa-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "6",
+      "titulo": "Sección 6 - Marcado",
+      "bloques": [
+        {
+          "id": "62031.6",
+          "codigo": "6",
+          "titulo": "Marcado",
+          "origenExcel": "Toma de notas 62031!B43:N53",
+          "pesoAvance": 2,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D44:F44" },
+          "notas": ["Los datos pueden tomarse directamente sobre el TRF"],
+          "equipos": "sec06.marcado",
+          "comentarios": true,
+          "reglas": [
+            { "id": "R-62031-06-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F44" },
+            { "id": "R-62031-06-cierre", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-62031-06-01"] },
+            { "id": "R-62031-06-peso", "tipo": "peso", "valor": 2, "aplicaSiNo": "na", "finSiNo": "R-62031-06-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "7",
+      "titulo": "Sección 7 - Bornes",
+      "bloques": [
+        {
+          "id": "62031.7.tornillo",
+          "equipos": "sec07.tornillo",
+          "codigo": "7.1",
+          "titulo": "Bornes integrales de tornillo (según IEC/EN 60598-1)",
+          "origenExcel": "Toma de notas 62031!B57:N76",
+          "pesoAvance": 4,
+          "na": { "id": "na", "etiqueta": "N/A - no tiene bornes de tornillo" },
+          "comentarios": true,
+          "notas": ["Los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "subBloques": [
+            {
+              "id": "62031.7.tornillo.generales",
+              "titulo": "7.1 (14.3) Requisitos generales",
+              "origenExcel": "Toma de notas 62031!B58:N63",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D59:F59" },
+              "reglas": [
+                { "id": "R-62031-07.1-14.3", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F59" }
+              ]
+            },
+            {
+              "id": "62031.7.tornillo.mecanicos",
+              "titulo": "7.1 (14.4) Ensayos mecánicos",
+              "origenExcel": "Toma de notas 62031!B65:N70",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D66:F66" },
+              "reglas": [
+                { "id": "R-62031-07.1-14.4", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F66" }
+              ]
+            }
+          ],
+          "reglas": [
+            { "id": "R-62031-07.1-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-07.1-14.3", "R-62031-07.1-14.4"] },
+            { "id": "R-62031-07.1-peso", "tipo": "peso", "valor": 4, "aplicaSiNo": "na", "finSiNo": "R-62031-07.1-cierre" }
+          ]
+        },
+        {
+          "id": "62031.7.sinTornillo",
+          "equipos": "sec07.sinTornillo",
+          "codigo": "7.1",
+          "titulo": "Bornes integrales sin tornillo (según IEC/EN 60598-1)",
+          "origenExcel": "Toma de notas 62031!B78:N104",
+          "pesoAvance": 6,
+          "na": { "id": "na", "etiqueta": "N/A - no tiene bornes sin tornillo" },
+          "comentarios": true,
+          "notas": ["Los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "subBloques": [
+            {
+              "id": "62031.7.sinTornillo.generales",
+              "titulo": "7.1 (15.3) Requisitos generales",
+              "origenExcel": "Toma de notas 62031!B79:N84",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D80:F80" },
+              "reglas": [
+                { "id": "R-62031-07.1-15.3", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F80" }
+              ]
+            },
+            {
+              "id": "62031.7.sinTornillo.interno",
+              "titulo": "7.1 (15.5) Bornes y conexiones para cableado interno",
+              "origenExcel": "Toma de notas 62031!B86:N91",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D87:F87" },
+              "reglas": [
+                { "id": "R-62031-07.1-15.5", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F87" }
+              ]
+            },
+            {
+              "id": "62031.7.sinTornillo.externo",
+              "titulo": "7.1 (15.6) Bornes y conexiones para cableado externo",
+              "origenExcel": "Toma de notas 62031!B93:N98",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D94:F94" },
+              "reglas": [
+                { "id": "R-62031-07.1-15.6", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F94" }
+              ]
+            }
+          ],
+          "reglas": [
+            { "id": "R-62031-07.1b-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-07.1-15.3", "R-62031-07.1-15.5", "R-62031-07.1-15.6"] },
+            { "id": "R-62031-07.1b-peso", "tipo": "peso", "valor": 6, "aplicaSiNo": "na", "finSiNo": "R-62031-07.1b-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "8",
+      "titulo": "Sección 8 - Tierra",
+      "bloques": [
+        {
+          "id": "62031.8",
+          "codigo": "- (9.1 a 9.5)",
+          "titulo": "Resistencia de puesta a tierra (según 61547-1)",
+          "origenExcel": "Toma de notas 62031!B108:N126",
+          "pesoAvance": 4,
+          "na": { "id": "na", "etiqueta": "N/A - el módulo no tiene puesta a tierra" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D111:F111" },
+          "equipos": "sec08.tierra",
+          "comentarios": true,
+          "campos": [
+            { "id": "valor", "etiqueta": "Valor", "tipo": "numero", "unidad": "Ω", "porMuestra": true, "origenExcel": "Toma de notas 62031!F114" },
+            { "id": "ensayo9395", "etiqueta": "Ensayo según 9.3 / 9.5", "tipo": "texto", "origenExcel": "Toma de notas 62031!C121" }
+          ],
+          "notas": [
+            "Los datos pueden tomarse directamente sobre el TRF",
+            "Condiciones de ensayo: corriente 10 A durante 1 min."
+          ],
+          "reglas": [
+            { "id": "R-62031-08-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F111" },
+            { "id": "R-62031-08-02", "tipo": "recuentoDatos", "campo": "valor", "umbralPorMuestra": 1,
+              "etiqueta": "Valor de resistencia de cada muestra", "origenExcel": "Toma de notas 62031!F114" },
+            { "id": "R-62031-08-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-08-01", "!R-62031-08-02"] },
+            { "id": "R-62031-08-peso", "tipo": "peso", "valor": 4, "aplicaSiNo": "na", "finSiNo": "R-62031-08-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "9",
+      "titulo": "Sección 9 - Contacto partes activas",
+      "bloques": [
+        {
+          "id": "62031.9.contacto",
+          "equipos": "sec09.contacto",
+          "codigo": "- (10.1)",
+          "titulo": "Protección de partes activas contra contacto accidental",
+          "origenExcel": "Toma de notas 62031!B132:N147",
+          "pesoAvance": 4,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D133:F133" },
+          "comentarios": true,
+          "campos": [
+            { "id": "zonas", "etiqueta": "Zonas evaluadas y resultado", "tipo": "grupoRepetido", "elementos": 3, "ampliable": true, "porMuestra": true,
+              "origenExcel": "Toma de notas 62031!E136:N141",
+              "campos": [
+                { "id": "evaluada", "etiqueta": "Zona evaluada", "tipo": "texto" },
+                { "id": "resultado", "etiqueta": "Resultado", "tipo": "texto" }
+              ] }
+          ],
+          "reglas": [
+            { "id": "R-62031-09-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F133" },
+            { "id": "R-62031-09-02", "tipo": "recuentoDatos", "campo": "zonas", "umbralPorMuestra": 2,
+              "etiqueta": "Al menos una zona evaluada con su resultado", "origenExcel": "Toma de notas 62031!E136:E141" },
+            { "id": "R-62031-09-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-09-01", "!R-62031-09-02"] },
+            { "id": "R-62031-09-peso", "tipo": "peso", "valor": 4, "aplicaSiNo": "na", "finSiNo": "R-62031-09-cierre" }
+          ]
+        },
+        {
+          "id": "62031.9.condensador",
+          "equipos": "sec09.condensador",
+          "codigo": "- (10.2)",
+          "titulo": "Dispositivo de control con condensador > 0,5 µF",
+          "origenExcel": "Toma de notas 62031!B149:N161",
+          "pesoAvance": 2,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D150:F150" },
+          "notas": ["Los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "comentarios": true,
+          "reglas": [
+            { "id": "R-62031-09.2-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F150" },
+            { "id": "R-62031-09.2-cierre", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-62031-09.2-01"] },
+            { "id": "R-62031-09.2-peso", "tipo": "peso", "valor": 2, "aplicaSiNo": "na", "finSiNo": "R-62031-09.2-cierre" }
+          ]
+        },
+        {
+          "id": "62031.9.mbts",
+          "equipos": "sec09.mbts",
+          "codigo": "- (10.3)",
+          "titulo": "Dispositivos de control que proporcionan MBTS (SELV)",
+          "origenExcel": "Toma de notas 62031!B163:N175",
+          "pesoAvance": 2,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D164:F164" },
+          "notas": ["Los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "comentarios": true,
+          "reglas": [
+            { "id": "R-62031-09.3-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F164" },
+            { "id": "R-62031-09.3-cierre", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-62031-09.3-01"] },
+            { "id": "R-62031-09.3-peso", "tipo": "peso", "valor": 2, "aplicaSiNo": "na", "finSiNo": "R-62031-09.3-cierre" }
+          ]
+        },
+        {
+          "id": "62031.9.partesMbts",
+          "equipos": "sec09.mbts",
+          "codigo": "- (10.4)",
+          "titulo": "Partes MBTS accesibles",
+          "origenExcel": "Toma de notas 62031!B177:N189",
+          "pesoAvance": 2,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D178:F178" },
+          "notas": ["Los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "comentarios": true,
+          "reglas": [
+            { "id": "R-62031-09.4-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F178" },
+            { "id": "R-62031-09.4-cierre", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-62031-09.4-01"] },
+            { "id": "R-62031-09.4-peso", "tipo": "peso", "valor": 2, "aplicaSiNo": "na", "finSiNo": "R-62031-09.4-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "10",
+      "titulo": "Sección 10 - Resistencia de aislamiento y humedad",
+      "bloques": [
+        {
+          "id": "62031.10",
+          "codigo": "10",
+          "titulo": "Resistencia de aislamiento y ensayo de humedad",
+          "origenExcel": "Toma de notas 62031!B193:N243",
+          "pesoAvance": 6,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D194:F194" },
+          "equipos": "sec10.aislamiento",
+          "comentarios": true,
+          "campos": [
+            { "id": "humedad.inicio", "etiqueta": "Ensayo de humedad — inicio", "tipo": "instante", "origenExcel": "Toma de notas 62031!F200:F201" },
+            { "id": "humedad.fin", "etiqueta": "Ensayo de humedad — fin", "tipo": "instante", "origenExcel": "Toma de notas 62031!F202:F203" },
+            { "id": "temperaturaProgramada", "etiqueta": "Temperatura programada", "tipo": "numero", "unidad": "ºC", "porDefecto": 25, "origenExcel": "Toma de notas 62031!D205" },
+            { "id": "humedadProgramada", "etiqueta": "Humedad programada", "tipo": "numero", "unidad": "%", "porDefecto": 93, "origenExcel": "Toma de notas 62031!D206" }
+          ],
+          "notas": [
+            "Antes de situar la muestra en el recinto se acondiciona a una temperatura entre t y t + 4 ºC durante un mínimo de 4 horas.",
+            "La muestra permanece 48 horas en el recinto a la temperatura indicada. La fecha del ensayo es la de inicio.",
+            "Después se somete el EBP al ensayo de resistencia de aislamiento: 500 V durante 1 min.",
+            "Nota 1: si el módulo LED tiene una unión interna o un componente entre bornes de salida y el borne de tierra, dicha unión se retira durante el ensayo.",
+            "Nota 2: los bornes de entrada y salida deben estar unidos; la envolvente o cubierta de aislamiento se cubre con hoja metálica.",
+            "Nota 3: a los módulos LED que trabajan a MBTS se les aplican los valores del anexo L de IEC 61347-1."
+          ],
+          "reglas": [
+            { "id": "R-62031-10-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F194" },
+            { "id": "R-62031-10-02", "tipo": "duracionMinima", "inicio": "humedad.inicio", "fin": "humedad.fin", "minimo": "48h",
+              "etiqueta": "El acondicionamiento de humedad dura al menos 48 h", "origenExcel": "Toma de notas 62031!D199" },
+            { "id": "R-62031-10-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-10-01", "!R-62031-10-02"] },
+            { "id": "R-62031-10-peso", "tipo": "peso", "valor": 6, "aplicaSiNo": "na", "finSiNo": "R-62031-10-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "11",
+      "titulo": "Sección 11 - Rigidez dieléctrica",
+      "bloques": [
+        {
+          "id": "62031.11",
+          "codigo": "11",
+          "titulo": "Rigidez dieléctrica",
+          "origenExcel": "Toma de notas 62031!B246:N262",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D248:F248" },
+          "equipos": "sec11.rigidez",
+          "comentarios": true,
+          "campos": [
+            { "id": "tensionU", "etiqueta": "Tensión U del módulo", "tipo": "numero", "unidad": "V", "porMuestra": true, "origenExcel": "Toma de notas 62031!F253" }
+          ],
+          "notas": ["Los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "reglas": [
+            { "id": "R-62031-11-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F248" },
+            { "id": "R-62031-11-02", "tipo": "recuentoDatos", "campo": "tensionU", "umbralPorMuestra": 1,
+              "etiqueta": "Tensión U de cada muestra", "origenExcel": "Toma de notas 62031!F253" },
+            { "id": "R-62031-11-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-11-01", "!R-62031-11-02"] },
+            { "id": "R-62031-11-peso", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-62031-11-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "12",
+      "titulo": "Sección 12 - Condiciones de fallo",
+      "bloques": [
+        {
+          "id": "62031.12.1",
+          "equipos": "sec12.fallo",
+          "codigo": "12.1",
+          "titulo": "Condiciones de fallo",
+          "origenExcel": "Toma de notas 62031!B267:N279",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D268:F268" },
+          "notas": ["Las condiciones ensayadas y sus resultados pueden tomarse directamente sobre el TRF (tabla 12 (14))"],
+          "comentarios": true,
+          "reglas": [
+            { "id": "R-62031-12.1-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F268" },
+            { "id": "R-62031-12.1-cierre", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-62031-12.1-01"] },
+            { "id": "R-62031-12.1-peso", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-62031-12.1-cierre" }
+          ]
+        },
+        {
+          "id": "62031.12.2",
+          "equipos": "sec12.sobrepotencia",
+          "codigo": "12.2",
+          "titulo": "Condición de sobrepotencia",
+          "origenExcel": "Toma de notas 62031!B282:N294",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D283:F283" },
+          "notas": ["Las condiciones ensayadas y sus resultados pueden tomarse directamente sobre el TRF (tabla 12 (14))"],
+          "comentarios": true,
+          "reglas": [
+            { "id": "R-62031-12.2-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F283" },
+            { "id": "R-62031-12.2-cierre", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-62031-12.2-01"] },
+            { "id": "R-62031-12.2-peso", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-62031-12.2-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "14",
+      "titulo": "Sección 14 - Construcción",
+      "bloques": [
+        {
+          "id": "62031.14",
+          "equipos": "sec14.construccion",
+          "codigo": "14",
+          "titulo": "Construcción",
+          "origenExcel": "Toma de notas 62031!B297:N305",
+          "pesoAvance": 2,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D299:F299" },
+          "notas": ["Los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "comentarios": true,
+          "reglas": [
+            { "id": "R-62031-14-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F299" },
+            { "id": "R-62031-14-cierre", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-62031-14-01"] },
+            { "id": "R-62031-14-peso", "tipo": "peso", "valor": 2, "aplicaSiNo": "na", "finSiNo": "R-62031-14-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "15",
+      "titulo": "Sección 15 - Líneas de fuga y distancias en el aire",
+      "bloques": [
+        {
+          "id": "62031.15",
+          "equipos": "sec15.lineasDeFuga",
+          "codigo": "15",
+          "titulo": "Líneas de fuga y distancias en el aire",
+          "origenExcel": "Toma de notas 62031!B307:N322",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D308:F308" },
+          "comentarios": true,
+          "campos": [
+            { "id": "distancias", "etiqueta": "Definición de las distancias (si procede)", "tipo": "grupoRepetido", "elementos": 4, "ampliable": true,
+              "origenExcel": "Toma de notas 62031!F313:F316",
+              "campos": [
+                { "id": "descripcion", "etiqueta": "Distancia", "tipo": "texto" }
+              ] }
+          ],
+          "notas": ["Los datos pueden tomarse directamente sobre el TRF"],
+          "reglas": [
+            { "id": "R-62031-15-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F308" },
+            { "id": "R-62031-15-cierre", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-62031-15-01"] },
+            { "id": "R-62031-15-peso", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-62031-15-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "16",
+      "titulo": "Sección 16 - Tornillos, partes conductoras y conexiones",
+      "bloques": [
+        {
+          "id": "62031.16",
+          "equipos": "sec16.tornillos",
+          "codigo": "- (4.12)",
+          "titulo": "Tornillos, uniones y conexiones (mm)",
+          "origenExcel": "Toma de notas 62031!B326:N394",
+          "pesoAvance": 6,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D328:F328" },
+          "comentarios": true,
+          "notas": ["Si los datos son comunes a varias muestras pueden anotarse sólo en una de ellas"],
+          "subBloques": [
+            {
+              "id": "62031.16.tornillos",
+              "titulo": "- (4.12.1) Tornillos",
+              "origenExcel": "Toma de notas 62031!B331:F342",
+              "na": { "id": "na", "etiqueta": "La luminaria NO tiene tornillos" },
+              "campos": [
+                { "id": "tornillos", "etiqueta": "Tornillos", "tipo": "grupoRepetido", "elementos": 5, "ampliable": true, "porMuestra": true,
+                  "campos": [
+                    { "id": "parte", "etiqueta": "Parte", "tipo": "texto" },
+                    { "id": "diametro", "etiqueta": "Diám.", "tipo": "numero", "unidad": "mm" }
+                  ] }
+              ],
+              "reglas": [
+                { "id": "R-62031-16-tornillos-datos", "tipo": "recuentoDatos", "campo": "tornillos", "umbral": 2,
+                  "etiqueta": "Al menos un tornillo con su parte y diámetro" },
+                { "id": "R-62031-16-tornillos", "tipo": "faltanDatos", "siNoAplica": "na",
+                  "faltanSi": ["!R-62031-16-tornillos-datos"],
+                  "etiqueta": "Faltan los tornillos, salvo que se marque que no tiene" }
+              ]
+            },
+            {
+              "id": "62031.16.uniones",
+              "titulo": "- (4.12.4) Uniones atornilladas",
+              "origenExcel": "Toma de notas 62031!B352:F359",
+              "na": { "id": "na", "etiqueta": "La luminaria NO tiene uniones atornilladas" },
+              "campos": [
+                { "id": "uniones", "etiqueta": "Uniones", "tipo": "grupoRepetido", "elementos": 3, "ampliable": true, "porMuestra": true,
+                  "campos": [
+                    { "id": "parte", "etiqueta": "Parte", "tipo": "texto" },
+                    { "id": "m", "etiqueta": "M", "tipo": "numero", "unidad": "mm" }
+                  ] }
+              ],
+              "reglas": [
+                { "id": "R-62031-16-uniones-datos", "tipo": "recuentoDatos", "campo": "uniones", "umbral": 2,
+                  "etiqueta": "Al menos una unión con su parte y medida" },
+                { "id": "R-62031-16-uniones", "tipo": "faltanDatos", "siNoAplica": "na",
+                  "faltanSi": ["!R-62031-16-uniones-datos"],
+                  "etiqueta": "Faltan las uniones, salvo que se marque que no tiene" }
+              ]
+            },
+            {
+              "id": "62031.16.portalamparas",
+              "titulo": "Portalámparas",
+              "origenExcel": "Toma de notas 62031!C369:N379",
+              "na": { "id": "na", "etiqueta": "La luminaria NO tiene portalámparas" },
+              "comentarios": true,
+              "campos": [
+                { "id": "portalamparas", "etiqueta": "Portalámparas", "tipo": "texto", "porMuestra": true }
+              ]
+            },
+            {
+              "id": "62031.16.prensaestopas",
+              "titulo": "- (4.12.5) Prensaestopas",
+              "origenExcel": "Toma de notas 62031!B382:F387",
+              "na": { "id": "na", "etiqueta": "La luminaria NO tiene prensaestopas" },
+              "campos": [
+                { "id": "prensaestopas", "etiqueta": "Prensaestopas", "tipo": "grupoRepetido", "elementos": 3, "ampliable": true, "porMuestra": true,
+                  "campos": [
+                    { "id": "descripcion", "etiqueta": "Prensa", "tipo": "texto" },
+                    { "id": "diametro", "etiqueta": "Diám.", "tipo": "numero", "unidad": "mm" }
+                  ] }
+              ]
+            }
+          ],
+          "reglas": [
+            { "id": "R-62031-16-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F328" },
+            { "id": "R-62031-16-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-16-01", "R-62031-16-tornillos", "R-62031-16-uniones"] },
+            { "id": "R-62031-16-peso", "tipo": "peso", "valor": 6, "aplicaSiNo": "na", "finSiNo": "R-62031-16-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "17",
+      "titulo": "Sección 17 - Resistencia al fuego",
+      "bloques": [
+        {
+          "id": "62031.17.bola",
+          "codigo": "- (18.1)",
+          "titulo": "Resistencia al calor (ensayo de bola)",
+          "origenExcel": "Toma de notas 62031!B399:N466",
+          "pesoAvance": 8,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D400:F400" },
+          "equipos": "sec17.bola",
+          "comentarios": true,
+          "campos": [
+            { "id": "acond.inicio", "etiqueta": "Acondicionamiento — inicio", "tipo": "instante", "origenExcel": "Toma de notas 62031!E410:E411" },
+            { "id": "acond.fin", "etiqueta": "Acondicionamiento — fin", "tipo": "instante", "origenExcel": "Toma de notas 62031!E412:E413" },
+            { "id": "numeroCapas", "etiqueta": "Nº de capas", "tipo": "entero", "porMuestra": true, "visibleSi": "R-62031-17-requiereCapas", "origenExcel": "Toma de notas 62031!F418" },
+            { "id": "dimensiones", "etiqueta": "Dimensiones de la muestra", "tipo": "grupoRepetido", "elementos": 1, "porMuestra": true,
+              "origenExcel": "Toma de notas 62031!F420:F422",
+              "campos": [
+                { "id": "espesor", "etiqueta": "Espesor", "tipo": "numero", "unidad": "mm" },
+                { "id": "largo", "etiqueta": "Largo", "tipo": "numero", "unidad": "mm" },
+                { "id": "ancho", "etiqueta": "Ancho", "tipo": "numero", "unidad": "mm" }
+              ] },
+            { "id": "temperaturaTermopar", "etiqueta": "Temperatura del termopar", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 62031!E424" },
+            { "id": "horno.acond.inicio", "etiqueta": "Inicio del acondicionamiento en horno", "tipo": "instante", "origenExcel": "Toma de notas 62031!E425" },
+            { "id": "horno.acond.fin", "etiqueta": "Fin del acondicionamiento en horno", "tipo": "instante", "origenExcel": "Toma de notas 62031!E426" },
+            { "id": "horno.ensayo.inicio", "etiqueta": "Inicio del ensayo", "tipo": "instante", "origenExcel": "Toma de notas 62031!E427" },
+            { "id": "horno.ensayo.fin", "etiqueta": "Fin del ensayo", "tipo": "instante", "origenExcel": "Toma de notas 62031!E428" },
+            { "id": "temperaturaAgua", "etiqueta": "Temperatura del agua", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 62031!E444" },
+            { "id": "tiempoEnAgua", "etiqueta": "Tiempo en agua", "tipo": "numero", "unidad": "min", "porMuestra": true, "origenExcel": "Toma de notas 62031!E445" },
+            { "id": "huella", "etiqueta": "Tamaño de la huella", "tipo": "numero", "unidad": "mm", "porMuestra": true, "origenExcel": "Toma de notas 62031!D447" }
+          ],
+          "checklists": [
+            { "id": "origenMuestra", "etiqueta": "Origen de la muestra", "modo": "exactamenteUna", "origenExcel": "Toma de notas 62031!C404:C406",
+              "opciones": [
+                { "id": "corte", "etiqueta": "Corte de una parte del EBP" },
+                { "id": "separada", "etiqueta": "Muestra separada suministrada por el fabricante" },
+                { "id": "acabado", "etiqueta": "Producto acabado completo" }
+              ] },
+            { "id": "capas", "etiqueta": "Dimensiones y preparación", "modo": "libre", "origenExcel": "Toma de notas 62031!C416:C418",
+              "opciones": [
+                { "id": "requiereCapas", "etiqueta": "El espesor de una sola capa es inferior a 2,5 mm y se requiere apilar varias capas de material" }
+              ] },
+            { "id": "procedimiento", "etiqueta": "Procedimiento de ensayo", "modo": "libre", "origenExcel": "Toma de notas 62031!C431:C441",
+              "opciones": [
+                { "id": "colocacion30s", "etiqueta": "La muestra se coloca dentro del horno en un tiempo inferior a 30 s" },
+                { "id": "recuperacion5min", "etiqueta": "Tras cerrar la puerta del horno se recupera la temperatura medida en el termopar en 5 min o menos" },
+                { "id": "inmersion", "etiqueta": "Tras sacar la muestra del horno se sumerge en agua a temperatura ambiente (20 ºC ± 5 ºC)" },
+                { "id": "entre4y8", "etiqueta": "La muestra se sumerge en agua entre 4 y 8 minutos" }
+              ] }
+          ],
+          "notas": [
+            "El espesor debe ser de al menos 2,5 mm; pueden apilarse varias muestras de material para alcanzarlo. Largo y ancho deben ser de al menos 10 mm.",
+            "El termopar de verificación se sitúa a un máximo de 50 mm de la muestra de ensayo. La tolerancia entre la temperatura medida y la consigna es de ±2 ºC.",
+            "Si el material de todas las muestras es idéntico puede rellenarse sólo el de la primera."
+          ],
+          "reglas": [
+            { "id": "R-62031-17-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F400" },
+            { "id": "R-62031-17-requiereCapas", "tipo": "opcion", "checklist": "capas", "opcion": "requiereCapas" },
+            { "id": "R-62031-17-origen", "tipo": "exactamenteUna", "checklist": "origenMuestra", "etiqueta": "Origen de la muestra elegido" },
+            { "id": "R-62031-17-acond", "tipo": "duracionMinima", "inicio": "acond.inicio", "fin": "acond.fin", "minimo": "24h",
+              "etiqueta": "La muestra estuvo al menos 24 h en el laboratorio antes del ensayo" },
+            { "id": "R-62031-17-agua", "tipo": "rango", "campo": "tiempoEnAgua", "min": 4, "max": 8,
+              "etiqueta": "El tiempo en agua está entre 4 y 8 minutos", "origenExcel": "Toma de notas 62031!E445" },
+            { "id": "R-62031-17-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-17-01", "!R-62031-17-origen", "!R-62031-17-acond", "!R-62031-17-agua"] },
+            { "id": "R-62031-17-peso", "tipo": "peso", "valor": 8, "aplicaSiNo": "na", "finSiNo": "R-62031-17-cierre" }
+          ]
+        },
+        {
+          "id": "62031.17.pcb",
+          "equipos": "sec17.pcb",
+          "codigo": "- (18.2)",
+          "titulo": "Placas de circuito impreso",
+          "origenExcel": "Toma de notas 62031!B469:N480",
+          "pesoAvance": 2,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D470:F470" },
+          "notas": ["Los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "comentarios": true,
+          "reglas": [
+            { "id": "R-62031-17.2-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F470" },
+            { "id": "R-62031-17.2-cierre", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-62031-17.2-01"] },
+            { "id": "R-62031-17.2-peso", "tipo": "peso", "valor": 2, "aplicaSiNo": "na", "finSiNo": "R-62031-17.2-cierre" }
+          ]
+        },
+        {
+          "id": "62031.17.llamaAguja",
+          "codigo": "- (18.4)",
+          "titulo": "Llama de aguja",
+          "origenExcel": "Toma de notas 62031!B483:N537",
+          "pesoAvance": 5,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D484:F484" },
+          "equipos": "sec17.llamaAguja",
+          "comentarios": true,
+          "campos": [
+            { "id": "acond.inicio", "etiqueta": "Acondicionamiento — inicio", "tipo": "instante", "origenExcel": "Toma de notas 62031!F495:F496" },
+            { "id": "acond.fin", "etiqueta": "Acondicionamiento — fin", "tipo": "instante", "origenExcel": "Toma de notas 62031!F497:F498" },
+            { "id": "duracionCombustion", "etiqueta": "Duración de combustión tb", "tipo": "numero", "unidad": "s", "porMuestra": true, "origenExcel": "Toma de notas 62031!E514" }
+          ],
+          "checklists": [
+            { "id": "disposicion", "etiqueta": "Disposición de la llama", "modo": "exactamenteUna", "origenExcel": "Toma de notas 62031!B502",
+              "opciones": [
+                { "id": "vertical", "etiqueta": "Vertical" },
+                { "id": "horizontal", "etiqueta": "Horizontal" },
+                { "id": "45", "etiqueta": "45º" }
+              ] },
+            { "id": "sinCombustion", "etiqueta": "Resultado", "modo": "libre", "origenExcel": "Toma de notas 62031!E515",
+              "opciones": [
+                { "id": "noCombustion", "etiqueta": "No hay combustión" }
+              ] }
+          ],
+          "notas": [
+            "Prescripciones específicas de EN/IEC 61347-1: ensayo realizado sobre una muestra única; el espécimen de ensayo debe ser el EBP (el módulo LED).",
+            "La llama se aplica en el centro de la superficie a ensayar durante 10 s.",
+            "Criterio de aceptación: cualquier llama automantenida debe extinguirse en los 30 s siguientes a la retirada de la llama de gas, y las eventuales gotas inflamadas no deben prender fuego al papel de seda.",
+            "Si el material de todas las muestras es el mismo, puede rellenarse sólo la primera columna."
+          ],
+          "reglas": [
+            { "id": "R-62031-17.4-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F484" },
+            { "id": "R-62031-17.4-02", "tipo": "exactamenteUna", "checklist": "disposicion", "etiqueta": "Disposición de la llama elegida" },
+            { "id": "R-62031-17.4-acond", "tipo": "duracionMinima", "inicio": "acond.inicio", "fin": "acond.fin", "minimo": "24h",
+              "etiqueta": "La muestra estuvo 24 h en el laboratorio antes del ensayo" },
+            { "id": "R-62031-17.4-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-17.4-01", "!R-62031-17.4-02", "!R-62031-17.4-acond"] },
+            { "id": "R-62031-17.4-peso", "tipo": "peso", "valor": 5, "aplicaSiNo": "na", "finSiNo": "R-62031-17.4-cierre" }
+          ]
+        },
+        {
+          "id": "62031.17.hiloIncandescente",
+          "codigo": "- (18.3)",
+          "titulo": "Hilo incandescente",
+          "origenExcel": "Toma de notas 62031!B540:N560",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D541:F541" },
+          "equipos": "sec17.hiloIncandescente",
+          "comentarios": true,
+          "campos": [
+            { "id": "valor", "etiqueta": "Valor", "tipo": "numero", "unidad": "mm", "porMuestra": true, "origenExcel": "Toma de notas 62031!F545" },
+            { "id": "tamano", "etiqueta": "Tamaño de la muestra (mm)", "tipo": "grupoRepetido", "elementos": 1, "porMuestra": true,
+              "origenExcel": "Toma de notas 62031!F549:F551",
+              "campos": [
+                { "id": "espesor", "etiqueta": "Espesor", "tipo": "numero", "unidad": "mm" },
+                { "id": "ancho", "etiqueta": "Ancho", "tipo": "numero", "unidad": "mm" },
+                { "id": "largo", "etiqueta": "Largo", "tipo": "numero", "unidad": "mm" }
+              ] }
+          ],
+          "notas": ["El resto de los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "reglas": [
+            { "id": "R-62031-17.3-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F541" },
+            { "id": "R-62031-17.3-02", "tipo": "recuentoDatos", "campo": "tamano", "umbralPorMuestra": 3,
+              "etiqueta": "Espesor, ancho y largo de cada muestra", "origenExcel": "Toma de notas 62031!F549:F551" },
+            { "id": "R-62031-17.3-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-17.3-01", "!R-62031-17.3-02"] },
+            { "id": "R-62031-17.3-peso", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-62031-17.3-cierre" }
+          ]
+        },
+        {
+          "id": "62031.17.caminos",
+          "equipos": "sec17.caminos",
+          "codigo": "- (18.5)",
+          "titulo": "Formación de caminos conductores",
+          "origenExcel": "Toma de notas 62031!B563:N574",
+          "pesoAvance": 2,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D564:F564" },
+          "notas": ["Los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "comentarios": true,
+          "reglas": [
+            { "id": "R-62031-17.5-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F564" },
+            { "id": "R-62031-17.5-cierre", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-62031-17.5-01"] },
+            { "id": "R-62031-17.5-peso", "tipo": "peso", "valor": 2, "aplicaSiNo": "na", "finSiNo": "R-62031-17.5-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "18",
+      "titulo": "Sección 18 - Resistencia a la corrosión",
+      "bloques": [
+        {
+          "id": "62031.18.1",
+          "equipos": "sec18.corrosion",
+          "codigo": "4.18.1",
+          "titulo": "Resistencia a la corrosión",
+          "origenExcel": "Toma de notas 62031!B578:N598",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D579:F579" },
+          "comentarios": true,
+          "campos": [
+            { "id": "lugar", "etiqueta": "Lugar donde se realiza el ensayo", "tipo": "texto", "origenExcel": "Toma de notas 62031!C581" },
+            { "id": "solucion", "etiqueta": "Solución utilizada", "tipo": "texto", "origenExcel": "Toma de notas 62031!C587" },
+            { "id": "tempSolucion", "etiqueta": "Tª solución (20±5 ºC)", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 62031!E590" },
+            { "id": "tempAire", "etiqueta": "Tª aire en caja (20±5 ºC)", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 62031!E591" },
+            { "id": "tempEstufa", "etiqueta": "Tª de la estufa (100±5 ºC)", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 62031!E592" }
+          ],
+          "reglas": [
+            { "id": "R-62031-18.1-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F579" },
+            { "id": "R-62031-18.1-02", "tipo": "rango", "campo": "tempSolucion", "min": 15, "max": 25,
+              "etiqueta": "La temperatura de la solución está en 20 ºC ± 5", "origenExcel": "Toma de notas 62031!E590" },
+            { "id": "R-62031-18.1-03", "tipo": "rango", "campo": "tempEstufa", "min": 95, "max": 105,
+              "etiqueta": "La temperatura de la estufa está en 100 ºC ± 5", "origenExcel": "Toma de notas 62031!E592" },
+            { "id": "R-62031-18.1-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-18.1-01", "!R-62031-18.1-02", "!R-62031-18.1-03"] },
+            { "id": "R-62031-18.1-peso", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-62031-18.1-cierre" }
+          ]
+        },
+        {
+          "id": "62031.18.2",
+          "equipos": "sec18.corrosion",
+          "codigo": "4.18.2",
+          "titulo": "Season cracking in copper (anexo F)",
+          "origenExcel": "Toma de notas 62031!B601:N614",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D602:F602" },
+          "comentarios": true,
+          "campos": [
+            { "id": "preacondicionamiento", "etiqueta": "Preacondicionamiento (24 h)", "tipo": "texto", "porMuestra": true, "origenExcel": "Toma de notas 62031!E605" },
+            { "id": "ph", "etiqueta": "pH de la solución NH4Cl", "tipo": "numero", "porMuestra": true, "origenExcel": "Toma de notas 62031!E606" }
+          ],
+          "notas": ["Si los datos son comunes para todas las muestras puede indicarse sólo para una de ellas"],
+          "reglas": [
+            { "id": "R-62031-18.2-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F602" },
+            { "id": "R-62031-18.2-02", "tipo": "recuentoDatos", "campo": "ph", "umbral": 1,
+              "etiqueta": "pH de la solución anotado", "origenExcel": "Toma de notas 62031!E606" },
+            { "id": "R-62031-18.2-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-18.2-01", "!R-62031-18.2-02"] },
+            { "id": "R-62031-18.2-peso", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-62031-18.2-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "20",
+      "titulo": "Sección 20 - Gestión del calor",
+      "bloques": [
+        {
+          "id": "62031.20",
+          "codigo": "20",
+          "titulo": "Gestión del calor",
+          "origenExcel": "Toma de notas 62031!B618:N633",
+          "pesoAvance": 4,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D619:F619" },
+          "equipos": "sec20.calor",
+          "comentarios": true,
+          "notas": ["Se realizan con todos los equipos marcados"],
+          "reglas": [
+            { "id": "R-62031-20-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F619" },
+            { "id": "R-62031-20-cierre", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-62031-20-01"] },
+            { "id": "R-62031-20-peso", "tipo": "peso", "valor": 4, "aplicaSiNo": "na", "finSiNo": "R-62031-20-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "21",
+      "titulo": "Sección 21 - Seguridad fotobiológica",
+      "bloques": [
+        {
+          "id": "62031.21",
+          "equipos": "sec21.luzAzul",
+          "codigo": "21.2",
+          "titulo": "Riesgo por luz azul",
+          "origenExcel": "Toma de notas 62031!B636:N652",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 62031!D638:F638" },
+          "comentarios": true,
+          "campos": [
+            { "id": "cct", "etiqueta": "CCT", "tipo": "numero", "unidad": "K", "porMuestra": true, "origenExcel": "Toma de notas 62031!E644" },
+            { "id": "eth", "etiqueta": "Ilum. RG1/RG2, Eth", "tipo": "numero", "unidad": "lux", "porMuestra": true, "origenExcel": "Toma de notas 62031!E645" }
+          ],
+          "notas": ["Los datos pueden estar en registros y cálculos adicionales propios del ensayo (por ejemplo, un excel separado)"],
+          "reglas": [
+            { "id": "R-62031-21-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de notas 62031!F638" },
+            { "id": "R-62031-21-02", "tipo": "recuentoDatos", "campo": "cct", "umbralPorMuestra": 1,
+              "etiqueta": "CCT de cada muestra", "origenExcel": "Toma de notas 62031!E644" },
+            { "id": "R-62031-21-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62031-21-01", "!R-62031-21-02"] },
+            { "id": "R-62031-21-peso", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-62031-21-cierre" }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "avance": {
+    "nota": "Los pesos replican la ponderación del Excel: el peso de un apartado solo suma cuando su regla de cierre deja de pedir datos."
+  }
+}

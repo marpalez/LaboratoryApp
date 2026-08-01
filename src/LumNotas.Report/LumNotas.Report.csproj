@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- Sin dependencias externas a propósito: el informe se genera como HTML con
+       estilos de impresión A4, y desde ahí Word o el navegador dan el PDF. -->
+  <ItemGroup>
+    <ProjectReference Include="..\LumNotas.Core\LumNotas.Core.csproj" />
+  </ItemGroup>
+
+</Project>

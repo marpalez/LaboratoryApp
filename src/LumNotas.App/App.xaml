@@ -1,0 +1,7 @@
+<Application x:Class="LumNotas.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:LumNotas.App">
+    <Application.Resources>
+    </Application.Resources>
+</Application>

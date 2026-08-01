@@ -1,0 +1,76 @@
+<Window x:Class="LumNotas.App.DialogoPlanificacion"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Planificación del servicio"
+        SizeToContent="WidthAndHeight" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        FontFamily="Segoe UI" FontSize="13" Background="White">
+
+    <Window.Resources>
+        <Style TargetType="TextBlock" x:Key="Rotulo">
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="26,22" Width="400">
+        <TextBlock x:Name="Titulo" FontSize="17" FontWeight="Bold" Foreground="#111827"
+                   TextWrapping="Wrap"/>
+        <TextBlock Margin="0,4,0,18" Foreground="#6B7280" FontSize="12" TextWrapping="Wrap"
+                   Text="Estas fechas solo se usan para el calendario. No cambian ningún dato de ensayo."/>
+
+        <Grid Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="14"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Inicio previsto" Style="{StaticResource Rotulo}"/>
+                <DatePicker x:Name="Inicio" SelectedDateChanged="AlCambiarFecha"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Fin previsto" Style="{StaticResource Rotulo}"/>
+                <DatePicker x:Name="Fin" SelectedDateChanged="AlCambiarFecha"/>
+            </StackPanel>
+        </Grid>
+
+        <TextBlock x:Name="Semana" Foreground="#6B7280" FontSize="11" Margin="0,-8,0,14"/>
+
+        <TextBlock Text="Estado" Style="{StaticResource Rotulo}"/>
+        <ComboBox x:Name="Estado" DisplayMemberPath="Etiqueta" SelectedValuePath="Valor"
+                  Margin="0,0,0,16"/>
+
+        <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8"
+                Padding="14,12" Margin="0,0,0,16">
+            <StackPanel>
+                <CheckBox x:Name="Recibidas" Content="Las muestras ya han llegado"
+                          Checked="AlMarcarRecibidas" Unchecked="AlMarcarRecibidas"/>
+                <StackPanel x:Name="ZonaRecepcion" Orientation="Horizontal" Margin="22,10,0,0">
+                    <TextBlock Text="Fecha de recepción" Style="{StaticResource Rotulo}"
+                               VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <DatePicker x:Name="Recepcion" Width="150"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <CheckBox x:Name="Archivar" Content="Quitar del calendario (archivar)" Margin="0,0,0,4"/>
+        <TextBlock Text="El proyecto sigue en su carpeta; vuelve a verse con «Ver archivados»."
+                   Foreground="#9CA3AF" FontSize="11" Margin="22,0,0,18" TextWrapping="Wrap"/>
+
+        <TextBlock x:Name="Aviso" Foreground="#DC2626" FontSize="12" TextWrapping="Wrap"
+                   Margin="0,0,0,12" Visibility="Collapsed"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Cancelar" Click="AlCancelar" IsCancel="True"
+                    Padding="18,9" Margin="0,0,10,0" Cursor="Hand"
+                    Background="#E5E7EB" Foreground="#374151" BorderThickness="0"/>
+            <Button x:Name="BotonGuardar" Content="Guardar" Click="AlGuardar" IsDefault="True"
+                    Padding="18,9" Cursor="Hand"
+                    Background="#2563EB" Foreground="White" BorderThickness="0"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

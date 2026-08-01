@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "id": "equipos-62262",
+    "version": "1.0.0",
+    "generadoEl": "2026-07-31",
+    "origen": "TomaDeNotasExcelCompleta.xlsx v2.1 — hoja \"BBDD Equipos IP-IK\", columnas del ensayo de IK",
+    "criterio": "Importación literal (DD-10) y por separado de cada norma (decisión del laboratorio, 2026-07-31).",
+    "edicionDeclarada": "EN 62262:2002 + A1:2021 / IEC TR 62696:2011"
+  },
+
+  "notasDeUso": [
+    "En caso de utilizar equipos adicionales debe indicarse en el apartado \"otros\".",
+    "Las casillas coloreadas (excepto amarillo) indican equipos alternativos: solo se marcan los que procedan.",
+    "Los equipos de casilla en blanco se asumen utilizados por ser equipos por defecto.",
+    "Las masas se toman de EQ-SAFE-102 y/o EQ-SAFE-103, según el método de ensayo que corresponda."
+  ],
+
+  "grupos": [
+    {
+      "id": "ik.impacto",
+      "seccion": "IK",
+      "titulo": "Ensayo de impacto IK",
+      "origenExcel": "BBDD Equipos IP-IK!G5:H18",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-212", "codigos": ["EQ-SAFE-212"], "descripcion": "Flexómetro", "origenExcel": "BBDD Equipos IP-IK!G6" },
+        { "codigoLiteral": "EQ-SAFE-206", "codigos": ["EQ-SAFE-206"], "descripcion": "Pie de rey", "origenExcel": "BBDD Equipos IP-IK!G7" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetro", "origenExcel": "BBDD Equipos IP-IK!G8" },
+        { "codigoLiteral": "EQ-SAFE-101", "codigos": ["EQ-SAFE-101"], "descripcion": "Martillo de resorte (Ehb)", "origenExcel": "BBDD Equipos IP-IK!G9" },
+        { "codigoLiteral": "EQ-SAFE-102", "codigos": ["EQ-SAFE-102"], "descripcion": "Péndulo de golpeo, con su correspondiente pesa (Eha)", "origenExcel": "BBDD Equipos IP-IK!G10" },
+        { "codigoLiteral": "EQ-SAFE-103", "codigos": ["EQ-SAFE-103"], "descripcion": "Equipo de caída vertical, con su correspondiente pesa (Ehc)", "origenExcel": "BBDD Equipos IP-IK!G11" },
+        { "codigoLiteral": "Masa IK07", "codigos": [], "descripcion": "Masa IK07 (de EQ-SAFE-102 y/o EQ-SAFE-103 según corresponda)", "origenExcel": "BBDD Equipos IP-IK!H12" },
+        { "codigoLiteral": "Masa IK08", "codigos": [], "descripcion": "Masa IK08 (de EQ-SAFE-102 y/o EQ-SAFE-103 según corresponda)", "origenExcel": "BBDD Equipos IP-IK!H13" },
+        { "codigoLiteral": "Masa IK09", "codigos": [], "descripcion": "Masa IK09 (de EQ-SAFE-102 y/o EQ-SAFE-103 según corresponda)", "origenExcel": "BBDD Equipos IP-IK!H14" },
+        { "codigoLiteral": "Masa IK10", "codigos": [], "descripcion": "Masa IK10 (de EQ-SAFE-102 y/o EQ-SAFE-103 según corresponda)", "origenExcel": "BBDD Equipos IP-IK!H15" },
+        { "codigoLiteral": "Masa IK11", "codigos": [], "descripcion": "Masa IK11 (de EQ-SAFE-102 y/o EQ-SAFE-103 según corresponda)", "origenExcel": "BBDD Equipos IP-IK!H16" },
+        { "codigoLiteral": "EQ-SAFE-202", "codigos": ["EQ-SAFE-202"], "descripcion": "Balanza y plataforma", "origenExcel": "BBDD Equipos IP-IK!G17" }
+      ]
+    }
+  ]
+}

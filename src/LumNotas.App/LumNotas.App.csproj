@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\LumNotas.Core\LumNotas.Core.csproj" />
+    <ProjectReference Include="..\LumNotas.Storage\LumNotas.Storage.csproj" />
+    <ProjectReference Include="..\LumNotas.Report\LumNotas.Report.csproj" />
+  </ItemGroup>
+
+  <!-- La plantilla y el catálogo viajan junto al ejecutable: así el .exe funciona
+       en cualquier carpeta sin depender de la estructura del proyecto. -->
+  <ItemGroup>
+    <Content Include="..\..\plantilla\*.json"
+             Link="plantilla\%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+</Project>

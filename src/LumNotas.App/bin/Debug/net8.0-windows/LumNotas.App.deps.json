@@ -1,0 +1,73 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "LumNotas.App/1.0.0": {
+        "dependencies": {
+          "LumNotas.Core": "1.0.0",
+          "LumNotas.Report": "1.0.0",
+          "LumNotas.Storage": "1.0.0"
+        },
+        "runtime": {
+          "LumNotas.App.dll": {}
+        }
+      },
+      "LumNotas.Core/1.0.0": {
+        "runtime": {
+          "LumNotas.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "LumNotas.Report/1.0.0": {
+        "dependencies": {
+          "LumNotas.Core": "1.0.0"
+        },
+        "runtime": {
+          "LumNotas.Report.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "LumNotas.Storage/1.0.0": {
+        "dependencies": {
+          "LumNotas.Core": "1.0.0"
+        },
+        "runtime": {
+          "LumNotas.Storage.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "LumNotas.App/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LumNotas.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LumNotas.Report/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LumNotas.Storage/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
