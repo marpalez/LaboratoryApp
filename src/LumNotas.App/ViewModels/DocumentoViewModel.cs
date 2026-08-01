@@ -19,6 +19,12 @@ public sealed class ServiciosDeVentana
     public Func<string, string?>? PedirFicheroParaInforme { get; set; }
     public Func<RespuestaCambios>? ConfirmarDescartarCambios { get; set; }
     public Action<string>? AbrirEnElVisor { get; set; }
+
+    /// <summary>
+    /// Editor de la lista de técnicos. Devuelve las correcciones de nombre hechas, o
+    /// <c>null</c> si no se tocó nada.
+    /// </summary>
+    public Func<IReadOnlyList<(string Viejo, string Nuevo)>?>? EditarTecnicos { get; set; }
 }
 
 /// <summary>
@@ -195,6 +201,16 @@ public sealed class DocumentoViewModel : ObservableObject
     /// Abre un proyecto por ruta. Lo usan el diálogo, la lista de recientes y el
     /// arranque con un fichero como argumento (doble clic sobre el .lumproj).
     /// </summary>
+    /// <summary>
+    /// Vuelve a leer la lista de técnicos en la ficha de proyecto. Lo llama la ventana
+    /// tras editarla, para que las pestañas ya abiertas no sigan con la lista vieja.
+    /// </summary>
+    public void RefrescarTecnicos(IReadOnlyList<(string Viejo, string Nuevo)>? renombrados = null)
+    {
+        foreach (var cabecera in Paneles.OfType<ProyectoViewModel>())
+            cabecera.RefrescarTecnicos(renombrados);
+    }
+
     public bool CargarDesde(string ruta)
     {
         if (!ConfirmarSiHayCambios()) return false;

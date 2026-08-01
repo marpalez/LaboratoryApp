@@ -108,6 +108,71 @@ public sealed class RepositorioDeProyectos
     private static Planificacion? SoloSiTieneAlgo(Planificacion planificacion)
         => planificacion.EsVacia ? null : planificacion;
 
+    // ---- técnicos ----------------------------------------------------------
+
+    /// <summary>
+    /// Corrige el nombre de un técnico en un proyecto, si lo lleva. Toca <b>solo</b> los
+    /// dos campos de técnico y deja el resto del fichero como estaba.
+    /// <para>
+    /// Se hace porque una errata en un nombre no es una persona distinta: si se corrige
+    /// en la lista y no en los proyectos, el filtro por técnico deja de encontrarlos.
+    /// Quitar a un técnico, en cambio, no toca nada — el ensayo lo hizo esa persona.
+    /// </para>
+    /// </summary>
+    public bool RenombrarTecnico(string ruta, string viejo, string nuevo)
+    {
+        var documento = JsonSerializer.Deserialize<DocumentoProyecto>(File.ReadAllText(ruta), Opciones)
+                        ?? throw new InvalidOperationException($"El proyecto '{ruta}' no se pudo leer.");
+
+        var cambiado = false;
+
+        for (var i = 0; i < documento.Valores.Count; i++)
+        {
+            var valor = documento.Valores[i];
+            if (valor.Campo is not ("tecnico1" or "tecnico2")) continue;
+            if (!string.Equals(valor.Valor?.Trim(), viejo.Trim(), StringComparison.CurrentCultureIgnoreCase)) continue;
+
+            documento.Valores[i] = new ValorGuardado
+            {
+                Ambito = valor.Ambito,
+                Campo = valor.Campo,
+                Muestra = valor.Muestra,
+                Tipo = valor.Tipo,
+                Valor = nuevo
+            };
+            cambiado = true;
+        }
+
+        if (cambiado) EscribirDeFormaAtomica(ruta, JsonSerializer.Serialize(documento, Opciones));
+        return cambiado;
+    }
+
+    /// <summary>
+    /// Corrige el nombre de un técnico en todos los proyectos de una carpeta y devuelve
+    /// en cuántos ha hecho falta. Un fichero ilegible se salta: no puede impedir que se
+    /// corrijan los demás.
+    /// </summary>
+    public int RenombrarTecnicoEnLaCarpeta(string carpeta, string viejo, string nuevo)
+    {
+        if (!Directory.Exists(carpeta)) return 0;
+
+        var cambiados = 0;
+
+        foreach (var ruta in Directory.EnumerateFiles(carpeta, "*" + Extension, SearchOption.AllDirectories))
+        {
+            try
+            {
+                if (RenombrarTecnico(ruta, viejo, nuevo)) cambiados++;
+            }
+            catch
+            {
+                // Un proyecto corrupto o bloqueado no detiene la corrección del resto.
+            }
+        }
+
+        return cambiados;
+    }
+
     // ---- planificación (la línea de tiempo del tablero) --------------------
 
     /// <summary>

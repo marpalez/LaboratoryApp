@@ -1,0 +1,150 @@
+{
+  "formato": "lumproj/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-01T22:06:51.4794889+02:00",
+  "codigoServicio": "JavIbo2406",
+  "numeroMuestras": 3,
+  "normas": [
+    "60598",
+    "62031"
+  ],
+  "patronIdentificador": "EBP_SAFE{codigoServicio}",
+  "planificacion": {
+    "inicio": "2026-08-04T00:00:00",
+    "fin": "2026-08-25T00:00:00",
+    "estado": "enCurso",
+    "recepcionMuestras": "2026-08-01T00:00:00+02:00",
+    "archivado": false
+  },
+  "selecciones": {
+    "partes2": [
+      "-2-3"
+    ]
+  },
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Javier Ibor"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico2",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Mario Madrigal"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "clase",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "II"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ta",
+      "muestra": 0,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "luminariaOrdinaria",
+      "muestra": 1,
+      "tipo": "bool",
+      "valor": "true"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipPrimeraCifra",
+      "muestra": 1,
+      "tipo": "texto",
+      "valor": "IP2X"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipSegundaCifra",
+      "muestra": 1,
+      "tipo": "texto",
+      "valor": "IPX0"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "luminariaOrdinaria",
+      "muestra": 2,
+      "tipo": "bool",
+      "valor": "false"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipPrimeraCifra",
+      "muestra": 2,
+      "tipo": "texto",
+      "valor": "IP2X"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipSegundaCifra",
+      "muestra": 2,
+      "tipo": "texto",
+      "valor": "IPX7"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "luminariaOrdinaria",
+      "muestra": 3,
+      "tipo": "bool",
+      "valor": "true"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipPrimeraCifra",
+      "muestra": 3,
+      "tipo": "texto",
+      "valor": "IP2X"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipSegundaCifra",
+      "muestra": 3,
+      "tipo": "texto",
+      "valor": "IPX0"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "gradoIk",
+      "muestra": 2,
+      "tipo": "texto",
+      "valor": "IK04"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "temperaturaInmersion",
+      "muestra": 0,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "profundidadInmersion",
+      "muestra": 0,
+      "tipo": "numero",
+      "valor": "2"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tiempoInmersion",
+      "muestra": 0,
+      "tipo": "numero",
+      "valor": "30"
+    }
+  ],
+  "na": [],
+  "checklists": []
+}

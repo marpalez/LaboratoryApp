@@ -66,6 +66,47 @@ public class PlanificacionTests : IDisposable
     }
 
     /// <summary>
+    /// En el fichero solo se guarda lo que se decide, no lo que se deduce. Sin esto el
+    /// <c>.lumproj</c> acababa con campos como «hayFechas» o «esVacia», que además
+    /// mentirían en cuanto alguien editara las fechas a mano.
+    /// </summary>
+    [Fact]
+    public void ElFicheroNoGuardaLoQueSeCalcula()
+    {
+        var ruta = Guardar(Proyecto());
+        _repositorio.ActualizarPlanificacion(ruta, Plan());
+
+        var texto = File.ReadAllText(ruta);
+
+        foreach (var calculado in new[] { "hayFechas", "esVacia", "finEfectivo", "muestrasRecibidas" })
+            Assert.DoesNotContain(calculado, texto, StringComparison.OrdinalIgnoreCase);
+
+        Assert.Contains("inicio", texto, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Quitar las fechas devuelve el servicio a «pendiente de planificar» sin perder lo
+    /// demás: el estado y la recepción de muestras siguen ahí.
+    /// </summary>
+    [Fact]
+    public void QuitarLasFechasDejaElServicioPendienteDePlanificar()
+    {
+        var ruta = Guardar(Proyecto());
+        _repositorio.ActualizarPlanificacion(ruta, Plan());
+
+        var sinFechas = _repositorio.LeerPlanificacion(ruta).Copia();
+        sinFechas.Inicio = null;
+        sinFechas.Fin = null;
+        _repositorio.ActualizarPlanificacion(ruta, sinFechas);
+
+        var leida = _repositorio.LeerPlanificacion(ruta);
+        Assert.False(leida.HayFechas);
+        Assert.False(leida.EsVacia);                                  // sigue teniendo estado
+        Assert.Equal(EstadoDeProyecto.EnCurso, leida.Estado);
+        Assert.Equal(new DateTime(2026, 8, 3), leida.RecepcionMuestras);
+    }
+
+    /// <summary>
     /// Un proyecto que nunca se ha planificado no arrastra un nodo vacío en el fichero,
     /// y leerlo devuelve una planificación en blanco en vez de fallar.
     /// </summary>
@@ -441,6 +482,62 @@ public class PlanificacionTests : IDisposable
         Assert.Equal(new DateTime(2026, 8, 10), plan.Inicio);
     }
 
+    /// <summary>
+    /// <b>No se puede arrastrar una barra fuera del calendario dibujado.</b> Se podía, y
+    /// la barra quedaba flotando en blanco, sin semanas debajo y sin saber en qué fecha
+    /// se estaba soltando. Para ir más lejos se pide sitio con «▶».
+    /// </summary>
+    [Fact]
+    public void LaBarraNoSeSaleDelCalendarioDibujado()
+    {
+        var (barra, _) = Barra();
+        var eje = EjeDeSemanas.Para([(new DateTime(2026, 8, 10), new DateTime(2026, 8, 20))],
+                                    new DateTime(2026, 8, 15), 70);
+
+        barra.Empezar(ModoArrastre.Mover);
+        barra.Arrastrar(5000);
+
+        Assert.True(barra.Fin!.Value < eje.Hasta, $"El fin {barra.Fin} se ha salido de {eje.Hasta}.");
+        Assert.InRange(barra.Izquierda, 0, eje.Ancho);
+        Assert.InRange(barra.Izquierda + barra.Ancho, 0, eje.Ancho);
+
+        // Y al topar conserva la duración: mover no puede encoger el servicio.
+        Assert.Equal(10, (barra.Fin.Value - barra.Inicio!.Value).Days);
+    }
+
+    [Fact]
+    public void TampocoSeSaleArrastrandoHaciaAtras()
+    {
+        var (barra, _) = Barra();
+        var eje = EjeDeSemanas.Para([(new DateTime(2026, 8, 10), new DateTime(2026, 8, 20))],
+                                    new DateTime(2026, 8, 15), 70);
+
+        barra.Empezar(ModoArrastre.Mover);
+        barra.Arrastrar(-5000);
+
+        Assert.True(barra.Inicio!.Value >= eje.Desde);
+        Assert.InRange(barra.Izquierda, 0, eje.Ancho);
+        Assert.Equal(10, (barra.Fin!.Value - barra.Inicio.Value).Days);
+    }
+
+    [Fact]
+    public void LosBordesTampocoSeSalen()
+    {
+        var eje = EjeDeSemanas.Para([(new DateTime(2026, 8, 10), new DateTime(2026, 8, 20))],
+                                    new DateTime(2026, 8, 15), 70);
+
+        var (izquierdo, _) = Barra();
+        izquierdo.Empezar(ModoArrastre.Inicio);
+        izquierdo.Arrastrar(-5000);
+        Assert.Equal(eje.Desde, izquierdo.Inicio);
+
+        var (derecho, _) = Barra();
+        derecho.Empezar(ModoArrastre.Fin);
+        derecho.Arrastrar(5000);
+        Assert.True(derecho.Fin!.Value < eje.Hasta);
+        Assert.InRange(derecho.Izquierda + derecho.Ancho, 0, eje.Ancho);
+    }
+
     [Fact]
     public void UnServicioSinFechasNoSeArrastra()
     {
@@ -453,6 +550,88 @@ public class PlanificacionTests : IDisposable
         Assert.False(barra.SePuedeArrastrar);
         Assert.False(barra.HayCambio);
         Assert.Null(barra.Inicio);
+    }
+
+    // ---- varios años -------------------------------------------------------
+
+    /// <summary>
+    /// El calendario no está atado a ningún año: se calcula, no se almacena. Un servicio
+    /// planificado en 2027, en 2030 o en 2044 se dibuja igual que uno de esta semana.
+    /// </summary>
+    [Theory]
+    [InlineData(2027)]
+    [InlineData(2029)]
+    [InlineData(2031)]
+    public void UnServicioDeCualquierAnoSeDibuja(int ano)
+    {
+        var hoy = new DateTime(2026, 8, 15);
+        var inicio = new DateTime(ano, 3, 8);
+        var fin = new DateTime(ano, 4, 20);
+
+        var eje = EjeDeSemanas.Para([(inicio, fin)], hoy, 46);
+
+        Assert.True(eje.Contiene(inicio, fin));
+        Assert.InRange(eje.PosicionDe(inicio), 0, eje.Ancho);
+        Assert.Contains(eje.Celdas, c => c.Lunes.Year == ano);
+        Assert.Equal(ISOWeek.GetWeekOfYear(inicio),
+                     eje.Celdas.First(c => c.Lunes == EjeDeSemanas.LunesDe(inicio)).Numero);
+
+        // Y el eje sigue empezando donde se trabaja, no en el año lejano.
+        Assert.True(eje.HoyEstaDentro);
+    }
+
+    /// <summary>
+    /// Se puede caminar hacia delante todo lo que haga falta para planificar en años
+    /// futuros, y el eje crece justo lo pedido.
+    /// </summary>
+    [Fact]
+    public void PedirSitioHaciaDelanteAlargaElEje()
+    {
+        var hoy = new DateTime(2026, 8, 15);
+        var eje = EjeDeSemanas.Para([], hoy, 46);
+        var conSitio = EjeDeSemanas.Para([], hoy, 46, extraDespues: 8);
+
+        Assert.Equal(eje.Semanas + 8, conSitio.Semanas);
+        Assert.Equal(eje.Desde, conSitio.Desde);
+        Assert.True(conSitio.HoyEstaDentro);
+    }
+
+    /// <summary>
+    /// <b>La protección que evita colgar la aplicación.</b> Un año tecleado mal —3026 en
+    /// vez de 2026— generaría cien mil semanas. Ni siquiera encuadra el calendario: el eje
+    /// sale igual que si ese proyecto no estuviera, y el disparate queda fuera para que se
+    /// vea que hay que corregirlo.
+    /// </summary>
+    [Theory]
+    [InlineData(3026)]
+    [InlineData(1026)]
+    public void UnAnoDisparatadoNiEncuadraNiAgrandaElEje(int ano)
+    {
+        var hoy = new DateTime(2026, 8, 15);
+        var disparate = (Inicio: new DateTime(ano, 5, 4), Fin: new DateTime(ano, 6, 8));
+        var real = (Inicio: new DateTime(2026, 8, 3), Fin: new DateTime(2026, 9, 4));
+
+        var conDisparate = EjeDeSemanas.Para([disparate, real], hoy, 46);
+        var sinDisparate = EjeDeSemanas.Para([real], hoy, 46);
+
+        Assert.Equal(sinDisparate.Semanas, conDisparate.Semanas);
+        Assert.Equal(sinDisparate.Desde, conDisparate.Desde);
+        Assert.True(conDisparate.Semanas <= EjeDeSemanas.MaximoSemanas);
+        Assert.True(conDisparate.HoyEstaDentro);
+        Assert.True(conDisparate.Contiene(real.Inicio, real.Fin));
+        Assert.False(conDisparate.Contiene(disparate.Inicio, disparate.Fin));
+    }
+
+    /// <summary>Ni siquiera pidiendo sitio a lo bestia se pasa del tope.</summary>
+    [Fact]
+    public void PedirSitioTampocoSaltaElTope()
+    {
+        var eje = EjeDeSemanas.Para([], new DateTime(2026, 8, 15), 46,
+                                    extraAntes: 100_000, extraDespues: 100_000);
+
+        Assert.True(eje.Semanas <= EjeDeSemanas.MaximoSemanas);
+        Assert.True(eje.HoyEstaDentro);
+        Assert.Equal(eje.Semanas, eje.Celdas.Count);
     }
 
     [Fact]

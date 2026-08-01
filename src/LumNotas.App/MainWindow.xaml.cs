@@ -62,6 +62,7 @@ public partial class MainWindow : Window
         };
 
         modelo.Servicios.ConfirmarDescartarCambios = () => DialogoCambiosSinGuardar.Preguntar(this);
+        modelo.Servicios.EditarTecnicos = () => DialogoTecnicos.Editar(this);
 
         // Cerrar la ventana es la forma más fácil de perder una toma de notas entera,
         // así que pregunta por cada pestaña con cambios.

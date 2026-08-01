@@ -33,6 +33,7 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
         AbrirReciente = new ComandoCon<string>(ruta => AbrirEnPestana(ruta));
         EmpezarConNorma = new ComandoCon<NormaDisponible>(EmpezarCon);
         IrAGestion = new Comando(AbrirGestion);
+        EditarTecnicos = new Comando(AbrirEditorDeTecnicos);
 
         RefrescarRecientes();
         AbrirPestana();
@@ -83,6 +84,19 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
     public ComandoCon<string> AbrirReciente { get; }
     public ComandoCon<NormaDisponible> EmpezarConNorma { get; }
     public Comando IrAGestion { get; }
+    public Comando EditarTecnicos { get; }
+
+    /// <summary>
+    /// Abre el editor de técnicos y, si se ha tocado la lista, refresca los desplegables
+    /// de <b>todas</b> las pestañas abiertas: si no, seguirían ofreciendo la lista vieja.
+    /// </summary>
+    private void AbrirEditorDeTecnicos()
+    {
+        if (Servicios.EditarTecnicos?.Invoke() is not { } renombrados) return;
+
+        foreach (var documento in Pestanas.OfType<DocumentoViewModel>())
+            documento.RefrescarTecnicos(renombrados);
+    }
 
     public string Titulo => ActivoDocumento?.Titulo ?? "Toma de notas de ensayos";
 

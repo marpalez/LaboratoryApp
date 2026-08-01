@@ -50,8 +50,40 @@ public sealed class BarraDePlanificacion(Planificacion plan, EjeDeSemanas eje)
         var (inicio, fin) = ArrastreDeFechas.Aplicar(
             _inicioAlEmpezar, _finAlEmpezar, _modo, eje.DiasEn(pixeles));
 
-        Inicio = inicio;
-        Fin = fin;
+        (Inicio, Fin) = Acotar(inicio, fin);
+    }
+
+    /// <summary>
+    /// Deja la barra dentro del calendario que se está dibujando. Sin esto se puede
+    /// arrastrar hasta un sitio donde no hay semanas: la barra queda flotando en blanco,
+    /// sin saber en qué fecha se está soltando. Para llevar un servicio más lejos se pide
+    /// sitio con «▶» y luego se arrastra.
+    /// </summary>
+    private (DateTime, DateTime) Acotar(DateTime inicio, DateTime fin)
+    {
+        var primero = eje.Desde;
+        var ultimo = eje.Hasta.AddDays(-1);
+
+        if (_modo == ModoArrastre.Mover)
+        {
+            // Mover conserva la duración, así que topar por un lado empuja el otro.
+            var dias = (fin - inicio).Days;
+
+            if (inicio < primero) (inicio, fin) = (primero, primero.AddDays(dias));
+            if (fin > ultimo) (inicio, fin) = (ultimo.AddDays(-dias), ultimo);
+
+            // Un servicio más largo que todo el calendario no se puede encajar; se deja
+            // pegado al principio en vez de dar fechas absurdas.
+            if (inicio < primero) inicio = primero;
+
+            return (inicio, fin);
+        }
+
+        if (inicio < primero) inicio = primero;
+        if (fin > ultimo) fin = ultimo;
+        if (fin < inicio) fin = inicio;
+
+        return (inicio, fin);
     }
 
     /// <summary>Vuelve a donde estaba antes de empezar el gesto.</summary>

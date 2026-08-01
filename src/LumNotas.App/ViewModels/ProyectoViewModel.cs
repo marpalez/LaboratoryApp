@@ -208,6 +208,7 @@ public sealed class ProyectoViewModel : ObservableObject
             .Where(c => !ConSitioPropio.Contains(c.Id) && !c.PorMuestra)
             .Select(c => new CampoExtraViewModel(c, datos, alCambiar, EsVerdadera))];
 
+        RellenarTecnicos();
         ReconstruirMuestras();
     }
 
@@ -378,16 +379,90 @@ public sealed class ProyectoViewModel : ObservableObject
         }
     }
 
-    public string Tecnico1
+    /// <summary>
+    /// Técnicos que ofrece el desplegable, incluidos los nombres que ya tuviera el
+    /// proyecto aunque no estén en la lista: los servicios guardados antes de existir el
+    /// catálogo llevan el técnico escrito a mano y <b>no pueden quedarse en blanco</b>.
+    /// <para>
+    /// Es una colección que <b>no se sustituye nunca</b>, solo se ajusta por dentro.
+    /// Cambiarla entera desde el <c>set</c> de Técnico 1 hacía que el desplegable
+    /// perdiera la selección, volviera a escribirla y se llamara a sí mismo sin fin:
+    /// desbordamiento de pila y la aplicación cerrándose sin dejar ni registro.
+    /// </para>
+    /// </summary>
+    public ObservableCollection<string> Tecnicos { get; } = [];
+
+    /// <summary>
+    /// Técnico 1, el <b>responsable</b> del proyecto: es el que sale en el tablero y por
+    /// el que se filtra el calendario.
+    /// </summary>
+    public string? Tecnico1
     {
-        get => _datos.Obtener("proyecto", "tecnico1") as string ?? "";
-        set { _datos.Establecer("proyecto", "tecnico1", value); Notificar(); _alCambiar(); }
+        get => _datos.Obtener("proyecto", "tecnico1") as string;
+        set
+        {
+            if (Tecnico1 == value) return;
+
+            _datos.Establecer("proyecto", "tecnico1", value);
+            Notificar();
+            Notificar(nameof(FaltaTecnico1));
+            _alCambiar();
+        }
     }
 
-    public string Tecnico2
+    public string? Tecnico2
     {
-        get => _datos.Obtener("proyecto", "tecnico2") as string ?? "";
-        set { _datos.Establecer("proyecto", "tecnico2", value); Notificar(); _alCambiar(); }
+        get => _datos.Obtener("proyecto", "tecnico2") as string;
+        set
+        {
+            if (Tecnico2 == value) return;
+
+            _datos.Establecer("proyecto", "tecnico2", value);
+            Notificar();
+            _alCambiar();
+        }
+    }
+
+    /// <summary>
+    /// Vuelve a leer la lista tras editarla desde «Configuración | Técnicos…».
+    /// </summary>
+    /// <param name="renombrados">
+    /// Correcciones de nombre hechas en el editor. Se aplican también al proyecto abierto:
+    /// en el fichero ya se han corregido, y si la pestaña se quedara con el nombre viejo lo
+    /// devolvería al guardar.
+    /// </param>
+    public void RefrescarTecnicos(IReadOnlyList<(string Viejo, string Nuevo)>? renombrados = null)
+    {
+        foreach (var (viejo, nuevo) in renombrados ?? [])
+        {
+            // Sin pasar por el 'set': el fichero ya lo tiene así, no es un cambio del técnico.
+            if (Coincide(Tecnico1, viejo)) _datos.Establecer("proyecto", "tecnico1", nuevo);
+            if (Coincide(Tecnico2, viejo)) _datos.Establecer("proyecto", "tecnico2", nuevo);
+        }
+
+        RellenarTecnicos();
+
+        Notificar(nameof(Tecnico1));
+        Notificar(nameof(Tecnico2));
+        Notificar(nameof(FaltaTecnico1));
+    }
+
+    private static bool Coincide(string? valor, string nombre)
+        => string.Equals(valor?.Trim(), nombre.Trim(), StringComparison.CurrentCultureIgnoreCase);
+
+    /// <summary>
+    /// Ajusta el contenido de <see cref="Tecnicos"/> conservando la colección. Se quita y
+    /// se añade lo justo para no tocar el elemento que esté seleccionado.
+    /// </summary>
+    private void RellenarTecnicos()
+    {
+        var deben = ServicioDeTecnicos.Catalogo.ConNombreSuelto(Tecnico1, Tecnico2);
+
+        for (var i = Tecnicos.Count - 1; i >= 0; i--)
+            if (!deben.Contains(Tecnicos[i])) Tecnicos.RemoveAt(i);
+
+        for (var i = 0; i < deben.Count; i++)
+            if (!Tecnicos.Contains(deben[i])) Tecnicos.Insert(Math.Min(i, Tecnicos.Count), deben[i]);
     }
 
     public string Ta

@@ -17,16 +17,3 @@ public sealed class DesplazamientoAMargen : IValueConverter
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => Binding.DoNothing;
 }
-
-/// <summary>
-/// Devuelve el número cambiado de signo. Lo usa la cabecera del calendario para
-/// seguir el desplazamiento horizontal de las barras y mantenerse alineada con ellas.
-/// </summary>
-public sealed class Negativo : IValueConverter
-{
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => value is double x ? -x : 0d;
-
-    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => Binding.DoNothing;
-}

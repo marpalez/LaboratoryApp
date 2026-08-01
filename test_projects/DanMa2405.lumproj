@@ -1,0 +1,33 @@
+{
+  "formato": "lumproj/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-01T22:20:26.7269216+02:00",
+  "codigoServicio": "DanMa2405",
+  "numeroMuestras": 0,
+  "normas": [
+    "60598"
+  ],
+  "patronIdentificador": "EBP_SAFE{codigoServicio}",
+  "planificacion": {
+    "inicio": "2026-08-11T00:00:00",
+    "fin": "2026-08-21T00:00:00",
+    "estado": "porHacer",
+    "recepcionMuestras": "2026-08-01T00:00:00+02:00",
+    "archivado": false
+  },
+  "selecciones": {},
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Daniel Martínez"
+    }
+  ],
+  "na": [],
+  "checklists": []
+}

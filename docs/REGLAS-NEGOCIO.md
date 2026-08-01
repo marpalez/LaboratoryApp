@@ -2,7 +2,7 @@
 
 **Origen:** `TomaDeNotasExcel.xlsx`, plantilla v2.1
 **Extraído el:** 2026-07-29 (última modificación del libro: 2026-07-29)
-**Versión del documento:** 2.8 — calendario con arrastre
+**Versión del documento:** 3.0 — lista de técnicos del laboratorio
 **Actualizado:** 2026‑08‑06
 **Propósito:** documento de revisión previo a la construcción de la aplicación de escritorio. Cada regla debe ser **confirmada, corregida o eliminada** por el laboratorio antes de programarla.
 
@@ -53,6 +53,11 @@ Las partes excluidas se conservan en este documento marcadas como 🚫 **fuera d
 | 2026‑08‑01 | DD‑33 | **El identificador de muestra sale de la plantilla.** En IK 62262 el laboratorio usa `EBP_CLIM…` en lugar de `EBP_SAFE…` |
 | 2026‑08‑01 | DD‑34 | **Los catálogos de equipos se importan por separado**, uno por norma |
 | 2026‑08‑01 | DD‑35 | **Qué es obligatorio en la cabecera lo decide la plantilla**, no el código: se leen los campos con `obligatorio: true` |
+| 2026‑08‑06 | DD‑62 | **El menú se llama «Configuración», no «Admin».** No hay roles ni permisos que administrar; cualquiera que abra el programa puede editar las listas. Ahí caben luego equipos y perfil de usuario |
+| 2026‑08‑06 | DD‑61 | **Los técnicos se eligen de una lista compartida** (`tecnicos.json` en la carpeta de proyectos). Escribirlos a mano daba la misma persona con tres grafías y rompía el filtro por técnico. Un nombre guardado que no esté en la lista se sigue ofreciendo, para no dejar sin técnico a los proyectos antiguos |
+| 2026‑08‑06 | DD‑60 | **La cabecera del calendario se sincroniza con un `ScrollViewer`, no con una transformación.** Con la ventana pequeña, el recorte de maquetación de WPF dejaba sin dibujar las semanas que no cabían |
+| 2026‑08‑06 | DD‑59 | **Arrastrar no saca la barra del calendario dibujado.** Se salía y quedaba flotando en blanco, sin semanas debajo: no se veía en qué fecha se estaba soltando. Para ir más lejos se pide sitio con «▶» |
+| 2026‑08‑06 | DD‑58 | **El calendario no guarda años: los calcula.** Encuadra lo que hay, se camina con ◀ ▶ hasta donde haga falta y se acota a ±5 años alrededor de hoy —ventana que se mueve sola, así que no caduca—. Una fecha fuera de ese horizonte no encuadra nada y baja a la banda de abajo: es una errata, no una planificación |
 | 2026‑08‑06 | DD‑57 | **El gesto de arrastre vive en el núcleo** (`BarraDePlanificacion`), no en el modelo de vista. Los eventos de ratón no se pueden automatizar en este equipo, así que la única forma de comprobar el gesto es que su lógica esté fuera de la interfaz |
 | 2026‑08‑06 | DD‑56 | **El arrastre se ajusta a días, no a semanas.** Se planifica por semanas, pero un servicio empieza el día que empieza; el número de semana se enseña como ayuda, no como rejilla obligatoria |
 | 2026‑08‑06 | DD‑55 | **El calendario mide en semanas ISO**, no en días ni en meses: es la unidad con la que planifica el laboratorio («entra en la S32»). La aritmética vive en `EjeDeSemanas`, dentro del núcleo, para poder probarla |
@@ -1016,7 +1021,7 @@ LumNotas.App           interfaz WPF (MVVM)
 | `src/LumNotas.Report` | Exportador del informe a HTML con estilos de impresión A4. **Sin dependencias externas** |
 | `src/LumNotas.App` | Interfaz WPF. `VentanaPrincipalViewModel` es la ventana con su barra de pestañas; `DocumentoViewModel` es **un proyecto abierto** (árbol con semáforo y formulario generado desde la plantilla); `GestionViewModel` es el tablero, que ocupa otra pestaña. Las plantillas grandes viven en `Window.Resources` y se eligen por tipo |
 | `plantilla/plantilla-62031.v1.json`, `plantilla-60529.v1.json`, `plantilla-62262.v1.json` | Las otras tres normas, con sus catálogos `equipos-62031`, `equipos-60529` y `equipos-62262` |
-| `tests/LumNotas.Core.Tests` | **169 tests, verificados en verde el 2026‑08‑06.** Cubren los ocho patrones, los nueve cálculos, los defectos corregidos, la integridad de la plantilla, el ciclo de guardado, varios proyectos simultáneos, el informe, el tablero y la planificación (semanas ISO, cambio de año, el gesto de arrastre completo y que planificar y anotar no se pisen) |
+| `tests/LumNotas.Core.Tests` | **192 tests, verificados en verde el 2026‑08‑06.** Cubren los ocho patrones, los nueve cálculos, los defectos corregidos, la integridad de la plantilla, el ciclo de guardado, varios proyectos simultáneos, el informe, el tablero y la planificación (semanas ISO, cambio de año, el gesto de arrastre completo, que años lejanos y erratas de año no rompan el eje, y que planificar y anotar no se pisen), y la lista de técnicos (que quitar no toque los proyectos y corregir sí) |
 
 Los ficheros de plantilla conservan `origenExcel` en cada elemento para poder auditarlos contra el libro original. Ese campo no se usa en ejecución.
 
@@ -1106,6 +1111,30 @@ Cómo encuentra los proyectos: se le indica **una carpeta** (la del laboratorio 
 
 El avance se cuenta **por secciones** (DD‑28): la sección 7 vale 1 aunque tenga trece apartados dentro. Es la vista que pidió el laboratorio.
 
+### Los técnicos del laboratorio
+
+Hasta el 2026‑08‑06 el técnico se escribía a mano, y eso producía **la misma persona con tres grafías distintas** —«D. Martínez», «Daniel Martinez», «daniel martínez»—, lo que rompe el filtro del calendario y cualquier recuento por técnico. Ahora **Técnico 1 y Técnico 2 se eligen de una lista**, que arranca vacía y es obligatoria en el caso de Técnico 1.
+
+**Técnico 1 es el responsable del proyecto**: es el que sale en el tablero y por el que filtra el calendario.
+
+La lista se edita en **«Configuración | Técnicos…»**. Se llamó *Configuración* y no *Admin* porque no hay roles ni permisos que administrar —cualquiera que abra el programa puede editarla— y porque ahí caben luego los catálogos de equipos y el perfil de usuario.
+
+| Dónde vive | `tecnicos.json` en la **carpeta de proyectos** (la compartida). Mientras no esté elegida, en la carpeta de plantillas |
+|---|---|
+| Por qué ahí | Añadir un técnico se hace una vez y lo ve todo el laboratorio, en vez de repetirlo en cada equipo |
+| Lista de partida | Daniel Martínez, Daniel Pastor, Javier Ibor, Javier Salvador, Mario Madrigal, Raúl González |
+
+**Las dos operaciones destructivas no son simétricas** (D‑23, decisión del laboratorio):
+
+- **Quitar** a un técnico **no toca ningún proyecto**. El ensayo lo hizo esa persona aunque ya no esté en la lista.
+- **Corregir** su nombre **sí se propaga** a los proyectos que lo lleven. Una errata no es una persona distinta, y si no se propagase, el filtro por técnico dejaría de encontrar sus servicios.
+
+Un nombre guardado que no esté en la lista —los proyectos anteriores a todo esto— **se sigue ofreciendo en su desplegable**, para que ese proyecto no se quede sin técnico.
+
+> **Tercera trampa de WPF, esta cara: la aplicación se cerraba de golpe al elegir un técnico.**
+> La lista de un desplegable **no se puede reconstruir desde el `set` de su propia selección**. Aquí `Tecnicos` era una propiedad calculada que devolvía una lista nueva y el `set` de Técnico 1 la notificaba: el `ComboBox` recibía un `ItemsSource` distinto, volvía a resolver su selección, la escribía otra vez, y vuelta a empezar. `StackOverflowException`, **que no se puede capturar**, así que la aplicación desaparecía sin dejar ni registro de error.
+> La cura es que la colección **no se sustituya nunca**: es una `ObservableCollection` que solo se ajusta por dentro, y los `set` comparan antes de escribir. Al no reproducirse desde código —hace falta el clic real— la confirmación salió del **registro de eventos de Windows**, que sí anotó el `StackOverflowException`.
+
 ### El calendario (línea de tiempo)
 
 Segunda vista de la misma carpeta, pedida el 2026‑08‑06 con Planyway como referencia. El tablero contesta *qué falta por rellenar*; el calendario contesta *cuándo toca cada servicio y qué se ha pasado de plazo*. Se cambia de una a otra con los botones «Tablero» y «Calendario».
@@ -1133,13 +1162,39 @@ Lo que se ve de un vistazo:
 - **Se ajusta a días enteros.** A zoom mínimo una semana son 26 px, o sea **menos de cuatro píxeles por día**; sin ajuste no se acierta.
 - **El gesto se calcula desde el punto de partida, no acumulando.** Ir y volver deja la barra exactamente donde estaba, y si no ha cambiado nada **no se escribe el fichero**.
 - **Los bordes topan el uno con el otro**: un fin anterior al inicio no existe.
+- **La barra no sale del calendario dibujado.** Se podía, y quedaba flotando en blanco, sin semanas debajo y sin saber en qué fecha se estaba soltando. Para llevar un servicio más lejos se pide sitio con «▶» y luego se arrastra.
 - **Clic y arrastre se distinguen por 4 píxeles de recorrido.** Por debajo es un clic y abre el diálogo; por encima es arrastre y el clic se anula. Sin ese margen, cada intento de abrir el diálogo movería el servicio un día.
+
+#### Varios años, sin fecha de caducidad
+
+Consultado el 2026‑08‑06 por si el programa «se quedaba obsoleto» al llegar 2027. **No hay ningún calendario almacenado**: el eje se calcula a partir de las fechas de los proyectos, y `DateTime` y las semanas ISO funcionan igual en 2027, en 2040 o en 2110. Un servicio planificado en 2027 se dibuja solo, sin tocar nada.
+
+Lo que sí hay son tres reglas para que eso no se pague en velocidad:
+
+| Regla | Por qué |
+|---|---|
+| El eje encuadra **solo lo que hay**, más dos semanas de margen | Un eje de diez años dejaría el trabajo real en una franja diminuta |
+| Botones **◀ Hoy ▶**, que añaden u ocultan 8 semanas vacías | Así se llega a cualquier año para planificar allí, sin dibujarlos todos de golpe |
+| **Horizonte de ±5 años** alrededor de hoy, y tope de `MaximoSemanas = 520` | Un año tecleado mal (3026 en vez de 2026) generaría **cien mil semanas** y colgaría la aplicación |
+
+El horizonte **se mueve con la fecha de hoy**, así que no caduca. Un proyecto cuyas fechas caigan fuera **no encuadra el calendario y no se pierde**: baja a la banda «Sin fechas o fuera del periodo», que es justo donde se ve que hay una errata que corregir.
+
+Coste real: el caso habitual son 30–60 semanas; el peor caso posible, 520 celdas de cabecera más 520 líneas de rejilla, que WPF dibuja sin despeinarse.
 
 Al soltar, el eje **se conserva mientras las fechas nuevas sigan cabiendo**, para que el calendario no se desplace bajo el ratón. Arrastrar el servicio que marca el extremo sí lo reencuadra, porque el eje siempre deja dos semanas de margen alrededor de lo que hay.
 
 El reparto de responsabilidades: `BarraDePlanificacion` y `ArrastreDeFechas` (núcleo, con tests) llevan la aritmética y el estado del gesto; `ArrastreDeBarra` (interfaz) solo traduce eventos de ratón a llamadas y decide las zonas de los bordes.
 
-Pulsar la barra abre el diálogo de planificación; pulsar el código de la izquierda abre la toma de notas en una pestaña. Filtros: técnico, estado, norma y «ver archivados»; el técnico y la norma se rellenan con lo que haya en los proyectos, no con una lista fija.
+Al llegar al borde de la vista, **el calendario se desplaza solo** mientras se arrastra. Hace falta un temporizador y no basta con el movimiento del ratón: al topar con el borde el técnico se queda quieto esperando que avance, y sin latido no avanzaría nunca.
+
+> **Dos trampas de WPF que ya mordieron.**
+>
+> 1. `ReleaseMouseCapture()` levanta `LostMouseCapture` **en el acto**, no al final del método. El manejador de ese evento es el que cancela un arrastre interrumpido, así que si se suelta la captura antes de borrar el estado del gesto, la barra se cancela sola justo antes de guardarse y vuelve a su sitio. En `ArrastreDeBarra.Terminar` **el estado se borra primero y la captura se suelta después**.
+> 2. **Cuando un elemento pide más ancho del que le dan, WPF le aplica un recorte de maquetación.** La cabecera del calendario era un panel movido con `TranslateTransform`: con la ventana maximizada cabía entera y funcionaba, pero con la ventana pequeña las semanas que no cabían **no llegaban a dibujarse** y la cabecera se quedaba en blanco al desplazarse. La cabecera va ahora dentro de su propio `ScrollViewer` —que mide el contenido sin límite— atado al de las barras con `ScrollSincronizado`. **Un fallo de maquetación que solo aparece al encoger la ventana casi siempre es este recorte.**
+
+**Pulsar la barra abre su configuración**; pulsar el código de la izquierda abre la toma de notas en una pestaña. Desde el diálogo, **«Quitar fechas»** devuelve el servicio a la banda de pendientes de planificar sin perder su estado ni la recepción de muestras. No se admite guardar con una sola fecha: o las dos, o ninguna, porque con una el servicio no se puede dibujar y se quedaría en un limbo entre planificado y pendiente.
+
+> **Cuarta trampa de WPF.** El clic sobre la barra dejó de abrir el diálogo al añadir el arrastre: `ArrastreDeBarra` suelta la captura del ratón en el `PreviewMouseLeftButtonUp`, y al perder la captura WPF **da el `Click` del botón por cancelado**. La solución no es devolver el evento sino asumirlo: el comportamiento decide si el gesto fue clic o arrastre y ejecuta lo que toque. Filtros: técnico, estado, norma y «ver archivados»; el técnico y la norma se rellenan con lo que haya en los proyectos, no con una lista fija.
 
 **Cómo convive con la toma de notas** (DD‑53). La planificación está dentro del `.lumproj`, pero:
 
@@ -1180,10 +1235,8 @@ Sin esa segunda regla, el técnico que tuviera el proyecto abierto desde hacía 
 | Alta | **Selectores de fecha y hora.** Hoy se escriben como texto (`20/07/2026 23:40`). Es lo que más molestará en uso real |
 | Alta | **Campos calculados de solo lectura.** El radio del arco de lluvia y las dos fuerzas de carga estática están implementados y con tests en `Calculos.cs`, pero la interfaz no sabe mostrar un campo calculado: se rellenan a mano |
 | Media | **Selección automática de equipos IP** (`seleccionAutomaticaEquipos`): declarada en la plantilla, no implementada |
-| Media | **Perfil de usuario** (DD‑08). Enlaza con lo siguiente: hoy el técnico es texto libre |
-| Media | **Lista de técnicos en desplegable.** Consultado el 2026‑08‑06 al pedir el filtro del calendario. Se dejó **para después**: el filtro se rellena con los nombres que ya hay en los proyectos, sin tocar la pantalla de toma de notas, que está dada por buena. Cuando se haga, el desplegable tiene que **aceptar los nombres ya guardados** aunque no estén en la lista, o los proyectos antiguos se quedan con un técnico inválido |
+| Media | **Perfil de usuario** (DD‑08). Con la lista de técnicos ya hecha, lo que falta es saber **quién** está usando el programa, para firmar quién guardó cada cosa |
 | Baja | **La cabecera del calendario no se queda fija al desplazarse en vertical.** Con muchos proyectos habrá que congelarla |
-| Baja | **El calendario no se desplaza solo al arrastrar contra el borde.** Hay que ampliar el zoom antes de mover un servicio muy lejos |
 | Media | **Instalador** y asociación de la extensión `.lumproj` |
 | Baja | Con 30 muestras el informe A4 no cabe: habría que girar la tabla o partirla |
 
@@ -1205,7 +1258,7 @@ dotnet test "…\AplicacionTomaNotas\LumNotas.sln"
 dotnet run --project "…\AplicacionTomaNotas\src\LumNotas.App"
 ```
 
-Si los **169 tests** pasan, el motor y las cuatro plantillas están sanos. La mayoría de los cambios de norma se hacen **editando el JSON de esa norma** en `plantilla/`, sin tocar código; añadir una norma entera es dejar caer un fichero `plantilla-*.json` en esa carpeta.
+Si los **192 tests** pasan, el motor y las cuatro plantillas están sanos. La mayoría de los cambios de norma se hacen **editando el JSON de esa norma** en `plantilla/`, sin tocar código; añadir una norma entera es dejar caer un fichero `plantilla-*.json` en esa carpeta.
 
 ### Punto ciego cerrado
 

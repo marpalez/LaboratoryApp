@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace LumNotas.Core.Gestion;
 
@@ -44,15 +45,22 @@ public sealed class Planificacion
     /// </summary>
     public bool Archivado { get; set; }
 
+    // Lo que sigue se calcula, no se guarda: sin [JsonIgnore] el .lumproj acababa con
+    // campos como «hayFechas» o «esVacia», que además mentirían al releerlos.
+
+    [JsonIgnore]
     public bool HayFechas => Inicio is not null && Fin is not null;
 
     /// <summary>Sin planificar todavía. Los proyectos anteriores al calendario están así.</summary>
+    [JsonIgnore]
     public bool EsVacia => Inicio is null && Fin is null && RecepcionMuestras is null
                            && Estado == EstadoDeProyecto.PorHacer && !Archivado;
 
     /// <summary>Fin corregido: una fecha de fin anterior al inicio dibujaría al revés.</summary>
+    [JsonIgnore]
     public DateTime? FinEfectivo => Fin is { } fin && Inicio is { } inicio && fin < inicio ? inicio : Fin;
 
+    [JsonIgnore]
     public bool MuestrasRecibidas => RecepcionMuestras is not null;
 
     /// <summary>
@@ -233,12 +241,30 @@ public sealed class EjeDeSemanas
         => fecha.Date.AddDays(-(((int)fecha.DayOfWeek + 6) % 7));
 
     /// <summary>
+    /// Tope de semanas que se dibujan de una vez: diez años.
+    /// <para>
+    /// El calendario <b>no está atado a ningún año</b> —se calcula, no se almacena— y
+    /// funciona igual en 2027 o en 2040. Lo que sí hay que acotar es el tamaño de una
+    /// sola pantalla: un año tecleado mal (3026 en vez de 2026) generaría cien mil
+    /// semanas y colgaría la aplicación. Con el tope, ese proyecto no se dibuja y
+    /// aparece en la banda de abajo, que es donde se ve que hay que corregirlo.
+    /// </para>
+    /// </summary>
+    public const int MaximoSemanas = 520;
+
+    /// <summary>
     /// Construye el eje que hace falta para dibujar unos rangos: los abarca todos, deja
     /// margen a los lados y siempre incluye la semana actual, aunque no haya ningún
     /// proyecto cerca —si no, el calendario abre en un sitio que no dice nada.
     /// </summary>
+    /// <param name="extraAntes">Semanas vacías añadidas por delante, para poder mirar atrás.</param>
+    /// <param name="extraDespues">
+    /// Semanas vacías añadidas por detrás. Es lo que permite planificar en años futuros:
+    /// se pide sitio y luego se arrastra o se planifica allí.
+    /// </param>
     public static EjeDeSemanas Para(IEnumerable<(DateTime Inicio, DateTime Fin)> rangos, DateTime hoy,
-                                    double anchoSemana, int semanasMinimas = 12)
+                                    double anchoSemana, int semanasMinimas = 12,
+                                    int extraAntes = 0, int extraDespues = 0)
     {
         var lunesDeHoy = LunesDe(hoy);
         var primero = lunesDeHoy;
@@ -246,6 +272,12 @@ public sealed class EjeDeSemanas
 
         foreach (var (inicio, fin) in rangos)
         {
+            // Los disparates no encuadran el calendario. Un año tecleado mal estiraría el
+            // eje a diez años y dejaría el trabajo real reducido a una franja diminuta;
+            // se ignora aquí y el proyecto sale en la banda de abajo, que es donde se ve
+            // que hay que corregirlo.
+            if (!EstaEnHorizonte(inicio, fin, lunesDeHoy)) continue;
+
             var a = LunesDe(inicio);
             var b = LunesDe(fin);
             if (a < primero) primero = a;
@@ -259,12 +291,40 @@ public sealed class EjeDeSemanas
         // Con pocos proyectos el eje saldría muy corto y el calendario parecería vacío.
         if (semanas < semanasMinimas)
         {
-            var faltan = semanasMinimas - semanas;
-            desde = desde.AddDays(-7 * (faltan / 2));
+            desde = desde.AddDays(-7 * ((semanasMinimas - semanas) / 2));
             semanas = semanasMinimas;
         }
 
-        return new EjeDeSemanas(desde, semanas, anchoSemana, hoy);
+        // El sitio pedido a mano se añade encima del encuadre natural, y no antes, para
+        // que pulsar «ver más adelante» mueva siempre lo mismo en vez de quedar absorbido
+        // por el mínimo cuando hay pocos proyectos.
+        desde = desde.AddDays(-7 * Math.Max(extraAntes, 0));
+        semanas += Math.Max(extraAntes, 0) + Math.Max(extraDespues, 0);
+
+        // La semana actual tiene que seguir dentro pase lo que pase, así que el recorte
+        // se hace alrededor de hoy y no del extremo de los datos.
+        var principio = lunesDeHoy.AddDays(-7 * (MaximoSemanas / 2));
+        if (desde < principio)
+        {
+            semanas -= (int)Math.Round((principio - desde).TotalDays / 7.0);
+            desde = principio;
+        }
+
+        return new EjeDeSemanas(desde, Math.Clamp(semanas, semanasMinimas, MaximoSemanas), anchoSemana, hoy);
+    }
+
+    /// <summary>Si un servicio cae, aunque sea en parte, dentro de lo que se está dibujando.</summary>
+    public bool Contiene(DateTime inicio, DateTime fin) => fin.Date >= Desde && inicio.Date < Hasta;
+
+    /// <summary>
+    /// Si unas fechas son planificables: cinco años a cada lado de hoy. No es un límite
+    /// del programa —la ventana se mueve con el calendario y nunca caduca—, sino la
+    /// frontera a partir de la cual una fecha es casi con seguridad una errata.
+    /// </summary>
+    public static bool EstaEnHorizonte(DateTime inicio, DateTime fin, DateTime hoy)
+    {
+        var mitad = 7 * (MaximoSemanas / 2);
+        return fin.Date >= LunesDe(hoy).AddDays(-mitad) && inicio.Date <= LunesDe(hoy).AddDays(mitad);
     }
 
     private static IReadOnlyList<CeldaDeMes> AgruparPorMes(List<CeldaDeSemana> celdas)

@@ -1,0 +1,32 @@
+{
+  "formato": "lumproj/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-01T22:21:14.2914038+02:00",
+  "codigoServicio": "RauGo2201",
+  "numeroMuestras": 0,
+  "normas": [
+    "62031"
+  ],
+  "patronIdentificador": "EBP_SAFE{codigoServicio}",
+  "planificacion": {
+    "inicio": "2026-07-27T00:00:00",
+    "fin": "2026-09-06T00:00:00",
+    "estado": "pendienteCliente",
+    "archivado": false
+  },
+  "selecciones": {},
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Raúl González"
+    }
+  ],
+  "na": [],
+  "checklists": []
+}

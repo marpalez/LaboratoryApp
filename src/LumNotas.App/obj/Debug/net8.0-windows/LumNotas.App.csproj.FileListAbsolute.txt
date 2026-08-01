@@ -40,3 +40,5 @@ C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\Aplicacion
 C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoCambiosSinGuardar.g.cs
 C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoPlanificacion.baml
 C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoPlanificacion.g.cs
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoTecnicos.baml
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoTecnicos.g.cs

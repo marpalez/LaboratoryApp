@@ -38,7 +38,13 @@
             </StackPanel>
         </Grid>
 
-        <TextBlock x:Name="Semana" Foreground="#6B7280" FontSize="11" Margin="0,-8,0,14"/>
+        <Grid Margin="0,-8,0,14">
+            <TextBlock x:Name="Semana" Foreground="#6B7280" FontSize="11" VerticalAlignment="Center"/>
+            <!-- Sin fechas, el servicio vuelve a la banda de pendientes de planificar -->
+            <Button x:Name="BotonQuitarFechas" Content="Quitar fechas" Click="AlQuitarFechas"
+                    HorizontalAlignment="Right" Padding="10,3" FontSize="11" Cursor="Hand"
+                    ToolTip="Deja el servicio como pendiente de planificar"/>
+        </Grid>
 
         <TextBlock Text="Estado" Style="{StaticResource Rotulo}"/>
         <ComboBox x:Name="Estado" DisplayMemberPath="Etiqueta" SelectedValuePath="Valor"

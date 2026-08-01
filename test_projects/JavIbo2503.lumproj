@@ -1,0 +1,39 @@
+{
+  "formato": "lumproj/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-01T22:20:32.5145766+02:00",
+  "codigoServicio": "JavIbo2503",
+  "numeroMuestras": 0,
+  "normas": [
+    "62262"
+  ],
+  "patronIdentificador": "EBP_CLIM{codigoServicio}",
+  "planificacion": {
+    "inicio": "2026-08-13T00:00:00+02:00",
+    "fin": "2026-09-26T00:00:00+02:00",
+    "estado": "porHacer",
+    "archivado": false
+  },
+  "selecciones": {},
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Javier Ibor"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico2",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Daniel Martínez"
+    }
+  ],
+  "na": [],
+  "checklists": []
+}

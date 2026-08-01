@@ -12,7 +12,6 @@
         <local:FaltaAColorConverter x:Key="FaltaAColor"/>
         <BooleanToVisibilityConverter x:Key="BoolAVisible"/>
         <local:DesplazamientoAMargen x:Key="Desplazamiento"/>
-        <local:Negativo x:Key="Negativo"/>
 
         <!-- Caja de texto obligatoria: borde rojo y más grueso mientras esté vacía -->
         <Style x:Key="Obligatorio" TargetType="TextBox">
@@ -403,14 +402,19 @@
                             <TextBlock Grid.Row="1" Text="Técnico 1 *" VerticalAlignment="Center" Margin="0,4"
                                        Foreground="{Binding FaltaTecnico1, Converter={StaticResource FaltaAColor},
                                                     ConverterParameter=#111827}"/>
-                            <TextBox Grid.Row="1" Grid.Column="1" Margin="0,4" Width="240" HorizontalAlignment="Left"
-                                     Style="{StaticResource Obligatorio}"
-                                     Text="{Binding Tecnico1, UpdateSourceTrigger=LostFocus}"
-                                     BorderBrush="{Binding FaltaTecnico1, Converter={StaticResource FaltaAColor}}"/>
+                            <!-- Se elige de la lista del laboratorio; escribirlo a mano producía
+                                 la misma persona con tres grafías. Empieza vacío a propósito. -->
+                            <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,4" Width="240"
+                                      HorizontalAlignment="Left" BorderThickness="2"
+                                      ItemsSource="{Binding Tecnicos}"
+                                      SelectedItem="{Binding Tecnico1}"
+                                      BorderBrush="{Binding FaltaTecnico1, Converter={StaticResource FaltaAColor}}"/>
 
                             <TextBlock Grid.Row="2" Text="Técnico 2" VerticalAlignment="Center" Margin="0,4"/>
-                            <TextBox Grid.Row="2" Grid.Column="1" Margin="0,4" Width="240" HorizontalAlignment="Left"
-                                     Text="{Binding Tecnico2, UpdateSourceTrigger=LostFocus}"/>
+                            <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,4" Width="240"
+                                      HorizontalAlignment="Left"
+                                      ItemsSource="{Binding Tecnicos}"
+                                      SelectedItem="{Binding Tecnico2}"/>
 
                             <TextBlock Grid.Row="3" Text="Nº de muestras *" VerticalAlignment="Center" Margin="0,4"
                                        Foreground="{Binding FaltaMuestras, Converter={StaticResource FaltaAColor},
@@ -1027,9 +1031,23 @@
                                       VerticalAlignment="Center" Margin="0,0,14,0"/>
 
                             <Button Content="−" Command="{Binding Calendario.Alejar}" Width="26"
-                                    Padding="0,3" Cursor="Hand"/>
+                                    Padding="0,3" Cursor="Hand" ToolTip="Semanas más estrechas"/>
                             <Button Content="+" Command="{Binding Calendario.Acercar}" Width="26"
-                                    Padding="0,3" Cursor="Hand" Margin="4,0,0,0"/>
+                                    Padding="0,3" Cursor="Hand" Margin="4,0,14,0"
+                                    ToolTip="Semanas más anchas"/>
+
+                            <!-- Caminar por el calendario: así se llega a cualquier año sin
+                                 dibujarlos todos de golpe -->
+                            <Button Content="◀" Command="{Binding Calendario.VerAntes}" Width="26"
+                                    Padding="0,3" Cursor="Hand" ToolTip="Ver semanas anteriores"/>
+                            <Button Content="Hoy" Command="{Binding Calendario.VolverAHoy}"
+                                    Padding="10,3" Cursor="Hand" Margin="4,0"
+                                    ToolTip="Volver al periodo de trabajo"/>
+                            <Button Content="▶" Command="{Binding Calendario.VerDespues}" Width="26"
+                                    Padding="0,3" Cursor="Hand" ToolTip="Ver semanas posteriores"/>
+
+                            <TextBlock Text="{Binding Calendario.Periodo}" VerticalAlignment="Center"
+                                       FontSize="11" Foreground="#6B7280" Margin="12,0,0,0"/>
                         </StackPanel>
 
                         <TextBlock Text="{Binding Carpeta}" Foreground="#9CA3AF" FontSize="11" Margin="0,8,0,0"
@@ -1110,14 +1128,14 @@
                                        VerticalAlignment="Bottom"/>
                         </Border>
 
-                        <Border Grid.Column="1" ClipToBounds="True" BorderBrush="#E5E7EB"
-                                BorderThickness="0,0,0,1">
+                        <!-- La cabecera va dentro de su propio ScrollViewer, atado al de las
+                             barras. Con una transformación se quedaba en blanco al desplazarse
+                             con la ventana pequeña: ver ScrollSincronizado. -->
+                        <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Hidden"
+                                      VerticalScrollBarVisibility="Disabled"
+                                      local:ScrollSincronizado.Con="{Binding ElementName=Pista}">
+                            <Border BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
                             <StackPanel HorizontalAlignment="Left">
-                                <StackPanel.RenderTransform>
-                                    <TranslateTransform
-                                        X="{Binding HorizontalOffset, ElementName=Pista,
-                                            Converter={StaticResource Negativo}}"/>
-                                </StackPanel.RenderTransform>
 
                                 <ItemsControl ItemsSource="{Binding Meses}">
                                     <ItemsControl.ItemsPanel>
@@ -1161,7 +1179,8 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </StackPanel>
-                        </Border>
+                            </Border>
+                        </ScrollViewer>
                     </Grid>
 
                     <!-- Cuerpo: nombres fijos a la izquierda, barras desplazables a la derecha -->
@@ -1252,8 +1271,8 @@
                             Padding="14,10" Visibility="{Binding HaySinFechas,
                                                         Converter={StaticResource BoolAVisible}}">
                         <StackPanel>
-                            <TextBlock Text="SIN FECHAS" FontSize="10" FontWeight="Bold" Foreground="#94A3B8"
-                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="SIN FECHAS O FUERA DEL PERIODO" FontSize="10" FontWeight="Bold"
+                                       Foreground="#94A3B8" Margin="0,0,0,8"/>
                             <ItemsControl ItemsSource="{Binding SinFechas}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
@@ -1322,6 +1341,11 @@
             <MenuItem Header="_Ver">
                 <!-- El tablero es una pestaña más, y solo una -->
                 <MenuItem Header="_Gestión de proyectos" Command="{Binding IrAGestion}"/>
+            </MenuItem>
+
+            <!-- Listas del laboratorio, comunes a todas las tomas de notas -->
+            <MenuItem Header="_Configuración">
+                <MenuItem Header="_Técnicos…" Command="{Binding EditarTecnicos}"/>
             </MenuItem>
         </Menu>
 

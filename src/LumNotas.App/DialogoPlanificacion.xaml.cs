@@ -73,10 +73,22 @@ public partial class DialogoPlanificacion : Window
             ({ } a, { } b) => $"De la semana {Semanas(a)} a la {Semanas(b)}",
             ({ } a, null) => $"Empieza en la semana {Semanas(a)}",
             (null, { } b) => $"Termina en la semana {Semanas(b)}",
-            _ => ""
+            _ => "Sin planificar"
         };
 
+        BotonQuitarFechas.IsEnabled = Inicio.SelectedDate is not null || Fin.SelectedDate is not null;
         Aviso.Visibility = Visibility.Collapsed;
+    }
+
+    /// <summary>
+    /// Devuelve el servicio a la banda de pendientes de planificar. Es lo contrario de
+    /// arrastrar: quitar las fechas a mano en dos casillas de calendario es incómodo.
+    /// </summary>
+    private void AlQuitarFechas(object sender, RoutedEventArgs e)
+    {
+        Inicio.SelectedDate = null;
+        Fin.SelectedDate = null;
+        ActualizarSemanas();
     }
 
     private static int Semanas(DateTime fecha) => System.Globalization.ISOWeek.GetWeekOfYear(fecha);
@@ -85,8 +97,16 @@ public partial class DialogoPlanificacion : Window
     {
         if (Inicio.SelectedDate is { } inicio && Fin.SelectedDate is { } fin && fin < inicio)
         {
-            Aviso.Text = "La fecha de fin es anterior a la de inicio.";
-            Aviso.Visibility = Visibility.Visible;
+            Avisar("La fecha de fin es anterior a la de inicio.");
+            return;
+        }
+
+        // Con una sola fecha el servicio no se puede dibujar y se quedaría en un limbo:
+        // ni planificado ni pendiente. O las dos, o ninguna.
+        if (Inicio.SelectedDate is null ^ Fin.SelectedDate is null)
+        {
+            Avisar("Pon las dos fechas, o quítalas las dos con «Quitar fechas» "
+                   + "para dejarlo pendiente de planificar.");
             return;
         }
 
@@ -103,4 +123,10 @@ public partial class DialogoPlanificacion : Window
     }
 
     private void AlCancelar(object sender, RoutedEventArgs e) => Close();
+
+    private void Avisar(string texto)
+    {
+        Aviso.Text = texto;
+        Aviso.Visibility = Visibility.Visible;
+    }
 }

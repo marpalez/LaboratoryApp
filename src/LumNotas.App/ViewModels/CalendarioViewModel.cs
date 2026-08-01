@@ -25,7 +25,12 @@ public sealed class CalendarioViewModel : ObservableObject
     private readonly Action<string> _abrir;
     private readonly Action<ResumenDeProyecto, Planificacion> _guardar;
 
+    /// <summary>Semanas vacías que se añaden cada vez que se pide ver más allá.</summary>
+    private const int Paso = 8;
+
     private int _zoom = 1;
+    private int _extraAntes;
+    private int _extraDespues;
     private string _tecnico = Todos;
     private string _estado = Todos;
     private string _norma = Todos;
@@ -41,6 +46,13 @@ public sealed class CalendarioViewModel : ObservableObject
 
         Acercar = new Comando(() => Zoom++, () => _zoom < Anchos.Length - 1);
         Alejar = new Comando(() => Zoom--, () => _zoom > 0);
+
+        // El calendario no está atado a ningún año: se pide sitio hacia donde haga falta
+        // y allí se planifica. Así se llega a 2027 o a 2030 sin dibujarlo todo de golpe.
+        VerAntes = new Comando(() => { _extraAntes += Paso; Recalcular(); });
+        VerDespues = new Comando(() => { _extraDespues += Paso; Recalcular(); });
+        VolverAHoy = new Comando(() => { _extraAntes = _extraDespues = 0; Recalcular(); },
+                                 () => _extraAntes > 0 || _extraDespues > 0);
     }
 
     public ObservableCollection<TarjetaPlanViewModel> Tarjetas { get; } = [];
@@ -57,6 +69,12 @@ public sealed class CalendarioViewModel : ObservableObject
 
     public Comando Acercar { get; }
     public Comando Alejar { get; }
+    public Comando VerAntes { get; }
+    public Comando VerDespues { get; }
+    public Comando VolverAHoy { get; }
+
+    /// <summary>Qué periodo se está enseñando, para saber dónde se está sin contar semanas.</summary>
+    public string Periodo => $"{_eje.Desde:MMM yyyy} – {_eje.Hasta.AddDays(-1):MMM yyyy}";
 
     // ---- eje ---------------------------------------------------------------
 
@@ -158,19 +176,24 @@ public sealed class CalendarioViewModel : ObservableObject
 
         var necesario = EjeDeSemanas.Para(
             conFechas.Select(p => (p.Planificacion.Inicio!.Value, p.Planificacion.FinEfectivo!.Value)),
-            hoy, Anchos[_zoom]);
+            hoy, Anchos[_zoom], extraAntes: _extraAntes, extraDespues: _extraDespues);
 
         // Al refrescar los datos, si el eje que ya había sigue valiendo, se conserva: al
         // soltar una barra el calendario no debe desplazarse bajo el ratón por haber
         // crecido dos semanas. Cambiar de filtro o de zoom sí lo reencuadra.
         if (rehacerEje || !_eje.Cubre(necesario)) _eje = necesario;
 
+        // Un proyecto con una fecha disparatada queda fuera del eje. No se pierde: baja a
+        // la banda de abajo, que es justo donde se ve que hay que corregirlo.
+        bool Dibujable(ResumenDeProyecto p)
+            => _eje.Contiene(p.Planificacion.Inicio!.Value, p.Planificacion.FinEfectivo!.Value);
+
         Tarjetas.Clear();
-        foreach (var proyecto in conFechas.OrderBy(p => p.Planificacion.Inicio))
+        foreach (var proyecto in conFechas.Where(Dibujable).OrderBy(p => p.Planificacion.Inicio))
             Tarjetas.Add(new TarjetaPlanViewModel(proyecto, _eje, hoy, _planificar, _abrir, _guardar));
 
         SinFechas.Clear();
-        foreach (var proyecto in visibles.Where(p => !p.Planificacion.HayFechas)
+        foreach (var proyecto in visibles.Where(p => !p.Planificacion.HayFechas || !Dibujable(p))
                                          .OrderBy(p => p.CodigoServicio))
             SinFechas.Add(new TarjetaPlanViewModel(proyecto, _eje, hoy, _planificar, _abrir, _guardar));
 
@@ -182,6 +205,8 @@ public sealed class CalendarioViewModel : ObservableObject
         Notificar(nameof(HoyVisible));
         Notificar(nameof(HayTarjetas));
         Notificar(nameof(HaySinFechas));
+        Notificar(nameof(Periodo));
+        VolverAHoy.Revisar();
     }
 
     private bool Pasa(ResumenDeProyecto proyecto)
