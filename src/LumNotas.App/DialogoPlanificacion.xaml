@@ -79,6 +79,17 @@
             </StackPanel>
         </Border>
 
+        <!--
+            Enlazar las familias de un mismo servicio. Se teclea el mismo nombre en las
+            que van juntas y el calendario las enseña como una sola barra. No hay fichero
+            de grupo: el enlace vive dentro de cada toma de notas (DD‑89, DD‑90).
+        -->
+        <TextBlock Text="Grupo" Style="{StaticResource Rotulo}"/>
+        <TextBox x:Name="Grupo" Padding="5,4" TextChanged="AlCambiarGrupo"/>
+        <TextBlock x:Name="AvisoGrupo"
+                   Text="Escribe el mismo nombre en las tomas de notas que sean del mismo trabajo —las familias de un servicio— y el calendario las enseñará en una sola barra. Las fechas y el importe se ponen solo en una de ellas."
+                   Foreground="#9CA3AF" FontSize="11" Margin="0,4,0,18" TextWrapping="Wrap"/>
+
         <CheckBox x:Name="Archivar" Content="Quitar del calendario (archivar)" Margin="0,0,0,4"/>
         <TextBlock Text="El proyecto sigue en su carpeta; vuelve a verse con «Ver archivados»."
                    Foreground="#9CA3AF" FontSize="11" Margin="22,0,0,18" TextWrapping="Wrap"/>

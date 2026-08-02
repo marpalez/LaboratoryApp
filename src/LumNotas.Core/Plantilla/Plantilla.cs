@@ -46,7 +46,13 @@ public sealed class PlantillaEnsayos
     {
         if (!string.IsNullOrWhiteSpace(Meta.Id)) datos.Normas.Add(Meta.Id);
 
-        if (principal && Muestras.Identificador is { Patron.Length: > 0 } identificador)
+        if (!principal) return;
+
+        // Quién es la principal se apunta, no se deja para deducirlo después. El patrón
+        // de muestras es una consecuencia de haberla elegido, no la elección.
+        if (!string.IsNullOrWhiteSpace(Meta.Id)) datos.NormaPrincipal = Meta.Id;
+
+        if (Muestras.Identificador is { Patron.Length: > 0 } identificador)
             datos.PatronIdentificador = identificador.Patron;
     }
 

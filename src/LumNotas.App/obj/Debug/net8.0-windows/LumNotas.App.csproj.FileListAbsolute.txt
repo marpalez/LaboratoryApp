@@ -50,3 +50,9 @@ C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\Aplicacion
 C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoAcercaDe.g.cs
 C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoCarpeta.baml
 C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoCarpeta.g.cs
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoReportarProblema.baml
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoReportarProblema.g.cs
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoNuevoProyecto.baml
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoNuevoProyecto.g.cs
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoProyectoRepetido.baml
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoProyectoRepetido.g.cs

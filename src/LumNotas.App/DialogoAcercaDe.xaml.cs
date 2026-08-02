@@ -23,6 +23,7 @@ public partial class DialogoAcercaDe : Window
 
     private void Refrescar()
     {
+        Nombre.Text = ServicioDeVersion.Nombre;
         Version.Text = "Versión " + ServicioDeVersion.EnEjecucion;
 
         var publicada = ServicioDeVersion.Publicada;

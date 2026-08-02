@@ -2,7 +2,7 @@
 
 **Origen:** `TomaDeNotasExcel.xlsx`, plantilla v2.1
 **Extraído el:** 2026-07-29 (última modificación del libro: 2026-07-29)
-**Versión del documento:** 3.10 — documento de traspaso al día
+**Versión del documento:** 3.26 — documento de traspaso al día
 **Actualizado:** 2026‑08‑02
 **Propósito:** nació como documento de revisión previo a programar —cada regla extraída del Excel debía ser **confirmada, corregida o eliminada** por el laboratorio— y hoy es además el **documento de traspaso** de la aplicación: qué hace, por qué se decidió así y qué queda pendiente. Lo que sigue sin confirmar va marcado con ⏳.
 
@@ -28,7 +28,7 @@ Las partes excluidas se conservan en este documento marcadas como 🚫 **fuera d
 | Fecha | Punto | Decisión |
 |---|---|---|
 | 2026‑07‑29 | Alcance | Solo EN/IEC 60598 (‑1 y partes ‑2). IK y 62031 fuera |
-| 2026‑07‑29 | Edición | Varios técnicos, **por turnos**: un fichero por proyecto con registro de autoría, sin edición simultánea |
+| 2026‑07‑29 | Edición | Varios técnicos, **por turnos**: un fichero por proyecto con registro de autoría, sin edición simultánea. *(Al implementar quedó en «el último en guardar manda», con la planificación escrita por un solo camino — DD‑50.)* |
 | 2026‑07‑29 | D‑02 | **Numeración canónica: edición 2024** (7 = Construcción, 11 = IP). La antigua queda solo como alias de visualización |
 | 2026‑07‑29 | D‑04 | Se acepta el comportamiento actual: **un 0 cuenta como dato introducido** |
 | 2026‑07‑29 | D‑05 | Corregido el diagnóstico: los acondicionamientos son correctos. **Se arregla el ensayo de bola** (comparaciones de solo hora) |
@@ -55,6 +55,20 @@ Las partes excluidas se conservan en este documento marcadas como 🚫 **fuera d
 | 2026‑08‑01 | DD‑33 | **El identificador de muestra sale de la plantilla.** En IK 62262 el laboratorio usa `EBP_CLIM…` en lugar de `EBP_SAFE…` |
 | 2026‑08‑01 | DD‑34 | **Los catálogos de equipos se importan por separado**, uno por norma |
 | 2026‑08‑01 | DD‑35 | **Qué es obligatorio en la cabecera lo decide la plantilla**, no el código: se leen los campos con `obligatorio: true` |
+| 2026‑08‑02 | DD‑93 | **La norma pasa a ser obligatoria en el alta**, y el alta sale de la portada. Sin norma no hay apartados que rellenar y el nombre del fichero la lleva dentro, así que dejarla para después obligaba a renombrarlo. En la portada, elegir norma y dar de alta eran dos caminos para lo mismo: el alta se queda en `Archivo` y en la barra del tablero. **Lo que falta se ve en rojo** en el rótulo del campo, y vuelve al gris al rellenarse — como las casillas obligatorias de la toma de notas |
+| 2026‑08‑02 | DD‑92 | **«(sin técnico)» es una opción del filtro de técnico**, no un técnico del catálogo. Aparece sola cuando hay servicios sin responsable y enseña justo esos, que es lo que hay que repartir. Mismo rótulo que usan el calendario y la carga, escrito en un solo sitio. **Crear un técnico llamado «Sin técnico» sería peor**: saldría como persona en todas las tomas de notas y la carga le sumaría días como si tuviera capacidad |
+| 2026‑08‑02 | DD‑91 | **El fichero se llama `TdN_<norma>_<código>xx-00.lumproj`**, p. ej. `TdN_60598_LEDC42502xx-00.lumproj`. El **`xx` es un hueco** para el número de toma de notas —un servicio puede llevar varias familias— y el **`00` es la edición**, que sube al corregir algo ya emitido. **Los pone el técnico renombrando**, no el programa: numerar y reeditar son decisiones del laboratorio, y un programa que las tomara solo acabaría renumerando un registro ya firmado |
+| 2026‑08‑02 | DD‑90 | **Las tomas de notas de un mismo trabajo se enlazan con un campo «Grupo»**, y el calendario las enseña en una sola barra. Resuelve DD‑88: el jefe planifica un trabajo y el técnico sigue viendo las cuatro familias en el tablero. **Manda la cabecera** —la que lleva las fechas—, y el importe va solo en ella; la barra enseña la suma, así que repetirlo deja de ser invisible. El enlace vive dentro de cada fichero, no en un índice aparte |
+| 2026‑08‑02 | DD‑89 | **No hay objeto «proyecto», y no lo habrá.** El registro del ensayo es el `.lumproj` y tiene que estar en la carpeta de tomas de notas de su servicio; un fichero de proyecto aparte sería un documento sin ensayo detrás y **rompería la trazabilidad**. Revierte DD‑83: la portada vuelve a dos zonas y el alta rápida crea una toma de notas, no un proyecto. Lo que agrupa varias tomas de notas de un mismo trabajo se resolverá **enlazándolas** desde el calendario, no creando un fichero por encima |
+| 2026‑08‑02 | DD‑88 | **Un proyecto puede llevar varias familias de luminarias, cada una con su toma de notas.** Es el motivo por el que en su día se decidió no tener objeto «proyecto». Se planifica **el trabajo entero**, y se resuelve enlazando las tomas de notas (DD‑90), no agrupándolas en un fichero |
+| 2026‑08‑02 | DD‑87 | ↩️ **Deshecha el mismo día por DD‑89.** **La portada tiene tres zonas: Proyectos, Gestión, y la toma de notas suelta en gris y abajo.** Elegir norma era la puerta de entrada del programa; desde que los proyectos se dan de alta, empezar por ahí es casi siempre crear un servicio que ya existía. No se quita —hay ensayos que no llegan a ser proyecto— pero deja de competir con «Proyectos» |
+| 2026‑08‑02 | DD‑86 | **Al guardar un proyecto nuevo se avisa si ese servicio ya existe** en la carpeta, con la opción de abrir el que hay. Nace de separar el alta de la toma de notas: un técnico puede empezar sin saber que su proyecto ya estaba creado. Los códigos se comparan sin mayúsculas, espacios ni guiones. **Se puede crear otro a sabiendas** —un reensayo repite código— porque quien decide es la persona. Es una red, no la solución: lo que evita el error es la pantalla de inicio |
+| 2026‑08‑02 | DD‑85 | **Para dar de alta un proyecto solo son obligatorios el nombre y el técnico 1.** Precisa DD‑83: no es que el formulario deba ser corto, es que **nada más puede bloquear** — norma y técnico 2 se pueden dejar en blanco. Lo que la norma exige para ensayar (`RequisitosDelProyecto`) no tiene voz en el alta. `Archivo \| Nuevo proyecto…`, también en la portada y en la barra del tablero; crea el `.lumproj` y va al calendario **sin abrir la toma de notas** |
+| 2026‑08‑02 | DD‑84 | **Qué norma es la principal la apunta el proyecto**, y se guarda en el `.lumproj`. Antes se deducía del patrón de muestras —que es la consecuencia de haberla elegido, no la elección—, y dos normas del mismo patrón lo dejaban en manos del orden alfabético. De paso se cierra un fallo latente: abrir un servicio de dos normas podía cargarlo por la añadida y **guardar renombraba todas las muestras** |
+| 2026‑08‑02 | DD‑83 | **El proyecto pasa a ser el centro y la toma de notas una parte suya.** Un proyecto tiene fechas, muestras, importe y certificaciones que no son de ninguna norma. **Con una restricción por encima de todo: crear un proyecto son cuatro cosas y Aceptar**, y nada de su cabecera puede ser obligatorio — el PM planifica antes de que exista un solo dato de ensayo. Se hace en tres pasos; el 1 (la identidad se lee de un solo sitio, sin tocar el formato) ya está |
+| 2026‑08‑02 | DD‑82 | **`Ayuda \| Reportar un problema…`**: el correo de quien mantiene el programa, con los datos que hacen falta para reproducir un fallo y acceso al registro de errores. **No envía nada por su cuenta** —eso obligaría a llevar una contraseña de servidor en el ejecutable, lo mismo que se descartó en DD‑67—; abre el programa de correo del equipo, que es quien tiene las credenciales |
+| 2026‑08‑02 | DD‑81 | **El programa se llama «LumenLab»**, escrito en `<Product>` del `.csproj` y en ningún otro sitio: portada, barra de título y «Acerca de» lo leen del ejecutable. Se titulaba por lo que hacía al principio, y ya hace dos cosas. La **versión** se ve en la portada, que es lo primero que se pregunta ante un fallo. **En la portada no hay ajustes**: las carpetas se cambian en *Configuración* |
+| 2026‑08‑02 | DD‑80 | **La portada se parte por la mitad**: tomar notas a la izquierda, gestión a la derecha, dos columnas iguales. La gestión ya no es un añadido sino la mitad de la aplicación. Cada una de sus tres vistas tiene enlace directo; el menú, en cambio, respeta la vista en la que se estaba |
 | 2026‑08‑02 | DD‑79 | **Ninguna opción general del filtro trae lo terminado ni lo archivado**, en las tres vistas. Se quitó «Todos»: en la carga, un servicio cerrado seguía sumando sus días e inflaba el porcentaje del técnico con trabajo que ya no existe. Lo cerrado se pide por su nombre, con «Terminado» o «Archivados» |
 | 2026‑08‑02 | DD‑78 | **En el tablero, cada norma añadida ocupa una sola línea**, con la cuenta de toda su toma de notas: no se va hasta que está entera completa. La principal se sigue detallando sección a sección. Desplegar la 62031 dentro de un servicio de luminarias enterraba lo importante |
 | 2026‑08‑02 | DD‑77 | **El tablero mide cada proyecto contra las normas que él lleva**, no contra la que esté abierta. Antes, un servicio de luminarias con 62031 no enseñaba los apartados de la 62031 y podía darse por terminado a medias; y uno de IP se medía con las reglas de luminarias. Con varias normas, cada sección lleva su número delante |
@@ -1003,21 +1017,23 @@ LumNotas.App           interfaz WPF (MVVM)
 | Elemento | Elección |
 |---|---|
 | Plataforma | .NET 8, Windows |
-| Interfaz | WPF + `CommunityToolkit.Mvvm` |
-| Fichero de proyecto | JSON (`System.Text.Json`), escritura atómica, en OneDrive |
-| Definición de plantilla | JSON versionado, incluido con la aplicación |
+| Interfaz | WPF + MVVM **a mano**, sin librería externa: `ObservableObject`, `Comando` y `ComandoCon<T>` en `Base.cs` son cien líneas y evitan una dependencia más |
+| Fichero de proyecto | JSON (`System.Text.Json`), escritura atómica, en OneDrive. Extensión `.lumproj` |
+| Definición de plantilla | JSON versionado, leído de la carpeta compartida del laboratorio |
 | Informe | HTML generado a mano, **sin dependencias**. Se descartó MigraDoc/PDFsharp: añadía una librería externa y daba problemas de resolución de fuentes (DD‑20) |
-| Contraseñas | Hash Argon2, restablecimiento local (sin correo) |
+| Contraseñas | **No hay** (DD‑67). Se estudiaron y se descartaron; si algún día hace falta control de acceso, son permisos de carpeta |
+
+> **Lo que este apartado planeaba y no sobrevivió.** Se escribió antes de programar, y conviene leerlo sabiendo qué cambió: se preveía `CommunityToolkit.Mvvm` y se acabó escribiendo el MVVM a mano; se preveía contraseña con hash Argon2 y se descartó entera; se preveía **edición por turnos** y acabó siendo **el último en guardar manda**, con la planificación escrita por un solo camino para que no se pisen (DD‑50). El resto se cumplió.
 
 ### Observaciones técnicas sobre las decisiones tomadas
 
 **OneDrive condiciona el formato de almacenamiento.** No se puede usar SQLite sobre una carpeta sincronizada: el bloqueo de fichero y la sincronización parcial provocan corrupción y copias en conflicto. Formato adoptado en su lugar:
 
-- **Un fichero JSON por proyecto** (`<código>.lumproj.json`), escrito de forma atómica en cada guardado (escritura a temporal + reemplazo).
+- **Un fichero JSON por toma de notas**, con extensión `.lumproj` y el nombre que fija el laboratorio (DD‑91), escrito de forma atómica en cada guardado (escritura a temporal + reemplazo).
 - Ventajas sobre OneDrive: reemplazo de fichero completo —que OneDrive sincroniza sin problema—, historial de versiones gratuito, recuperación manual si algo falla, y contenido legible sin la aplicación.
-- Con la edición **por turnos** ya decidida, no hace falta control de concurrencia. Sí conviene un aviso al abrir si OneDrive marca el fichero como no sincronizado.
+- **Manda el último en guardar**, y la planificación la escribe un solo camino releyendo el fichero (DD‑50), de modo que mover una fecha en el calendario no pisa lo que esté anotando el técnico ni al revés. Sigue conviniendo un aviso al abrir si OneDrive marca el fichero como no sincronizado.
 
-**Sobre DD‑08.** El perfil con contraseña tiene un alcance limitado que conviene tener presente: los ficheros de proyecto viven en OneDrive en claro, así que la contraseña de la aplicación no protege los datos —cualquiera con acceso a la carpeta los lee igual—. Su valor real es **atribuir autoría** en el PDF. Además, la recuperación de contraseña por correo exige un servidor de correo o credenciales SMTP, que hoy no existen. Propuesta para el borrador:
+**Sobre DD‑08.** *(Lo que sigue es del borrador. La contraseña se descartó entera en DD‑67 por el motivo que este mismo párrafo anticipaba; lo que queda vivo del perfil es saber **quién** usa el programa, sin contraseña.)* El perfil con contraseña tiene un alcance limitado que conviene tener presente: los ficheros de proyecto viven en OneDrive en claro, así que la contraseña de la aplicación no protege los datos —cualquiera con acceso a la carpeta los lee igual—. Su valor real es **atribuir autoría** en el PDF. Además, la recuperación de contraseña por correo exige un servidor de correo o credenciales SMTP, que hoy no existen. Propuesta para el borrador:
 
 - Perfil local con nombre, DNI y correo (para la cabecera del PDF).
 - Contraseña almacenada con hash (Argon2), sesión persistente mediante testigo local.
@@ -1035,13 +1051,13 @@ LumNotas.App           interfaz WPF (MVVM)
 |---|---|
 | `plantilla/equipos-60598.v1.json` | Catálogo de equipos completo: **43 grupos, 224 entradas, 89 códigos distintos**. Importación literal desde `BBDD Equipos 60598` (DD‑10), con las notas de uso del laboratorio y la trazabilidad de cada celda de origen |
 | `plantilla/plantilla-60598.v1.json` | **La norma entera como datos**: 16 secciones y 45 apartados, con campos, checklists, subbloques, grupos repetibles, reglas P1‑P8 y los nueve cálculos. ~140 KB |
-| `src/LumNotas.Core` | Motor de reglas: modelo de plantilla, catálogo de equipos, almacén de datos, evaluador de los tipos de regla, predicados y cálculos con nombre, requisitos del proyecto, indicador de avance, estado de apartado y resumen para el tablero. En `Gestion/` vive además todo lo de planificación: eje de semanas ISO, gesto de arrastre, ocupación, lista de técnicos, capacidad mensual y carga por técnico — **fuera de la interfaz para poder probarlo** |
+| `src/LumNotas.Core` | Motor de reglas: modelo de plantilla, catálogo de equipos, almacén de datos, evaluador de los tipos de regla, predicados y cálculos con nombre, requisitos del proyecto, indicador de avance, estado de apartado y resumen para el tablero. En `Gestion/` vive además todo lo que no es ensayo: eje de semanas ISO, gesto de arrastre, ocupación, lista de técnicos, capacidad mensual, carga por técnico, filtros, **alta de una toma de notas** (`AltaDeProyecto`), **nombre del fichero** (`NombreDeTomaDeNotas`), **aviso de servicios repetidos** (`ProyectosRepetidos`) y **enlace de las familias de un trabajo** (`EnlaceDeTomasDeNotas`) — todo **fuera de la interfaz para poder probarlo** |
 | `src/LumNotas.Storage` | Un fichero `.lumproj` por proyecto (JSON), con **escritura atómica** (temporal + reemplazo) para que OneDrive lo sincronice sin corromperlo. Más la lista de recientes, los ajustes y el explorador de carpetas |
 | `src/LumNotas.Report` | Exportador del informe a HTML con estilos de impresión A4. **Sin dependencias externas** |
 | `src/LumNotas.App` | Interfaz WPF. `VentanaPrincipalViewModel` es la ventana con su barra de pestañas; `DocumentoViewModel` es **un proyecto abierto** (árbol con semáforo y formulario generado desde la plantilla); `GestionViewModel` es la pestaña de gestión, con sus tres vistas (`CalendarioViewModel`, `CargaViewModel`). Las plantillas grandes viven en `Window.Resources` y se eligen por tipo |
 | Ficheros compartidos | Junto a los proyectos, en la carpeta de OneDrive: `tecnicos.json` (la lista del laboratorio) y `capacidad.json` (tarifa y días por mes). Se editan desde `Configuración` y valen para todos |
 | `plantilla/plantilla-62031.v1.json`, `plantilla-60529.v1.json`, `plantilla-62262.v1.json` | Las otras tres normas, con sus catálogos `equipos-62031`, `equipos-60529` y `equipos-62262` |
-| `tests/LumNotas.Core.Tests` | **262 tests, verificados en verde el 2026‑08‑02.** Cubren los ocho patrones, los nueve cálculos, los defectos corregidos, la integridad de la plantilla, el ciclo de guardado, varios proyectos simultáneos, el informe, el tablero y la planificación (semanas ISO, cambio de año, el gesto de arrastre completo, que años lejanos y erratas de año no rompan el eje, y que planificar y anotar no se pisen), y la lista de técnicos (que quitar no toque los proyectos y corregir sí), y la ocupación por técnico (que lo solapado no cuente dos veces), y la carga mensual (tarifa, capacidad, reparto entre meses y que no se pierda trabajo), y el escaneo de la matrioska de clientes (que encuentre lo hondo, que la caché caduque bien, que una rama rota no lo tumbe y que una norma añadida ocupe una sola línea con la cuenta de toda ella) |
+| `tests/LumNotas.Core.Tests` | **299 tests, verificados en verde el 2026‑08‑02.** Cubren los ocho patrones, los nueve cálculos, los defectos corregidos, la integridad de la plantilla, el ciclo de guardado, varios proyectos simultáneos, el informe, el tablero y la planificación (semanas ISO, cambio de año, el gesto de arrastre completo, que años lejanos y erratas de año no rompan el eje, y que planificar y anotar no se pisen), y la lista de técnicos (que quitar no toque los proyectos y corregir sí), y la ocupación por técnico (que lo solapado no cuente dos veces), y la carga mensual (tarifa, capacidad, reparto entre meses y que no se pierda trabajo), y el escaneo de la matrioska de clientes (que encuentre lo hondo, que la caché caduque bien, que una rama rota no lo tumbe y que una norma añadida ocupe una sola línea con la cuenta de toda ella) |
 
 Los ficheros de plantilla conservan `origenExcel` en cada elemento para poder auditarlos contra el libro original. Ese campo no se usa en ejecución.
 
@@ -1069,6 +1085,10 @@ Solo **seis reglas** necesitan código a medida (`Predicados.cs`); el resto es c
 | `PersistenciaTests` | El ciclo guardar/cargar no pierde nada, el proyecto leído produce las mismas reglas que el original, la escritura atómica no deja restos y el fichero es legible sin la aplicación |
 | `InformeTests` | Que el HTML se genera con la portada, los apartados y los formatos en `es-ES` |
 | `GestionTests` | El tablero: que el avance cuenta secciones y no apartados, que al completar un apartado baja la sección, que las secciones que no aplican no salen, que el escaneo encuentra los proyectos de las subcarpetas y que **un fichero corrupto no tumba el tablero** |
+| `AltaDeProyectoTests` | Que dar de alta exige **solo el nombre, el técnico y la norma**, y que lo que la norma pide para ensayar **no bloquea el alta** |
+| `NombreDeFicheroTests` | Que el nombre del fichero es el que fija el laboratorio, con las cuatro normas y con el código escrito de cualquier manera |
+| `ProyectosRepetidosTests` | Que un servicio que ya existe se reconoce aunque el código se teclee con otras mayúsculas o espacios, y que un fichero ilegible no provoca un aviso falso |
+| `EnlaceTests` | El enlace de las familias de un trabajo: quién hace de cabecera, que el avance y el importe son los del grupo entero y que el enlace sobrevive a que el técnico guarde |
 | `PlantillasDeOtrasNormasTests` | Integridad de **todas** las normas instaladas, no solo la de luminarias: ids únicos, referencias entre reglas, `visibleSi` y `reglaDeCierre`, predicados registrados, grupos de equipos existentes, evaluación sin excepciones, que ningún id de bloque se repita entre normas, qué normas se pueden combinar, el grado por muestra y que cada norma exija su propia cabecera. **Los que vigilan la unificación recorren la carpeta**, no una lista escrita a mano, así que una norma nueva queda cubierta por existir |
 
 ### La interfaz
@@ -1083,7 +1103,7 @@ La pantalla **se genera a partir de la plantilla**, no está escrita a mano: añ
 - **Contador de apartados** en la cabecera. El porcentaje ponderado y la barra de progreso se retiraron (DD‑25) por no aportar nada; el cálculo sigue en `IndicadorDeAvance`.
 - **El índice se pliega** con el botón ◀ / ▶ de la cabecera. Con 30 muestras, esos 360 px son la diferencia entre ver tres columnas o siete.
 - **Una barra de pestañas y una sola**: los proyectos y el tablero al mismo nivel, con el `+` detrás de la última. La pestaña de delante va en negrita y con fondo más claro.
-- **Menús**: `Archivo` (pestañas, abrir, guardar, exportar), `Ver` (ir al tablero) y `Configuración`, que guarda lo que es del laboratorio entero y no de un proyecto: la **lista de técnicos** y la **capacidad y tarifa**. Se llamó *Configuración* y no *Admin* porque no hay roles ni permisos que administrar (DD‑62).
+- **Menús**: `Archivo` (nuevo proyecto, pestañas, abrir, guardar, exportar), `Ver` (**Inicio** y el tablero), `Configuración`, que guarda lo que es del laboratorio entero y no de un proyecto —las **dos carpetas**, la **lista de técnicos**, la **capacidad y tarifa** y las **normas instaladas**—, y `Ayuda`, con **«Reportar un problema…»** y «Acerca de…». Se llamó *Configuración* y no *Admin* porque no hay roles ni permisos que administrar (DD‑62).
 - **El técnico se elige de una lista, no se escribe.** Técnico 1 y Técnico 2 son desplegables en las cuatro normas, vacíos de partida. Técnico 1 es el **responsable** del servicio y por él se agrupa el calendario y se calcula la carga.
 
 ### Pestañas: varios proyectos a la vez
@@ -1096,19 +1116,39 @@ El técnico suele llevar dos o tres servicios en marcha —mientras una muestra 
 - Cerrar una pestaña con cambios avisa. Cerrar la última deja una vacía, no una ventana en blanco.
 - **Al cerrar la aplicación se pregunta por cada pestaña con cambios**, no solo por la de delante.
 - Ctrl+S y Ctrl+P actúan sobre la pestaña activa.
-- **El tablero de gestión es una pestaña más**, y solo una: se abre desde la portada o desde *Ver · Gestión de proyectos*, y volver a pedirlo salta a la que ya está. No hay pestañas de dos niveles.
+- **El tablero de gestión es una pestaña más**, y solo una: se abre desde la portada —por cualquiera de sus tres vistas— o desde *Ver · Gestión de proyectos*, y volver a pedirlo salta a la que ya está. No hay pestañas de dos niveles.
 
 Eso obligó a partir en dos lo que era una sola clase: `DocumentoViewModel` es **un proyecto abierto** —datos, motor, cabecera, árbol, ruta y cambios sin guardar— y `VentanaPrincipalViewModel` es la ventana que sostiene la colección de documentos, el tablero y los menús. **El núcleo no se tocó**: `DatosProyecto`, el motor y las plantillas ya recibían todo por parámetro y no guardaban estado global, que es justo lo que hizo viable el cambio.
 
 ### La portada
 
-La aplicación arranca en una portada, no sobre un proyecto de luminarias en blanco. Es lo que enseña **una pestaña recién abierta**, igual que la página de inicio de un navegador. Desde ella:
+La aplicación arranca en una portada, no sobre un proyecto de luminarias en blanco. Es lo que enseña **una pestaña recién abierta**, igual que la página de inicio de un navegador.
 
-- **Una tarjeta por norma instalada** — sale de `CatalogoDeNormas`, así que dejar caer un `plantilla-*.json` en la carpeta añade su tarjeta sin tocar nada.
-- **Abrir proyecto…** y la lista de **recientes**.
-- **Gestión de proyectos**, que salta directo al tablero.
+Encabeza **el nombre del programa y su versión** (DD‑81), no el de una de sus dos mitades: se llamaba «Toma de notas de ensayos», que dejó de ser verdad en cuanto la gestión pasó a ser la otra mitad. El nombre está escrito en **un solo sitio**, `<Product>` del `.csproj`; la portada, la barra de título y «Acerca de» lo leen del ejecutable. La versión se enseña en la portada, y no solo en «Acerca de», porque es lo primero que hay que preguntar cuando alguien avisa de un fallo.
 
-En cuanto se elige norma o se abre un fichero, esa misma pestaña pasa a ser la toma de notas.
+Debajo, **«Software de toma de notas primarias para ensayos y gestión de proyectos.»** — sin citar ninguna norma: el programa lleva cuatro y las que se dejen caer en la carpeta, así que nombrar una sola describía mal lo que hace.
+
+**Partida por la mitad** (DD‑80): a la izquierda la toma de notas, a la derecha gestionar.
+
+| Toma de notas (izquierda) | Gestión (derecha) |
+|---|---|
+| **Una tarjeta por norma instalada** — sale de `CatalogoDeNormas`, así que dejar caer un `plantilla-*.json` añade la suya sin tocar nada | **Tablero** · qué falta por rellenar |
+| **Abrir…** | **Calendario** · cuándo toca cada uno |
+| Los **tres últimos abiertos** | **Carga** · cuánto tiene comprometido cada técnico |
+
+En la portada se enseñan **tres** recientes, no todos: ahí son un atajo para volver a lo de ayer, y una lista larga empuja hacia abajo lo que de verdad se usa. `Archivo | Proyectos recientes` los sigue teniendo todos, que para eso hay que ir a buscarlo.
+
+> **Hubo una zona «Proyectos» y duró un día.** El 2026‑08‑02 la portada se partió en tres —Proyectos, Gestión y «toma de notas sin proyecto asignado»— dando por hecho que existiría un objeto proyecto por encima de las tomas de notas. El laboratorio lo paró: **el registro del ensayo es el `.lumproj`**, y un fichero de proyecto flotando fuera de la carpeta de tomas de notas sería un documento sin ensayo detrás (DD‑89). Sin ese objeto, «con proyecto» y «sin proyecto» dejan de distinguir nada y la tercera zona sobra. Queda escrito para que a nadie se le ocurra volver a partirla sin leer DD‑89.
+
+**El alta rápida no está en la portada** (DD‑93). Estuvo, junto a las tarjetas de norma, y era ofrecer dos caminos para lo mismo: elegir norma y dar de alta acaban las dos en una toma de notas. Se queda en `Archivo | Nueva toma de notas…` y en la barra del tablero, que es donde está el responsable cuando se le ocurre.
+
+**En la portada no hay ajustes.** Estuvo un rato la carpeta de proyectos con su «Cambiar carpetas…», y el laboratorio lo quitó el mismo día: la pantalla de inicio es para empezar a trabajar, y una ruta de configuración a un clic invita a tocarla sin querer. Las carpetas se cambian donde se cambia todo lo demás, en *Configuración*.
+
+**Cada vista tiene su enlace directo**, no solo el tablero: entrar a gestión y buscar después el botón de la vista eran dos pasos para una sola intención. El menú *Ver · Gestión de proyectos* hace lo contrario a propósito — **respeta la vista en la que se estaba**, porque volver desde el menú a media planificación no debería devolverte al tablero.
+
+Las dos columnas son `*` y `*`, sin ancho fijo ni mínimos: así **nadie puede pedir más ancho del que hay**, que es lo que provocaba el recorte silencioso de WPF (trampa 4 de la sección 14). Verificado en la ventana más pequeña que se admite, 740 px, donde siguen cabiendo las cuatro tarjetas de norma en dos columnas.
+
+En cuanto se elige norma o se abre un fichero, esa misma pestaña pasa a ser la toma de notas. Para volver, **`Ver | Inicio`**: salta a una pestaña vacía si la hay y abre una si no queda ninguna — no cierra nada ni deja pestañas iguales acumuladas.
 
 ### Cambios sin guardar
 
@@ -1156,6 +1196,12 @@ Así, **todo lo que decide qué proyectos se miran está en una sola fila**, y e
 Cambiar de filtro **no vuelve a escanear**: se filtra lo ya leído, así que es instantáneo. Y la línea de estado dice siempre cuántos se han quedado fuera —«3 proyectos · 2 fuera del filtro»—, porque un filtro que esconde en silencio es peor que no tenerlo.
 
 Las listas de técnicos y normas salen **de los proyectos que hay**, no de una lista fija. Si el elegido desaparece —se archivó el último servicio de ese técnico— se vuelve a «(todos)» en vez de dejar el tablero vacío sin explicar por qué.
+
+**«(sin técnico)» es una opción más** del filtro de técnico (DD‑92), y aparece sola cuando hay algún servicio sin responsable. Enseña justo los que están sin asignar, que es lo que el responsable quiere ver para repartirlos. Va **al final de la lista**, después de las personas: es un cajón, no un compañero.
+
+Es el **mismo rótulo** con el que el calendario agrupa las filas y la carga nombra su última línea, y está escrito en un solo sitio (`CargaPorTecnico.SinTecnico`). Si cada vista se inventara el suyo, filtrar por «(sin técnico)» dejaría de casar con lo que enseña el calendario. Lleva paréntesis a propósito: nadie se llama así, de modo que no puede chocar con un técnico de verdad.
+
+> **No hace falta —ni conviene— crear un técnico llamado «Sin técnico»** en `Configuración | Técnicos`. Saldría como una persona en el desplegable de Técnico 1 de todas las tomas de notas y, en cuanto se asignara, la carga lo trataría como alguien con capacidad y sumaría días a su nombre. El hueco vacío ya se agrupa solo.
 
 Cómo encuentra los proyectos: se le indica **la carpeta de proyectos** y la escanea buscando `*.lumproj`, incluidas todas sus subcarpetas. Sin índice ni base de datos — con varios técnicos sincronizando, un índice se desincroniza y miente; el fichero es la única verdad (DD‑27).
 
@@ -1226,7 +1272,7 @@ Basta con apuntar a `clientes`: se busca en ella **y en todas sus subcarpetas**,
 
 Si la carpeta compartida se deja en blanco **se usa la de proyectos**, para no romper una instalación que las tenga juntas.
 
-Se eligen en **`Configuración | Carpetas del laboratorio…`**, que enseña de cada una qué contiene —proyectos encontrados, normas publicadas, técnicos, tarifa y versión— y avisa en rojo si una ruta guardada ha dejado de estar accesible. **Se pregunta sola la primera vez** que se abre el programa en un equipo.
+Se eligen en **`Configuración | Carpetas: proyectos y compartida…`** —el menú las nombra las dos porque en «Carpeta del laboratorio…», en singular, no se adivinaba que dentro estuvieran ambas—, que enseña de cada una qué contiene —proyectos encontrados, normas publicadas, técnicos, tarifa y versión— y avisa en rojo si una ruta guardada ha dejado de estar accesible. **Se pregunta sola la primera vez** que se abre el programa en un equipo.
 
 > La carpeta compartida tiene que ser **de lectura para todo el mundo**, aunque solo unos pocos escriban en ella. Si los técnicos no pudieran leerla, se quedarían sin normas ni lista de técnicos.
 
@@ -1261,6 +1307,123 @@ El mismo problema, un piso más arriba: con la aplicación copiada en varios ord
 **Es un aviso, no un candado.** Dejar sin trabajar a un laboratorio porque un fichero de OneDrive dice otra cosa sería peor que el problema que resuelve. Y ante cualquier duda —un número de versión que no se entiende— no avisa: es preferible callar que avisar en falso todos los días.
 
 > **Para que esto sirva hay que subir `<Version>` en `LumNotas.App.csproj` en cada entrega.** Si no se sube, los demás equipos no se enteran de nada. Está comentado en el propio fichero.
+
+### Avisar de un fallo
+
+`Ayuda | Reportar un problema…` enseña **el correo de quien mantiene el programa** y, debajo, los datos sin los cuales casi ningún fallo se puede reproducir: versión, equipo, usuario, Windows, fecha y la ruta del registro de errores. Todo copiable de una vez, y con un botón que abre el explorador **con `errores.log` ya seleccionado** para poder arrastrarlo al correo.
+
+- **«Escribir el correo»** abre el programa de correo del equipo con destinatario, asunto —que ya lleva la versión— y un cuerpo con tres preguntas: qué hacías, qué esperabas y qué pasó.
+- Si el equipo no tiene programa de correo asociado, lo dice y queda **«Copiar dirección»**, que es lo que hace falta para escribir desde el correo del navegador.
+
+**El programa no envía nada por su cuenta** (DD‑82). Mandar el correo directamente obligaría a llevar una contraseña de servidor dentro del ejecutable, que es exactamente lo que se descartó al hablar de recuperar contraseñas (DD‑67). Quien tiene las credenciales es el equipo, no la aplicación.
+
+La dirección está **escrita en el código**, no en la carpeta compartida: si dependiera de la configuración, un equipo mal configurado se quedaría sin saber a quién avisar justo cuando algo va mal.
+
+### El proyecto y sus tomas de notas
+
+Todo empezó por la toma de notas, y por eso la toma de notas está en el centro. **Ya no le corresponde.** Un proyecto tiene fechas, llegada de muestras, estado, importe y —en cuanto se pidan— ENAC, ENEC, CB o EMC; nada de eso es de una norma, y la toma de notas ha pasado a ser *una parte* del proyecto, no al revés. Con dos normas en el mismo servicio ya se ven las costuras: hay dos cabeceras y un solo cliente.
+
+**Adónde va**: un proyecto con cabecera propia —cliente, código, técnicos, certificaciones— y **N tomas de notas colgando**, cada una con lo suyo de ensayo. En pantalla no sería una vista nueva: el árbol que ya existe gana un nivel (`Proyecto → norma → sección → apartado`) y desaparece el prefijo con el que hoy se distinguen las secciones de cada norma.
+
+**La restricción que manda sobre todo lo demás** (DD‑83, precisada en DD‑85): el responsable da de alta un proyecto y **ya tiene tarjeta que planificar** sin rellenar un solo dato de ensayo — eso es cosa del técnico cuando empiece. De ahí dos reglas que ningún cambio puede romper:
+
+- **Para dar de alta una toma de notas solo hacen falta el nombre, el técnico 1 y la norma.** No es que el formulario tenga que ser corto: es que **nada más puede bloquear**. El técnico 2 se puede dejar en blanco. La norma empezó siendo opcional y el laboratorio la hizo obligatoria (DD‑93): una toma de notas sin norma no tiene apartados que rellenar, y el nombre del fichero la lleva dentro, así que dejarla para después obligaba a renombrarlo.
+- **Lo que falta se ve en rojo.** El rótulo del campo se pone rojo mientras esté vacío y vuelve al gris en cuanto se rellena — el mismo criterio que las casillas obligatorias de la toma de notas. Rojo mientras esté vacío, no rojo para siempre: así el rojo señala trabajo pendiente y no decora.
+- **Nada de la cabecera del proyecto puede ser obligatorio.** Un proyecto a medias es el estado normal durante semanas, no un error. En particular, la cabecera del proyecto **no puede heredar los `obligatorio: true` de las plantillas**, o el camino rápido muere ahí.
+
+Quién decide qué bloquea es `AltaDeProyecto`, en el núcleo y con tests; el diálogo solo lo pregunta. Lo que la norma exige para *ensayar* sigue estando donde estaba, en `RequisitosDelProyecto`, y **no tiene voz en el alta**: un proyecto recién creado tiene la cabecera casi entera por rellenar y eso es lo correcto.
+
+**Cómo se está haciendo**, en tres pasos que se entregan por separado y no dejan el programa a medias:
+
+| | Paso | Estado |
+|---|---|---|
+| 1 | La identidad del proyecto deja de pedirse por su clave en la cabecera y pasa a leerse de un solo sitio. **Sin cambiar el formato del fichero ni nada en pantalla** | **hecho** el 2026‑08‑02 |
+| 2 | **Qué norma es la principal la dice el proyecto**, no se deduce | **hecho** el 2026‑08‑02 |
+| 3 | **Diálogo «Nuevo proyecto»**: dar de alta sin pasar por la toma de notas | **hecho** el 2026‑08‑02 |
+| 4 | El árbol gana un nivel: cabecera propia del proyecto y una rama por norma | pendiente |
+
+Del **paso 3**: `Archivo | Nuevo proyecto…`, y también desde la mitad de gestión de la portada y desde la barra del tablero — que son los tres sitios donde está el responsable cuando se le ocurre. Se rellenan nombre y técnico, se elige carpeta y el `.lumproj` queda en disco con su tarjeta ya en el calendario, **sin abrir su toma de notas**: quien da de alta un proyecto lo hace para planificarlo.
+
+Antes, lo mismo eran cuatro pasos: elegir norma en la portada, escribir en la cabecera de la toma de notas, «Guardar como» y buscar carpeta. Se comprueba además que no se pise un proyecto que ya exista con ese nombre en esa carpeta — dos servicios del mismo cliente llamados igual es un descuido frecuente, y ahí se perdería el trabajo del otro.
+
+#### Un proyecto, varias familias
+
+Salió al llegar aquí, y es el motivo por el que en su día se decidió **no** tener objeto «proyecto»: en el laboratorio **un proyecto puede llevar cuatro familias de luminarias, cada una con su propia toma de notas**. Cada familia tiene sus muestras, su clase, su Ta y su grado IP; lo único que comparten es el cliente, el código, los técnicos y la oferta.
+
+Los niveles reales son tres, no dos:
+
+```
+Proyecto        cliente, código, técnicos, fechas, importe, ENAC/EMC
+└ Familia       una toma de notas: sus muestras, su clase, su Ta
+   └ Norma      60598, y las que se le añadan
+```
+
+**Lo que hay hoy** —un `.lumproj` por toma de notas— ya sirve para esto: cuatro familias son cuatro ficheros. Y tiene una virtud que no conviene perder: **cuatro técnicos pueden trabajar a la vez en cuatro familias del mismo proyecto**, porque son cuatro ficheros distintos. Meter las cuatro en uno reabriría el problema de los dos escritores que ya se resolvió con la planificación.
+
+**Se resuelve enlazándolas** (DD‑90), no creando un fichero por encima. En el diálogo de planificación hay un campo **«Grupo»**: se escribe el mismo nombre en las tomas de notas del mismo trabajo y el calendario las enseña **en una sola barra**.
+
+| | |
+|---|---|
+| **Dónde vive el enlace** | Dentro de cada `.lumproj`, con su planificación. Sin fichero de grupo, sin índice — y **viaja con el fichero** si se mueve de carpeta |
+| **Quién manda** | La **cabecera**: la que lleva las fechas. Es la que se dibuja, la que se arrastra y donde va el importe |
+| **Qué enseña la barra** | El avance **del trabajo entero**, sumando las cuatro. Un servicio no está hecho porque lo esté la primera familia |
+| **El tablero** | No cambia: una columna por familia, que es la unidad de trabajo del técnico |
+
+El nombre del grupo se compara **sin mayúsculas, espacios ni guiones**, igual que los códigos de servicio: se teclea a mano en cada una de las cuatro y una mayúscula no puede desenlazarlas.
+
+**Por qué así y no con un fichero de grupo**: mismo motivo que no hay índice de proyectos (DD‑27) y que no hay objeto proyecto (DD‑89). Un fichero que dice quién va con quién es una segunda verdad que se desincroniza; el enlace dentro de cada toma de notas se lee abriéndola y no puede quedarse huérfano.
+
+> **El importe sigue yendo en una sola.** El grupo enseña la **suma** de lo que lleven sus miembros: con la cabecera llevando el único importe, coincide con el de la oferta. Si en la barra aparece **el cuádruple de lo que costó el trabajo**, es que se ha repetido en las cuatro — y ese error, que antes era invisible y disparaba la carga del técnico, ahora se ve.
+
+#### Cómo se llama el fichero
+
+El nombre lo fija el laboratorio (DD‑91) y se lee de un vistazo en el explorador, sin abrir nada:
+
+```
+TdN_60598_LEDC42502xx-00.lumproj
+└─┬─┘ └─┬─┘ └───┬───┘└┬┘ └┬┘
+  │     │       │     │   └── edición
+  │     │       │     └────── nº de toma de notas
+  │     │       └──────────── código de servicio
+  │     └──────────────────── la norma principal
+  └────────────────────────── es una toma de notas
+```
+
+**El `xx` y el `00` los pone el técnico**, renombrando el fichero. El `xx` es un hueco a la vista: un servicio puede llevar varias familias y cada una lleva su número. El `00` es la edición, y sube a `01` cuando hay que corregir algo ya emitido.
+
+**El programa no los gestiona, y es a propósito**: numerar familias y decidir que algo se reedita son decisiones del laboratorio. Un programa que las tomara solo acabaría renumerando un registro ya firmado.
+
+Lo componen los dos caminos que crean fichero —el alta rápida y el «Guardar como» de la toma de notas— desde el mismo sitio, para que no puedan divergir. Sin norma elegida queda `TdN_LEDC42502xx-00`; el `TdN_` no se pierde nunca, porque es lo que dice qué es el fichero.
+
+#### El mismo servicio, dos ficheros
+
+Dar de alta los proyectos por un lado y tomar notas por otro trajo un problema que **no es de software**: un técnico puede ponerse a tomar notas **sin saber que su proyecto ya estaba creado**. Acabarían con el mismo servicio partido en dos ficheros —uno con los datos y otro con las fechas— y ninguno completo.
+
+**Al guardar un proyecto nuevo se mira si ese servicio ya existe** en la carpeta del laboratorio (DD‑86). Si lo hay, se enseña cuál, de quién es y dónde está, con tres salidas:
+
+| | |
+|---|---|
+| **Abrir el que ya existe** | lo habitual. Se abre en otra pestaña; la del técnico se queda intacta |
+| **Crear otro igualmente** | a sabiendas: un reensayo o un servicio partido pueden repetir código |
+| Cancelar | |
+
+Los códigos se comparan **sin mayúsculas, espacios ni guiones**: «ANTAR2504», «antar 2504» y «ANTAR‑2504» son el mismo servicio para el laboratorio, y compararlos en crudo dejaría pasar el caso más probable — el técnico escribiéndolo a su manera. Un código en blanco no choca con nada, y un fichero ilegible tampoco: su código no es fiable.
+
+Se comprueba **releyendo el disco**, no mirando el último escaneo: el proyecto con el que se choca puede haberlo dado de alta el responsable hace cinco minutos desde otro equipo, que es justo el caso que hay que cazar. Con la caché cuesta una décima de segundo, y solo se hace al guardar un proyecto **nuevo** — una vez en la vida de cada uno. La misma comprobación se hace al **dar de alta**: repetir un alta es igual de fácil que empezar dos veces.
+
+> **Esto es una red, no la solución.** Atrapa el error venga de donde venga, pero no evita que ocurra. Lo que lo evita es que la portada deje de ofrecerle al técnico «empieza un servicio nuevo» como primera acción y le enseñe **sus** proyectos — y para eso el programa tiene que saber quién es, que es el perfil de usuario pendiente desde DD‑08.
+
+> **Lo que queda del paso 3 se ha movido al 4 a propósito.** Estaba previsto dejar el código y los técnicos en *solo lectura* dentro de la toma de notas, y hacerlo ahora los dejaría sin ningún sitio donde corregirlos: la cabecera de la norma es hoy el único. Primero el panel del proyecto, y entonces sí.
+
+Del **paso 1**: `codigoServicio` y `numeroMuestras` **ya estaban** promovidos a datos del proyecto desde el principio; los técnicos no. Ahora `DatosProyecto.Tecnico1` y `Tecnico2` son el único sitio que sabe dónde vive ese dato — antes la clave estaba escrita en seis puntos de cuatro proyectos distintos. Se sigue guardando donde siempre, así que **los proyectos ya escritos se leen igual** y el informe sigue enseñando el técnico; hay tests que lo fijan en los dos sentidos.
+
+Del **paso 2** (DD‑84): la norma principal se apunta al elegirla —`PlantillaEnsayos.AplicarA(principal: true)`— y se guarda en el `.lumproj`. Antes se reconstruía del **patrón con el que se nombran las muestras**, que es una *consecuencia* de haberla elegido y no la elección; con dos normas del mismo patrón —IP 60529 y módulos LED 62031 nombran las dos `EBP_SAFE…`— la pregunta se quedaba sin respuesta y acababa decidiéndola el orden alfabético.
+
+> **Un fallo latente que salió al hacerlo.** Al abrir un proyecto, la norma con la que se cargaba era *la primera de las suyas que estuviera instalada*, leída de un `HashSet` cuyo orden no es de fiar. En un servicio de dos normas podía abrirse por la añadida, y entonces **guardar reescribía el patrón de muestras** —`EBP_SAFE` por `EBP_CLIM`— y con él el identificador de todas las muestras del servicio. Ahora manda la principal que apunta el proyecto, y abrir y guardar ya no puede cambiarla.
+
+Los ficheros anteriores no traen el campo: se quedan sin principal apuntada y se sigue deduciendo, como siempre. **No hay migración**, ni la habrá para el paso 3: cada fichero se cura cuando se guarde. Nadie lanza una conversión masiva sobre OneDrive.
+
+> Cuando llegue el momento de guardar la cabecera del proyecto, vale la misma regla que con la planificación: **un solo camino la escribe**, y guardar desde la toma de notas la conserva releyéndola del disco. Dos escritores es el problema que ya se resolvió una vez.
 
 ### Los técnicos del laboratorio
 
@@ -1408,12 +1571,17 @@ Sin esa segunda regla, el técnico que tuviera el proyecto abierto desde hacía 
 | **Proyectos** | Abrir, guardar, guardar como, recientes, apertura por doble clic |
 | **Pestañas** | Varios proyectos abiertos a la vez, más el tablero. Aviso de cambios sin guardar al cerrar pestaña y al cerrar la aplicación |
 | **Informe** | HTML A4 con portada, un apartado por página, equipos, comentarios y avisos |
-| **Gestión de proyectos** | Tres vistas de la misma carpeta —tablero, calendario y carga— con **un solo juego de filtros**: estado, técnico y norma. El tablero da columna por proyecto y tarjeta por sección pendiente; cada norma añadida ocupa una sola línea |
+| **Gestión de proyectos** | Tres vistas de la misma carpeta —tablero, calendario y carga— con **un solo juego de filtros**: estado, técnico y norma. Ninguna opción general trae lo terminado ni lo archivado, y **«(sin técnico)» se puede pedir** para ver lo que falta por repartir. El tablero da columna por proyecto y tarjeta por sección pendiente; cada norma añadida ocupa una sola línea |
 | **Calendario** | Línea de tiempo en semanas ISO, **agrupada por técnico responsable**: estado, recepción de muestras, archivado y aviso de fuera de plazo. **Las barras se arrastran**: el centro mueve, los bordes cambian inicio o fin. Pulsarlas abre su configuración |
 | **Carga por técnico** | Tabla técnicos × meses en porcentaje de ocupación. El trabajo sale del importe de la oferta (÷ 80 €) y se reparte entre meses por días entre semana, contra una capacidad de 22 días —10 en agosto, 15 en diciembre— |
 | **Técnicos** | Lista compartida del laboratorio, elegible en Técnico 1 y 2 de las cuatro normas. Se edita en `Configuración`; corregir un nombre se propaga a los proyectos, quitarlo no los toca |
 | **Cuatro normas** | 60598‑1, 62031, 60529 (IP) y 62262 (IK), cada una con su plantilla y su catálogo de equipos, elegibles desde la portada. Ver sección 16 |
-| **Portada** | Elegir norma, abrir proyecto, recientes o saltar al tablero |
+| **Portada** | Partida por la mitad: normas, abrir y los **tres últimos abiertos** a la izquierda; tablero, calendario y carga a la derecha, cada uno con enlace directo. Encabezada por el nombre del programa y su **versión** |
+| **Alta rápida** | `Archivo \| Nueva toma de notas…` crea el `.lumproj` con **nombre, técnico y norma**, sin pasar por la cabecera ni por «Guardar como». Lo que falta se ve en rojo. El responsable ya tiene tarjeta que planificar antes de que exista un dato de ensayo |
+| **Nombre de fichero** | `TdN_60598_LEDC42502xx-00.lumproj`, compuesto en un solo sitio para los dos caminos que crean fichero. El `xx` y la edición los lleva el técnico |
+| **Aviso de duplicados** | Al crear una toma de notas se comprueba si ese servicio ya existe en la carpeta, comparando sin mayúsculas ni espacios. Se ofrece abrir la que hay, o crear otra a sabiendas |
+| **Trabajos de varias familias** | Campo **«Grupo»** en la planificación: las tomas de notas del mismo trabajo se enlazan y el calendario las enseña en **una sola barra**, con el avance y el importe sumados. El tablero las sigue viendo por separado |
+| **Reportar un problema** | `Ayuda` da el correo de quien mantiene el programa con los datos que hacen falta para reproducir un fallo y acceso al registro de errores |
 | **Grado por muestra** | IP e IK se eligen en la fila de cada muestra, con el atajo «Luminaria ordinaria». La fila es idéntica en las tres normas que la usan |
 | **Dos carpetas de OneDrive** | Una de proyectos y otra compartida (normas, técnicos, tarifa, versión). Se eligen en `Configuración` y se preguntan solas la primera vez |
 | **Una versión para todos** | Las normas se leen de la carpeta compartida y se publican desde `Configuración`; `Ayuda \| Acerca de` enseña la versión y avisa si el laboratorio ha publicado una más nueva |
@@ -1427,7 +1595,7 @@ Sin esa segunda regla, el técnico que tuviera el proyecto abierto desde hacía 
 |---|---|
 | Alta | **Filtro por antigüedad al escanear** («leer solo los últimos 2 años»). Propuesto el 2026‑08‑02 y **pendiente de confirmar el valor por defecto**. Es el único filtro que evita *leer*, no solo *ver*: importa en un equipo nuevo y cuando se publica una norma, que invalida la caché entera. Debe decir siempre cuántos proyectos ha dejado fuera |
 | Media | **Calibración de los equipos.** Ya se registra qué equipo se usó en cada apartado; si el catálogo llevara su fecha de calibración, el programa podría avisar de que un equipo estaba fuera de calibración el día del ensayo. Media función hecha y sin aprovechar — es la no conformidad que detecta el programa antes que el auditor |
-| Media | **Duplicar un proyecto.** Los laboratorios ensayan familias de luminarias; arrancar un servicio desde otro ahorra rellenar la cabecera veinte veces |
+| Media | **Duplicar una toma de notas.** Un trabajo lleva varias familias y todas comparten cliente, código y técnicos. El alta rápida y el enlace por grupo alivian la mitad del problema; lo que falta es **arrancar una familia desde otra ya rellena**, sin repetir la cabecera cuatro veces |
 | Baja | **Buscar en el tablero.** Con años de clientes no hay caja de búsqueda |
 | Baja | **Exportar el calendario o la carga**, para enviarlos a quien no abre el programa. El exportador de HTML ya existe |
 | Baja | **Las tarjetas de clase, Ta y partes ‑2 siguen escritas a mano en el XAML.** Solo se muestran y se exigen donde la norma las declara, pero el asterisco de obligatorio es texto fijo. Se generalizó la cabecera entera el 2026‑08‑01 y **el laboratorio pidió revertirlo**: la pantalla de luminarias se da por buena y no se toca |
@@ -1460,7 +1628,7 @@ dotnet test "…\AplicacionTomaNotas\LumNotas.sln"
 dotnet run --project "…\AplicacionTomaNotas\src\LumNotas.App"
 ```
 
-Si los **262 tests** pasan, el motor y las cuatro plantillas están sanos. La mayoría de los cambios de norma se hacen **editando el JSON de esa norma** en `plantilla/`, sin tocar código; añadir una norma entera es dejar caer un fichero `plantilla-*.json` en esa carpeta.
+Si los **299 tests** pasan, el motor y las cuatro plantillas están sanos. La mayoría de los cambios de norma se hacen **editando el JSON de esa norma** en `plantilla/`, sin tocar código; añadir una norma entera es dejar caer un fichero `plantilla-*.json` en esa carpeta.
 
 **Dónde poner cada cosa**, que es lo que más se ha repetido al construir esto:
 
@@ -1471,7 +1639,7 @@ Si los **262 tests** pasan, el motor y las cuatro plantillas están sanos. La ma
 | Un filtro nuevo del tablero | `GestionViewModel`, **no** en una vista: valen para las tres |
 | Algo compartido por el laboratorio | La carpeta compartida, y reflejado en `Configuración \| Carpetas…` |
 
-**Ninguno de los 262 tests toca la interfaz**, así que lo que se apoye en WPF hay que escribirlo de forma que la lógica quede fuera. No es purismo: en este equipo no se pueden automatizar los eventos de ratón, y sacar la lógica del gesto al núcleo fue la única manera de comprobar el arrastre del calendario.
+**Ninguno de los 299 tests toca la interfaz**, así que lo que se apoye en WPF hay que escribirlo de forma que la lógica quede fuera. No es purismo: en este equipo no se pueden automatizar los eventos de ratón, y sacar la lógica del gesto al núcleo fue la única manera de comprobar el arrastre del calendario.
 
 ### Punto ciego cerrado
 

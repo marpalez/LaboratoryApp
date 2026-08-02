@@ -66,6 +66,23 @@ public partial class MainWindow : Window
         modelo.Servicios.EditarCapacidad = () => DialogoCapacidad.Editar(this);
         modelo.Servicios.VerPlantillas = () => DialogoPlantillas.Mostrar(this);
         modelo.Servicios.VerAcercaDe = () => DialogoAcercaDe.Mostrar(this);
+        modelo.Servicios.ReportarProblema = () => DialogoReportarProblema.Mostrar(this);
+        modelo.Servicios.CrearProyecto = carpeta => DialogoNuevoProyecto.Preguntar(
+            this, new RepositorioDeProyectos(), carpeta,
+            codigo => modelo.Servicios.ComprobarSiYaExiste?.Invoke(codigo, null));
+
+        modelo.Servicios.ComprobarSiYaExiste = (codigo, rutaPropia) =>
+        {
+            var existentes = modelo.Gestion.BuscarPorCodigo(codigo, rutaPropia);
+            if (existentes.Count == 0) return null;
+
+            var respuesta = DialogoProyectoRepetido.Preguntar(this, codigo, existentes);
+
+            // Abrirlo es cosa de la ventana, que es quien lleva las pestañas.
+            if (respuesta == RespuestaRepetido.Abrir) modelo.AbrirEnPestana(existentes[0].Ruta);
+
+            return respuesta;
+        };
 
         // La carpeta se aplica a través del tablero, que es quien la guarda y avisa al
         // resto de la ventana de que hay que releerlo todo.

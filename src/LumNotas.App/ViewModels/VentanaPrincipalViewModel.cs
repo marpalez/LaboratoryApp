@@ -33,7 +33,8 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
         Abrir = new Comando(AbrirProyecto);
         AbrirReciente = new ComandoCon<string>(ruta => AbrirEnPestana(ruta));
         EmpezarConNorma = new ComandoCon<NormaDisponible>(EmpezarCon);
-        IrAGestion = new Comando(AbrirGestion);
+        IrAGestion = new Comando(() => AbrirGestion(null));
+        IrAVistaDeGestion = new ComandoCon<Vista>(vista => AbrirGestion(vista));
         EditarTecnicos = new Comando(AbrirEditorDeTecnicos);
         EditarCapacidad = new Comando(() =>
         {
@@ -42,6 +43,9 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
         });
         VerPlantillas = new Comando(() => Servicios.VerPlantillas?.Invoke());
         ElegirCarpetaDelLaboratorio = new Comando(() => Servicios.ElegirCarpetaDelLaboratorio?.Invoke());
+        ReportarProblema = new Comando(() => Servicios.ReportarProblema?.Invoke());
+        NuevoProyecto = new Comando(DarDeAltaUnProyecto);
+        VerInicio = new Comando(IrAInicio);
         VerAcercaDe = new Comando(() =>
         {
             Servicios.VerAcercaDe?.Invoke();
@@ -92,7 +96,12 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
     public bool HayDocumento => Activo is DocumentoViewModel { SinProyecto: false };
 
     public GestionViewModel Gestion { get; }
+    /// <summary>Todos los recientes. Los enseña el menú <c>Archivo</c>.</summary>
     public ObservableCollection<ProyectoReciente> Recientes { get; } = [];
+
+    /// <summary>Los tres últimos, que es lo que cabe en la portada sin estorbar.</summary>
+    public ObservableCollection<ProyectoReciente> UltimosAbiertos { get; } = [];
+
     public bool HayRecientes => Recientes.Count > 0;
 
     public Comando NuevaPestana { get; }
@@ -102,11 +111,40 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
     public ComandoCon<string> AbrirReciente { get; }
     public ComandoCon<NormaDisponible> EmpezarConNorma { get; }
     public Comando IrAGestion { get; }
+
+    /// <summary>
+    /// Entra en gestión directamente por una de sus tres vistas. Desde la portada se
+    /// elige a qué se va, que es lo que se tenía en la cabeza al pulsar; el menú sigue
+    /// usando <see cref="IrAGestion"/>, que respeta la vista en la que se estaba.
+    /// </summary>
+    public ComandoCon<Vista> IrAVistaDeGestion { get; }
     public Comando EditarTecnicos { get; }
     public Comando EditarCapacidad { get; }
     public Comando VerPlantillas { get; }
     public Comando ElegirCarpetaDelLaboratorio { get; }
+    public Comando ReportarProblema { get; }
     public Comando VerAcercaDe { get; }
+
+    /// <summary>Alta de un proyecto para planificarlo, sin abrir su toma de notas.</summary>
+    public Comando NuevoProyecto { get; }
+
+    /// <summary>Volver a la portada sin tener que cerrar lo que se esté haciendo.</summary>
+    public Comando VerInicio { get; }
+
+    /// <summary>
+    /// Crea el proyecto y <b>se queda en gestión</b>, en el calendario. No se abre su toma
+    /// de notas: quien da de alta un proyecto lo hace para planificarlo, y rellenarla es
+    /// cosa del técnico cuando empiece.
+    /// </summary>
+    private void DarDeAltaUnProyecto()
+    {
+        if (Servicios.CrearProyecto?.Invoke(Gestion.Carpeta) is null) return;
+
+        // El proyecto nuevo tiene que aparecer sin que nadie pulse «Actualizar»: si no,
+        // parecería que no se ha creado.
+        Gestion.Refrescar.Execute(null);
+        AbrirGestion(Vista.Calendario);
+    }
 
     /// <summary>
     /// De la carpeta del laboratorio salen los proyectos, las normas, los técnicos, la
@@ -142,6 +180,15 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
     /// </summary>
     public bool HayVersionMasNueva => !_avisoDescartado && ServicioDeVersion.HayMasNueva;
 
+    /// <summary>
+    /// Nombre y versión, para la portada. La versión se enseña ahí y no solo en «Acerca
+    /// de» porque es lo primero que hay que preguntar cuando alguien llama diciendo que
+    /// algo no le funciona: ahora se lee sin abrir ningún menú.
+    /// </summary>
+    public static string NombreDelPrograma => ServicioDeVersion.Nombre;
+
+    public static string VersionEnEjecucion => "v" + ServicioDeVersion.EnEjecucion;
+
     public string TextoDeVersionMasNueva =>
         $"Hay una versión más nueva del programa: {ServicioDeVersion.Publicada?.Version}. "
         + $"Estás usando la {ServicioDeVersion.EnEjecucion}.";
@@ -158,7 +205,7 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
             documento.RefrescarTecnicos(renombrados);
     }
 
-    public string Titulo => ActivoDocumento?.Titulo ?? "Toma de notas de ensayos";
+    public string Titulo => ActivoDocumento?.Titulo ?? NombreDelPrograma;
 
     private string _mensaje = "";
 
@@ -169,6 +216,17 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
     }
 
     // ---- pestañas ----------------------------------------------------------
+
+    /// <summary>
+    /// Vuelve a la portada. Si ya hay una pestaña vacía se salta a ella en vez de abrir
+    /// otra: la portada se enseña en cualquier pestaña sin proyecto, y volver a Inicio
+    /// tres veces no debería dejar tres pestañas iguales abiertas.
+    /// </summary>
+    private void IrAInicio()
+    {
+        var vacia = Pestanas.OfType<DocumentoViewModel>().FirstOrDefault(d => d.SinProyecto);
+        Activo = vacia ?? AbrirPestana();
+    }
 
     /// <summary>Abre una pestaña nueva, que arranca enseñando la portada.</summary>
     public DocumentoViewModel AbrirPestana()
@@ -206,9 +264,14 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
     /// El tablero es una pestaña más, pero solo una: si ya está abierto se salta a ella
     /// en vez de repetirlo.
     /// </summary>
-    private void AbrirGestion()
+    /// <param name="vista">
+    /// A qué vista se entra. <c>null</c> deja la que estuviera: volver desde el menú a
+    /// media planificación no debería devolverte al tablero.
+    /// </param>
+    private void AbrirGestion(Vista? vista)
     {
         if (!Pestanas.Contains(Gestion)) Pestanas.Add(Gestion);
+        if (vista is { } elegida) Gestion.VistaActual = elegida;
         Activo = Gestion;
     }
 
@@ -257,10 +320,23 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
         RefrescarRecientes();
     }
 
+    /// <summary>
+    /// Cuántos se enseñan en la portada. Tres: ahí es un atajo para volver a lo de ayer,
+    /// no un historial — una lista larga empuja hacia abajo lo que de verdad se usa. El
+    /// menú <c>Archivo | Proyectos recientes</c> los sigue enseñando todos, que para eso
+    /// hay que ir a buscarlo.
+    /// </summary>
+    private const int RecientesEnPortada = 3;
+
     private void RefrescarRecientes()
     {
         Recientes.Clear();
         foreach (var r in _recientes.Existentes) Recientes.Add(new ProyectoReciente(r));
+
+        UltimosAbiertos.Clear();
+        foreach (var r in _recientes.Existentes.Take(RecientesEnPortada))
+            UltimosAbiertos.Add(new ProyectoReciente(r));
+
         Notificar(nameof(HayRecientes));
     }
 
@@ -333,6 +409,20 @@ public enum RespuestaCambios
     Descartar,
 
     /// <summary>Cerró el aviso: se queda donde estaba y no se pierde nada.</summary>
+    Cancelar
+}
+
+/// <summary>
+/// Qué se hace cuando el servicio que se va a guardar ya existe en la carpeta.
+/// </summary>
+public enum RespuestaRepetido
+{
+    /// <summary>Abrir el que ya está, que casi siempre es lo que se quería.</summary>
+    Abrir,
+
+    /// <summary>A sabiendas: un reensayo o un servicio partido pueden repetir código.</summary>
+    CrearIgualmente,
+
     Cancelar
 }
 

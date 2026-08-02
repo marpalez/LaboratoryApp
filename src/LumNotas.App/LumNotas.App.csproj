@@ -30,7 +30,12 @@
   -->
   <PropertyGroup>
     <Version>1.0.0</Version>
-    <Product>Toma de notas de ensayos</Product>
+    <!--
+      El nombre del programa está aquí y solo aquí: la portada y «Acerca de» lo leen del
+      ejecutable. Ya no se llama por lo que hacía al principio, porque hace dos cosas:
+      tomar notas de ensayo y gestionar los proyectos.
+    -->
+    <Product>LumenLab</Product>
     <Company>Laboratorio de ensayos de luminarias</Company>
   </PropertyGroup>
 

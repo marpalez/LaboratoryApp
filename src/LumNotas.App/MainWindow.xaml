@@ -92,6 +92,33 @@
         </Style>
 
         <!--
+            Acceso directo a una de las vistas de gestión. Mismo truco que la tarjeta de
+            norma: WPF no redondea un Button, así que la plantilla se rehace sobre un
+            Border. Ocupa todo el ancho de su zona porque son una lista, no una rejilla.
+        -->
+        <Style x:Key="AccesoGestion" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Caja" CornerRadius="10" Padding="14,12"
+                                Background="#F0FDFA" BorderBrush="#CCFBF1" BorderThickness="1">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Caja" Property="Background" Value="#CCFBF1"/>
+                                <Setter TargetName="Caja" Property="BorderBrush" Value="#0F766E"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--
             Tarjeta de norma. WPF no da esquinas redondeadas en Button, así que la
             plantilla se rehace sobre un Border; de paso se marca al pasar por encima.
         -->
@@ -870,28 +897,47 @@
                     tarjetas nunca aprovechan el ancho. Con Stretch ocupa lo que haya
                     hasta MaxWidth, y a partir de ahí WPF lo centra solo.
                 -->
-                <StackPanel MaxWidth="940" Margin="32,32"
+                <StackPanel MaxWidth="940" Margin="24,32"
                             HorizontalAlignment="Stretch" VerticalAlignment="Center">
-                    <TextBlock Text="Toma de notas de ensayos" FontSize="26" FontWeight="Bold"
-                               Foreground="#111827" TextWrapping="Wrap"/>
-                    <TextBlock Text="Elige la norma con la que vas a trabajar o consulta el estado de los proyectos."
+                    <!--
+                        El nombre del programa, no el de una de sus dos mitades. La versión va
+                        al lado para poder leerla sin abrir ningún menú: es lo primero que hay
+                        que preguntar cuando alguien avisa de un fallo.
+                    -->
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{x:Static vm:VentanaPrincipalViewModel.NombreDelPrograma}"
+                                   FontSize="26" FontWeight="Bold" Foreground="#111827"/>
+                        <Border CornerRadius="9" Background="#E8EAEE" Padding="8,2"
+                                Margin="10,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Static vm:VentanaPrincipalViewModel.VersionEnEjecucion}"
+                                       FontSize="11" Foreground="#6B7280"/>
+                        </Border>
+                    </StackPanel>
+                    <!-- Sin citar la norma: el programa lleva cuatro y las que se dejen
+                         caer en la carpeta, así que nombrar una sola sobraba -->
+                    <TextBlock Text="Software de toma de notas primarias para ensayos y gestión de proyectos."
                                Foreground="#6B7280" FontSize="12" Margin="0,6,0,26" TextWrapping="Wrap"/>
 
                     <!--
-                        Izquierda, tomar notas; derecha, gestionar. Son dos oficios distintos.
-                        La tarjeta de la derecha lleva ancho fijo y la columna de la izquierda
-                        se queda con el resto: al estrechar la ventana encogen las tarjetas de
-                        norma, no el panel de gestión, que se quedaba con el texto cortado.
+                        Izquierda, tomar notas; derecha, gestionar. Son dos oficios distintos y
+                        pesan lo mismo, así que la portada se parte por la mitad: dos columnas
+                        iguales, sin ancho fijo. Con «*» y «*» nadie puede pedir más de lo que
+                        hay, que es lo que provocaba el recorte silencioso de WPF; en la ventana
+                        más pequeña que se admite (740) siguen cabiendo las dos tarjetas de norma.
                     -->
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <!-- 2 tarjetas de 132 + sus márgenes + el relleno de la zona:
-                                 por debajo de esto se recortaría el borde de la segunda -->
-                            <ColumnDefinition Width="*" MinWidth="336"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- ZONA 1 · tomar notas, en azul -->
+                        <!--
+                            ZONA 1 · la toma de notas, en azul.
+                            No hay «proyecto» que crear: el registro del ensayo es el
+                            .lumproj y vive en la carpeta de tomas de notas de su servicio.
+                            Un fichero de proyecto aparte sería un documento sin ensayo
+                            detrás, y eso rompe la trazabilidad (DD‑89).
+                        -->
                         <Border Grid.Column="0" Style="{StaticResource ZonaInicio}">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
@@ -900,7 +946,8 @@
                                     <TextBlock Text="TOMA DE NOTAS" Style="{StaticResource RotuloZona}"
                                                Foreground="#2563EB"/>
                                 </StackPanel>
-                                <TextBlock Text="Empieza un servicio nuevo con la norma que toque."
+                                <TextBlock Text="Empieza un servicio nuevo con la norma que toque, o abre el que estés llevando."
+                                           TextWrapping="Wrap"
                                            FontSize="12" Foreground="#6B7280" Margin="13,0,0,16"/>
 
                                 <ItemsControl ItemsSource="{Binding Normas}">
@@ -928,14 +975,20 @@
 
                                 <Border Height="1" Background="#EEF0F3" Margin="0,10,12,16"/>
 
-                                <TextBlock Text="O CONTINÚA CON ALGO YA EMPEZADO"
-                                           Style="{StaticResource RotuloZona}" Foreground="#9CA3AF"
-                                           Margin="0,0,0,10"/>
-                                <Button Content="Abrir proyecto…" Command="{Binding DataContext.Abrir, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        Padding="20,10" Cursor="Hand" HorizontalAlignment="Left"
-                                        Background="#2563EB" Foreground="White" BorderThickness="0"/>
+                                <!-- Empezar por la norma y el alta rápida hacen lo mismo, y
+                                     tenerlos juntos aquí era ofrecer dos caminos para una
+                                     sola cosa. El alta se queda en «Archivo» y en la barra
+                                     del tablero, que es donde está el responsable. -->
+                                <Button Content="Abrir…"
+                                        Command="{Binding DataContext.Abrir, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        Padding="20,10" Cursor="Hand" HorizontalAlignment="Left"/>
 
-                                <ItemsControl ItemsSource="{Binding DataContext.Recientes, RelativeSource={RelativeSource AncestorType=Window}}" Margin="0,14,0,0"
+                                <TextBlock Text="ÚLTIMOS ABIERTOS"
+                                           Style="{StaticResource RotuloZona}" Foreground="#9CA3AF"
+                                           Margin="0,20,0,8"
+                                           Visibility="{Binding DataContext.HayRecientes, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolAVisible}}"/>
+
+                                <ItemsControl ItemsSource="{Binding DataContext.UltimosAbiertos, RelativeSource={RelativeSource AncestorType=Window}}"
                                               Visibility="{Binding DataContext.HayRecientes, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolAVisible}}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -957,8 +1010,12 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- ZONA 2 · seguimiento, en verde azulado para que no se confunda -->
-                        <Border Grid.Column="1" Width="280" Margin="18,0,0,0" VerticalAlignment="Top"
+                        <!--
+                            ZONA 2 · gestión, en verde azulado para que no se confunda.
+                            Cada vista tiene su enlace directo: entrar a la de gestión y luego
+                            buscar el botón de la vista eran dos pasos para lo mismo.
+                        -->
+                        <Border Grid.Column="1" Margin="18,0,0,0" VerticalAlignment="Top"
                                 Style="{StaticResource ZonaInicio}">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
@@ -967,21 +1024,53 @@
                                     <TextBlock Text="GESTIÓN DE PROYECTOS" Style="{StaticResource RotuloZona}"
                                                Foreground="#0F766E"/>
                                 </StackPanel>
-                                <TextBlock Text="Mira cómo van los servicios sin abrirlos uno a uno."
+                                <TextBlock Text="Mira cómo van todos los servicios sin abrirlos uno a uno."
+                                           TextWrapping="Wrap"
                                            FontSize="12" Foreground="#6B7280" Margin="13,0,0,16"/>
 
-                                <Border CornerRadius="10" Background="#F0FDFA" BorderBrush="#CCFBF1"
-                                        BorderThickness="1" Padding="16,14" Margin="0,0,0,16">
-                                    <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="#115E59"
-                                               Text="Un tablero por carpeta: una columna por servicio y una tarjeta por sección pendiente."/>
-                                </Border>
+                                <!-- Crear un proyecto es de la zona 1, no de esta: aquí se mira,
+                                     no se da de alta. Repetir el botón solo sería ruido. -->
 
-                                <Button Content="Abrir el tablero" Command="{Binding DataContext.IrAGestion, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        Padding="20,10" Cursor="Hand" HorizontalAlignment="Left"
-                                        Background="#0F766E" Foreground="White" BorderThickness="0"/>
+                                <Button Style="{StaticResource AccesoGestion}"
+                                        Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{x:Static vm:Vista.Tablero}">
+                                    <StackPanel>
+                                        <TextBlock Text="Tablero" FontSize="14" FontWeight="Bold"
+                                                   Foreground="#0F766E"/>
+                                        <TextBlock Text="Qué falta por rellenar, servicio a servicio."
+                                                   TextWrapping="Wrap" FontSize="12" Foreground="#115E59"
+                                                   Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button Style="{StaticResource AccesoGestion}"
+                                        Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{x:Static vm:Vista.Calendario}">
+                                    <StackPanel>
+                                        <TextBlock Text="Calendario" FontSize="14" FontWeight="Bold"
+                                                   Foreground="#0F766E"/>
+                                        <TextBlock Text="Cuándo toca cada uno, por semanas y por técnico."
+                                                   TextWrapping="Wrap" FontSize="12" Foreground="#115E59"
+                                                   Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button Style="{StaticResource AccesoGestion}"
+                                        Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{x:Static vm:Vista.Carga}">
+                                    <StackPanel>
+                                        <TextBlock Text="Carga" FontSize="14" FontWeight="Bold"
+                                                   Foreground="#0F766E"/>
+                                        <TextBlock Text="Cuánto tiene comprometido cada técnico cada mes."
+                                                   TextWrapping="Wrap" FontSize="12" Foreground="#115E59"
+                                                   Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Button>
+
                             </StackPanel>
                         </Border>
                     </Grid>
+
                 </StackPanel>
                 </Grid>
             </ScrollViewer>
@@ -1013,6 +1102,11 @@
                                     Tag="{Binding VistaCarga}"
                                     ToolTip="Cuánto tiene comprometido cada técnico cada mes"/>
 
+                            <Button Content="Nueva toma de notas…"
+                                    Command="{Binding DataContext.NuevoProyecto, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    Padding="14,6" Cursor="Hand" Margin="0,0,8,0"
+                                    Background="#0F766E" Foreground="White" BorderThickness="0"
+                                    ToolTip="Solo hacen falta el nombre y el técnico responsable"/>
                             <Button Content="Elegir carpeta…" Command="{Binding ElegirCarpeta}"
                                     Padding="14,6" Cursor="Hand" Margin="0,0,8,0"/>
                             <Button Content="Actualizar" Command="{Binding Refrescar}"
@@ -1388,6 +1482,16 @@
                                                             <TextBlock Text="{Binding Codigo}" Foreground="White"
                                                                        FontSize="11" FontWeight="SemiBold"
                                                                        TextTrimming="CharacterEllipsis"/>
+                                                            <!-- Varias familias enlazadas: la barra tiene que
+                                                                 decir que abarca más de una toma de notas -->
+                                                            <Border CornerRadius="7" Background="#33FFFFFF"
+                                                                    Padding="6,1" Margin="7,0,0,0"
+                                                                    VerticalAlignment="Center"
+                                                                    Visibility="{Binding EsGrupo,
+                                                                                 Converter={StaticResource BoolAVisible}}">
+                                                                <TextBlock Text="{Binding EtiquetaDeGrupo}"
+                                                                           Foreground="White" FontSize="10"/>
+                                                            </Border>
                                                         </StackPanel>
                                                     </Button>
                                                 </Grid>
@@ -1463,7 +1567,10 @@
 
         <Menu Grid.Row="0" Background="#FFFFFF" BorderBrush="#E1E4E8" BorderThickness="0,0,0,1" Padding="6,3">
             <MenuItem Header="_Archivo">
-                <MenuItem Header="_Nueva pestaña" Command="{Binding NuevaPestana}" InputGestureText="Ctrl+T"/>
+                <MenuItem Header="_Nueva toma de notas…" Command="{Binding NuevoProyecto}"
+                          ToolTip="Darla de alta con nombre y técnico, para poder planificarla ya"/>
+                <Separator/>
+                <MenuItem Header="Nueva _pestaña" Command="{Binding NuevaPestana}" InputGestureText="Ctrl+T"/>
                 <MenuItem Header="_Abrir otro proyecto…" Command="{Binding Abrir}" InputGestureText="Ctrl+O"/>
                 <MenuItem Header="Proyectos _recientes" ItemsSource="{Binding Recientes}"
                           IsEnabled="{Binding HayRecientes}">
@@ -1490,6 +1597,11 @@
             </MenuItem>
 
             <MenuItem Header="_Ver">
+                <!-- Salta a una pestaña vacía, o abre una si no queda ninguna: la portada
+                     es lo que enseña cualquier pestaña sin proyecto -->
+                <MenuItem Header="_Inicio" Command="{Binding VerInicio}"
+                          ToolTip="Volver a la portada sin cerrar lo que tengas abierto"/>
+                <Separator/>
                 <!-- El tablero es una pestaña más, y solo una -->
                 <MenuItem Header="_Gestión de proyectos" Command="{Binding IrAGestion}"/>
             </MenuItem>
@@ -1497,7 +1609,11 @@
             <!-- Listas del laboratorio, comunes a todas las tomas de notas -->
             <MenuItem Header="_Configuración">
                 <!-- Lo primero: de esta carpeta sale todo lo demás -->
-                <MenuItem Header="_Carpeta del laboratorio…" Command="{Binding ElegirCarpetaDelLaboratorio}"/>
+                <!-- El nombre las dice las dos: son la carpeta donde se buscan los
+                     proyectos y la compartida, y en una sola ventana no se adivinaba -->
+                <MenuItem Header="_Carpetas: proyectos y compartida…"
+                          Command="{Binding ElegirCarpetaDelLaboratorio}"
+                          ToolTip="Dónde se buscan los proyectos y dónde están las normas, los técnicos y la tarifa"/>
                 <Separator/>
                 <MenuItem Header="_Técnicos…" Command="{Binding EditarTecnicos}"/>
                 <MenuItem Header="_Capacidad y tarifa…" Command="{Binding EditarCapacidad}"/>
@@ -1506,6 +1622,9 @@
             </MenuItem>
 
             <MenuItem Header="A_yuda">
+                <MenuItem Header="_Reportar un problema…" Command="{Binding ReportarProblema}"
+                          ToolTip="A quién avisar cuando algo falla, y con qué datos"/>
+                <Separator/>
                 <MenuItem Header="_Acerca de…" Command="{Binding VerAcercaDe}"/>
             </MenuItem>
         </Menu>

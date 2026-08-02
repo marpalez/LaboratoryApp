@@ -398,12 +398,12 @@ public sealed class ProyectoViewModel : ObservableObject
     /// </summary>
     public string? Tecnico1
     {
-        get => _datos.Obtener("proyecto", "tecnico1") as string;
+        get => _datos.Tecnico1;
         set
         {
             if (Tecnico1 == value) return;
 
-            _datos.Establecer("proyecto", "tecnico1", value);
+            _datos.Tecnico1 = value;
             Notificar();
             Notificar(nameof(FaltaTecnico1));
             _alCambiar();
@@ -412,12 +412,12 @@ public sealed class ProyectoViewModel : ObservableObject
 
     public string? Tecnico2
     {
-        get => _datos.Obtener("proyecto", "tecnico2") as string;
+        get => _datos.Tecnico2;
         set
         {
             if (Tecnico2 == value) return;
 
-            _datos.Establecer("proyecto", "tecnico2", value);
+            _datos.Tecnico2 = value;
             Notificar();
             _alCambiar();
         }
@@ -436,8 +436,8 @@ public sealed class ProyectoViewModel : ObservableObject
         foreach (var (viejo, nuevo) in renombrados ?? [])
         {
             // Sin pasar por el 'set': el fichero ya lo tiene así, no es un cambio del técnico.
-            if (Coincide(Tecnico1, viejo)) _datos.Establecer("proyecto", "tecnico1", nuevo);
-            if (Coincide(Tecnico2, viejo)) _datos.Establecer("proyecto", "tecnico2", nuevo);
+            if (Coincide(Tecnico1, viejo)) _datos.Tecnico1 = nuevo;
+            if (Coincide(Tecnico2, viejo)) _datos.Tecnico2 = nuevo;
         }
 
         RellenarTecnicos();

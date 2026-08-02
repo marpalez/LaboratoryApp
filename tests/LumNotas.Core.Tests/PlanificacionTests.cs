@@ -704,6 +704,22 @@ public class PlanificacionTests : IDisposable
         Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso), FiltroDeEstado.Archivados));
     }
 
+    /// <summary>
+    /// Los servicios sin responsable se agrupan bajo <b>un solo rótulo</b>, y es el mismo
+    /// en el calendario, en la carga y en el filtro del tablero. Si cada vista se
+    /// inventara el suyo, filtrar por «(sin técnico)» dejaría de casar con lo que enseña
+    /// el calendario, y nadie entendería por qué.
+    /// </summary>
+    [Fact]
+    public void LoQueNoTieneTecnicoSeLlamaIgualEnTodasPartes()
+    {
+        Assert.Equal("(sin técnico)", CargaPorTecnico.SinTecnico);
+
+        // Y lleva paréntesis a propósito: nadie se llama así, de modo que no puede
+        // chocar con un técnico de verdad de la lista del laboratorio.
+        Assert.DoesNotContain(CatalogoDeTecnicos.DePartida().Tecnicos, t => t == CargaPorTecnico.SinTecnico);
+    }
+
     /// <summary>Quien busca «En curso» no quiere lo que se apartó de en medio.</summary>
     [Fact]
     public void UnEstadoConcretoNoTraeLoArchivado()

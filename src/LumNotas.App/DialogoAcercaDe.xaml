@@ -7,7 +7,9 @@
         FontFamily="Segoe UI" FontSize="13" Background="White">
 
     <StackPanel Margin="26,22">
-        <TextBlock Text="Toma de notas de ensayos" FontSize="17" FontWeight="Bold" Foreground="#111827"/>
+        <!-- El nombre lo pone el código, leído del ejecutable: escrito aquí acabaría
+             diciendo una cosa distinta de la portada -->
+        <TextBlock x:Name="Nombre" FontSize="17" FontWeight="Bold" Foreground="#111827"/>
         <TextBlock x:Name="Version" Margin="0,4,0,16" Foreground="#6B7280" FontSize="12"/>
 
         <Border x:Name="Estado" CornerRadius="8" Padding="14,12" BorderThickness="1" Margin="0,0,0,16">

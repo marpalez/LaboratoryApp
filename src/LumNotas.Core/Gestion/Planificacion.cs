@@ -56,6 +56,23 @@ public sealed class Planificacion
     /// </summary>
     public double? Importe { get; set; }
 
+    /// <summary>
+    /// Trabajo del que forma parte esta toma de notas. Es lo que enlaza las varias
+    /// familias de luminarias de un mismo servicio para que el calendario las enseñe
+    /// como <b>una sola barra</b>.
+    /// <para>
+    /// Es un nombre, no un identificador: se teclea en el diálogo de planificación y se
+    /// compara sin mayúsculas ni espacios. No hay fichero de grupo — el enlace vive
+    /// dentro de cada toma de notas y viaja con ella si se mueve de carpeta (DD‑89).
+    /// </para>
+    /// <para>
+    /// De las enlazadas, <b>una hace de cabecera</b>: la que lleva las fechas y el
+    /// importe. Las demás solo dicen a qué grupo pertenecen. Así el importe de la oferta
+    /// está en un único sitio y la carga no lo cuenta cuatro veces.
+    /// </para>
+    /// </summary>
+    public string? Grupo { get; set; }
+
     // Lo que sigue se calcula, no se guarda: sin [JsonIgnore] el .lumproj acababa con
     // campos como «hayFechas» o «esVacia», que además mentirían al releerlos.
 
@@ -65,7 +82,8 @@ public sealed class Planificacion
     /// <summary>Sin planificar todavía. Los proyectos anteriores al calendario están así.</summary>
     [JsonIgnore]
     public bool EsVacia => Inicio is null && Fin is null && RecepcionMuestras is null
-                           && Estado == EstadoDeProyecto.PorHacer && !Archivado && Importe is null;
+                           && Estado == EstadoDeProyecto.PorHacer && !Archivado && Importe is null
+                           && string.IsNullOrWhiteSpace(Grupo);
 
     /// <summary>Fin corregido: una fecha de fin anterior al inicio dibujaría al revés.</summary>
     [JsonIgnore]
@@ -88,7 +106,8 @@ public sealed class Planificacion
         Estado = Estado,
         RecepcionMuestras = RecepcionMuestras,
         Archivado = Archivado,
-        Importe = Importe
+        Importe = Importe,
+        Grupo = Grupo
     };
 
     public static string EtiquetaDe(EstadoDeProyecto estado) => estado switch

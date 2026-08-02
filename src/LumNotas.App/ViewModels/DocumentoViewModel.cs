@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using LumNotas.Core.Datos;
+using LumNotas.Core.Gestion;
 using LumNotas.Core.Motor;
 using LumNotas.Core.Plantilla;
 using LumNotas.Report;
@@ -37,6 +38,25 @@ public sealed class ServiciosDeVentana
 
     /// <summary>Elegir la carpeta compartida del laboratorio.</summary>
     public Action? ElegirCarpetaDelLaboratorio { get; set; }
+
+    /// <summary>A quién avisar cuando algo falla, y con qué datos.</summary>
+    public Action? ReportarProblema { get; set; }
+
+    /// <summary>
+    /// Alta de un proyecto para planificarlo. Recibe la carpeta donde abrir el examinador
+    /// y devuelve la ruta del <c>.lumproj</c> creado, o <c>null</c> si se canceló.
+    /// </summary>
+    public Func<string?, string?>? CrearProyecto { get; set; }
+
+    /// <summary>
+    /// Comprueba si ese código de servicio ya existe en la carpeta del laboratorio y, si
+    /// lo hay, pregunta qué hacer. Devuelve <c>null</c> cuando no hay con qué chocar.
+    /// </summary>
+    /// <remarks>
+    /// Si se elige abrir el que ya existe, <b>lo abre la ventana</b>: es quien lleva las
+    /// pestañas, y así la del técnico se queda intacta con lo que llevara anotado.
+    /// </remarks>
+    public Func<string, string?, RespuestaRepetido?>? ComprobarSiYaExiste { get; set; }
 }
 
 /// <summary>
@@ -141,7 +161,9 @@ public sealed class DocumentoViewModel : ObservableObject
     {
         get
         {
-            if (SinProyecto) return "Toma de notas de ensayos";
+            // Sin proyecto abierto la barra de título dice el nombre del programa, que
+            // se lee del ejecutable para no repetirlo escrito en otro sitio más.
+            if (SinProyecto) return ServicioDeVersion.Nombre;
 
             var nombre = _ruta is null ? "sin guardar" : Path.GetFileName(_ruta);
             return $"Toma de notas{Separador}{Codigo}{Separador}{nombre}{MarcaDeCambios}";
@@ -233,8 +255,15 @@ public sealed class DocumentoViewModel : ObservableObject
 
             // El proyecto guarda con qué norma nació: se carga esa, no la que estuviera
             // abierta. Abrir un IK con la plantilla de luminarias no mostraría nada.
-            var norma = datos.Normas.Select(id => Normas.FirstOrDefault(n => n.Id == id))
-                                    .FirstOrDefault(n => n is not null)
+            //
+            // Manda la que el proyecto dice que es la principal. El resto es el rescate
+            // para los guardados antes de que se apuntara, y ahí el orden de un HashSet
+            // no es de fiar: con dos normas podía abrirse por la añadida, y entonces
+            // guardar reescribía el patrón de muestras —EBP_SAFE por EBP_CLIM— y con él
+            // el identificador de todas las muestras del servicio.
+            var norma = Normas.FirstOrDefault(n => n.Id == datos.NormaPrincipal)
+                        ?? datos.Normas.Select(id => Normas.FirstOrDefault(n => n.Id == id))
+                                       .FirstOrDefault(n => n is not null)
                         ?? Normas.FirstOrDefault(n => n.Id == "60598")
                         ?? Normas.FirstOrDefault();
 
@@ -479,7 +508,15 @@ public sealed class DocumentoViewModel : ObservableObject
         {
             if (pedirRuta || _ruta is null)
             {
-                var sugerido = $"{_datos.CodigoServicio}{RepositorioDeProyectos.Extension}";
+                // Antes de crear un fichero: ¿no estará ya ese servicio en la carpeta?
+                // Desde que el responsable da de alta los proyectos, un técnico puede
+                // haberse puesto a tomar notas sin saber que el suyo ya existía.
+                if (!ProsigueAunqueYaExista()) return;
+
+                // El nombre lo fija el laboratorio: TdN_60598_LEDC42502xx-00.lumproj
+                var sugerido = NombreDeTomaDeNotas.ConExtension(
+                    Plantilla!.Meta.Id, _datos.CodigoServicio, RepositorioDeProyectos.Extension);
+
                 var elegida = _servicios.PedirFicheroParaGuardar?.Invoke(sugerido);
                 if (string.IsNullOrWhiteSpace(elegida)) return;
                 _ruta = elegida;
@@ -499,6 +536,21 @@ public sealed class DocumentoViewModel : ObservableObject
             Mensaje = $"No se pudo guardar: {ex.Message}";
             Cambio?.Invoke();
         }
+    }
+
+    /// <summary>
+    /// Si hay que seguir guardando. Cuando el servicio ya existe en la carpeta se
+    /// pregunta, y el técnico puede abrir el que hay —lo habitual— o crear otro a
+    /// sabiendas: un reensayo o un servicio partido pueden repetir código legítimamente.
+    /// </summary>
+    private bool ProsigueAunqueYaExista()
+    {
+        if (_servicios.ComprobarSiYaExiste is null) return true;
+
+        // Si elige abrir el que ya existe, lo abre la ventana en una pestaña aparte —esta
+        // se queda como está, con lo que hubiera anotado— y aquí solo hay que no seguir.
+        return _servicios.ComprobarSiYaExiste(_datos.CodigoServicio, _ruta)
+            is null or RespuestaRepetido.CrearIgualmente;
     }
 
     private void Exportar()

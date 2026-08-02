@@ -1,4 +1,5 @@
 using LumNotas.Core.Datos;
+using LumNotas.Core.Gestion;
 using LumNotas.Core.Motor;
 using LumNotas.Core.Plantilla;
 
@@ -734,6 +735,66 @@ public class PlantillasDeOtrasNormasTests
 
         Assert.Equal("EBP_CLIM12345202601", datos.IdentificadorDeMuestra(1));
         Assert.Contains("60529", datos.Normas);
+
+        // Y la principal es la que se aplicó como tal, no la última en llegar.
+        Assert.Equal("62262", datos.NormaPrincipal);
+    }
+
+    // ---- cuál es la principal la dice el proyecto --------------------------
+
+    /// <summary>
+    /// El proyecto <b>apunta</b> con qué norma nació, en vez de dejar que se deduzca
+    /// después del patrón de muestras.
+    /// <para>
+    /// El caso que lo obligaba: IP 60529 y módulos LED 62031 <b>comparten patrón</b>
+    /// —las dos nombran <c>EBP_SAFE…</c>—, así que deducirlo no daba respuesta y se
+    /// acababa decidiendo por orden alfabético, que no significa nada.
+    /// </para>
+    /// </summary>
+    [Fact]
+    public void ConDosNormasDelMismoPatronMandaLaQueElProyectoApunto()
+    {
+        var ip = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "60529");
+        var led = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62031");
+
+        // Nace como módulos LED, con el IP añadido detrás.
+        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
+        led.AplicarA(datos);
+        ip.AplicarA(datos, principal: false);
+
+        Assert.Equal("62031", datos.NormaPrincipal);
+
+        // El tablero detalla la 62031 y resume la 60529 en una línea, se le pasen las
+        // plantillas en el orden que se le pasen.
+        foreach (var orden in new[] { new[] { ip, led }, [led, ip] })
+        {
+            var resumen = AnalizadorDeProyectos.Analizar(orden, datos, "x.lumproj", DateTime.Now);
+            Assert.Contains(resumen.SeccionesPendientes, s => s.Titulo == ip.Meta.Titulo);
+        }
+    }
+
+    /// <summary>
+    /// Si la norma principal se quita del servicio desde la toma de notas, no puede
+    /// seguir detallándose una norma que el proyecto ya no lleva: se vuelve a deducir.
+    /// </summary>
+    [Fact]
+    public void SiLaPrincipalYaNoEstaEntreLasSuyasSeVuelveADeducir()
+    {
+        var luminarias = Contexto.Plantilla;
+        var led = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62031");
+
+        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
+        led.AplicarA(datos);
+        luminarias.AplicarA(datos, principal: false);
+
+        // Se retira la 62031 del servicio, pero el proyecto sigue apuntándola.
+        datos.Normas.Remove("62031");
+        Assert.Equal("62031", datos.NormaPrincipal);
+
+        // No se cae ni detalla la que ya no está: manda luminarias, como siempre.
+        var resumen = AnalizadorDeProyectos.Analizar([luminarias], datos, "x.lumproj", DateTime.Now);
+        Assert.Null(resumen.Error);
+        Assert.NotEmpty(resumen.SeccionesPendientes);
     }
 
     /// <summary>Solo luminarias declara clase de aislamiento; el resto no la pide.</summary>

@@ -1,0 +1,45 @@
+<Window x:Class="LumNotas.App.DialogoProyectoRepetido"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ese proyecto ya existe"
+        SizeToContent="Height" Width="580" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        FontFamily="Segoe UI" FontSize="13" Background="White">
+
+    <StackPanel Margin="28,24">
+        <TextBlock x:Name="Titulo" FontSize="17" FontWeight="Bold"
+                   Foreground="#111827" TextWrapping="Wrap"/>
+        <TextBlock Margin="0,8,0,16" Foreground="#6B7280" FontSize="12" TextWrapping="Wrap"
+                   Text="Seguramente lo dio de alta el responsable para planificarlo. Si creas otro, tendréis el mismo servicio en dos ficheros: el tuyo con los datos y el suyo con las fechas."/>
+
+        <!-- Con quién chocas y dónde está: sin esto el aviso no sirve para decidir -->
+        <ItemsControl x:Name="Existentes" Margin="0,0,0,20">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="#FEF3C7" BorderBrush="#FDE68A" BorderThickness="1"
+                            CornerRadius="8" Padding="14,12" Margin="0,0,0,6">
+                        <StackPanel>
+                            <TextBlock Text="{Binding CodigoServicio}" FontWeight="Bold" Foreground="#92400E"/>
+                            <TextBlock Text="{Binding Tecnico}" FontSize="12" Foreground="#92400E"
+                                       Margin="0,2,0,0"/>
+                            <TextBlock Text="{Binding Ruta}" FontSize="11" Foreground="#B45309"
+                                       TextTrimming="CharacterEllipsis" ToolTip="{Binding Ruta}"
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Cancelar" Click="AlCancelar" IsCancel="True"
+                    Padding="16,9" Margin="0,0,10,0" Cursor="Hand"/>
+            <Button Content="Crear otro igualmente" Click="AlCrearIgual"
+                    Padding="16,9" Margin="0,0,10,0" Cursor="Hand"
+                    Background="#E5E7EB" Foreground="#374151" BorderThickness="0"/>
+            <Button x:Name="BotonAbrir" Content="Abrir el que ya existe" Click="AlAbrir" IsDefault="True"
+                    Padding="18,9" Cursor="Hand"
+                    Background="#2563EB" Foreground="White" BorderThickness="0"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

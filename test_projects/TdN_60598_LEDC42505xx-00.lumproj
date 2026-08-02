@@ -1,0 +1,34 @@
+{
+  "formato": "lumproj/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-02T23:35:56.3429884+02:00",
+  "codigoServicio": "LEDC42505",
+  "numeroMuestras": 1,
+  "normas": [
+    "60598"
+  ],
+  "normaPrincipal": "60598",
+  "patronIdentificador": "EBP_SAFE{codigoServicio}",
+  "planificacion": {
+    "inicio": "2026-08-31T00:00:00",
+    "fin": "2026-09-30T00:00:00",
+    "estado": "porHacer",
+    "archivado": false,
+    "importe": 5000
+  },
+  "selecciones": {},
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Sin técnico"
+    }
+  ],
+  "na": [],
+  "checklists": []
+}

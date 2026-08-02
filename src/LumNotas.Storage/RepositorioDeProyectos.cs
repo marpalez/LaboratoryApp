@@ -48,6 +48,7 @@ public sealed class RepositorioDeProyectos
             CodigoServicio = datos.CodigoServicio,
             NumeroMuestras = datos.NumeroMuestras,
             Normas = [.. datos.Normas],
+            NormaPrincipal = datos.NormaPrincipal,
             PatronIdentificador = datos.PatronIdentificador,
             Selecciones = datos.VolcarSelecciones().ToDictionary(s => s.Campo, s => s.Valores.ToList()),
             Valores = [.. datos.Volcar().Select(v => new ValorGuardado
@@ -80,6 +81,9 @@ public sealed class RepositorioDeProyectos
         {
             CodigoServicio = documento.CodigoServicio,
             NumeroMuestras = documento.NumeroMuestras,
+            // Los proyectos guardados antes de que se apuntara no la traen: se quedan en
+            // null y el tablero la deduce, como hacía siempre.
+            NormaPrincipal = documento.NormaPrincipal,
             PatronIdentificador = documento.PatronIdentificador ?? DatosProyecto.PatronPorDefecto
         };
 
@@ -129,7 +133,7 @@ public sealed class RepositorioDeProyectos
         for (var i = 0; i < documento.Valores.Count; i++)
         {
             var valor = documento.Valores[i];
-            if (valor.Campo is not ("tecnico1" or "tecnico2")) continue;
+            if (!DatosProyecto.EsCampoDeTecnico(valor.Campo)) continue;
             if (!string.Equals(valor.Valor?.Trim(), viejo.Trim(), StringComparison.CurrentCultureIgnoreCase)) continue;
 
             documento.Valores[i] = new ValorGuardado
@@ -264,6 +268,12 @@ public sealed class RepositorioDeProyectos
 
         /// <summary>Normas que lleva el proyecto. Un servicio puede ensayarse contra varias.</summary>
         public List<string> Normas { get; init; } = [];
+
+        /// <summary>
+        /// Con cuál nació, que es la que el tablero detalla. Los ficheros anteriores a
+        /// este campo no la traen y se deduce al leerlos.
+        /// </summary>
+        public string? NormaPrincipal { get; init; }
 
         public string? PatronIdentificador { get; init; }
 

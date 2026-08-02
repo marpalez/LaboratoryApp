@@ -14,6 +14,15 @@ namespace LumNotas.App.ViewModels;
 /// </summary>
 public static class ServicioDeVersion
 {
+    /// <summary>
+    /// Cómo se llama el programa. Sale de <c>&lt;Product&gt;</c> en el <c>.csproj</c>, que es
+    /// el único sitio donde está escrito: la portada, la ventana «Acerca de» y las
+    /// propiedades del ejecutable dicen lo mismo sin tener que acordarse de tres sitios.
+    /// </summary>
+    public static string Nombre { get; } =
+        Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyProductAttribute>()?.Product
+        ?? "LumNotas";
+
     /// <summary>La versión de este ejecutable.</summary>
     public static string EnEjecucion { get; } =
         Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion

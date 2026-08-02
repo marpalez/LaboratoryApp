@@ -44,6 +44,7 @@ public partial class DialogoPlanificacion : Window
         Recibidas.IsChecked = actual.MuestrasRecibidas;
         Recepcion.SelectedDate = actual.RecepcionMuestras;
         Archivar.IsChecked = actual.Archivado;
+        Grupo.Text = actual.Grupo ?? "";
 
         ActualizarZonaRecepcion();
         ActualizarSemanas();
@@ -81,6 +82,21 @@ public partial class DialogoPlanificacion : Window
 
     private void AlCambiarImporte(object sender, System.Windows.Controls.TextChangedEventArgs e)
         => ActualizarTrabajo();
+
+    /// <summary>
+    /// El grupo se escribe a mano en cada toma de notas, así que una errata las deja sin
+    /// enlazar. Aquí se recuerda cómo va a quedar guardado —sin mayúsculas ni espacios de
+    /// más— para que se vea que «ANTAR 2504» y «antar2504» son el mismo trabajo.
+    /// </summary>
+    private void AlCambiarGrupo(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        var escrito = Grupo.Text.Trim();
+
+        AvisoGrupo.Text = escrito.Length == 0
+            ? "Escribe el mismo nombre en las tomas de notas que sean del mismo trabajo —las familias de un servicio— y el calendario las enseñará en una sola barra. Las fechas y el importe se ponen solo en una de ellas."
+            : $"Se enlazará con las que lleven «{escrito}». No hace falta escribirlo igual: "
+              + "no se distinguen mayúsculas, espacios ni guiones.";
+    }
 
     private void AlCambiarFecha(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         => ActualizarSemanas();
@@ -167,7 +183,9 @@ public partial class DialogoPlanificacion : Window
             Estado = Estado.SelectedValue is EstadoDeProyecto estado ? estado : EstadoDeProyecto.PorHacer,
             RecepcionMuestras = Recibidas.IsChecked == true ? Recepcion.SelectedDate : null,
             Archivado = Archivar.IsChecked == true,
-            Importe = importe
+            Importe = importe,
+            // Vacío es sin grupo, no un grupo llamado "".
+            Grupo = Grupo.Text.Trim() is { Length: > 0 } grupo ? grupo : null
         };
 
         Close();

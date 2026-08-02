@@ -18,6 +18,61 @@ public sealed class DatosProyecto
     public string CodigoServicio { get; set; } = "";
     public int NumeroMuestras { get; set; } = 1;
 
+    // ---- identidad del proyecto -------------------------------------------
+    //
+    // Lo que sigue es del proyecto y no de una norma: no cambia porque el servicio
+    // lleve además módulos LED. Las cuatro plantillas lo declaran igual en su
+    // cabecera —y ahí sigue guardado, que este paso no toca el formato del fichero—
+    // pero el resto del programa ya no lo busca por su clave. Cuando la identidad
+    // pase a tener su propio sitio en el `.lumproj`, se cambia aquí y no en las seis
+    // líneas que había repartidas por cuatro proyectos.
+
+    /// <summary>El bloque donde las plantillas declaran la cabecera del servicio.</summary>
+    public const string Cabecera = "proyecto";
+
+    /// <summary>
+    /// Responsable del proyecto: el que sale en el tablero y por el que se filtra el
+    /// calendario. Con varias normas hay un solo responsable, no uno por norma.
+    /// </summary>
+    public string? Tecnico1
+    {
+        get => Obtener(Cabecera, CampoTecnico1) as string;
+        set => Establecer(Cabecera, CampoTecnico1, value);
+    }
+
+    /// <summary>El segundo técnico, si lo hay. No es el responsable.</summary>
+    public string? Tecnico2
+    {
+        get => Obtener(Cabecera, CampoTecnico2) as string;
+        set => Establecer(Cabecera, CampoTecnico2, value);
+    }
+
+    /// <summary>
+    /// La norma con la que nació el proyecto: la que el tablero detalla sección a sección
+    /// mientras las añadidas ocupan una línea cada una.
+    /// <para>
+    /// <b>Es un dato del proyecto, y por eso se guarda.</b> Antes había que deducirlo del
+    /// patrón con el que se nombran las muestras, que es una <i>consecuencia</i> de haberla
+    /// elegido y no la elección: dos normas que comparten patrón dejaban la pregunta sin
+    /// respuesta y se acababa decidiendo por orden alfabético.
+    /// </para>
+    /// <para>
+    /// Los proyectos guardados antes de que esto existiera no lo traen; ahí se sigue
+    /// deduciendo. Ver <c>AnalizadorDeProyectos</c>.
+    /// </para>
+    /// </summary>
+    public string? NormaPrincipal { get; set; }
+
+    public const string CampoTecnico1 = "tecnico1";
+    public const string CampoTecnico2 = "tecnico2";
+
+    /// <summary>
+    /// Si una clave de la cabecera es la de un técnico. Lo necesita el repositorio, que
+    /// corrige nombres sobre el fichero ya serializado y no sobre este objeto.
+    /// </summary>
+    public static bool EsCampoDeTecnico(string campo)
+        => campo is CampoTecnico1 or CampoTecnico2;
+
     /// <summary>
     /// Normas que lleva este proyecto (los <c>meta.id</c> de las plantillas). Un servicio
     /// puede ensayarse contra varias a la vez: 60598-1, 62031, 60529 e IK 62262.

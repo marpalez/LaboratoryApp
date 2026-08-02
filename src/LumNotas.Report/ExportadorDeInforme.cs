@@ -96,8 +96,8 @@ public sealed class ExportadorDeInforme(PlantillaEnsayos plantilla, CatalogoDeEq
             datos.NumeroMuestras == 0
                 ? "—"
                 : string.Join(", ", datos.Muestras.Select(datos.IdentificadorDeMuestra)));
-        Ficha(h, "Técnico 1", V(datos, "proyecto", "tecnico1"));
-        Ficha(h, "Técnico 2", V(datos, "proyecto", "tecnico2"));
+        Ficha(h, "Técnico 1", datos.Tecnico1 ?? "");
+        Ficha(h, "Técnico 2", datos.Tecnico2 ?? "");
         Ficha(h, "Nº de muestras", datos.NumeroMuestras.ToString());
         Ficha(h, "Clase", datos.Clase.ToString());
         Ficha(h, "Ta", V(datos, "proyecto", "ta"));

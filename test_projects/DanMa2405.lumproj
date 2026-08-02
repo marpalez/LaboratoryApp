@@ -13,7 +13,7 @@
     "fin": "2026-09-26T00:00:00+02:00",
     "estado": "porHacer",
     "recepcionMuestras": "2026-08-02T00:00:00+02:00",
-    "archivado": true,
+    "archivado": false,
     "importe": 500
   },
   "selecciones": {},

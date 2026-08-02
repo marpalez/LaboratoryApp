@@ -174,6 +174,63 @@ public class TecnicosTests : IDisposable
         Assert.Contains("Javier Ibor", CatalogoDeTecnicos.Cargar(_carpeta).ConNombreSuelto("Javier Ibor"));
     }
 
+    // ---- el técnico es del proyecto, no de la norma ------------------------
+
+    /// <summary>
+    /// El responsable se pide ya por <see cref="DatosProyecto.Tecnico1"/> y no buscando su
+    /// clave en la cabecera. <b>Sigue guardándose en el mismo sitio</b>: los proyectos
+    /// escritos antes de existir la propiedad —como los que crea <c>Guardar</c> aquí, a la
+    /// vieja usanza— tienen que leerse igual, antes y después de pasar por el disco.
+    /// </summary>
+    [Fact]
+    public void ElResponsableSeLeeIgualEnLosProyectosYaGuardados()
+    {
+        var ruta = Guardar("111112026", "Javier Ibor", "Mario Madrigal");
+
+        var releido = _repositorio.Cargar(ruta);
+
+        Assert.Equal("Javier Ibor", releido.Tecnico1);
+        Assert.Equal("Mario Madrigal", releido.Tecnico2);
+    }
+
+    /// <summary>
+    /// Y al revés: escribirlo por la propiedad lo deja donde la plantilla lo declara, que
+    /// es de donde lo sacan el informe y las reglas de la norma. Si dejara de coincidir,
+    /// el técnico desaparecería del informe sin que nadie se enterase.
+    /// </summary>
+    [Fact]
+    public void EscribirElResponsableLoDejaDondeLaPlantillaLoDeclara()
+    {
+        var datos = new DatosProyecto { CodigoServicio = "111112026" };
+        datos.Tecnico1 = "Javier Ibor";
+
+        Assert.Equal("Javier Ibor", datos.Obtener(DatosProyecto.Cabecera, DatosProyecto.CampoTecnico1));
+
+        // Y la clave es la misma que declaran las cuatro plantillas en su cabecera.
+        foreach (var plantilla in Contexto.TodasLasPlantillas())
+            Assert.Contains(plantilla.Proyecto.Campos, c => c.Id == DatosProyecto.CampoTecnico1);
+    }
+
+    /// <summary>
+    /// <b>Un proyecto tiene un responsable, no uno por norma.</b> Es la razón de que el
+    /// dato sea del proyecto: un servicio de luminarias con módulos LED no lo hacen dos
+    /// personas distintas por llevar dos tomas de notas.
+    /// </summary>
+    [Fact]
+    public void ElResponsableEsUnoAunqueElProyectoLleveVariasNormas()
+    {
+        var datos = new DatosProyecto { CodigoServicio = "111112026", NumeroMuestras = 1 };
+        datos.Tecnico1 = "Javier Ibor";
+
+        var normas = Contexto.TodasLasPlantillas().ToList();
+        foreach (var norma in normas) datos.Normas.Add(norma.Meta.Id);
+
+        // Se mire por donde se mire —cambiando cuál va primera— el responsable es el mismo.
+        foreach (var orden in new[] { normas, Enumerable.Reverse(normas).ToList() })
+            Assert.Equal("Javier Ibor",
+                AnalizadorDeProyectos.Analizar(orden, datos, "x.lumproj", DateTime.Now).Tecnico);
+    }
+
     [Fact]
     public void UnProyectoCorruptoNoDetieneLaCorreccionDeLosDemas()
     {

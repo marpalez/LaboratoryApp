@@ -140,12 +140,16 @@ public sealed class CalendarioViewModel : ObservableObject
 
         // El filtro —estado, técnico y norma— lo aplica el tablero antes de llamar aquí:
         // uno solo para las tres vistas.
-        var visibles = _proyectos;
+        // Las tomas de notas enlazadas —las familias de un mismo servicio— se juntan en
+        // una sola línea: el jefe planifica un trabajo, no cuatro. Manda la cabecera,
+        // que es la que lleva las fechas.
+        var visibles = EnlaceDeTomasDeNotas.Agrupar(_proyectos);
 
-        var conFechas = visibles.Where(p => p.Planificacion.HayFechas).ToList();
+        var conFechas = visibles.Where(e => e.Cabecera.Planificacion.HayFechas).ToList();
 
         var necesario = EjeDeSemanas.Para(
-            conFechas.Select(p => (p.Planificacion.Inicio!.Value, p.Planificacion.FinEfectivo!.Value)),
+            conFechas.Select(e => (e.Cabecera.Planificacion.Inicio!.Value,
+                                   e.Cabecera.Planificacion.FinEfectivo!.Value)),
             hoy, Anchos[_zoom], extraAntes: _extraAntes, extraDespues: _extraDespues);
 
         // Al refrescar los datos, si el eje que ya había sigue valiendo, se conserva: al
@@ -155,19 +159,22 @@ public sealed class CalendarioViewModel : ObservableObject
 
         // Un proyecto con una fecha disparatada queda fuera del eje. No se pierde: baja a
         // la banda de abajo, que es justo donde se ve que hay que corregirlo.
-        bool Dibujable(ResumenDeProyecto p)
-            => _eje.Contiene(p.Planificacion.Inicio!.Value, p.Planificacion.FinEfectivo!.Value);
+        bool Dibujable(EntradaDeCalendario e)
+            => e.Cabecera.Planificacion.HayFechas
+               && _eje.Contiene(e.Cabecera.Planificacion.Inicio!.Value,
+                                e.Cabecera.Planificacion.FinEfectivo!.Value);
 
         Tarjetas.Clear();
-        foreach (var proyecto in conFechas.Where(Dibujable).OrderBy(p => p.Planificacion.Inicio))
-            Tarjetas.Add(new TarjetaPlanViewModel(proyecto, _eje, hoy, _planificar, _abrir, _guardar));
+        foreach (var entrada in conFechas.Where(Dibujable)
+                                         .OrderBy(e => e.Cabecera.Planificacion.Inicio))
+            Tarjetas.Add(new TarjetaPlanViewModel(entrada, _eje, hoy, _planificar, _abrir, _guardar));
 
         RehacerFilas();
 
         SinFechas.Clear();
-        foreach (var proyecto in visibles.Where(p => !p.Planificacion.HayFechas || !Dibujable(p))
-                                         .OrderBy(p => p.CodigoServicio))
-            SinFechas.Add(new TarjetaPlanViewModel(proyecto, _eje, hoy, _planificar, _abrir, _guardar));
+        foreach (var entrada in visibles.Where(e => !Dibujable(e))
+                                        .OrderBy(e => e.Cabecera.CodigoServicio))
+            SinFechas.Add(new TarjetaPlanViewModel(entrada, _eje, hoy, _planificar, _abrir, _guardar));
 
         Notificar(nameof(Semanas));
         Notificar(nameof(Meses));
@@ -211,8 +218,12 @@ public sealed class CalendarioViewModel : ObservableObject
         }
     }
 
-    /// <summary>Etiqueta de los servicios que aún no tienen responsable asignado.</summary>
-    public const string SinTecnico = "(sin técnico)";
+    /// <summary>
+    /// Etiqueta de los servicios que aún no tienen responsable asignado. Es la misma que
+    /// usan la carga y el filtro del tablero: si cada vista se inventara la suya, filtrar
+    /// por «(sin técnico)» dejaría de casar con lo que enseña el calendario.
+    /// </summary>
+    public const string SinTecnico = CargaPorTecnico.SinTecnico;
 
 }
 
@@ -253,18 +264,26 @@ public sealed class TarjetaPlanViewModel : ObservableObject
     private readonly Action<ResumenDeProyecto, Planificacion> _guardar;
     private readonly BarraDePlanificacion _barra;
 
-    public TarjetaPlanViewModel(ResumenDeProyecto proyecto, EjeDeSemanas eje, DateTime hoy,
+    /// <param name="entrada">
+    /// La toma de notas que se dibuja y, si está enlazada, las que van con ella. Se
+    /// arrastra y se planifica <b>la cabecera</b>, que es la que lleva las fechas; el
+    /// avance que se enseña es el del trabajo entero.
+    /// </param>
+    public TarjetaPlanViewModel(EntradaDeCalendario entrada, EjeDeSemanas eje, DateTime hoy,
                                 Action<ResumenDeProyecto> planificar, Action<string> abrir,
                                 Action<ResumenDeProyecto, Planificacion> guardar)
     {
-        _proyecto = proyecto;
+        _entrada = entrada;
+        _proyecto = entrada.Cabecera;
         _hoy = hoy;
         _guardar = guardar;
-        _barra = new BarraDePlanificacion(proyecto.Planificacion, eje);
+        _barra = new BarraDePlanificacion(_proyecto.Planificacion, eje);
 
-        Planificar = new Comando(() => planificar(proyecto));
-        Abrir = new Comando(() => abrir(proyecto.Ruta));
+        Planificar = new Comando(() => planificar(_proyecto));
+        Abrir = new Comando(() => abrir(_proyecto.Ruta));
     }
+
+    private readonly EntradaDeCalendario _entrada;
 
     // ---- arrastre ----------------------------------------------------------
     // El gesto lo lleva BarraDePlanificacion, en el núcleo. Aquí solo se avisa a la
@@ -314,8 +333,19 @@ public sealed class TarjetaPlanViewModel : ObservableObject
 
     public string Tecnico => _proyecto.Tecnico;
     public string Normas => string.Join(" + ", _proyecto.Normas);
-    public string Avance => _proyecto.Avance;
+
+    /// <summary>El avance del trabajo entero: si hay varias enlazadas, la suma.</summary>
+    public string Avance => _entrada.Avance;
+
     public string Carpeta => Path.GetDirectoryName(_proyecto.Ruta) ?? "";
+
+    /// <summary>Cuántas tomas de notas van en esta barra. Una, si no está enlazada.</summary>
+    public int Enlazadas => _entrada.Miembros.Count;
+
+    public bool EsGrupo => _entrada.EsGrupo;
+
+    /// <summary>Rótulo del grupo para la barra: «ANTAR2504 · 4 tomas de notas».</summary>
+    public string EtiquetaDeGrupo => _entrada.EsGrupo ? $"{Enlazadas} tomas de notas" : "";
 
     /// <summary>Se llama <c>Plan</c> y no <c>Planificacion</c> para no tapar al tipo.</summary>
     public Planificacion Plan => _proyecto.Planificacion;
@@ -356,6 +386,12 @@ public sealed class TarjetaPlanViewModel : ObservableObject
         new[]
         {
             Codigo + (string.IsNullOrWhiteSpace(Normas) ? "" : "  |  " + Normas),
+            // Con varias enlazadas hay que decir cuáles, o la barra miente sobre qué abarca.
+            !EsGrupo ? null
+                : $"Grupo «{_entrada.Grupo}» · {Enlazadas} tomas de notas:\n  "
+                  + string.Join("\n  ", _entrada.Miembros.Select(m =>
+                      (string.IsNullOrWhiteSpace(m.CodigoServicio) ? m.Nombre : m.CodigoServicio)
+                      + "  " + m.Avance)),
             string.IsNullOrWhiteSpace(Tecnico) ? null : "Técnico: " + Tecnico,
             "Estado: " + EstadoTexto + (Retrasado ? "  ·  fuera de plazo" : ""),
             "Fechas: " + Fechas,

@@ -68,6 +68,33 @@ public sealed class GestionViewModel : ObservableObject
     public Action<string>? AbrirProyecto { get; set; }
 
     /// <summary>
+    /// Proyectos de la carpeta del laboratorio que ya usan ese código de servicio.
+    /// <para>
+    /// <b>Relee el disco</b> en vez de mirar lo último escaneado: el proyecto con el que
+    /// se choca puede haberlo dado de alta el responsable hace cinco minutos desde otro
+    /// equipo, que es justo el caso que hay que cazar. Con la caché de resúmenes cuesta
+    /// una décima de segundo, y solo se consulta al guardar un proyecto <b>nuevo</b>,
+    /// una vez en la vida de cada uno.
+    /// </para>
+    /// </summary>
+    public IReadOnlyList<ResumenDeProyecto> BuscarPorCodigo(string? codigo, string? rutaPropia = null)
+    {
+        if (string.IsNullOrWhiteSpace(codigo) || string.IsNullOrWhiteSpace(Carpeta)) return [];
+
+        try
+        {
+            var todos = _explorador.Explorar(Carpeta, _normasInstaladas, _porDefecto);
+            return ProyectosRepetidos.ConElMismoCodigo(todos, codigo, rutaPropia);
+        }
+        catch (Exception)
+        {
+            // Sin carpeta accesible no se puede comprobar, y decirlo sería ruido: no
+            // impide guardar ni le sirve de nada al técnico.
+            return [];
+        }
+    }
+
+    /// <summary>
     /// Diálogo de planificación: recibe el título y una copia de lo que hay, y devuelve
     /// lo editado, o <c>null</c> si el técnico canceló. Lo inyecta la ventana.
     /// </summary>
@@ -321,7 +348,8 @@ public sealed class GestionViewModel : ObservableObject
         _ultimos = todos;
         _leidoEn = reloj.Elapsed;
 
-        Rellenar(Tecnicos, todos.Select(p => p.Tecnico), ref _tecnico, nameof(Tecnico));
+        Rellenar(Tecnicos, todos.Select(p => p.Tecnico), ref _tecnico, nameof(Tecnico),
+                 CargaPorTecnico.SinTecnico);
         Rellenar(Normas, todos.SelectMany(p => p.Normas), ref _norma, nameof(Norma));
 
         Repartir(reencuadrar: false);
@@ -361,27 +389,48 @@ public sealed class GestionViewModel : ObservableObject
     {
         if (!FiltroDeEstado.Pasa(proyecto.Planificacion, Estado)) return false;
 
-        if (Tecnico != Cualquiera && !string.Equals(proyecto.Tecnico, Tecnico,
-                StringComparison.CurrentCultureIgnoreCase)) return false;
+        if (Tecnico != Cualquiera && !EsSuyo(proyecto)) return false;
 
         return Norma == Cualquiera || proyecto.Normas.Contains(Norma);
     }
+
+    /// <summary>
+    /// Si el servicio lo lleva el técnico elegido. <b>«(sin técnico)» es una opción más</b>:
+    /// pedirlo enseña justo los que están sin asignar, que es lo que hay que repartir.
+    /// </summary>
+    private bool EsSuyo(ResumenDeProyecto proyecto)
+        => Tecnico == CargaPorTecnico.SinTecnico
+            ? string.IsNullOrWhiteSpace(proyecto.Tecnico)
+            : string.Equals(proyecto.Tecnico, Tecnico, StringComparison.CurrentCultureIgnoreCase);
 
     /// <summary>
     /// Rehace la lista de un desplegable con los valores que hay en los proyectos. Si el
     /// elegido ya no existe —se archivó el último servicio de ese técnico— se vuelve a
     /// «(todos)» en vez de dejar el tablero vacío sin explicar por qué.
     /// </summary>
+    /// <param name="etiquetaSiFalta">
+    /// Qué ofrecer cuando <b>hay proyectos sin ese dato</b>. En técnicos es «(sin
+    /// técnico)», el mismo rótulo con el que el calendario y la carga los agrupan: sin
+    /// esta opción no había manera de pedir los que están sin asignar, que es justo lo
+    /// que el responsable quiere ver para repartirlos.
+    /// </param>
     private void Rellenar(ObservableCollection<string> destino, IEnumerable<string> valores,
-                          ref string elegido, string propiedad)
+                          ref string elegido, string propiedad, string? etiquetaSiFalta = null)
     {
-        var lista = valores.Where(v => !string.IsNullOrWhiteSpace(v))
-                           .Distinct(StringComparer.CurrentCultureIgnoreCase)
-                           .OrderBy(v => v, StringComparer.CurrentCultureIgnoreCase)
-                           .ToList();
+        var todos = valores.ToList();
+
+        var lista = todos.Where(v => !string.IsNullOrWhiteSpace(v))
+                         .Distinct(StringComparer.CurrentCultureIgnoreCase)
+                         .OrderBy(v => v, StringComparer.CurrentCultureIgnoreCase)
+                         .ToList();
 
         destino.Clear();
         destino.Add(Cualquiera);
+
+        // Al final, después de las personas: es un cajón, no un compañero más.
+        if (etiquetaSiFalta is not null && todos.Any(string.IsNullOrWhiteSpace))
+            lista.Add(etiquetaSiFalta);
+
         foreach (var valor in lista) destino.Add(valor);
 
         if (destino.Contains(elegido)) return;

@@ -9,6 +9,13 @@
     "62031"
   ],
   "patronIdentificador": "EBP_SAFE{codigoServicio}",
+  "planificacion": {
+    "inicio": "2026-07-27T00:00:00",
+    "fin": "2026-08-24T00:00:00",
+    "estado": "enCurso",
+    "archivado": false,
+    "importe": 10000
+  },
   "selecciones": {
     "partes2": [
       "-2-2"

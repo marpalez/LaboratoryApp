@@ -1,0 +1,76 @@
+<Window x:Class="LumNotas.App.DialogoNuevoProyecto"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Nueva toma de notas"
+        SizeToContent="Height" Width="560" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        FontFamily="Segoe UI" FontSize="13" Background="White">
+
+    <Window.Resources>
+        <Style TargetType="TextBlock" x:Key="Etiqueta">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="Opcional">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="#9CA3AF"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="26,22">
+        <TextBlock Text="Nueva toma de notas" FontSize="17" FontWeight="Bold" Foreground="#111827"/>
+        <TextBlock Margin="0,4,0,18" Foreground="#6B7280" FontSize="12" TextWrapping="Wrap"
+                   Text="Con el nombre, el responsable y la norma ya se puede planificar. Lo demás lo rellenará el técnico cuando empiece el ensayo. En rojo, lo que falta."/>
+
+        <!--
+            Los obligatorios, arriba y juntos. El rótulo se pone rojo mientras el campo
+            esté vacío, igual que las casillas obligatorias de la toma de notas: así se ve
+            qué falta sin tener que leer el aviso de abajo.
+        -->
+        <TextBlock x:Name="EtiquetaNombre" Text="Nombre o código de servicio"
+                   Style="{StaticResource Etiqueta}"/>
+        <TextBox x:Name="Nombre" Padding="6,5" Margin="0,0,0,14" TextChanged="AlEscribir"/>
+
+        <TextBlock x:Name="EtiquetaTecnico" Text="Técnico 1 · responsable"
+                   Style="{StaticResource Etiqueta}"/>
+        <ComboBox x:Name="Tecnico1" Padding="6,5" Margin="0,0,0,14"
+                  SelectionChanged="AlElegirTecnico"/>
+
+        <TextBlock x:Name="EtiquetaNorma" Text="Norma" Style="{StaticResource Etiqueta}"/>
+        <TextBlock Text="Con la que se va a ensayar. Es la que el tablero detallará y la que da nombre al fichero."
+                   Style="{StaticResource Opcional}"/>
+        <ComboBox x:Name="Norma" Padding="6,5" Margin="0,0,0,14"
+                  DisplayMemberPath="Titulo" SelectionChanged="AlElegirNorma"/>
+
+        <TextBlock x:Name="EtiquetaCarpeta" Text="Carpeta" Style="{StaticResource Etiqueta}"/>
+        <!-- El .lumproj es el registro del ensayo: tiene que quedar donde le corresponde
+             en el árbol de clientes, no en cualquier sitio -->
+        <TextBlock Text="La carpeta de tomas de notas de ese servicio, dentro de la del cliente."
+                   Style="{StaticResource Opcional}"/>
+        <DockPanel Margin="0,0,0,4">
+            <Button DockPanel.Dock="Right" Content="Examinar…" Click="AlElegirCarpeta"
+                    Padding="14,6" Margin="8,0,0,0" Cursor="Hand"/>
+            <TextBox x:Name="Carpeta" Padding="6,5" IsReadOnly="True" Background="#F9FAFB"
+                     TextChanged="AlEscribir" TextWrapping="NoWrap"/>
+        </DockPanel>
+
+        <Border Height="1" Background="#EEF0F3" Margin="0,18,0,16"/>
+
+        <!-- Lo que no bloquea, debajo de la línea -->
+        <TextBlock Text="Técnico 2" Style="{StaticResource Etiqueta}"/>
+        <TextBlock Text="Opcional. Hay servicios con un solo técnico." Style="{StaticResource Opcional}"/>
+        <ComboBox x:Name="Tecnico2" Padding="6,5"/>
+
+        <TextBlock x:Name="Aviso" FontSize="12" TextWrapping="Wrap" Margin="0,14,0,0"
+                   Visibility="Collapsed"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+            <Button Content="Cancelar" Click="AlCerrar" IsCancel="True" Padding="18,9" Cursor="Hand"/>
+            <Button x:Name="BotonCrear" Content="Crear" Click="AlCrear" IsDefault="True"
+                    Padding="22,9" Margin="8,0,0,0" Cursor="Hand"
+                    Background="#0F766E" Foreground="White" BorderThickness="0"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

@@ -36,6 +36,43 @@ public class PersistenciaTests : IDisposable
         return datos;
     }
 
+    /// <summary>
+    /// Con qué norma nació el proyecto es un dato suyo y se guarda. Antes había que
+    /// reconstruirlo del patrón de muestras cada vez que se leía el fichero.
+    /// </summary>
+    [Fact]
+    public void LaNormaPrincipalSeGuardaConElProyecto()
+    {
+        var datos = ProyectoDeEjemplo();
+        Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62031").AplicarA(datos);
+        Contexto.Plantilla.AplicarA(datos, principal: false);
+
+        _repositorio.Guardar(datos, Ruta, "1.0.0-mvp");
+        var leido = _repositorio.Cargar(Ruta);
+
+        Assert.Equal("62031", leido.NormaPrincipal);
+        Assert.Contains("60598", leido.Normas);
+    }
+
+    /// <summary>
+    /// Un proyecto guardado antes de que existiera el campo se abre igual: se queda sin
+    /// principal apuntada y el tablero la deduce, como hacía siempre. <b>No hay
+    /// migración</b>: el fichero se cura cuando se guarde.
+    /// </summary>
+    [Fact]
+    public void UnProyectoSinNormaPrincipalSeAbreIgual()
+    {
+        _repositorio.Guardar(ProyectoDeEjemplo(), Ruta, "1.0.0-mvp");
+
+        // Se le quita el campo, dejando el fichero como lo escribía la versión anterior.
+        var json = File.ReadAllText(Ruta);
+        Assert.DoesNotContain("\"normaPrincipal\"", json);
+
+        var leido = _repositorio.Cargar(Ruta);
+        Assert.Null(leido.NormaPrincipal);
+        Assert.Equal("123452026", leido.CodigoServicio);
+    }
+
     [Fact]
     public void GuardarYCargar_ConservaTodosLosDatos()
     {

@@ -104,7 +104,7 @@ public static class AnalizadorDeProyectos
             Ruta = ruta,
             Nombre = Path.GetFileNameWithoutExtension(ruta),
             CodigoServicio = datos.CodigoServicio,
-            Tecnico = datos.Obtener("proyecto", "tecnico1") as string ?? "",
+            Tecnico = datos.Tecnico1 ?? "",
             NumeroMuestras = datos.NumeroMuestras,
             Modificado = modificado,
             Normas = [.. datos.Normas.OrderBy(n => n)],
@@ -139,10 +139,8 @@ public static class AnalizadorDeProyectos
     /// <summary>
     /// La norma principal primero y las añadidas detrás.
     /// <para>
-    /// Cuál es la principal lo delata <b>cómo se nombran las muestras</b>: las de
-    /// seguridad son <c>EBP_SAFE…</c> y las de IK <c>EBP_CLIM…</c>, y ese patrón lo fija
-    /// la norma con la que nació el proyecto. Si eso no lo aclara —varias normas comparten
-    /// patrón—, manda luminarias, que es la de uso más frecuente.
+    /// <b>Lo dice el proyecto</b>: se apunta al elegirla y aquí solo se lee. Es un dato
+    /// suyo, igual que el responsable, y no algo que haya que reconstruir cada vez.
     /// </para>
     /// </summary>
     private static IReadOnlyList<PlantillaEnsayos> Ordenar(
@@ -150,16 +148,36 @@ public static class AnalizadorDeProyectos
     {
         if (normas.Count <= 1) return normas;
 
+        // Si la que dice el proyecto ya no está entre las suyas —se quitó desde la toma de
+        // notas— no vale de nada: se vuelve a deducir en lugar de detallar una norma que
+        // el servicio ya no lleva.
+        var principal = normas.FirstOrDefault(p => p.Meta.Id == datos.NormaPrincipal)
+                        ?? Deducir(normas, datos);
+
+        return [principal, .. normas.Where(p => !ReferenceEquals(p, principal))
+                                    .OrderBy(p => p.Meta.Id, StringComparer.Ordinal)];
+    }
+
+    /// <summary>
+    /// Cuál era la principal en un proyecto guardado antes de que se apuntara.
+    /// <para>
+    /// Lo delata <b>cómo se nombran las muestras</b>: las de seguridad son
+    /// <c>EBP_SAFE…</c> y las de IK <c>EBP_CLIM…</c>, y ese patrón lo fijó la norma con la
+    /// que nació el proyecto. Cuando eso no lo aclara —varias normas comparten patrón—
+    /// manda luminarias, que es la de uso más frecuente; y si tampoco está, el orden
+    /// alfabético, que al menos es estable.
+    /// </para>
+    /// </summary>
+    private static PlantillaEnsayos Deducir(
+        IReadOnlyList<PlantillaEnsayos> normas, DatosProyecto datos)
+    {
         var porPatron = normas
             .Where(p => p.Muestras.Identificador?.Patron == datos.PatronIdentificador)
             .ToList();
 
-        var principal = normas.FirstOrDefault(p => p.Meta.Id == "60598")
-                        ?? (porPatron.Count == 1 ? porPatron[0] : null)
-                        ?? normas.OrderBy(p => p.Meta.Id, StringComparer.Ordinal).First();
-
-        return [principal, .. normas.Where(p => !ReferenceEquals(p, principal))
-                                    .OrderBy(p => p.Meta.Id, StringComparer.Ordinal)];
+        return normas.FirstOrDefault(p => p.Meta.Id == "60598")
+               ?? (porPatron.Count == 1 ? porPatron[0] : null)
+               ?? normas.OrderBy(p => p.Meta.Id, StringComparer.Ordinal).First();
     }
 
     /// <summary>Cómo se llama la línea de una norma añadida.</summary>
