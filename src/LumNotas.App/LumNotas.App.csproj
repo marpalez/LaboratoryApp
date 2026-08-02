@@ -22,4 +22,16 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <!--
+    ESTE NÚMERO HAY QUE SUBIRLO EN CADA ENTREGA.
+    Es el que sale en «Ayuda | Acerca de» y con el que se compara la versión que el
+    laboratorio ha publicado en la carpeta compartida. Si no se sube, los demás equipos
+    no se enteran de que hay una versión nueva.
+  -->
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Product>Toma de notas de ensayos</Product>
+    <Company>Laboratorio de ensayos de luminarias</Company>
+  </PropertyGroup>
+
 </Project>

@@ -14,24 +14,38 @@ public sealed class GestionViewModel : ObservableObject
 {
     private readonly ExploradorDeProyectos _explorador;
     private readonly RepositorioDeProyectos _repositorio;
-    private PlantillaEnsayos _plantilla;
-    private readonly Ajustes _ajustes = Ajustes.Cargar();
-    private string _mensaje = "";
-    private bool _soloPendientes = true;
-    private bool _vistaCalendario;
+    private readonly PlantillaEnsayos _porDefecto;
 
-    public GestionViewModel(PlantillaEnsayos plantilla, RepositorioDeProyectos repositorio)
+    /// <summary>
+    /// Las normas instaladas, por id. Cada proyecto se mide contra <b>las suyas</b>: si un
+    /// servicio de luminarias lleva además módulos LED, sus apartados cuentan igual.
+    /// </summary>
+    private readonly IReadOnlyDictionary<string, PlantillaEnsayos> _normasInstaladas;
+
+    private string _carpeta = Ajustes.Cargar().CarpetaDeProyectos;
+    private CancellationTokenSource? _enCurso;
+    private bool _explorando;
+    private string _mensaje = "";
+    private string _estado = FiltroDeEstado.EnDesarrollo;
+    private string _tecnico = Cualquiera;
+    private string _norma = Cualquiera;
+
+    /// <summary>Lo último que se leyó del disco, sin filtrar. Filtrar no vuelve a escanear.</summary>
+    private IReadOnlyList<ResumenDeProyecto> _ultimos = [];
+    private Vista _vista = Vista.Tablero;
+
+    public GestionViewModel(PlantillaEnsayos porDefecto, RepositorioDeProyectos repositorio)
     {
-        _plantilla = plantilla;
+        _porDefecto = porDefecto;
+        _normasInstaladas = LeerNormasInstaladas(porDefecto);
         _repositorio = repositorio;
         _explorador = new ExploradorDeProyectos(repositorio);
         Calendario = new CalendarioViewModel(Planificar, ruta => AbrirProyecto?.Invoke(ruta), Guardar);
 
-        // El tablero mide el avance con la norma que esté cargada.
-
         Refrescar = new Comando(Explorar);
-        VerTablero = new Comando(() => VistaCalendario = false);
-        VerCalendario = new Comando(() => VistaCalendario = true);
+        VerTablero = new Comando(() => VistaActual = Vista.Tablero);
+        VerCalendario = new Comando(() => VistaActual = Vista.Calendario);
+        VerCarga = new Comando(() => VistaActual = Vista.Carga);
         ElegirCarpeta = new Comando(() =>
         {
             var elegida = PedirCarpeta?.Invoke(Carpeta);
@@ -46,6 +60,9 @@ public sealed class GestionViewModel : ObservableObject
 
     /// <summary>La otra vista de los mismos proyectos: la línea de tiempo.</summary>
     public CalendarioViewModel Calendario { get; }
+
+    /// <summary>Y la tercera: cuánta carga soporta cada técnico cada mes.</summary>
+    public CargaViewModel Carga { get; } = new();
 
     /// <summary>Abrir un proyecto en una pestaña; lo resuelve la ventana.</summary>
     public Action<string>? AbrirProyecto { get; set; }
@@ -62,20 +79,25 @@ public sealed class GestionViewModel : ObservableObject
     /// Tablero (qué falta por rellenar) o calendario (cuándo toca cada servicio). Son
     /// dos preguntas distintas sobre la misma carpeta.
     /// </summary>
-    public bool VistaCalendario
+    public Vista VistaActual
     {
-        get => _vistaCalendario;
+        get => _vista;
         set
         {
-            if (!Establecer(ref _vistaCalendario, value)) return;
+            if (!Establecer(ref _vista, value)) return;
             Notificar(nameof(VistaTablero));
+            Notificar(nameof(VistaCalendario));
+            Notificar(nameof(VistaCarga));
         }
     }
 
-    public bool VistaTablero => !_vistaCalendario;
+    public bool VistaTablero => _vista == Vista.Tablero;
+    public bool VistaCalendario => _vista == Vista.Calendario;
+    public bool VistaCarga => _vista == Vista.Carga;
 
     public Comando VerTablero { get; }
     public Comando VerCalendario { get; }
+    public Comando VerCarga { get; }
 
     /// <summary>Abre el diálogo de planificación de un servicio y guarda lo que se decida.</summary>
     private void Planificar(ResumenDeProyecto proyecto)
@@ -103,8 +125,8 @@ public sealed class GestionViewModel : ObservableObject
             return;
         }
 
-        // El explorador cachea por fecha de modificación; el fichero acaba de cambiar.
-        _explorador.OlvidarCache();
+        // No hace falta vaciar la caché: el fichero acaba de cambiar de fecha, así que
+        // solo ese se relee. Tirarla entera obligaría a releer cientos por uno.
         Explorar();
     }
 
@@ -122,13 +144,31 @@ public sealed class GestionViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Al cambiar de norma el tablero tiene que medir con la nueva: los apartados y el
-    /// número de secciones son distintos.
+    /// Carga las plantillas del laboratorio una vez por sesión. Son cuatro ficheros; se
+    /// leen aquí y no en cada proyecto porque el tablero recorre cientos de ellos.
     /// </summary>
-    public void CambiarPlantilla(PlantillaEnsayos plantilla)
+    private static IReadOnlyDictionary<string, PlantillaEnsayos> LeerNormasInstaladas(PlantillaEnsayos porDefecto)
     {
-        _plantilla = plantilla;
-        if (!string.IsNullOrWhiteSpace(Carpeta)) Explorar();
+        var normas = new Dictionary<string, PlantillaEnsayos>(StringComparer.OrdinalIgnoreCase);
+
+        try
+        {
+            foreach (var norma in ServicioDePlantillas.Normas())
+            {
+                // Una plantilla rota no puede dejar el tablero sin medir las demás.
+                try
+                {
+                    var plantilla = PlantillaEnsayos.Cargar(norma.Ruta);
+                    if (!string.IsNullOrWhiteSpace(plantilla.Meta.Id)) normas[plantilla.Meta.Id] = plantilla;
+                }
+                catch (Exception) { }
+            }
+        }
+        catch (Exception) { }
+
+        if (!string.IsNullOrWhiteSpace(porDefecto.Meta.Id)) normas.TryAdd(porDefecto.Meta.Id, porDefecto);
+
+        return normas;
     }
 
     public Comando Refrescar { get; }
@@ -137,25 +177,68 @@ public sealed class GestionViewModel : ObservableObject
     /// <summary>Diálogo de carpeta; lo inyecta la ventana para no atar el modelo a WPF.</summary>
     public Func<string, string?>? PedirCarpeta { get; set; }
 
+    /// <summary>
+    /// La carpeta del laboratorio. No es solo dónde están los proyectos: de ella salen
+    /// también las normas, la lista de técnicos, la tarifa y la versión publicada, así
+    /// que al cambiarla hay que refrescar todo eso — de ahí <see cref="AlCambiarCarpeta"/>.
+    /// </summary>
     public string Carpeta
     {
-        get => _ajustes.CarpetaDeProyectos;
+        get => _carpeta;
         set
         {
-            _ajustes.CarpetaDeProyectos = value;
-            _ajustes.Guardar();
+            // Se relee y se guarda del tirón: la carpeta compartida se escribe desde otro
+            // sitio y no puede perderse por guardar aquí una copia vieja de los ajustes.
+            Ajustes.Actualizar(a => a.CarpetaDeProyectos = value);
+            _carpeta = value;
+
             Notificar();
-            _explorador.OlvidarCache();
+
+            // La caché va por ruta completa, así que cambiar de carpeta no la invalida:
+            // volver a la anterior sigue siendo inmediato.
             Explorar();
+            AlCambiarCarpeta?.Invoke();
         }
     }
 
-    /// <summary>Ocultar los proyectos ya terminados: al PM le interesa lo que queda.</summary>
-    public bool SoloPendientes
+    /// <summary>Lo que hay que rehacer cuando cambia la carpeta; lo resuelve la ventana.</summary>
+    public Action? AlCambiarCarpeta { get; set; }
+
+    /// <summary>
+    /// Qué proyectos se están mirando, para las tres vistas a la vez. Cambiarlo
+    /// <b>no vuelve a escanear</b>: se filtra lo que ya se leyó, así que es instantáneo.
+    /// </summary>
+    public IReadOnlyList<string> Estados { get; } = FiltroDeEstado.Opciones;
+
+    public string Estado
     {
-        get => _soloPendientes;
-        set { if (Establecer(ref _soloPendientes, value)) Explorar(); }
+        get => _estado;
+        set { if (Establecer(ref _estado, value)) Repartir(reencuadrar: true); }
     }
+
+    /// <summary>Técnicos y normas que hay en los proyectos, con «(todos)» al principio.</summary>
+    public ObservableCollection<string> Tecnicos { get; } = [Cualquiera];
+
+    public ObservableCollection<string> Normas { get; } = [Cualquiera];
+
+    /// <summary>
+    /// Filtrar por responsable. Vale para las tres vistas: en el tablero enseña lo que
+    /// lleva esa persona, en el calendario deja solo su fila y en la carga su carga.
+    /// </summary>
+    public string Tecnico
+    {
+        get => _tecnico;
+        set { if (Establecer(ref _tecnico, value)) Repartir(reencuadrar: true); }
+    }
+
+    public string Norma
+    {
+        get => _norma;
+        set { if (Establecer(ref _norma, value)) Repartir(reencuadrar: true); }
+    }
+
+    /// <summary>Lo que se ofrece cuando no se quiere filtrar por eso.</summary>
+    public const string Cualquiera = "(todos)";
 
     public string Mensaje
     {
@@ -165,33 +248,160 @@ public sealed class GestionViewModel : ObservableObject
 
     public bool HayCarpeta => !string.IsNullOrWhiteSpace(Carpeta);
 
-    private void Explorar()
+    /// <summary>Si hay un escaneo en marcha, para poder avisarlo y cancelarlo.</summary>
+    public bool Explorando
     {
-        Proyectos.Clear();
+        get => _explorando;
+        private set => Establecer(ref _explorando, value);
+    }
+
+    /// <summary>
+    /// Recorre la carpeta y calcula el estado de cada proyecto.
+    /// <para>
+    /// Va <b>en segundo plano</b>: en el laboratorio los proyectos cuelgan de una
+    /// matrioska de carpetas de clientes con años de historia, y hacerlo en el hilo de la
+    /// ventana la dejaba congelada. Mientras dura se sigue viendo lo anterior y se cuenta
+    /// por dónde va; los resultados sustituyen a lo viejo solo al terminar.
+    /// </para>
+    /// </summary>
+    private async void Explorar()
+    {
         Notificar(nameof(HayCarpeta));
 
         if (!HayCarpeta)
         {
+            _ultimos = [];
+            Proyectos.Clear();
             Calendario.Cargar([]);
+            Carga.Cargar([]);
             Mensaje = "Elige la carpeta donde el laboratorio guarda los proyectos.";
             return;
         }
 
-        var todos = _explorador.Explorar(Carpeta, _plantilla);
+        // Un escaneo nuevo manda sobre el que estuviera en marcha: si se cambia de
+        // carpeta a media faena, lo que llegue de la anterior ya no interesa.
+        _enCurso?.Cancel();
+        var cancelacion = _enCurso = new CancellationTokenSource();
 
-        // El calendario recibe todos: «solo pendientes» es un filtro del tablero, y en la
-        // línea de tiempo interesa ver también lo ya terminado para saber qué hueco queda.
-        Calendario.Cargar(todos);
+        Explorando = true;
+        var aviso = new Progress<AvanceDeExploracion>(a => Mensaje = a.Texto);
+        var reloj = System.Diagnostics.Stopwatch.StartNew();
 
-        var mostrados = SoloPendientes ? todos.Where(p => !p.Terminado).ToList() : [.. todos];
+        IReadOnlyList<ResumenDeProyecto> todos;
 
-        foreach (var proyecto in mostrados) Proyectos.Add(proyecto);
+        try
+        {
+            var carpeta = Carpeta;
 
-        var terminados = todos.Count(p => p.Terminado);
-        Mensaje = todos.Count == 0
-            ? $"No hay proyectos en {Carpeta}"
-            : $"{todos.Count} proyectos · {terminados} terminados · actualizado a las {DateTime.Now:HH:mm}";
+            todos = await Task.Run(
+                () => _explorador.Explorar(carpeta, _normasInstaladas, _porDefecto, true,
+                                           aviso, cancelacion.Token),
+                cancelacion.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;   // manda el escaneo que lo canceló
+        }
+        catch (Exception ex)
+        {
+            if (!cancelacion.IsCancellationRequested)
+            {
+                Explorando = false;
+                Mensaje = "No se pudo leer la carpeta: " + ex.Message;
+            }
+            return;
+        }
+        finally
+        {
+            if (_enCurso == cancelacion) Explorando = false;
+        }
+
+        if (cancelacion.IsCancellationRequested) return;
+
+        _ultimos = todos;
+        _leidoEn = reloj.Elapsed;
+
+        Rellenar(Tecnicos, todos.Select(p => p.Tecnico), ref _tecnico, nameof(Tecnico));
+        Rellenar(Normas, todos.SelectMany(p => p.Normas), ref _norma, nameof(Norma));
+
+        Repartir(reencuadrar: false);
     }
+
+    private TimeSpan _leidoEn;
+
+    /// <summary>
+    /// Reparte a las tres vistas lo que pasa el filtro. Es lo que se rehace al cambiar de
+    /// filtro, sin volver a tocar el disco.
+    /// </summary>
+    /// <param name="reencuadrar">
+    /// Si el calendario debe reajustar su eje. Al cambiar de filtro sí —se está mirando
+    /// otra cosa—; al refrescar los datos no, para que no se mueva bajo el ratón.
+    /// </param>
+    private void Repartir(bool reencuadrar)
+    {
+        var visibles = _ultimos.Where(Pasa).ToList();
+
+        Calendario.Cargar(visibles, reencuadrar);
+        Carga.Cargar(visibles);
+
+        Proyectos.Clear();
+        foreach (var proyecto in visibles) Proyectos.Add(proyecto);
+
+        var ocultos = _ultimos.Count - visibles.Count;
+
+        Mensaje = _ultimos.Count == 0
+            ? $"No hay proyectos en {Carpeta}"
+            : $"{visibles.Count} proyecto{(visibles.Count == 1 ? "" : "s")}"
+              + (ocultos == 0 ? "" : $" · {ocultos} fuera del filtro")
+              + $" · leídos en {_leidoEn.TotalSeconds:0.0} s"
+              + $" · actualizado a las {DateTime.Now:HH:mm}";
+    }
+
+    private bool Pasa(ResumenDeProyecto proyecto)
+    {
+        if (!FiltroDeEstado.Pasa(proyecto.Planificacion, Estado)) return false;
+
+        if (Tecnico != Cualquiera && !string.Equals(proyecto.Tecnico, Tecnico,
+                StringComparison.CurrentCultureIgnoreCase)) return false;
+
+        return Norma == Cualquiera || proyecto.Normas.Contains(Norma);
+    }
+
+    /// <summary>
+    /// Rehace la lista de un desplegable con los valores que hay en los proyectos. Si el
+    /// elegido ya no existe —se archivó el último servicio de ese técnico— se vuelve a
+    /// «(todos)» en vez de dejar el tablero vacío sin explicar por qué.
+    /// </summary>
+    private void Rellenar(ObservableCollection<string> destino, IEnumerable<string> valores,
+                          ref string elegido, string propiedad)
+    {
+        var lista = valores.Where(v => !string.IsNullOrWhiteSpace(v))
+                           .Distinct(StringComparer.CurrentCultureIgnoreCase)
+                           .OrderBy(v => v, StringComparer.CurrentCultureIgnoreCase)
+                           .ToList();
+
+        destino.Clear();
+        destino.Add(Cualquiera);
+        foreach (var valor in lista) destino.Add(valor);
+
+        if (destino.Contains(elegido)) return;
+
+        elegido = Cualquiera;
+        Notificar(propiedad);
+    }
+}
+
+/// <summary>Las tres preguntas del responsable sobre la misma carpeta de proyectos.</summary>
+public enum Vista
+{
+    /// <summary>Qué falta por rellenar.</summary>
+    Tablero,
+
+    /// <summary>Cuándo toca cada servicio.</summary>
+    Calendario,
+
+    /// <summary>Si cabe: cuánta carga soporta cada técnico cada mes.</summary>
+    Carga
 }
 
 /// <summary>Ajustes de la aplicación, guardados en el perfil del usuario.</summary>
@@ -200,7 +410,38 @@ public sealed class Ajustes
     private static string Ruta => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LumNotas", "ajustes.json");
 
+    /// <summary>Dónde están los proyectos. Se escanea entera, con sus subcarpetas.</summary>
     public string CarpetaDeProyectos { get; set; } = "";
+
+    /// <summary>
+    /// Dónde está lo compartido: normas, técnicos, tarifa y versión publicada.
+    /// <para>
+    /// Va aparte de los proyectos porque en el laboratorio <b>no son la misma carpeta</b>:
+    /// los proyectos cuelgan de la de clientes, cada uno en su rama, y la configuración
+    /// vive en otro sitio. Si se deja en blanco se usa la de proyectos, para no romper a
+    /// quien las tenga juntas.
+    /// </para>
+    /// </summary>
+    public string CarpetaCompartida { get; set; } = "";
+
+    /// <summary>
+    /// Si ya se ha preguntado por las carpetas al arrancar. Se pregunta una vez y no se
+    /// vuelve a insistir: quien las deje sin elegir lo hará a sabiendas, y siempre puede
+    /// ponerlas desde «Configuración».
+    /// </summary>
+    public bool CarpetaYaPreguntada { get; set; }
+
+    /// <summary>
+    /// Lee, cambia y guarda de una vez. Hace falta porque hay dos sitios que escriben
+    /// ajustes: si cada uno guardara su copia en memoria, el último borraría lo que
+    /// hubiera cambiado el otro.
+    /// </summary>
+    public static void Actualizar(Action<Ajustes> cambio)
+    {
+        var ajustes = Cargar();
+        cambio(ajustes);
+        ajustes.Guardar();
+    }
 
     public static Ajustes Cargar()
     {

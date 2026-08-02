@@ -23,7 +23,8 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
         Gestion = new GestionViewModel(PlantillaDeReferencia(), _repositorio)
         {
             // Desde el calendario se salta al proyecto sin pasar por el explorador.
-            AbrirProyecto = AbrirEnPestana
+            AbrirProyecto = AbrirEnPestana,
+            AlCambiarCarpeta = AdoptarCarpetaDelLaboratorio
         };
 
         NuevaPestana = new Comando(() => AbrirPestana());
@@ -34,6 +35,23 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
         EmpezarConNorma = new ComandoCon<NormaDisponible>(EmpezarCon);
         IrAGestion = new Comando(AbrirGestion);
         EditarTecnicos = new Comando(AbrirEditorDeTecnicos);
+        EditarCapacidad = new Comando(() =>
+        {
+            // La tabla de carga se calcula con estos números: hay que rehacerla.
+            if (Servicios.EditarCapacidad?.Invoke() is true) Gestion.Carga.Recalcular();
+        });
+        VerPlantillas = new Comando(() => Servicios.VerPlantillas?.Invoke());
+        ElegirCarpetaDelLaboratorio = new Comando(() => Servicios.ElegirCarpetaDelLaboratorio?.Invoke());
+        VerAcercaDe = new Comando(() =>
+        {
+            Servicios.VerAcercaDe?.Invoke();
+            Notificar(nameof(HayVersionMasNueva));
+        });
+        OcultarAvisoDeVersion = new Comando(() =>
+        {
+            _avisoDescartado = true;
+            Notificar(nameof(HayVersionMasNueva));
+        });
 
         RefrescarRecientes();
         AbrirPestana();
@@ -85,6 +103,48 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
     public ComandoCon<NormaDisponible> EmpezarConNorma { get; }
     public Comando IrAGestion { get; }
     public Comando EditarTecnicos { get; }
+    public Comando EditarCapacidad { get; }
+    public Comando VerPlantillas { get; }
+    public Comando ElegirCarpetaDelLaboratorio { get; }
+    public Comando VerAcercaDe { get; }
+
+    /// <summary>
+    /// De la carpeta del laboratorio salen los proyectos, las normas, los técnicos, la
+    /// tarifa y la versión publicada. Al cambiarla hay que releerlo todo, o el programa
+    /// se queda enseñando datos de la carpeta anterior.
+    /// <para>
+    /// Las <b>normas no se recargan en caliente</b> a propósito: se resuelven una vez por
+    /// sesión, así que cambiar de carpeta con proyectos abiertos dejaría unas pestañas
+    /// con una versión de la norma y otras con otra. Se avisa de que hay que reiniciar.
+    /// </para>
+    /// </summary>
+    public void AdoptarCarpetaCompartida() => AdoptarCarpetaDelLaboratorio();
+
+    private void AdoptarCarpetaDelLaboratorio()
+    {
+        ServicioDeTecnicos.Recargar();
+        ServicioDeCapacidad.Recargar();
+        ServicioDeVersion.Olvidar();
+
+        foreach (var documento in Pestanas.OfType<DocumentoViewModel>()) documento.RefrescarTecnicos();
+
+        Gestion.Carga.Recalcular();
+        Notificar(nameof(HayVersionMasNueva));
+    }
+    public Comando OcultarAvisoDeVersion { get; }
+
+    private bool _avisoDescartado;
+
+    /// <summary>
+    /// Este equipo se ha quedado con una versión anterior a la que el laboratorio da por
+    /// buena. Se avisa, no se bloquea: dejar sin trabajar a un laboratorio porque un
+    /// fichero de OneDrive dice otra cosa sería peor que el problema.
+    /// </summary>
+    public bool HayVersionMasNueva => !_avisoDescartado && ServicioDeVersion.HayMasNueva;
+
+    public string TextoDeVersionMasNueva =>
+        $"Hay una versión más nueva del programa: {ServicioDeVersion.Publicada?.Version}. "
+        + $"Estás usando la {ServicioDeVersion.EnEjecucion}.";
 
     /// <summary>
     /// Abre el editor de técnicos y, si se ha tocado la lista, refresca los desplegables
@@ -156,7 +216,6 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
     {
         var documento = ActivoDocumento ?? AbrirPestana();
         documento.EmpezarCon(norma);
-        Gestion.CambiarPlantilla(documento.Plantilla ?? PlantillaDeReferencia());
         Activo = documento;
     }
 
@@ -187,7 +246,6 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
         if (documento.CargarDesde(ruta))
         {
             Activo = documento;
-            Gestion.CambiarPlantilla(documento.Plantilla ?? PlantillaDeReferencia());
         }
 
         Mensaje = documento.Mensaje;
@@ -227,7 +285,7 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
     {
         // Si no se encuentra la carpeta, la aplicación arranca igual: simplemente no
         // hay normas que ofrecer en la portada.
-        try { return CatalogoDeNormas.Disponibles(); }
+        try { return ServicioDePlantillas.Normas(); }
         catch (Exception) { return []; }
     }
 

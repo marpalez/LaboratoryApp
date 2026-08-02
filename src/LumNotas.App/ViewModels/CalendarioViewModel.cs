@@ -31,10 +31,7 @@ public sealed class CalendarioViewModel : ObservableObject
     private int _zoom = 1;
     private int _extraAntes;
     private int _extraDespues;
-    private string _tecnico = Todos;
-    private string _estado = Todos;
-    private string _norma = Todos;
-    private bool _verArchivados;
+    private bool _agrupar = true;
     private EjeDeSemanas _eje = EjeDeSemanas.Para([], DateTime.Today, Anchos[1]);
 
     public CalendarioViewModel(Action<ResumenDeProyecto> planificar, Action<string> abrir,
@@ -58,14 +55,17 @@ public sealed class CalendarioViewModel : ObservableObject
     public ObservableCollection<TarjetaPlanViewModel> Tarjetas { get; } = [];
 
     /// <summary>
+    /// Lo que se dibuja, fila a fila: cabeceras de técnico y barras de servicio. Las dos
+    /// columnas del calendario —nombres y barras— recorren esta misma lista, y por eso
+    /// van alineadas.
+    /// </summary>
+    public ObservableCollection<object> Filas { get; } = [];
+
+    /// <summary>
     /// Servicios todavía sin fechas. Van en una lista aparte en vez de no dibujarse:
     /// un proyecto invisible es un proyecto que se olvida.
     /// </summary>
     public ObservableCollection<TarjetaPlanViewModel> SinFechas { get; } = [];
-
-    public ObservableCollection<string> Tecnicos { get; } = [Todos];
-    public ObservableCollection<string> Normas { get; } = [Todos];
-    public IReadOnlyList<string> Estados { get; } = [Todos, .. Planificacion.Estados.Select(Planificacion.EtiquetaDe)];
 
     public Comando Acercar { get; }
     public Comando Alejar { get; }
@@ -88,31 +88,18 @@ public sealed class CalendarioViewModel : ObservableObject
     public bool HayTarjetas => Tarjetas.Count > 0;
     public bool HaySinFechas => SinFechas.Count > 0;
 
-    // ---- filtros -----------------------------------------------------------
+    // ---- ajustes de la vista -----------------------------------------------
 
-    public string Tecnico
+    /// <summary>
+    /// Agrupar los servicios por técnico responsable. Es la vista que pidió el
+    /// laboratorio: al responsable no le interesa una lista de servicios —el código ya
+    /// va escrito en la barra— sino <b>cuántos lleva cada técnico y cuánto tiempo le
+    /// ocupan</b>.
+    /// </summary>
+    public bool AgruparPorTecnico
     {
-        get => _tecnico;
-        set { if (Establecer(ref _tecnico, value)) Recalcular(); }
-    }
-
-    public string Estado
-    {
-        get => _estado;
-        set { if (Establecer(ref _estado, value)) Recalcular(); }
-    }
-
-    public string Norma
-    {
-        get => _norma;
-        set { if (Establecer(ref _norma, value)) Recalcular(); }
-    }
-
-    /// <summary>Un proyecto archivado sigue en su carpeta; solo se ha quitado de la vista.</summary>
-    public bool VerArchivados
-    {
-        get => _verArchivados;
-        set { if (Establecer(ref _verArchivados, value)) Recalcular(); }
+        get => _agrupar;
+        set { if (Establecer(ref _agrupar, value)) Recalcular(rehacerEje: false); }
     }
 
     public int Zoom
@@ -130,37 +117,17 @@ public sealed class CalendarioViewModel : ObservableObject
 
     // ---- carga -------------------------------------------------------------
 
-    /// <summary>Recibe lo que ha encontrado el explorador y vuelve a dibujar.</summary>
-    public void Cargar(IReadOnlyList<ResumenDeProyecto> proyectos)
+    /// <summary>
+    /// Recibe los proyectos que ha dejado pasar el filtro del tablero y vuelve a dibujar.
+    /// </summary>
+    /// <param name="reencuadrar">
+    /// Si el eje debe reajustarse. Al cambiar de filtro sí, porque se está mirando otra
+    /// cosa; al refrescar los datos no, para que no se mueva bajo el ratón.
+    /// </param>
+    public void Cargar(IReadOnlyList<ResumenDeProyecto> proyectos, bool reencuadrar = false)
     {
         _proyectos = proyectos;
-
-        Rellenar(Tecnicos, proyectos.Select(p => p.Tecnico), ref _tecnico, nameof(Tecnico));
-        Rellenar(Normas, proyectos.SelectMany(p => p.Normas), ref _norma, nameof(Norma));
-
-        Recalcular(rehacerEje: false);
-    }
-
-    /// <summary>
-    /// Rehace la lista de un desplegable con los valores que hay en los proyectos. Si el
-    /// que estaba elegido ya no existe —se archivó el último servicio de ese técnico— se
-    /// vuelve a «todos» en vez de dejar el calendario vacío sin explicar por qué.
-    /// </summary>
-    private void Rellenar(ObservableCollection<string> destino, IEnumerable<string> valores,
-                          ref string elegido, string propiedad)
-    {
-        var lista = valores.Where(v => !string.IsNullOrWhiteSpace(v))
-                           .Distinct(StringComparer.CurrentCultureIgnoreCase)
-                           .OrderBy(v => v, StringComparer.CurrentCultureIgnoreCase)
-                           .ToList();
-
-        destino.Clear();
-        destino.Add(Todos);
-        foreach (var valor in lista) destino.Add(valor);
-
-        if (destino.Contains(elegido)) return;
-        elegido = Todos;
-        Notificar(propiedad);
+        Recalcular(reencuadrar);
     }
 
     /// <param name="rehacerEje">
@@ -170,7 +137,10 @@ public sealed class CalendarioViewModel : ObservableObject
     private void Recalcular(bool rehacerEje = true)
     {
         var hoy = DateTime.Today;
-        var visibles = _proyectos.Where(Pasa).ToList();
+
+        // El filtro —estado, técnico y norma— lo aplica el tablero antes de llamar aquí:
+        // uno solo para las tres vistas.
+        var visibles = _proyectos;
 
         var conFechas = visibles.Where(p => p.Planificacion.HayFechas).ToList();
 
@@ -192,6 +162,8 @@ public sealed class CalendarioViewModel : ObservableObject
         foreach (var proyecto in conFechas.Where(Dibujable).OrderBy(p => p.Planificacion.Inicio))
             Tarjetas.Add(new TarjetaPlanViewModel(proyecto, _eje, hoy, _planificar, _abrir, _guardar));
 
+        RehacerFilas();
+
         SinFechas.Clear();
         foreach (var proyecto in visibles.Where(p => !p.Planificacion.HayFechas || !Dibujable(p))
                                          .OrderBy(p => p.CodigoServicio))
@@ -209,20 +181,68 @@ public sealed class CalendarioViewModel : ObservableObject
         VolverAHoy.Revisar();
     }
 
-    private bool Pasa(ResumenDeProyecto proyecto)
+    /// <summary>
+    /// Ordena las barras en filas. Agrupadas, cada técnico abre con una cabecera que
+    /// dice cuántos servicios lleva y cuánto tiempo le ocupan; debajo van los suyos, del
+    /// más próximo al más lejano.
+    /// </summary>
+    private void RehacerFilas()
     {
-        if (proyecto.Planificacion.Archivado && !_verArchivados) return false;
+        Filas.Clear();
 
-        if (_tecnico != Todos && !string.Equals(proyecto.Tecnico, _tecnico,
-                StringComparison.CurrentCultureIgnoreCase)) return false;
+        if (!AgruparPorTecnico)
+        {
+            foreach (var tarjeta in Tarjetas) Filas.Add(tarjeta);
+            return;
+        }
 
-        if (_norma != Todos && !proyecto.Normas.Contains(_norma)) return false;
+        var grupos = Tarjetas
+            .GroupBy(t => string.IsNullOrWhiteSpace(t.Tecnico) ? SinTecnico : t.Tecnico.Trim(),
+                     StringComparer.CurrentCultureIgnoreCase)
+            // Los servicios sin responsable al final: son los que hay que asignar.
+            .OrderBy(g => g.Key == SinTecnico)
+            .ThenBy(g => g.Key, StringComparer.CurrentCultureIgnoreCase);
 
-        if (_estado != Todos &&
-            Planificacion.EtiquetaDe(proyecto.Planificacion.Estado) != _estado) return false;
-
-        return true;
+        foreach (var grupo in grupos)
+        {
+            var suyos = grupo.OrderBy(t => t.Inicio).ToList();
+            Filas.Add(new GrupoDeTecnicoViewModel(grupo.Key, suyos));
+            foreach (var tarjeta in suyos) Filas.Add(tarjeta);
+        }
     }
+
+    /// <summary>Etiqueta de los servicios que aún no tienen responsable asignado.</summary>
+    public const string SinTecnico = "(sin técnico)";
+
+}
+
+/// <summary>
+/// Cabecera de un técnico en la línea de tiempo: quién es y qué carga lleva.
+/// </summary>
+public sealed class GrupoDeTecnicoViewModel
+{
+    public GrupoDeTecnicoViewModel(string tecnico, IReadOnlyList<TarjetaPlanViewModel> servicios)
+    {
+        Tecnico = tecnico;
+
+        var dias = Ocupacion.Dias(servicios
+            .Where(s => s.Inicio is not null && s.Fin is not null)
+            .Select(s => (s.Inicio!.Value, s.Fin!.Value)));
+
+        Carga = Ocupacion.Resumir(servicios.Count, dias);
+        Retrasados = servicios.Count(s => s.Retrasado);
+    }
+
+    public string Tecnico { get; }
+
+    /// <summary>«3 proyectos · 5 semanas», contando una sola vez lo que se solapa.</summary>
+    public string Carga { get; }
+
+    public int Retrasados { get; }
+
+    public bool HayRetrasados => Retrasados > 0;
+
+    public string AvisoDeRetraso => Retrasados == 1 ? "1 fuera de plazo" : $"{Retrasados} fuera de plazo";
 }
 
 /// <summary>Una toma de notas dibujada sobre la línea de tiempo.</summary>
@@ -299,6 +319,10 @@ public sealed class TarjetaPlanViewModel : ObservableObject
 
     /// <summary>Se llama <c>Plan</c> y no <c>Planificacion</c> para no tapar al tipo.</summary>
     public Planificacion Plan => _proyecto.Planificacion;
+
+    /// <summary>Fechas que se están enseñando, que durante el arrastre no son las guardadas.</summary>
+    public DateTime? Inicio => _barra.Inicio;
+    public DateTime? Fin => _barra.Fin;
 
     public bool Archivado => Plan.Archivado;
 

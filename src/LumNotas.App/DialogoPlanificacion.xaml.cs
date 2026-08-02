@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Windows;
+using LumNotas.App.ViewModels;
 using LumNotas.Core.Gestion;
 
 namespace LumNotas.App;
@@ -38,13 +40,47 @@ public partial class DialogoPlanificacion : Window
             .ToList();
         Estado.SelectedValue = actual.Estado;
 
+        Importe.Text = actual.Importe?.ToString("0.##", CultureInfo.CurrentCulture) ?? "";
         Recibidas.IsChecked = actual.MuestrasRecibidas;
         Recepcion.SelectedDate = actual.RecepcionMuestras;
         Archivar.IsChecked = actual.Archivado;
 
         ActualizarZonaRecepcion();
         ActualizarSemanas();
+        ActualizarTrabajo();
     }
+
+    /// <summary>
+    /// Enseña en qué se traduce el importe, que es el número con el que se planifica.
+    /// Verlo mientras se teclea evita descubrir en la tabla de carga que había un cero de más.
+    /// </summary>
+    private void ActualizarTrabajo()
+    {
+        if (LeerImporte() is { } importe && importe > 0)
+        {
+            var dias = ServicioDeCapacidad.Capacidad.DiasDeTrabajo(importe);
+            Trabajo.Text = $"≈ {dias:0.#} días de trabajo";
+            return;
+        }
+
+        Trabajo.Text = Importe.Text.Trim().Length == 0
+            ? "Sin importe, este servicio no cuenta en la carga"
+            : "No se entiende ese importe";
+    }
+
+    private double? LeerImporte()
+    {
+        var texto = Importe.Text.Trim().Replace("€", "").Trim();
+        if (texto.Length == 0) return null;
+
+        return double.TryParse(texto, NumberStyles.Any, CultureInfo.CurrentCulture, out var valor)
+               || double.TryParse(texto, NumberStyles.Any, CultureInfo.InvariantCulture, out valor)
+            ? valor
+            : null;
+    }
+
+    private void AlCambiarImporte(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        => ActualizarTrabajo();
 
     private void AlCambiarFecha(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         => ActualizarSemanas();
@@ -110,13 +146,28 @@ public partial class DialogoPlanificacion : Window
             return;
         }
 
+        var importe = LeerImporte();
+
+        if (Importe.Text.Trim().Length > 0 && importe is null)
+        {
+            Avisar("El importe no se entiende. Escribe solo el número, por ejemplo 2000.");
+            return;
+        }
+
+        if (importe < 0)
+        {
+            Avisar("El importe no puede ser negativo.");
+            return;
+        }
+
         _resultado = new Planificacion
         {
             Inicio = Inicio.SelectedDate,
             Fin = Fin.SelectedDate,
             Estado = Estado.SelectedValue is EstadoDeProyecto estado ? estado : EstadoDeProyecto.PorHacer,
             RecepcionMuestras = Recibidas.IsChecked == true ? Recepcion.SelectedDate : null,
-            Archivado = Archivar.IsChecked == true
+            Archivado = Archivar.IsChecked == true,
+            Importe = importe
         };
 
         Close();

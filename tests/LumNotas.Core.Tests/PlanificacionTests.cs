@@ -168,7 +168,7 @@ public class PlanificacionTests : IDisposable
         var ruta = Guardar(Proyecto(), "111112026");
         _repositorio.ActualizarPlanificacion(ruta, Plan());
 
-        var resumenes = new ExploradorDeProyectos(_repositorio).Explorar(_carpeta, Contexto.Plantilla);
+        var resumenes = new ExploradorDeProyectos(_repositorio, Path.Combine(_carpeta, "cache.json")).Explorar(_carpeta, Contexto.Plantilla);
 
         var resumen = Assert.Single(resumenes);
         Assert.Equal(new DateTime(2026, 8, 10), resumen.Planificacion.Inicio);
@@ -632,6 +632,166 @@ public class PlanificacionTests : IDisposable
         Assert.True(eje.Semanas <= EjeDeSemanas.MaximoSemanas);
         Assert.True(eje.HoyEstaDentro);
         Assert.Equal(eje.Semanas, eje.Celdas.Count);
+    }
+
+    // ---- qué proyectos se miran --------------------------------------------
+
+    private static Planificacion Con(EstadoDeProyecto estado, bool archivado = false)
+        => new() { Estado = estado, Archivado = archivado };
+
+    /// <summary>
+    /// Lo que pidió el responsable: ver solo lo que se está desarrollando. Terminar un
+    /// servicio lo saca de la vista <b>sin que nadie tenga que acordarse de archivarlo</b>,
+    /// porque marcar el estado ya forma parte del trabajo.
+    /// </summary>
+    [Fact]
+    public void EnDesarrolloDejaFueraLoTerminadoYLoArchivado()
+    {
+        Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.PorHacer), FiltroDeEstado.EnDesarrollo));
+        Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso), FiltroDeEstado.EnDesarrollo));
+        Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.PendienteCliente), FiltroDeEstado.EnDesarrollo));
+
+        Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.Terminado), FiltroDeEstado.EnDesarrollo));
+        Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso, archivado: true), FiltroDeEstado.EnDesarrollo));
+    }
+
+    /// <summary>Es lo que se mira a diario, así que es lo que sale sin elegir nada.</summary>
+    [Fact]
+    public void SinElegirFiltroSeMiraLoQueEstaEnDesarrollo()
+    {
+        Assert.Equal(FiltroDeEstado.EnDesarrollo, FiltroDeEstado.Opciones[0]);
+
+        foreach (var vacio in new string?[] { null, "" })
+        {
+            Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso), vacio));
+            Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.Terminado), vacio));
+        }
+    }
+
+    /// <summary>
+    /// Ninguna opción general trae lo terminado ni lo archivado: son las tres vistas las
+    /// que hablan de trabajo vivo, y en la carga mensual un servicio cerrado sumaría días
+    /// que ya nadie va a hacer.
+    /// </summary>
+    [Fact]
+    public void NingunFiltroGeneralTraeLoTerminadoNiLoArchivado()
+    {
+        foreach (var general in new string?[] { null, "", FiltroDeEstado.EnDesarrollo, FiltroDeEstado.Todos })
+        {
+            Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.Terminado), general));
+            Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso, archivado: true), general));
+            Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso), general));
+        }
+    }
+
+    /// <summary>
+    /// «Todos» ya no se ofrece porque significaba lo mismo que «En desarrollo» en cuanto
+    /// dejó de traer lo cerrado; dos entradas idénticas en el desplegable solo confunden.
+    /// El valor se sigue aceptando, para que nadie que lo pase se quede sin tablero.
+    /// </summary>
+    [Fact]
+    public void ElDesplegableNoOfreceDosVecesLoMismo()
+    {
+        Assert.DoesNotContain(FiltroDeEstado.Todos, FiltroDeEstado.Opciones);
+        Assert.Contains("Terminado", FiltroDeEstado.Opciones);
+        Assert.Contains(FiltroDeEstado.Archivados, FiltroDeEstado.Opciones);
+    }
+
+    [Fact]
+    public void ArchivadosEnsenaSoloLoApartado()
+    {
+        Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso, archivado: true), FiltroDeEstado.Archivados));
+        Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso), FiltroDeEstado.Archivados));
+    }
+
+    /// <summary>Quien busca «En curso» no quiere lo que se apartó de en medio.</summary>
+    [Fact]
+    public void UnEstadoConcretoNoTraeLoArchivado()
+    {
+        Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso), "En curso"));
+        Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso, archivado: true), "En curso"));
+        Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.PorHacer), "En curso"));
+
+        // Y «Terminado» sí se puede pedir a propósito.
+        Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.Terminado), "Terminado"));
+    }
+
+    /// <summary>
+    /// <b>Manda el estado que puso la persona, no el que deduce el programa.</b> Un
+    /// servicio con todo relleno pero esperando al cliente no está terminado.
+    /// </summary>
+    [Fact]
+    public void ElFiltroNoMiraElAvanceSinoLoQueDijoLaPersona()
+    {
+        var esperandoAlCliente = Con(EstadoDeProyecto.PendienteCliente);
+
+        Assert.True(FiltroDeEstado.Pasa(esperandoAlCliente, FiltroDeEstado.EnDesarrollo));
+
+        // Y al revés: marcado como terminado aunque le falten secciones, se oculta.
+        Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.Terminado), FiltroDeEstado.EnDesarrollo));
+    }
+
+    // ---- carga de un técnico -----------------------------------------------
+
+    [Fact]
+    public void LaOcupacionCuentaLosDiasDeCadaServicio()
+    {
+        var dias = Ocupacion.Dias([
+            (new DateTime(2026, 8, 3), new DateTime(2026, 8, 7)),      // 5 días
+            (new DateTime(2026, 9, 1), new DateTime(2026, 9, 3))       // 3 días
+        ]);
+
+        Assert.Equal(8, dias);
+    }
+
+    /// <summary>
+    /// <b>Dos servicios a la vez no ocupan el doble.</b> Sumar duraciones exageraría la
+    /// carga justo de quien lleva varios a la vez, que es a quien el responsable busca.
+    /// </summary>
+    [Fact]
+    public void LosServiciosQueSeSolapanNoCuentanDosVeces()
+    {
+        var solapados = Ocupacion.Dias([
+            (new DateTime(2026, 8, 3), new DateTime(2026, 8, 14)),     // 12 días
+            (new DateTime(2026, 8, 10), new DateTime(2026, 8, 21))     // 12 días, 5 en común
+        ]);
+
+        Assert.Equal(19, solapados);   // del 3 al 21, no 24
+    }
+
+    /// <summary>Un servicio que acaba el lunes y otro que empieza el martes son un tramo.</summary>
+    [Fact]
+    public void LosTramosPegadosSeUnen()
+    {
+        var dias = Ocupacion.Dias([
+            (new DateTime(2026, 8, 3), new DateTime(2026, 8, 7)),
+            (new DateTime(2026, 8, 8), new DateTime(2026, 8, 12))
+        ]);
+
+        Assert.Equal(10, dias);
+    }
+
+    [Fact]
+    public void UnServicioContenidoEnOtroNoAnadeNada()
+    {
+        var dias = Ocupacion.Dias([
+            (new DateTime(2026, 8, 3), new DateTime(2026, 8, 28)),
+            (new DateTime(2026, 8, 10), new DateTime(2026, 8, 14))
+        ]);
+
+        Assert.Equal(26, dias);
+    }
+
+    [Fact]
+    public void SinServiciosNoHayOcupacion() => Assert.Equal(0, Ocupacion.Dias([]));
+
+    [Fact]
+    public void LaCargaSeCuentaEnDiasSiEsCortaYEnSemanasSiEsLarga()
+    {
+        Assert.Equal("1 proyecto", Ocupacion.Resumir(1, 0));
+        Assert.Equal("1 proyecto · 3 días", Ocupacion.Resumir(1, 3));
+        Assert.Equal("2 proyectos · 1 semana", Ocupacion.Resumir(2, 7));
+        Assert.Equal("3 proyectos · 4 semanas", Ocupacion.Resumir(3, 22));
     }
 
     [Fact]

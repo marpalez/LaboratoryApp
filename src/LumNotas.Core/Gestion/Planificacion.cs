@@ -45,6 +45,17 @@ public sealed class Planificacion
     /// </summary>
     public bool Archivado { get; set; }
 
+    /// <summary>
+    /// Importe de la oferta, en euros. De aquí sale el trabajo que supone el servicio
+    /// —el laboratorio lo mide dividiendo entre 80 €/día—, que es lo que alimenta la
+    /// vista de carga por técnico.
+    /// <para>
+    /// Es dato comercial, no de ensayo: se guarda con la planificación y <b>no aparece
+    /// en el informe</b> que se firma.
+    /// </para>
+    /// </summary>
+    public double? Importe { get; set; }
+
     // Lo que sigue se calcula, no se guarda: sin [JsonIgnore] el .lumproj acababa con
     // campos como «hayFechas» o «esVacia», que además mentirían al releerlos.
 
@@ -54,7 +65,7 @@ public sealed class Planificacion
     /// <summary>Sin planificar todavía. Los proyectos anteriores al calendario están así.</summary>
     [JsonIgnore]
     public bool EsVacia => Inicio is null && Fin is null && RecepcionMuestras is null
-                           && Estado == EstadoDeProyecto.PorHacer && !Archivado;
+                           && Estado == EstadoDeProyecto.PorHacer && !Archivado && Importe is null;
 
     /// <summary>Fin corregido: una fecha de fin anterior al inicio dibujaría al revés.</summary>
     [JsonIgnore]
@@ -76,7 +87,8 @@ public sealed class Planificacion
         Fin = Fin,
         Estado = Estado,
         RecepcionMuestras = RecepcionMuestras,
-        Archivado = Archivado
+        Archivado = Archivado,
+        Importe = Importe
     };
 
     public static string EtiquetaDe(EstadoDeProyecto estado) => estado switch

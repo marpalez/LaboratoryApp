@@ -2,9 +2,9 @@
 
 **Origen:** `TomaDeNotasExcel.xlsx`, plantilla v2.1
 **Extraído el:** 2026-07-29 (última modificación del libro: 2026-07-29)
-**Versión del documento:** 3.0 — lista de técnicos del laboratorio
-**Actualizado:** 2026‑08‑06
-**Propósito:** documento de revisión previo a la construcción de la aplicación de escritorio. Cada regla debe ser **confirmada, corregida o eliminada** por el laboratorio antes de programarla.
+**Versión del documento:** 3.10 — documento de traspaso al día
+**Actualizado:** 2026‑08‑02
+**Propósito:** nació como documento de revisión previo a programar —cada regla extraída del Excel debía ser **confirmada, corregida o eliminada** por el laboratorio— y hoy es además el **documento de traspaso** de la aplicación: qué hace, por qué se decidió así y qué queda pendiente. Lo que sigue sin confirmar va marcado con ⏳.
 
 ## Alcance del borrador
 
@@ -22,6 +22,8 @@ Decisión del laboratorio (2026‑07‑29): para valorar la viabilidad, el borra
 Las partes excluidas se conservan en este documento marcadas como 🚫 **fuera de alcance**, para no perder la información cuando se retomen.
 
 ## Registro de decisiones
+
+**El orden lo marca el número, no la fecha.** `D‑xx` son decisiones de negocio y `DD‑xx` de desarrollo, y cada uno se asignó al tomarse; las fechas salen del reloj del equipo y alguna se quedó descolocada. Ante una duda de qué vino antes, manda el número.
 
 | Fecha | Punto | Decisión |
 |---|---|---|
@@ -53,6 +55,23 @@ Las partes excluidas se conservan en este documento marcadas como 🚫 **fuera d
 | 2026‑08‑01 | DD‑33 | **El identificador de muestra sale de la plantilla.** En IK 62262 el laboratorio usa `EBP_CLIM…` en lugar de `EBP_SAFE…` |
 | 2026‑08‑01 | DD‑34 | **Los catálogos de equipos se importan por separado**, uno por norma |
 | 2026‑08‑01 | DD‑35 | **Qué es obligatorio en la cabecera lo decide la plantilla**, no el código: se leen los campos con `obligatorio: true` |
+| 2026‑08‑02 | DD‑79 | **Ninguna opción general del filtro trae lo terminado ni lo archivado**, en las tres vistas. Se quitó «Todos»: en la carga, un servicio cerrado seguía sumando sus días e inflaba el porcentaje del técnico con trabajo que ya no existe. Lo cerrado se pide por su nombre, con «Terminado» o «Archivados» |
+| 2026‑08‑02 | DD‑78 | **En el tablero, cada norma añadida ocupa una sola línea**, con la cuenta de toda su toma de notas: no se va hasta que está entera completa. La principal se sigue detallando sección a sección. Desplegar la 62031 dentro de un servicio de luminarias enterraba lo importante |
+| 2026‑08‑02 | DD‑77 | **El tablero mide cada proyecto contra las normas que él lleva**, no contra la que esté abierta. Antes, un servicio de luminarias con 62031 no enseñaba los apartados de la 62031 y podía darse por terminado a medias; y uno de IP se medía con las reglas de luminarias. Con varias normas, cada sección lleva su número delante |
+| 2026‑08‑02 | DD‑76 | **Los filtros de técnico y norma también son comunes a las tres vistas.** El laboratorio pidió el de técnico en el tablero; en vez de duplicarlo se subió a la barra común, donde ya estaba el de estado. En el calendario solo quedan sus ajustes propios |
+| 2026‑08‑02 | DD‑75 | **Un solo filtro de estado para las tres vistas**, por defecto «En desarrollo». Antes el tablero tenía su casilla y el calendario su desplegable, y podían contradecirse. Cambiarlo no vuelve a escanear, y se dice siempre cuántos quedan fuera |
+| 2026‑08‑02 | DD‑74 | **Para ocultar manda el estado que puso la persona, no el que deduce el programa.** Con el calculado, un servicio con todo relleno pero pendiente del cliente salía como terminado sin que nadie lo dijera. **Archivar oculta ahora en las tres vistas**, no solo en el calendario |
+| 2026‑08‑02 | DD‑73 | **El escaneo va en segundo plano y no bloquea la ventana.** Con una carpeta de clientes grande, congelarse varios segundos parece que el programa se ha colgado; mientras dura se sigue viendo lo anterior y se cuenta por dónde va |
+| 2026‑08‑02 | DD‑72 | **Lo ya analizado se guarda entre sesiones**, validado por fecha, tamaño y versión de la plantilla. Sin esto, cada arranque releía y analizaba todos los proyectos aunque no hubiera cambiado ninguno. La caché va en el perfil del usuario, no en la carpeta compartida: escribirla varios a la vez sobre OneDrive solo daría conflictos |
+| 2026‑08‑02 | DD‑71 | **Los proyectos y la configuración compartida están en carpetas distintas.** Lo corrigió el laboratorio: los proyectos cuelgan de la carpeta de clientes, cada uno en su rama, y la configuración vive aparte. Son dos ajustes; si el segundo se deja en blanco se usa el primero |
+| 2026‑08‑02 | DD‑70 | **La carpeta del laboratorio se elige en «Configuración» y se pregunta sola la primera vez.** Estaba solo en el tablero, de cuando esa carpeta era únicamente dónde estaban los proyectos; al gobernar también normas, técnicos, tarifa y versión, un técnico que no abriera el tablero no la elegía nunca y trabajaba aislado sin saberlo |
+| 2026‑08‑02 | DD‑69 | **El aviso de versión nueva avisa, no bloquea.** Con la aplicación en varios equipos, lo grave es trabajar meses con una versión vieja sin saberlo; impedir trabajar porque un fichero de OneDrive dice otra cosa sería peor que el problema |
+| 2026‑08‑02 | DD‑68 | **Las normas se leen de la carpeta compartida, no de junto al ejecutable.** Con una copia por equipo, dos técnicos podían rellenar versiones distintas de la misma norma sin enterarse. La copia local queda de respaldo y, cuando se usa, **se avisa** |
+| 2026‑08‑06 | DD‑67 | **Sin contraseña en «Configuración».** Se planteó al aparecer los importes y se descartó: protegía la lista de técnicos y la tarifa mientras los importes seguían visibles por otros tres caminos. Lo que corresponde, si algún día hace falta, son permisos de carpeta. Ver «Descartado, y por qué» |
+| 2026‑08‑06 | DD‑66 | **El importe de la oferta vive en la planificación, no en la toma de notas.** Es dato comercial: no se anota como un ensayo ni sale en el informe que se firma |
+| 2026‑08‑06 | DD‑65 | **El trabajo de un servicio se reparte entre meses por días entre semana**, suponiendo esfuerzo uniforme. Es impreciso en un servicio suelto y suficiente sobre el conjunto de un técnico; la alternativa exacta —teclear días por mes— no la rellenaría nadie |
+| 2026‑08‑06 | DD‑64 | **La ocupación de un técnico se mide en días ocupados, no sumando duraciones.** Dos servicios a la vez no ocupan el doble, y sumarlos exageraría la carga justo de quien lleva varios en paralelo |
+| 2026‑08‑06 | DD‑63 | **El calendario se agrupa por técnico responsable.** La columna izquierda dejó de listar servicios —el código ya va en la barra— para responder a lo que el responsable necesita: cuántos lleva cada uno y cuánto le ocupan |
 | 2026‑08‑06 | DD‑62 | **El menú se llama «Configuración», no «Admin».** No hay roles ni permisos que administrar; cualquiera que abra el programa puede editar las listas. Ahí caben luego equipos y perfil de usuario |
 | 2026‑08‑06 | DD‑61 | **Los técnicos se eligen de una lista compartida** (`tecnicos.json` en la carpeta de proyectos). Escribirlos a mano daba la misma persona con tres grafías y rompía el filtro por técnico. Un nombre guardado que no esté en la lista se sigue ofreciendo, para no dejar sin técnico a los proyectos antiguos |
 | 2026‑08‑06 | DD‑60 | **La cabecera del calendario se sincroniza con un `ScrollViewer`, no con una transformación.** Con la ventana pequeña, el recorte de maquetación de WPF dejaba sin dibujar las semanas que no cabían |
@@ -1016,12 +1035,13 @@ LumNotas.App           interfaz WPF (MVVM)
 |---|---|
 | `plantilla/equipos-60598.v1.json` | Catálogo de equipos completo: **43 grupos, 224 entradas, 89 códigos distintos**. Importación literal desde `BBDD Equipos 60598` (DD‑10), con las notas de uso del laboratorio y la trazabilidad de cada celda de origen |
 | `plantilla/plantilla-60598.v1.json` | **La norma entera como datos**: 16 secciones y 45 apartados, con campos, checklists, subbloques, grupos repetibles, reglas P1‑P8 y los nueve cálculos. ~140 KB |
-| `src/LumNotas.Core` | Motor de reglas: modelo de plantilla, catálogo de equipos, almacén de datos, evaluador de los tipos de regla, predicados y cálculos con nombre, requisitos del proyecto, indicador de avance, estado de apartado y resumen para el tablero |
+| `src/LumNotas.Core` | Motor de reglas: modelo de plantilla, catálogo de equipos, almacén de datos, evaluador de los tipos de regla, predicados y cálculos con nombre, requisitos del proyecto, indicador de avance, estado de apartado y resumen para el tablero. En `Gestion/` vive además todo lo de planificación: eje de semanas ISO, gesto de arrastre, ocupación, lista de técnicos, capacidad mensual y carga por técnico — **fuera de la interfaz para poder probarlo** |
 | `src/LumNotas.Storage` | Un fichero `.lumproj` por proyecto (JSON), con **escritura atómica** (temporal + reemplazo) para que OneDrive lo sincronice sin corromperlo. Más la lista de recientes, los ajustes y el explorador de carpetas |
 | `src/LumNotas.Report` | Exportador del informe a HTML con estilos de impresión A4. **Sin dependencias externas** |
-| `src/LumNotas.App` | Interfaz WPF. `VentanaPrincipalViewModel` es la ventana con su barra de pestañas; `DocumentoViewModel` es **un proyecto abierto** (árbol con semáforo y formulario generado desde la plantilla); `GestionViewModel` es el tablero, que ocupa otra pestaña. Las plantillas grandes viven en `Window.Resources` y se eligen por tipo |
+| `src/LumNotas.App` | Interfaz WPF. `VentanaPrincipalViewModel` es la ventana con su barra de pestañas; `DocumentoViewModel` es **un proyecto abierto** (árbol con semáforo y formulario generado desde la plantilla); `GestionViewModel` es la pestaña de gestión, con sus tres vistas (`CalendarioViewModel`, `CargaViewModel`). Las plantillas grandes viven en `Window.Resources` y se eligen por tipo |
+| Ficheros compartidos | Junto a los proyectos, en la carpeta de OneDrive: `tecnicos.json` (la lista del laboratorio) y `capacidad.json` (tarifa y días por mes). Se editan desde `Configuración` y valen para todos |
 | `plantilla/plantilla-62031.v1.json`, `plantilla-60529.v1.json`, `plantilla-62262.v1.json` | Las otras tres normas, con sus catálogos `equipos-62031`, `equipos-60529` y `equipos-62262` |
-| `tests/LumNotas.Core.Tests` | **192 tests, verificados en verde el 2026‑08‑06.** Cubren los ocho patrones, los nueve cálculos, los defectos corregidos, la integridad de la plantilla, el ciclo de guardado, varios proyectos simultáneos, el informe, el tablero y la planificación (semanas ISO, cambio de año, el gesto de arrastre completo, que años lejanos y erratas de año no rompan el eje, y que planificar y anotar no se pisen), y la lista de técnicos (que quitar no toque los proyectos y corregir sí) |
+| `tests/LumNotas.Core.Tests` | **262 tests, verificados en verde el 2026‑08‑02.** Cubren los ocho patrones, los nueve cálculos, los defectos corregidos, la integridad de la plantilla, el ciclo de guardado, varios proyectos simultáneos, el informe, el tablero y la planificación (semanas ISO, cambio de año, el gesto de arrastre completo, que años lejanos y erratas de año no rompan el eje, y que planificar y anotar no se pisen), y la lista de técnicos (que quitar no toque los proyectos y corregir sí), y la ocupación por técnico (que lo solapado no cuente dos veces), y la carga mensual (tarifa, capacidad, reparto entre meses y que no se pierda trabajo), y el escaneo de la matrioska de clientes (que encuentre lo hondo, que la caché caduque bien, que una rama rota no lo tumbe y que una norma añadida ocupe una sola línea con la cuenta de toda ella) |
 
 Los ficheros de plantilla conservan `origenExcel` en cada elemento para poder auditarlos contra el libro original. Ese campo no se usa en ejecución.
 
@@ -1063,6 +1083,8 @@ La pantalla **se genera a partir de la plantilla**, no está escrita a mano: añ
 - **Contador de apartados** en la cabecera. El porcentaje ponderado y la barra de progreso se retiraron (DD‑25) por no aportar nada; el cálculo sigue en `IndicadorDeAvance`.
 - **El índice se pliega** con el botón ◀ / ▶ de la cabecera. Con 30 muestras, esos 360 px son la diferencia entre ver tres columnas o siete.
 - **Una barra de pestañas y una sola**: los proyectos y el tablero al mismo nivel, con el `+` detrás de la última. La pestaña de delante va en negrita y con fondo más claro.
+- **Menús**: `Archivo` (pestañas, abrir, guardar, exportar), `Ver` (ir al tablero) y `Configuración`, que guarda lo que es del laboratorio entero y no de un proyecto: la **lista de técnicos** y la **capacidad y tarifa**. Se llamó *Configuración* y no *Admin* porque no hay roles ni permisos que administrar (DD‑62).
+- **El técnico se elige de una lista, no se escribe.** Técnico 1 y Técnico 2 son desplegables en las cuatro normas, vacíos de partida. Técnico 1 es el **responsable** del servicio y por él se agrupa el calendario y se calcula la carga.
 
 ### Pestañas: varios proyectos a la vez
 
@@ -1098,18 +1120,147 @@ Todo lo que abandona el proyecto abierto pasa por el mismo aviso: proyecto nuevo
 
 ### El tablero de gestión de proyectos
 
-Segunda pestaña, pensada para el responsable, no para el técnico. **Columnas = proyectos, tarjetas = secciones pendientes** (a lo Trello).
+Pestaña propia, pensada para el responsable y no para el técnico. Tiene **tres vistas de la misma carpeta**, que responden a sus tres preguntas:
 
-Cómo encuentra los proyectos: se le indica **una carpeta** (la del laboratorio en OneDrive) y la escanea buscando `*.lumproj`, incluidas subcarpetas. Sin índice ni base de datos — con varios técnicos sincronizando, un índice se desincroniza y miente; el fichero es la única verdad (DD‑27).
+| Vista | Pregunta |
+|---|---|
+| **Tablero** | ¿Qué falta por rellenar? |
+| **Calendario** | ¿Cuándo toca cada servicio? |
+| **Carga** | ¿Cabe? |
+
+El tablero es lo primero que se construyó: **columnas = proyectos, tarjetas = secciones pendientes** (a lo Trello).
+
+#### Qué proyectos se miran
+
+Un solo desplegable **«Mostrar»** para las tres vistas: el responsable decide una vez qué le interesa y el tablero, el calendario y la carga hablan de lo mismo. Por defecto, **«En desarrollo»** — ni terminado ni archivado.
+
+| Opción | Qué enseña |
+|---|---|
+| **En desarrollo** | ni terminado ni archivado. Lo que se está trabajando |
+| Un estado concreto | ese estado, **sin** lo archivado: quien busca «En curso» no quiere lo que se apartó |
+| Archivados | solo lo apartado de en medio |
+
+**Lo cerrado se pide por su nombre** (DD‑79). Había una opción «Todos» que traía literalmente todo, y el laboratorio la quitó de en medio (2026‑08‑02): quien la elegía buscaba «los proyectos de todos los técnicos», no «también los de 2019». En la carga era peor que un estorbo visual — un servicio terminado seguía sumando sus días al mes, así que el porcentaje del técnico salía inflado con trabajo que ya nadie va a hacer. Ahora **ninguna opción general trae lo terminado ni lo archivado**; para verlos se eligen «Terminado» o «Archivados», que siguen ahí. Como sin lo cerrado «Todos» decía exactamente lo mismo que «En desarrollo», se dejó una sola entrada en vez de dos idénticas.
+
+**Manda el estado que puso la persona, no el que deduce el programa** (DD‑74). Antes «terminado» significaba dos cosas: el tablero usaba el calculado —todas las secciones rellenas— y el calendario el manual. Así, un servicio con todo relleno pero **esperando confirmación del cliente salía como terminado** sin que nadie lo hubiera dicho. Lo calculado se queda como lo que es: el avance, `12/16 secciones`.
+
+Los dos mecanismos de ocultar tienen papeles distintos:
+
+- **Terminado** → el trabajo está hecho. Sale de la vista **solo**, sin que nadie tenga que acordarse de archivar, porque marcar el estado ya forma parte del trabajo.
+- **Archivado** → «quítamelo de en medio» pase lo que pase: lo cancelado, lo aparcado, lo viejo que estorba. Antes solo ocultaba en el calendario; ahora **oculta en las tres vistas**, que es lo que cualquiera esperaría al pulsarlo.
+
+Junto al estado están los otros dos filtros, **técnico y norma**, que también valen para las tres vistas. El de técnico estaba solo en el calendario y el laboratorio lo pidió también en el tablero (2026‑08‑02); en vez de duplicarlo se subió a la barra común, igual que el de estado.
+
+Así, **todo lo que decide qué proyectos se miran está en una sola fila**, y en el calendario solo quedan sus ajustes propios: agrupar por técnico, zoom y navegación.
+
+Cambiar de filtro **no vuelve a escanear**: se filtra lo ya leído, así que es instantáneo. Y la línea de estado dice siempre cuántos se han quedado fuera —«3 proyectos · 2 fuera del filtro»—, porque un filtro que esconde en silencio es peor que no tenerlo.
+
+Las listas de técnicos y normas salen **de los proyectos que hay**, no de una lista fija. Si el elegido desaparece —se archivó el último servicio de ese técnico— se vuelve a «(todos)» en vez de dejar el tablero vacío sin explicar por qué.
+
+Cómo encuentra los proyectos: se le indica **la carpeta de proyectos** y la escanea buscando `*.lumproj`, incluidas todas sus subcarpetas. Sin índice ni base de datos — con varios técnicos sincronizando, un índice se desincroniza y miente; el fichero es la única verdad (DD‑27).
 
 | Pieza | Qué hace |
 |---|---|
-| `ExploradorDeProyectos` | Escanea la carpeta, cachea por fecha de modificación y **aísla los ficheros ilegibles**: uno corrupto sale como tarjeta de error en vez de tumbar el tablero |
+| `ExploradorDeProyectos` | Escanea la carpeta y **aísla los ficheros ilegibles**: uno corrupto sale como tarjeta de error en vez de tumbar el tablero. Preparado para árboles grandes, ver más abajo |
+| `CacheDeResumenes` | Lo ya analizado, guardado **entre sesiones** en el perfil del usuario |
 | `AnalizadorDeProyectos` | Calcula el resumen reutilizando el mismo `MotorDeReglas` de la toma de notas |
 | `EstadoDeApartado` | El semáforo, movido de la interfaz al núcleo para que ambas pestañas usen exactamente la misma lógica |
-| `AjustesDeAplicacion` | Recuerda la carpeta elegida entre sesiones |
+| `FiltroDeEstado` | Qué proyectos se miran, común a las tres vistas |
+| `Ajustes` | Recuerda entre sesiones las dos carpetas y si ya se preguntaron |
 
 El avance se cuenta **por secciones** (DD‑28): la sección 7 vale 1 aunque tenga trece apartados dentro. Es la vista que pidió el laboratorio.
+
+**Cada proyecto se mide contra las normas que él dice llevar** (DD‑77). Hasta el 2026‑08‑02 el tablero medía todo contra una sola plantilla —la que estuviera abierta—, con dos consecuencias feas: un servicio de luminarias **con módulos LED 62031 no enseñaba los apartados de la 62031**, y podía darse por terminado con media toma de notas sin rellenar; y un servicio de IP se evaluaba contra las reglas de luminarias, que no son las suyas.
+
+Ahora se cargan las plantillas instaladas una vez por sesión y cada proyecto se analiza con las suyas.
+
+**La norma principal se detalla; cada norma añadida ocupa una sola línea** (DD‑78):
+
+```
+Sección 16 - Bornes con tornillos      1 de 1 apartados pendientes
+Sección 17 - Bornes sin tornillo       1 de 1 apartados pendientes
+Ensayo de IK - EN/IEC 62262            1 de 1 apartados pendientes
+Módulos LED — EN/IEC 62031            26 de 26 apartados pendientes
+```
+
+Esa línea trae la cuenta de **toda** su toma de notas, así que **no desaparece hasta que la norma entera está completa**. Es lo que pidió el laboratorio: al responsable le interesa el detalle de lo que está ensayando y, de lo añadido, solo si queda algo por hacer. Desplegar la 62031 entera dentro de un servicio de luminarias enterraba lo importante — y encaja con cómo se veía ya el IK, que al vivir dentro de la plantilla de luminarias siempre fue una línea.
+
+Cuál es la principal lo delata **cómo se nombran las muestras**: `EBP_SAFE…` en las de seguridad y `EBP_CLIM…` en IK, y ese patrón lo fija la norma con la que nació el proyecto. Si eso no lo aclara, manda luminarias.
+
+Un proyecto que no apunte sus normas —los guardados antes de que se registraran— se mide con la de por defecto, para no dejarlo sin medir.
+
+#### Escanear una matrioska de carpetas
+
+Los proyectos del laboratorio cuelgan de la carpeta de clientes, cada uno en su rama y con años de historia detrás. El tablero **lee entero cada `.lumproj`** que encuentra —el estado sale de aplicarle las reglas—, así que sobre un árbol grande eso se nota. Cuatro medidas, por orden de lo que aportan:
+
+| | |
+|---|---|
+| **Caché entre sesiones** | Lo ya analizado se guarda en el perfil del usuario. Un proyecto que no ha cambiado **no se vuelve a leer**, ni siquiera tras reiniciar |
+| **En segundo plano** | El escaneo ya no bloquea la ventana. Mientras dura se sigue viendo lo anterior, se cuenta por dónde va y hay una barra de actividad |
+| **Lectura en paralelo** | Ocho proyectos a la vez: sobre OneDrive el tiempo se va esperando al disco, no calculando |
+| **`IgnoreInaccessible`** | En una carpeta de clientes con años siempre hay alguna rama sin permisos. Sin esto, **una sola abortaba el escaneo entero** |
+
+Medido con **400 proyectos en 40 clientes**: primera vez **461 ms**, sesiones siguientes **107 ms**. Sobre OneDrive la diferencia es mayor, porque ahí cada lectura cuesta bastante más que en disco local.
+
+La caché se valida por **fecha, tamaño y versión de la plantilla**: el resumen sale de aplicar las reglas de una norma, así que al publicar una versión nueva deja de valer sola. Y **solo se reescribe si ha cambiado algo** — sin esa comprobación, un refresco sin cambios reescribía el fichero entero y se comía tres cuartas partes de lo ahorrado.
+
+Va en el perfil del usuario y no en la carpeta compartida: es una caché de este equipo, y varios técnicos escribiéndola a la vez sobre OneDrive solo daría conflictos. Si se corrompe, se tira y se rehace.
+
+### Las dos carpetas del laboratorio
+
+**Son dos carpetas de OneDrive distintas** (confirmado por el laboratorio el 2026‑08‑02), elegidas una vez en cada equipo:
+
+| Ajuste | Qué guarda |
+|---|---|
+| **Carpeta de proyectos** | los `*.lumproj` |
+| **Carpeta compartida** | `plantilla/` (las normas), `tecnicos.json`, `capacidad.json`, `version.json` |
+
+Los proyectos **no están todos juntos**: cuelgan de la carpeta de clientes, cada uno en su rama.
+
+```
+clientes/antares/antar2504/01/tomadenotas/antar2504.lumproj
+clientes/moonoff/moono2304/01/tomadenotas/moono2304.lumproj
+```
+
+Basta con apuntar a `clientes`: se busca en ella **y en todas sus subcarpetas**, así que la profundidad y la forma de cada rama dan igual.
+
+Si la carpeta compartida se deja en blanco **se usa la de proyectos**, para no romper una instalación que las tenga juntas.
+
+Se eligen en **`Configuración | Carpetas del laboratorio…`**, que enseña de cada una qué contiene —proyectos encontrados, normas publicadas, técnicos, tarifa y versión— y avisa en rojo si una ruta guardada ha dejado de estar accesible. **Se pregunta sola la primera vez** que se abre el programa en un equipo.
+
+> La carpeta compartida tiene que ser **de lectura para todo el mundo**, aunque solo unos pocos escriban en ella. Si los técnicos no pudieran leerla, se quedarían sin normas ni lista de técnicos.
+
+> **Por qué se movió ahí** (2026‑08‑02): estaba solo en el botón «Elegir carpeta…» del tablero, de cuando esa carpeta era únicamente «dónde están los proyectos». Al pasar a gobernar también normas, técnicos, tarifa y versión, quedó en el sitio equivocado: **un técnico que no abriera nunca el tablero no la elegiría jamás**, y trabajaría con las normas de su equipo y su propia lista de técnicos sin enterarse. Justo lo que se quería evitar. El botón del tablero sigue estando y hace lo mismo.
+
+Al cambiarla se releen los técnicos, la tarifa, la versión publicada y los proyectos. **Las normas no se recargan en caliente**: se resuelven una vez por sesión, y cambiarlas con proyectos abiertos dejaría unas pestañas con una versión de la norma y otras con otra. El diálogo avisa de que hay que reiniciar.
+
+### Una sola versión de las normas para todo el laboratorio
+
+Resuelto el 2026‑08‑02. Hasta entonces la carpeta `plantilla` viajaba **junto al ejecutable**, así que cada equipo llevaba su copia: dos técnicos podían estar rellenando **versiones distintas de la misma norma** sin enterarse. En un laboratorio acreditado eso es un problema, no una molestia.
+
+**Ahora manda la carpeta compartida.** Las normas se buscan en `<carpeta de proyectos>/plantilla`; la copia del equipo queda como respaldo.
+
+| Situación | Qué se usa |
+|---|---|
+| Hay normas publicadas en la carpeta compartida | Las compartidas |
+| No están publicadas todavía | Las del equipo, **avisando** |
+| No se llega a la carpeta (OneDrive sin conexión) | Las del equipo, **avisando** |
+
+El aviso importa tanto como la resolución: seguir trabajando con una versión distinta a la del compañero **no puede pasar inadvertido**. Se ve en `Configuración | Normas instaladas…`, que además lista las normas con su versión y tiene el botón **«Publicar en la carpeta compartida»** — que es la migración entera, de «cada equipo con su copia» a «una sola versión para todos».
+
+Las plantillas y sus catálogos de equipos **se publican juntos**: el catálogo se busca al lado de su plantilla, así que separarlos dejaría apartados sin equipos.
+
+### Saber qué versión del programa se está usando
+
+El mismo problema, un piso más arriba: con la aplicación copiada en varios ordenadores, lo que no puede pasar es que alguien trabaje meses con una versión antigua **sin saberlo**.
+
+- **`Ayuda | Acerca de…`** enseña la versión del programa, las normas cargadas con su versión y de dónde salen. Es también lo que permite responder **con qué versión se registró cada ensayo**, parte de lo que pide la ISO 17025 sobre validación de software.
+- Quien instala una versión nueva la **publica** desde ahí. Se escribe un `version.json` en la carpeta compartida.
+- Los equipos que sigan con una anterior ven **una banda ámbar al arrancar**. Se puede quitar hasta el siguiente arranque.
+
+**Es un aviso, no un candado.** Dejar sin trabajar a un laboratorio porque un fichero de OneDrive dice otra cosa sería peor que el problema que resuelve. Y ante cualquier duda —un número de versión que no se entiende— no avisa: es preferible callar que avisar en falso todos los días.
+
+> **Para que esto sirva hay que subir `<Version>` en `LumNotas.App.csproj` en cada entrega.** Si no se sube, los demás equipos no se enteran de nada. Está comentado en el propio fichero.
 
 ### Los técnicos del laboratorio
 
@@ -1135,9 +1286,36 @@ Un nombre guardado que no esté en la lista —los proyectos anteriores a todo e
 > La lista de un desplegable **no se puede reconstruir desde el `set` de su propia selección**. Aquí `Tecnicos` era una propiedad calculada que devolvía una lista nueva y el `set` de Técnico 1 la notificaba: el `ComboBox` recibía un `ItemsSource` distinto, volvía a resolver su selección, la escribía otra vez, y vuelta a empezar. `StackOverflowException`, **que no se puede capturar**, así que la aplicación desaparecía sin dejar ni registro de error.
 > La cura es que la colección **no se sustituya nunca**: es una `ObservableCollection` que solo se ajusta por dentro, y los `set` comparan antes de escribir. Al no reproducirse desde código —hace falta el clic real— la confirmación salió del **registro de eventos de Windows**, que sí anotó el `StackOverflowException`.
 
+### La carga por técnico (tercera vista)
+
+Pedida el 2026‑08‑06. El tablero dice *qué falta*, el calendario *cuándo*, y esta *si cabe*. Tabla de **técnicos × meses** con el porcentaje de ocupación, en `Gestión de proyectos | Carga`.
+
+**Cómo se calcula**, con la regla del laboratorio:
+
+1. **Trabajo de un servicio = importe de la oferta ÷ 80 €.** Es como lo calcula la empresa: una oferta de 2 000 € son 25 días de trabajo.
+2. **Reparto entre meses** en proporción a los **días entre semana** que el servicio tiene en cada uno. Los fines de semana no cuentan.
+3. **Comparación con la capacidad del mes**, que no es igual todo el año.
+
+| Mes | Días de trabajo que caben |
+|---|---|
+| Agosto | **10** (dos semanas laborables) |
+| Diciembre | **15** (tres semanas) |
+| Los demás | **22** |
+
+La tarifa y los doce valores se editan en **`Configuración | Capacidad y tarifa…`** y se guardan junto a la lista de técnicos, en la carpeta compartida.
+
+Verde por debajo del 85 %, ámbar hasta el 100 %, **rojo por encima**: ahí el técnico está sobrevendido. Un servicio de 2 000 € planificado entero en agosto sale al **250 %**, que es exactamente el aviso que se buscaba — medio laboratorio está de vacaciones.
+
+**Dos cosas que conviene tener presentes:**
+
+- **El reparto supone esfuerzo uniforme**, y en un laboratorio no lo es: montaje, dos días en cámara sin tocar nada, medida. En un servicio suelto el reparto mensual es impreciso; sobre el conjunto de un técnico los errores se compensan y sirve para planificar, que es para lo que se usa. La alternativa —teclear días por mes a mano— no la rellenaría nadie.
+- **Un servicio sin importe no cuenta**, y se avisa con «N sin importe» junto al técnico, en vez de rebajar su carga en silencio.
+
+El importe es **dato comercial, no de ensayo**: se guarda con la planificación y **no aparece en el informe** que se firma. Aviso dado al laboratorio: el `.lumproj` es texto plano en la carpeta compartida, así que quien tenga acceso a la carpeta ve los importes.
+
 ### El calendario (línea de tiempo)
 
-Segunda vista de la misma carpeta, pedida el 2026‑08‑06 con Planyway como referencia. El tablero contesta *qué falta por rellenar*; el calendario contesta *cuándo toca cada servicio y qué se ha pasado de plazo*. Se cambia de una a otra con los botones «Tablero» y «Calendario».
+Pedido el 2026‑08‑06 con Planyway como referencia. Contesta *cuándo toca cada servicio y qué se ha pasado de plazo*. Es una de las **tres vistas de la misma carpeta**, que se eligen con los botones «Tablero», «Calendario» y «Carga».
 
 **Una tarjeta por toma de notas** (DD‑54). Un servicio con 60598‑1 + ‑2‑3 + IK + 62031 sale como una sola barra, porque todo cuelga de la toma de notas principal.
 
@@ -1150,11 +1328,21 @@ Segunda vista de la misma carpeta, pedida el 2026‑08‑06 con Planyway como re
 
 **El eje va en semanas ISO** (DD‑55), porque es como planifica el laboratorio. `EjeDeSemanas`, en `LumNotas.Core/Gestion/Planificacion.cs`, calcula las celdas, los meses de la cabecera y la posición en píxeles de cada barra. Está en el núcleo y no en la interfaz para poder probarlo: los años de 53 semanas y las semanas que cruzan de diciembre a enero son justo lo que se rompe en silencio. No hace falta importar los años de ningún sitio — `DateTime` e `ISOWeek` ya los saben.
 
+#### La columna de la izquierda es de técnicos, no de servicios
+
+Cambiado el 2026‑08‑06 a petición del laboratorio. El código del servicio **ya va escrito dentro de su barra**, así que repetirlo a la izquierda no aportaba nada. Lo que le falta al responsable es lo contrario: **cuántos servicios lleva cada técnico y cuánto tiempo le ocupan**.
+
+Por defecto los servicios se **agrupan por Técnico 1**, el responsable. Cada grupo abre con una cabecera —nombre en azul, y debajo «3 proyectos · 10 semanas», más «N fuera de plazo» en rojo si los hay— y bajo ella van sus servicios, con el código pequeño y en gris. Se puede desagrupar con la casilla «Agrupar por técnico». Los servicios sin responsable van al final, bajo «(sin técnico)», que es donde se ve lo que falta por asignar.
+
+**La ocupación cuenta días, no suma duraciones** (`Ocupacion.Dias`). Dos servicios que se solapan no ocupan el doble: el técnico está ocupado una vez. Sumar duraciones exageraría la carga justo de quien lleva varios a la vez, que es a quien se busca. Los tramos pegados —uno acaba el lunes, otro empieza el martes— cuentan como uno solo.
+
+Las dos columnas —nombres y barras— **recorren la misma lista de filas** con las mismas alturas: por eso van alineadas y no hay que sincronizar nada.
+
 Lo que se ve de un vistazo:
 
 - **línea roja vertical de «hoy»** y la semana en curso resaltada en la cabecera;
 - **barra en rojo** si la fecha de fin ya pasó y el servicio no está terminado — este es el valor de todo el invento, lo demás es decoración;
-- **punto blanco** en la barra si las muestras ya están en el laboratorio;
+- **icono de caja** en la barra si las muestras ya están en el laboratorio, y también en la banda de abajo —muestras aquí y todavía sin planificar es lo que corre prisa—. Va dibujado como trazo, no como imagen, para verse nítido a cualquier tamaño y tomar el color de donde se ponga;
 - los servicios **sin fechas** salen en una banda aparte, con un botón «Planificar…», para que no se pierdan de vista.
 
 **Las barras se arrastran con el ratón** (2026‑08‑06): el centro mueve el servicio entero conservando la duración, el borde izquierdo cambia solo el inicio y el derecho solo el fin. Cuatro detalles que no son evidentes:
@@ -1220,24 +1408,36 @@ Sin esa segunda regla, el técnico que tuviera el proyecto abierto desde hacía 
 | **Proyectos** | Abrir, guardar, guardar como, recientes, apertura por doble clic |
 | **Pestañas** | Varios proyectos abiertos a la vez, más el tablero. Aviso de cambios sin guardar al cerrar pestaña y al cerrar la aplicación |
 | **Informe** | HTML A4 con portada, un apartado por página, equipos, comentarios y avisos |
-| **Gestión de proyectos** | Tablero por carpeta: columna por proyecto, tarjeta por sección pendiente, avance contado por secciones |
-| **Calendario** | Línea de tiempo en semanas ISO: una tarjeta por servicio, estado, recepción de muestras, archivado, aviso de fuera de plazo y filtros por técnico, estado y norma. **Las barras se arrastran**: el centro mueve, los bordes cambian inicio o fin |
+| **Gestión de proyectos** | Tres vistas de la misma carpeta —tablero, calendario y carga— con **un solo juego de filtros**: estado, técnico y norma. El tablero da columna por proyecto y tarjeta por sección pendiente; cada norma añadida ocupa una sola línea |
+| **Calendario** | Línea de tiempo en semanas ISO, **agrupada por técnico responsable**: estado, recepción de muestras, archivado y aviso de fuera de plazo. **Las barras se arrastran**: el centro mueve, los bordes cambian inicio o fin. Pulsarlas abre su configuración |
+| **Carga por técnico** | Tabla técnicos × meses en porcentaje de ocupación. El trabajo sale del importe de la oferta (÷ 80 €) y se reparte entre meses por días entre semana, contra una capacidad de 22 días —10 en agosto, 15 en diciembre— |
+| **Técnicos** | Lista compartida del laboratorio, elegible en Técnico 1 y 2 de las cuatro normas. Se edita en `Configuración`; corregir un nombre se propaga a los proyectos, quitarlo no los toca |
 | **Cuatro normas** | 60598‑1, 62031, 60529 (IP) y 62262 (IK), cada una con su plantilla y su catálogo de equipos, elegibles desde la portada. Ver sección 16 |
 | **Portada** | Elegir norma, abrir proyecto, recientes o saltar al tablero |
 | **Grado por muestra** | IP e IK se eligen en la fila de cada muestra, con el atajo «Luminaria ordinaria». La fila es idéntica en las tres normas que la usan |
+| **Dos carpetas de OneDrive** | Una de proyectos y otra compartida (normas, técnicos, tarifa, versión). Se eligen en `Configuración` y se preguntan solas la primera vez |
+| **Una versión para todos** | Las normas se leen de la carpeta compartida y se publican desde `Configuración`; `Ayuda \| Acerca de` enseña la versión y avisa si el laboratorio ha publicado una más nueva |
+| **Árboles grandes** | Escaneo en segundo plano, en paralelo, con caché entre sesiones y saltando las ramas sin permisos. 400 proyectos: 461 ms la primera vez, 107 ms las siguientes |
 
 ### Pendiente
 
+**Lo primero, y no es código: nadie ha rellenado todavía un ensayo real de principio a fin.** Ni un servicio completo con sus muestras, su informe impreso y firmado. Todo lo construido encima es una apuesta razonada, pero una apuesta. Un servicio de verdad en paralelo con el Excel dirá más que tres funciones nuevas — y hasta que eso pase, no conviene repartir el programa a seis ordenadores.
+
 | Prioridad | Qué |
 |---|---|
+| Alta | **Filtro por antigüedad al escanear** («leer solo los últimos 2 años»). Propuesto el 2026‑08‑02 y **pendiente de confirmar el valor por defecto**. Es el único filtro que evita *leer*, no solo *ver*: importa en un equipo nuevo y cuando se publica una norma, que invalida la caché entera. Debe decir siempre cuántos proyectos ha dejado fuera |
+| Media | **Calibración de los equipos.** Ya se registra qué equipo se usó en cada apartado; si el catálogo llevara su fecha de calibración, el programa podría avisar de que un equipo estaba fuera de calibración el día del ensayo. Media función hecha y sin aprovechar — es la no conformidad que detecta el programa antes que el auditor |
+| Media | **Duplicar un proyecto.** Los laboratorios ensayan familias de luminarias; arrancar un servicio desde otro ahorra rellenar la cabecera veinte veces |
+| Baja | **Buscar en el tablero.** Con años de clientes no hay caja de búsqueda |
+| Baja | **Exportar el calendario o la carga**, para enviarlos a quien no abre el programa. El exportador de HTML ya existe |
 | Baja | **Las tarjetas de clase, Ta y partes ‑2 siguen escritas a mano en el XAML.** Solo se muestran y se exigen donde la norma las declara, pero el asterisco de obligatorio es texto fijo. Se generalizó la cabecera entera el 2026‑08‑01 y **el laboratorio pidió revertirlo**: la pantalla de luminarias se da por buena y no se toca |
-| Baja | **`MainWindow.xaml` sigue siendo grande.** Al pasar a pestañas, las plantillas de proyecto y de tablero salieron a `Window.Resources`, que era la mitad del problema. Partirlo en varios diccionarios de recursos terminaría el trabajo |
-| Alta | **Selectores de fecha y hora.** Hoy se escriben como texto (`20/07/2026 23:40`). Es lo que más molestará en uso real |
+| Media | **`MainWindow.xaml` se ha hecho grande de verdad.** Ya son tres vistas de gestión —tablero, calendario y carga— dentro del mismo fichero, además de la toma de notas y la portada. Toca partirlo en diccionarios de recursos, uno por vista. Ha subido de prioridad porque cada añadido nuevo cuesta más de encontrar |
+| Alta | **Selectores de fecha y hora en la toma de notas.** Hoy se escriben como texto (`20/07/2026 23:40`). Es lo que más molestará en uso real. La planificación ya usa `DatePicker`, así que el patrón a seguir está hecho |
 | Alta | **Campos calculados de solo lectura.** El radio del arco de lluvia y las dos fuerzas de carga estática están implementados y con tests en `Calculos.cs`, pero la interfaz no sabe mostrar un campo calculado: se rellenan a mano |
 | Media | **Selección automática de equipos IP** (`seleccionAutomaticaEquipos`): declarada en la plantilla, no implementada |
 | Media | **Perfil de usuario** (DD‑08). Con la lista de técnicos ya hecha, lo que falta es saber **quién** está usando el programa, para firmar quién guardó cada cosa |
 | Baja | **La cabecera del calendario no se queda fija al desplazarse en vertical.** Con muchos proyectos habrá que congelarla |
-| Media | **Instalador** y asociación de la extensión `.lumproj` |
+| Media | **Instalador** y asociación de la extensión `.lumproj`. Estudiado el 2026‑08‑02: la recomendación es **ClickOnce** publicando a una carpeta de red —cada equipo instala una vez y se actualiza solo al arrancar—, con **Inno Setup** como plan B. Publicar **autocontenido**, para no instalar .NET 8 en cada equipo. SmartScreen avisará la primera vez por no estar firmado; firmar cuesta 200‑400 €/año. **No repartirlo hasta que el programa haya pasado un ensayo real completo**: sería repartir el mismo problema a seis ordenadores |
 | Baja | Con 30 muestras el informe A4 no cabe: habría que girar la tabla o partirla |
 
 ### Pendiente del laboratorio
@@ -1250,6 +1450,8 @@ Además, la lista de normas que admite la **62031** (`meta.normasCompatibles`) l
 
 - **Login con usuario, contraseña y recuperación por email** (consultado el 2026‑08‑02). En una aplicación de escritorio con ficheros JSON en una carpeta compartida, un login **no protege nada**: los datos se abren con el Bloc de notas sin pasar por él, y los permisos que comprueba el propio programa se saltan cerrando el programa. Lo que hace falta para la ISO 17025 no es autenticación sino **trazabilidad** —quién guardó y cuándo—, que es el perfil de usuario ya pendiente (DD‑08) y cuesta un par de días. Si algún día hay servidor, la autenticación se delega en **Entra ID**, que el laboratorio ya paga con Microsoft 365, en vez de escribir la nuestra.
 - **Varias ventanas** en lugar de pestañas: se valoró por ser mucho más barato, pero el laboratorio prefirió pestañas.
+- **Contraseña para entrar en «Configuración»** (consultado el 2026‑08‑06, al aparecer los importes de las ofertas). Se descartó tras verlo, **porque protegía lo que no importaba**: detrás de ese menú solo están la lista de técnicos y la tarifa, mientras que los importes viven en los `.lumproj` y se ven de tres maneras que no pasan por ahí —el diálogo de cualquier barra del calendario, el Bloc de notas sobre el fichero, y la vista Carga—. Es echar la llave al cajón de los bolígrafos con la caja fuerte abierta.
+  Añadido a esto, la recuperación no tenía salida decente: sin servidor, la recuperación por correo obligaría a incrustar las credenciales del servidor de correo en el programa, de donde las saca cualquiera. **Si algún día hay que impedir que alguien vea los importes, la respuesta son los permisos de la carpeta** —OneDrive o Windows sobre una subcarpeta—, que sí los respeta el sistema operativo, no una comprobación que hace el propio programa y que se salta cerrándolo.
 
 ### Cómo retomar
 
@@ -1258,7 +1460,18 @@ dotnet test "…\AplicacionTomaNotas\LumNotas.sln"
 dotnet run --project "…\AplicacionTomaNotas\src\LumNotas.App"
 ```
 
-Si los **192 tests** pasan, el motor y las cuatro plantillas están sanos. La mayoría de los cambios de norma se hacen **editando el JSON de esa norma** en `plantilla/`, sin tocar código; añadir una norma entera es dejar caer un fichero `plantilla-*.json` en esa carpeta.
+Si los **262 tests** pasan, el motor y las cuatro plantillas están sanos. La mayoría de los cambios de norma se hacen **editando el JSON de esa norma** en `plantilla/`, sin tocar código; añadir una norma entera es dejar caer un fichero `plantilla-*.json` en esa carpeta.
+
+**Dónde poner cada cosa**, que es lo que más se ha repetido al construir esto:
+
+| Si es… | Va en… |
+|---|---|
+| Reglas, cálculos, aritmética de fechas, gestos | `LumNotas.Core` — **para poder probarlo** |
+| Ficheros: proyectos, caché, escaneo | `LumNotas.Storage` |
+| Un filtro nuevo del tablero | `GestionViewModel`, **no** en una vista: valen para las tres |
+| Algo compartido por el laboratorio | La carpeta compartida, y reflejado en `Configuración \| Carpetas…` |
+
+**Ninguno de los 262 tests toca la interfaz**, así que lo que se apoye en WPF hay que escribirlo de forma que la lógica quede fuera. No es purismo: en este equipo no se pueden automatizar los eventos de ratón, y sacar la lógica del gesto al núcleo fue la única manera de comprobar el arrastre del calendario.
 
 ### Punto ciego cerrado
 

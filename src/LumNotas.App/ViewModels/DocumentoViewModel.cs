@@ -25,6 +25,18 @@ public sealed class ServiciosDeVentana
     /// <c>null</c> si no se tocó nada.
     /// </summary>
     public Func<IReadOnlyList<(string Viejo, string Nuevo)>?>? EditarTecnicos { get; set; }
+
+    /// <summary>Editor de la tarifa y la capacidad mensual. Devuelve si se ha guardado.</summary>
+    public Func<bool>? EditarCapacidad { get; set; }
+
+    /// <summary>Qué normas hay instaladas y de dónde salen.</summary>
+    public Action? VerPlantillas { get; set; }
+
+    /// <summary>Versión del programa y de las normas, y publicarla como la del laboratorio.</summary>
+    public Action? VerAcercaDe { get; set; }
+
+    /// <summary>Elegir la carpeta compartida del laboratorio.</summary>
+    public Action? ElegirCarpetaDelLaboratorio { get; set; }
 }
 
 /// <summary>

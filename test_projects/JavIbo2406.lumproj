@@ -11,10 +11,11 @@
   "patronIdentificador": "EBP_SAFE{codigoServicio}",
   "planificacion": {
     "inicio": "2026-08-04T00:00:00",
-    "fin": "2026-08-25T00:00:00",
+    "fin": "2026-08-26T00:00:00",
     "estado": "enCurso",
     "recepcionMuestras": "2026-08-01T00:00:00+02:00",
-    "archivado": false
+    "archivado": false,
+    "importe": 635
   },
   "selecciones": {
     "partes2": [

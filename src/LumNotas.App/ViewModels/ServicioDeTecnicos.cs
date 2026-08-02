@@ -26,21 +26,10 @@ public static class ServicioDeTecnicos
 
     /// <summary>La carpeta compartida si está elegida; si no, la de plantillas.</summary>
     public static string Carpeta()
-    {
-        var proyectos = Ajustes.Cargar().CarpetaDeProyectos;
-        if (!string.IsNullOrWhiteSpace(proyectos) && Directory.Exists(proyectos)) return proyectos;
-
-        try { return CatalogoDeNormas.Carpeta(); }
-        catch (DirectoryNotFoundException) { return AppContext.BaseDirectory; }
-    }
+        => ServicioDeCarpetas.Compartida()
+           ?? PlantillasCompartidas.LocalSiExiste()
+           ?? AppContext.BaseDirectory;
 
     /// <summary>Si el fichero se guardará donde lo ven los demás, para poder avisarlo.</summary>
-    public static bool EsCompartida
-    {
-        get
-        {
-            var proyectos = Ajustes.Cargar().CarpetaDeProyectos;
-            return !string.IsNullOrWhiteSpace(proyectos) && Directory.Exists(proyectos);
-        }
-    }
+    public static bool EsCompartida => ServicioDeCarpetas.HayCompartida;
 }

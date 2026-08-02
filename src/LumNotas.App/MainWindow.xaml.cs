@@ -63,6 +63,16 @@ public partial class MainWindow : Window
 
         modelo.Servicios.ConfirmarDescartarCambios = () => DialogoCambiosSinGuardar.Preguntar(this);
         modelo.Servicios.EditarTecnicos = () => DialogoTecnicos.Editar(this);
+        modelo.Servicios.EditarCapacidad = () => DialogoCapacidad.Editar(this);
+        modelo.Servicios.VerPlantillas = () => DialogoPlantillas.Mostrar(this);
+        modelo.Servicios.VerAcercaDe = () => DialogoAcercaDe.Mostrar(this);
+
+        // La carpeta se aplica a través del tablero, que es quien la guarda y avisa al
+        // resto de la ventana de que hay que releerlo todo.
+        modelo.Servicios.ElegirCarpetaDelLaboratorio = () => DialogoCarpeta.Mostrar(
+            this,
+            carpeta => modelo.Gestion.Carpeta = carpeta,
+            modelo.AdoptarCarpetaCompartida);
 
         // Cerrar la ventana es la forma más fácil de perder una toma de notas entera,
         // así que pregunta por cada pestaña con cambios.

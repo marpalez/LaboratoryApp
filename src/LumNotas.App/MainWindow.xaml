@@ -13,6 +13,14 @@
         <BooleanToVisibilityConverter x:Key="BoolAVisible"/>
         <local:DesplazamientoAMargen x:Key="Desplazamiento"/>
 
+        <!--
+            Caja de cartón con las solapas abiertas: «las muestras ya están aquí».
+            Va dibujada como trazo y no como imagen para que se vea nítida a cualquier
+            tamaño y tome el color de donde se ponga, que en la barra es blanco y en la
+            tarjeta gris.
+        -->
+        <Geometry x:Key="IconoCaja">M1,3 H13 V13 H1 Z M1,6.5 H13 M7,3 V6.5</Geometry>
+
         <!-- Caja de texto obligatoria: borde rojo y más grueso mientras esté vacía -->
         <Style x:Key="Obligatorio" TargetType="TextBox">
             <Setter Property="Padding" Value="5,3"/>
@@ -122,32 +130,36 @@
 
         <!-- Selector de vista del tablero. La activa va en negrita y con fondo, igual
              que las pestañas: es el mismo gesto de «aquí estás». -->
+        <!--
+            El fondo y el color se ponen en el propio botón y la plantilla los toma con
+            TemplateBinding. Antes los cambiaba un DataTrigger de dentro de la plantilla
+            apuntando a un elemento con nombre, y nunca llegaba a saltar: la vista activa
+            no se distinguía de las demás.
+        -->
         <Style x:Key="Vista" TargetType="Button">
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Foreground" Value="#6B7280"/>
+            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Caja" CornerRadius="7" Background="Transparent" Padding="14,6">
+                        <Border CornerRadius="7" Background="{TemplateBinding Background}" Padding="14,6">
                             <ContentPresenter VerticalAlignment="Center"/>
                         </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Caja" Property="Background" Value="#F1F5F9"/>
-                            </Trigger>
-                            <!-- Tag lleva si esta vista es la que se está mostrando. Va como
-                                 DataTrigger porque Tag es object: un Trigger normal compararía
-                                 el booleano contra la cadena "True" y nunca saltaría. -->
-                            <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
-                                         Value="True">
-                                <Setter TargetName="Caja" Property="Background" Value="#E0E7FF"/>
-                                <Setter Property="Foreground" Value="#1E3A8A"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
-                            </DataTrigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F1F5F9"/>
+                </Trigger>
+                <!-- Tag lleva si esta vista es la que se está mostrando -->
+                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="True">
+                    <Setter Property="Background" Value="#E0E7FF"/>
+                    <Setter Property="Foreground" Value="#1E3A8A"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
 
         <!-- El código del servicio, que abre su toma de notas al pulsarlo -->
@@ -993,41 +1005,44 @@
                             <Button Content="Tablero" Command="{Binding VerTablero}" Margin="0,0,6,0"
                                     Style="{StaticResource Vista}"
                                     Tag="{Binding VistaTablero}"/>
-                            <Button Content="Calendario" Command="{Binding VerCalendario}" Margin="0,0,18,0"
+                            <Button Content="Calendario" Command="{Binding VerCalendario}" Margin="0,0,6,0"
                                     Style="{StaticResource Vista}"
                                     Tag="{Binding VistaCalendario}"/>
+                            <Button Content="Carga" Command="{Binding VerCarga}" Margin="0,0,18,0"
+                                    Style="{StaticResource Vista}"
+                                    Tag="{Binding VistaCarga}"
+                                    ToolTip="Cuánto tiene comprometido cada técnico cada mes"/>
 
                             <Button Content="Elegir carpeta…" Command="{Binding ElegirCarpeta}"
                                     Padding="14,6" Cursor="Hand" Margin="0,0,8,0"/>
                             <Button Content="Actualizar" Command="{Binding Refrescar}"
                                     Padding="14,6" Cursor="Hand" Margin="0,0,16,0"/>
-                            <CheckBox Content="Solo proyectos pendientes" IsChecked="{Binding SoloPendientes}"
-                                      VerticalAlignment="Center"
-                                      Visibility="{Binding VistaTablero, Converter={StaticResource BoolAVisible}}"/>
-                        </StackPanel>
 
-                        <!-- Filtros: solo tienen sentido sobre la línea de tiempo -->
-                        <StackPanel Orientation="Horizontal"
-                                    Visibility="{Binding VistaCalendario, Converter={StaticResource BoolAVisible}}">
+                            <!-- Un solo filtro para las tres vistas: el responsable decide
+                                 una vez qué mira y todas hablan de lo mismo -->
+                            <TextBlock Text="Mostrar" VerticalAlignment="Center" FontSize="11"
+                                       Foreground="#6B7280" Margin="0,0,6,0"/>
+                            <ComboBox ItemsSource="{Binding Estados}" SelectedItem="{Binding Estado}"
+                                      MinWidth="140" VerticalAlignment="Center" Margin="0,0,14,0"
+                                      ToolTip="Los terminados y los archivados no se muestran salvo que los pidas"/>
+
                             <TextBlock Text="Técnico" VerticalAlignment="Center" FontSize="11"
                                        Foreground="#6B7280" Margin="0,0,6,0"/>
-                            <ComboBox ItemsSource="{Binding Calendario.Tecnicos}"
-                                      SelectedItem="{Binding Calendario.Tecnico}"
-                                      MinWidth="130" Margin="0,0,14,0"/>
-
-                            <TextBlock Text="Estado" VerticalAlignment="Center" FontSize="11"
-                                       Foreground="#6B7280" Margin="0,0,6,0"/>
-                            <ComboBox ItemsSource="{Binding Calendario.Estados}"
-                                      SelectedItem="{Binding Calendario.Estado}"
-                                      MinWidth="130" Margin="0,0,14,0"/>
+                            <ComboBox ItemsSource="{Binding Tecnicos}" SelectedItem="{Binding Tecnico}"
+                                      MinWidth="130" VerticalAlignment="Center" Margin="0,0,14,0"/>
 
                             <TextBlock Text="Norma" VerticalAlignment="Center" FontSize="11"
                                        Foreground="#6B7280" Margin="0,0,6,0"/>
-                            <ComboBox ItemsSource="{Binding Calendario.Normas}"
-                                      SelectedItem="{Binding Calendario.Norma}"
-                                      MinWidth="100" Margin="0,0,14,0"/>
+                            <ComboBox ItemsSource="{Binding Normas}" SelectedItem="{Binding Norma}"
+                                      MinWidth="90" VerticalAlignment="Center"/>
+                        </StackPanel>
 
-                            <CheckBox Content="Ver archivados" IsChecked="{Binding Calendario.VerArchivados}"
+                        <!-- Ajustes propios de la línea de tiempo. Los filtros están arriba,
+                             porque valen para las tres vistas. -->
+                        <StackPanel Orientation="Horizontal"
+                                    Visibility="{Binding VistaCalendario, Converter={StaticResource BoolAVisible}}">
+                            <CheckBox Content="Agrupar por técnico"
+                                      IsChecked="{Binding Calendario.AgruparPorTecnico}"
                                       VerticalAlignment="Center" Margin="0,0,14,0"/>
 
                             <Button Content="−" Command="{Binding Calendario.Alejar}" Width="26"
@@ -1053,6 +1068,12 @@
                         <TextBlock Text="{Binding Carpeta}" Foreground="#9CA3AF" FontSize="11" Margin="0,8,0,0"
                                    TextTrimming="CharacterEllipsis"/>
                         <TextBlock Text="{Binding Mensaje}" Foreground="#6B7280" FontSize="12" Margin="0,2,0,0"/>
+
+                        <!-- Con una carpeta de clientes grande el escaneo tarda; que se vea
+                             que está trabajando y no colgado -->
+                        <ProgressBar Height="3" IsIndeterminate="True" Margin="0,6,0,0"
+                                     Background="Transparent" BorderThickness="0" Foreground="#2563EB"
+                                     Visibility="{Binding Explorando, Converter={StaticResource BoolAVisible}}"/>
                     </StackPanel>
                 </Border>
 
@@ -1105,6 +1126,94 @@
                     </ItemsControl>
                 </ScrollViewer>
 
+                <!-- ===================== CARGA =====================
+                     Técnicos por meses, en porcentaje de ocupación. El tablero dice qué
+                     falta, el calendario cuándo, y esto si cabe. -->
+                <Grid Grid.Row="1"
+                      Visibility="{Binding VistaCarga, Converter={StaticResource BoolAVisible}}">
+                <Grid DataContext="{Binding Carga}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="{Binding Mensaje}" Foreground="#6B7280" FontSize="11"
+                               Margin="20,12,20,0"/>
+
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                                  HorizontalScrollBarVisibility="Auto" Padding="20,10,20,16">
+                        <StackPanel>
+                            <!-- Cabecera de meses -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Border Width="200"/>
+                                <ItemsControl ItemsSource="{Binding Meses}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Width="74" Padding="0,4">
+                                                <TextBlock Text="{Binding}" FontSize="10" FontWeight="Bold"
+                                                           Foreground="#64748B" TextAlignment="Center"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+
+                            <ItemsControl ItemsSource="{Binding Filas}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                            <Border Width="200" Padding="0,0,10,0" VerticalAlignment="Center">
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Tecnico}" FontWeight="SemiBold"
+                                                               Foreground="#1E3A8A"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                    <!-- Sin importe no hay trabajo que repartir: se avisa
+                                                         en vez de rebajar la carga en silencio -->
+                                                    <TextBlock Text="{Binding SinImporte}" FontSize="10"
+                                                               Foreground="#B45309"
+                                                               Visibility="{Binding FaltaAlgunImporte,
+                                                                            Converter={StaticResource BoolAVisible}}"/>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <ItemsControl ItemsSource="{Binding Meses}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Width="70" Height="34" Margin="2,0"
+                                                                CornerRadius="6" Background="{Binding Fondo}"
+                                                                ToolTip="{Binding Detalle}">
+                                                            <TextBlock Text="{Binding Texto}"
+                                                                       Foreground="{Binding Color}"
+                                                                       FontWeight="{Binding Peso}"
+                                                                       FontSize="12"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <Border Background="#F8FAFC" BorderBrush="#E5E7EB" BorderThickness="1"
+                                    CornerRadius="8" Padding="14,10" Margin="0,16,0,0"
+                                    HorizontalAlignment="Left">
+                                <TextBlock FontSize="11" Foreground="#4B5563" TextWrapping="Wrap" MaxWidth="620"
+                                           Text="El trabajo de cada servicio sale de su oferta y se reparte entre los meses que abarca, en proporción a sus días entre semana. Se compara con lo que cabe en cada mes, que no es lo mismo en agosto que en marzo. Verde por debajo del 85 %, ámbar hasta el 100 %, rojo por encima."/>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+                </Grid>
+
                 <!-- =================== CALENDARIO =================== -->
                 <Grid Grid.Row="1"
                       Visibility="{Binding VistaCalendario, Converter={StaticResource BoolAVisible}}">
@@ -1124,7 +1233,7 @@
                         </Grid.ColumnDefinitions>
 
                         <Border Grid.Column="0" BorderBrush="#E5E7EB" BorderThickness="0,0,1,1" Padding="12,8">
-                            <TextBlock Text="SERVICIO" FontSize="10" FontWeight="Bold" Foreground="#94A3B8"
+                            <TextBlock Text="TÉCNICO" FontSize="10" FontWeight="Bold" Foreground="#94A3B8"
                                        VerticalAlignment="Bottom"/>
                         </Border>
 
@@ -1192,21 +1301,43 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <ItemsControl Grid.Column="0" ItemsSource="{Binding Tarjetas}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Height="46" Padding="12,0" BorderBrush="#EEF0F3"
-                                                BorderThickness="0,0,1,1">
+                            <!-- Nombres. Recorre las mismas filas que las barras, con las
+                                 mismas alturas, y por eso van alineadas. -->
+                            <ItemsControl Grid.Column="0" ItemsSource="{Binding Filas}">
+                                <ItemsControl.Resources>
+                                    <!-- Cabecera de técnico: quién es y qué carga lleva -->
+                                    <DataTemplate DataType="{x:Type vm:GrupoDeTecnicoViewModel}">
+                                        <Border Height="38" Padding="12,0" Background="#F1F5F9"
+                                                BorderBrush="#E2E8F0" BorderThickness="0,0,1,1">
                                             <StackPanel VerticalAlignment="Center">
-                                                <Button Content="{Binding Codigo}" Command="{Binding Abrir}"
-                                                        Style="{StaticResource EnlaceProyecto}"
-                                                        ToolTip="Abrir la toma de notas"/>
-                                                <TextBlock Text="{Binding Tecnico}" FontSize="10"
-                                                           Foreground="#9CA3AF" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Tecnico}" FontWeight="Bold"
+                                                           Foreground="#1E3A8A" FontSize="13"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Carga}" FontSize="10"
+                                                               Foreground="#64748B"/>
+                                                    <TextBlock Text="{Binding AvisoDeRetraso}" FontSize="10"
+                                                               Foreground="#DC2626" Margin="6,0,0,0"
+                                                               Visibility="{Binding HayRetrasados,
+                                                                            Converter={StaticResource BoolAVisible}}"/>
+                                                </StackPanel>
                                             </StackPanel>
                                         </Border>
                                     </DataTemplate>
-                                </ItemsControl.ItemTemplate>
+
+                                    <!-- Un servicio del técnico: el código, pequeño y discreto,
+                                         porque ya va escrito dentro de su propia barra -->
+                                    <DataTemplate DataType="{x:Type vm:TarjetaPlanViewModel}">
+                                        <Border Height="46" Padding="22,0,12,0" BorderBrush="#EEF0F3"
+                                                BorderThickness="0,0,1,1">
+                                            <Button Content="{Binding Codigo}" Command="{Binding Abrir}"
+                                                    VerticalAlignment="Center" FontSize="11"
+                                                    Style="{StaticResource EnlaceProyecto}"
+                                                    Foreground="#374151"
+                                                    ToolTip="Abrir la toma de notas"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.Resources>
                             </ItemsControl>
 
                             <ScrollViewer x:Name="Pista" Grid.Column="1" HorizontalScrollBarVisibility="Auto"
@@ -1225,9 +1356,16 @@
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
 
-                                    <ItemsControl ItemsSource="{Binding Tarjetas}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
+                                    <ItemsControl ItemsSource="{Binding Filas}">
+                                        <ItemsControl.Resources>
+                                            <!-- Las cabeceras de técnico no llevan barra, pero sí
+                                                 ocupan su fila para no descuadrar las columnas -->
+                                            <DataTemplate DataType="{x:Type vm:GrupoDeTecnicoViewModel}">
+                                                <Border Height="38" Background="#F8FAFC"
+                                                        BorderBrush="#E2E8F0" BorderThickness="0,0,0,1"/>
+                                            </DataTemplate>
+
+                                            <DataTemplate DataType="{x:Type vm:TarjetaPlanViewModel}">
                                                 <Grid Height="46">
                                                     <!-- Se arrastra entera desde el centro; los
                                                          bordes cambian solo el inicio o el fin -->
@@ -1240,11 +1378,13 @@
                                                                      Converter={StaticResource Desplazamiento}}"
                                                             ToolTip="{Binding Detalle}">
                                                         <StackPanel Orientation="Horizontal">
-                                                            <!-- Punto blanco: las muestras ya están en el laboratorio -->
-                                                            <Ellipse Width="7" Height="7" Fill="White" Margin="0,0,6,0"
-                                                                     VerticalAlignment="Center"
-                                                                     Visibility="{Binding MuestrasRecibidas,
-                                                                                  Converter={StaticResource BoolAVisible}}"/>
+                                                            <!-- Caja de cartón: las muestras ya están en el laboratorio -->
+                                                            <Path Data="{StaticResource IconoCaja}"
+                                                                  Stroke="White" StrokeThickness="1.2"
+                                                                  StrokeLineJoin="Round" Margin="0,0,6,0"
+                                                                  VerticalAlignment="Center"
+                                                                  Visibility="{Binding MuestrasRecibidas,
+                                                                               Converter={StaticResource BoolAVisible}}"/>
                                                             <TextBlock Text="{Binding Codigo}" Foreground="White"
                                                                        FontSize="11" FontWeight="SemiBold"
                                                                        TextTrimming="CharacterEllipsis"/>
@@ -1252,7 +1392,7 @@
                                                     </Button>
                                                 </Grid>
                                             </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
+                                        </ItemsControl.Resources>
                                     </ItemsControl>
 
                                     <!-- Hoy: lo primero que busca el ojo -->
@@ -1282,8 +1422,19 @@
                                         <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1"
                                                 CornerRadius="8" Padding="12,8" Margin="0,0,8,8">
                                             <StackPanel>
-                                                <Button Content="{Binding Codigo}" Command="{Binding Abrir}"
-                                                        Style="{StaticResource EnlaceProyecto}"/>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <!-- Muestras ya en el laboratorio y todavía sin
+                                                         planificar: eso es lo que corre prisa -->
+                                                    <Path Data="{StaticResource IconoCaja}"
+                                                          Stroke="#B45309" StrokeThickness="1.2"
+                                                          StrokeLineJoin="Round" Margin="0,0,6,0"
+                                                          VerticalAlignment="Center"
+                                                          ToolTip="Las muestras ya están en el laboratorio"
+                                                          Visibility="{Binding MuestrasRecibidas,
+                                                                       Converter={StaticResource BoolAVisible}}"/>
+                                                    <Button Content="{Binding Codigo}" Command="{Binding Abrir}"
+                                                            Style="{StaticResource EnlaceProyecto}"/>
+                                                </StackPanel>
                                                 <TextBlock Text="{Binding Tecnico}" FontSize="10"
                                                            Foreground="#9CA3AF"/>
                                                 <Button Content="Planificar…" Command="{Binding Planificar}"
@@ -1345,21 +1496,51 @@
 
             <!-- Listas del laboratorio, comunes a todas las tomas de notas -->
             <MenuItem Header="_Configuración">
+                <!-- Lo primero: de esta carpeta sale todo lo demás -->
+                <MenuItem Header="_Carpeta del laboratorio…" Command="{Binding ElegirCarpetaDelLaboratorio}"/>
+                <Separator/>
                 <MenuItem Header="_Técnicos…" Command="{Binding EditarTecnicos}"/>
+                <MenuItem Header="_Capacidad y tarifa…" Command="{Binding EditarCapacidad}"/>
+                <Separator/>
+                <MenuItem Header="_Normas instaladas…" Command="{Binding VerPlantillas}"/>
+            </MenuItem>
+
+            <MenuItem Header="A_yuda">
+                <MenuItem Header="_Acerca de…" Command="{Binding VerAcercaDe}"/>
             </MenuItem>
         </Menu>
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
+
+            <!--
+                Este equipo se ha quedado con una versión anterior a la del laboratorio.
+                Se avisa y se puede quitar de en medio: es un aviso, no un candado.
+            -->
+            <Border Grid.Row="0" Background="#FEF3C7" BorderBrush="#FDE68A" BorderThickness="0,0,0,1"
+                    Padding="16,8"
+                    Visibility="{Binding HayVersionMasNueva, Converter={StaticResource BoolAVisible}}">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="✕" Command="{Binding OcultarAvisoDeVersion}"
+                            Background="Transparent" BorderThickness="0" Foreground="#92400E"
+                            Padding="6,0" Cursor="Hand" ToolTip="Ocultar hasta el próximo arranque"/>
+                    <Button DockPanel.Dock="Right" Content="Ver detalles" Command="{Binding VerAcercaDe}"
+                            Background="Transparent" BorderThickness="0" Foreground="#92400E"
+                            Padding="10,0" Cursor="Hand" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding TextoDeVersionMasNueva}" Foreground="#92400E"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                </DockPanel>
+            </Border>
 
             <!--
                 Barra de pestañas: un proyecto en cada una y el botón de abrir otra
                 justo detrás de la última, como en un navegador.
             -->
-            <Border Grid.Row="0" Background="#ECEEF1">
+            <Border Grid.Row="1" Background="#ECEEF1">
             <WrapPanel Margin="6,5,6,0">
                 <ItemsControl ItemsSource="{Binding Pestanas}">
                     <ItemsControl.ItemsPanel>
@@ -1417,7 +1598,7 @@
             </WrapPanel>
             </Border>
 
-            <ContentControl Grid.Row="1" Content="{Binding Activo}"/>
+            <ContentControl Grid.Row="2" Content="{Binding Activo}"/>
         </Grid>
 
 

@@ -31,6 +31,7 @@ public partial class App : Application
             var modelo = new VentanaPrincipalViewModel();
             var ventana = new MainWindow(modelo);
             ventana.Show();
+            PedirCarpetaLaPrimeraVez(modelo);
 
             // Si se ha arrancado con un fichero como argumento (doble clic sobre un
             // .lumproj en la carpeta del servicio), se abre ese proyecto directamente.
@@ -42,6 +43,27 @@ public partial class App : Application
             MessageBox.Show(ex.Message, "No se pudo arrancar", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown(1);
         }
+    }
+
+    /// <summary>
+    /// En un equipo recién instalado, pide las carpetas del laboratorio.
+    /// <para>
+    /// Se pregunta <b>una sola vez</b> y no se vuelve a insistir. Sin ellas, el técnico
+    /// trabajaría con las normas de su equipo, su propia lista de técnicos y sin
+    /// enterarse de las versiones nuevas — y todo eso en silencio, que es lo que se
+    /// quiere evitar. Quien las deje sin elegir lo hará a sabiendas, y siempre puede
+    /// ponerlas desde «Configuración».
+    /// </para>
+    /// </summary>
+    private static void PedirCarpetaLaPrimeraVez(VentanaPrincipalViewModel modelo)
+    {
+        var ajustes = Ajustes.Cargar();
+        if (ajustes.CarpetaYaPreguntada || !string.IsNullOrWhiteSpace(ajustes.CarpetaDeProyectos)) return;
+
+        ajustes.CarpetaYaPreguntada = true;
+        ajustes.Guardar();
+
+        modelo.ElegirCarpetaDelLaboratorio.Execute(null);
     }
 
     /// <summary>
@@ -81,7 +103,7 @@ public partial class App : Application
     /// </summary>
     private static string BuscarPlantilla()
     {
-        var normas = CatalogoDeNormas.Disponibles();
+        var normas = ServicioDePlantillas.Normas();
         if (normas.Count == 0)
             throw new FileNotFoundException("No hay ninguna toma de notas instalada en la carpeta 'plantilla'.");
 

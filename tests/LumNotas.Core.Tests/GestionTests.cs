@@ -102,7 +102,7 @@ public class GestionTests : IDisposable
         Guardar(Proyecto("222222026"), "222222026");
         Guardar(Proyecto("333332026"), "333332026");
 
-        var resumenes = new ExploradorDeProyectos(_repositorio).Explorar(_carpeta, Contexto.Plantilla);
+        var resumenes = new ExploradorDeProyectos(_repositorio, Path.Combine(_carpeta, "cache.json")).Explorar(_carpeta, Contexto.Plantilla);
 
         Assert.Equal(3, resumenes.Count);
         Assert.All(resumenes, r => Assert.Null(r.Error));
@@ -115,7 +115,7 @@ public class GestionTests : IDisposable
         Guardar(Proyecto("111112026"), "bueno");
         File.WriteAllText(Path.Combine(_carpeta, "roto" + RepositorioDeProyectos.Extension), "{ esto no es json");
 
-        var resumenes = new ExploradorDeProyectos(_repositorio).Explorar(_carpeta, Contexto.Plantilla);
+        var resumenes = new ExploradorDeProyectos(_repositorio, Path.Combine(_carpeta, "cache.json")).Explorar(_carpeta, Contexto.Plantilla);
 
         Assert.Equal(2, resumenes.Count);
         Assert.Single(resumenes, r => r.Error is not null);
@@ -125,7 +125,7 @@ public class GestionTests : IDisposable
     [Fact]
     public void CarpetaInexistente_DevuelveListaVacia()
     {
-        var resumenes = new ExploradorDeProyectos(_repositorio)
+        var resumenes = new ExploradorDeProyectos(_repositorio, Path.Combine(_carpeta, "cache.json"))
             .Explorar(Path.Combine(_carpeta, "no-existe"), Contexto.Plantilla);
 
         Assert.Empty(resumenes);

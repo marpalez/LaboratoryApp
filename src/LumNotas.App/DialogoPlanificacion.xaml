@@ -46,9 +46,25 @@
                     ToolTip="Deja el servicio como pendiente de planificar"/>
         </Grid>
 
-        <TextBlock Text="Estado" Style="{StaticResource Rotulo}"/>
-        <ComboBox x:Name="Estado" DisplayMemberPath="Etiqueta" SelectedValuePath="Valor"
-                  Margin="0,0,0,16"/>
+        <Grid Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="14"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Estado" Style="{StaticResource Rotulo}"/>
+                <ComboBox x:Name="Estado" DisplayMemberPath="Etiqueta" SelectedValuePath="Valor"/>
+            </StackPanel>
+
+            <!-- De aquí sale el trabajo del servicio para la vista de carga -->
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Importe de la oferta (€)" Style="{StaticResource Rotulo}"/>
+                <TextBox x:Name="Importe" Padding="5,4" TextChanged="AlCambiarImporte"/>
+                <TextBlock x:Name="Trabajo" FontSize="10" Foreground="#6B7280" Margin="0,3,0,0"/>
+            </StackPanel>
+        </Grid>
 
         <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8"
                 Padding="14,12" Margin="0,0,0,16">

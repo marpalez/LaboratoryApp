@@ -42,3 +42,11 @@ C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\Aplicacion
 C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoPlanificacion.g.cs
 C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoTecnicos.baml
 C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoTecnicos.g.cs
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoCapacidad.baml
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoCapacidad.g.cs
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoPlantillas.baml
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoPlantillas.g.cs
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoAcercaDe.baml
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoAcercaDe.g.cs
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoCarpeta.baml
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.App\obj\Debug\net8.0-windows\DialogoCarpeta.g.cs

@@ -1,0 +1,51 @@
+<Window x:Class="LumNotas.App.DialogoCapacidad"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Capacidad y tarifa"
+        SizeToContent="Height" Width="460" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        FontFamily="Segoe UI" FontSize="13" Background="White">
+
+    <StackPanel Margin="26,22">
+        <TextBlock Text="Capacidad y tarifa" FontSize="17" FontWeight="Bold" Foreground="#111827"/>
+        <TextBlock Margin="0,4,0,18" Foreground="#6B7280" FontSize="12" TextWrapping="Wrap"
+                   Text="Con estos números se calcula la carga de cada técnico. Se guardan junto a la lista de técnicos."/>
+
+        <TextBlock Text="Euros de oferta que equivalen a un día de trabajo" Foreground="#374151"
+                   FontSize="12" Margin="0,0,0,4"/>
+        <TextBox x:Name="Tarifa" Width="120" HorizontalAlignment="Left" Padding="5,4" Margin="0,0,0,18"/>
+
+        <TextBlock Text="Días de trabajo que caben en cada mes" Foreground="#374151"
+                   FontSize="12" Margin="0,0,0,6"/>
+
+        <ItemsControl x:Name="Meses">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,14,8" Width="120">
+                        <TextBlock Text="{Binding Nombre}" Width="70" VerticalAlignment="Center"
+                                   FontSize="12" Foreground="#4B5563"/>
+                        <TextBox Text="{Binding Dias, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="46" Padding="4,3" TextAlignment="Center"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <TextBlock x:Name="Aviso" Foreground="#DC2626" FontSize="12" TextWrapping="Wrap"
+                   Margin="0,8,0,0" Visibility="Collapsed"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+            <Button Content="Restaurar" Click="AlRestaurar" Padding="14,9" Margin="0,0,10,0"
+                    Cursor="Hand" ToolTip="Vuelve a 22 días, 10 en agosto y 15 en diciembre"/>
+            <Button Content="Cancelar" Click="AlCancelar" IsCancel="True"
+                    Padding="18,9" Margin="0,0,10,0" Cursor="Hand"
+                    Background="#E5E7EB" Foreground="#374151" BorderThickness="0"/>
+            <Button Content="Guardar" Click="AlGuardar" IsDefault="True"
+                    Padding="18,9" Cursor="Hand"
+                    Background="#2563EB" Foreground="White" BorderThickness="0"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
