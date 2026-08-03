@@ -261,10 +261,10 @@ public sealed class DocumentoViewModel : ObservableObject
             // no es de fiar: con dos normas podía abrirse por la añadida, y entonces
             // guardar reescribía el patrón de muestras —EBP_SAFE por EBP_CLIM— y con él
             // el identificador de todas las muestras del servicio.
-            var norma = Normas.FirstOrDefault(n => n.Id == datos.NormaPrincipal)
-                        ?? datos.Normas.Select(id => Normas.FirstOrDefault(n => n.Id == id))
+            var norma = Normas.FirstOrDefault(n => n.Responde(datos.NormaPrincipal))
+                        ?? datos.Normas.Select(id => Normas.FirstOrDefault(n => n.Responde(id)))
                                        .FirstOrDefault(n => n is not null)
-                        ?? Normas.FirstOrDefault(n => n.Id == "60598")
+                        ?? Normas.FirstOrDefault(n => n.CodigoDeFichero == "60598")
                         ?? Normas.FirstOrDefault();
 
             if (norma is null) throw new InvalidOperationException("No hay ninguna norma instalada.");
@@ -281,7 +281,7 @@ public sealed class DocumentoViewModel : ObservableObject
             ReconstruirPaneles();
             _alAbrirFichero(ruta);
             Anunciar();
-            Mensaje = $"Abierto {ruta}";
+            Mensaje = $"Abierto {ruta}" + AvisoDeVersionDePlantilla();
             return true;
         }
         catch (Exception ex)
@@ -347,7 +347,10 @@ public sealed class DocumentoViewModel : ObservableObject
     /// declara, se admiten todas.
     /// </summary>
     private bool EsCompatible(NormaDisponible norma)
-        => Plantilla!.Meta.NormasCompatibles is not { } admitidas || admitidas.Contains(norma.Id);
+        => Plantilla!.Meta.NormasCompatibles is not { } admitidas
+           // La lista puede citar el id de ahora o uno anterior: una plantilla vieja que
+           // nombre «60529» sigue refiriéndose a la misma norma.
+           || admitidas.Any(norma.Responde);
 
     private void CambiarNormaAnadida(NormaDisponible norma, bool activa)
     {
@@ -514,8 +517,11 @@ public sealed class DocumentoViewModel : ObservableObject
                 if (!ProsigueAunqueYaExista()) return;
 
                 // El nombre lo fija el laboratorio: TdN_60598_LEDC42502xx-00.lumproj
+                // El código corto, no el id: el id lleva edición y el laboratorio quiere
+                // el nombre del fichero como estaba (DD‑95).
                 var sugerido = NombreDeTomaDeNotas.ConExtension(
-                    Plantilla!.Meta.Id, _datos.CodigoServicio, RepositorioDeProyectos.Extension);
+                    Plantilla!.Meta.CodigoParaFichero, _datos.CodigoServicio,
+                    RepositorioDeProyectos.Extension);
 
                 var elegida = _servicios.PedirFicheroParaGuardar?.Invoke(sugerido);
                 if (string.IsNullOrWhiteSpace(elegida)) return;
@@ -536,6 +542,23 @@ public sealed class DocumentoViewModel : ObservableObject
             Mensaje = $"No se pudo guardar: {ex.Message}";
             Cambio?.Invoke();
         }
+    }
+
+    /// <summary>
+    /// Aviso cuando el proyecto se registró con una versión de la plantilla distinta de la
+    /// instalada. <b>No bloquea nada</b>: solo evita que el técnico vea cambiar el avance
+    /// de un día para otro y lo tome por un fallo suyo — fue una corrección de la norma.
+    /// </summary>
+    private string AvisoDeVersionDePlantilla()
+    {
+        var guardada = _datos.VersionDePlantillaGuardada;
+        var actual = Plantilla?.Meta.Version;
+
+        return string.IsNullOrWhiteSpace(guardada) || string.IsNullOrWhiteSpace(actual)
+               || guardada == actual
+            ? ""
+            : $"   ⚠ Se registró con la plantilla {guardada} y la instalada es la {actual}: "
+              + "puede cambiar lo que se pide o lo que aplica.";
     }
 
     /// <summary>

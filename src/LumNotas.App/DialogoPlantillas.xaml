@@ -43,6 +43,15 @@
             </ItemsControl>
         </Border>
 
+        <!-- Lo que hay en este equipo y el laboratorio todavía no tiene. En ámbar y
+             pegado al botón de publicar, que es lo que hay que hacer con ello. -->
+        <Border x:Name="SinPublicarCaja" Background="#FEF3C7" BorderBrush="#FDE68A"
+                BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,12,0,0"
+                Visibility="{Binding Visibility, ElementName=SinPublicar}">
+            <TextBlock x:Name="SinPublicar" FontSize="12" Foreground="#92400E"
+                       TextWrapping="Wrap" Visibility="Collapsed"/>
+        </Border>
+
         <TextBlock x:Name="Resultado" FontSize="12" Margin="0,12,0,0" TextWrapping="Wrap"
                    Foreground="#15803D" Visibility="Collapsed"/>
 

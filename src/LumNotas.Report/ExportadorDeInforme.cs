@@ -71,6 +71,22 @@ public sealed class ExportadorDeInforme(PlantillaEnsayos plantilla, CatalogoDeEq
     }
 
     /// <summary>Portadilla de cada norma, en su propia página, cuando el proyecto lleva varias.</summary>
+    /// <summary>
+    /// Con qué versión de la plantilla se <b>registró</b> el ensayo, que no siempre es la
+    /// instalada hoy: si el laboratorio ha publicado una corrección desde entonces, el
+    /// informe tiene que decir con cuál se tomaron las notas, no con cuál se imprime.
+    /// Cuando no coinciden se dicen las dos, que es lo que necesita quien audite.
+    /// </summary>
+    private string VersionRegistrada(DatosProyecto datos)
+    {
+        var actual = plantilla.Meta.Version;
+        var guardada = datos.VersionDePlantillaGuardada;
+
+        if (string.IsNullOrWhiteSpace(guardada) || guardada == actual) return actual;
+
+        return $"{guardada} (registrado) · {actual} (instalada al generar este informe)";
+    }
+
     private static void SeparadorDeNorma(StringBuilder h, PlantillaEnsayos norma)
     {
         h.AppendLine("<section class=\"apartado norma\">");
@@ -108,7 +124,7 @@ public sealed class ExportadorDeInforme(PlantillaEnsayos plantilla, CatalogoDeEq
         Ficha(h, "Partes -2 aplicables", Lista(datos.Partes2));
         if (normas.Count > 1)
             Ficha(h, "Normas incluidas", string.Join(" · ", normas.Select(n => TituloDe(n.Plantilla))));
-        Ficha(h, "Versión de plantilla", plantilla.Meta.Version);
+        Ficha(h, "Versión de plantilla", VersionRegistrada(datos));
         Ficha(h, "Documento generado el", DateTime.Now.ToString("dd/MM/yyyy HH:mm"));
         Ficha(h, "Estado", $"{avance.PorcentajePonderado:0}% ponderado · {avance.Contador} apartados completados");
         h.AppendLine("</table>");

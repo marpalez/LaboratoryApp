@@ -55,6 +55,41 @@ public partial class DialogoPlantillas : Window
         // Publicar solo tiene sentido si hay copia local y carpeta compartida a la que ir.
         BotonPublicar.IsEnabled = PlantillasCompartidas.LocalSiExiste() is not null
                                   && ServicioDeCarpetas.HayCompartida;
+
+        AvisarDeLoQueFaltaPorPublicar();
+    }
+
+    /// <summary>
+    /// Dice si en este equipo hay normas que el laboratorio todavía no tiene. Desde que
+    /// se publica la primera tanda, el programa lee de la carpeta compartida y deja de
+    /// mirar la local: añadir una norma aquí no producía <b>ninguna</b> señal — el fichero
+    /// estaba, no aparecía, y nada explicaba por qué.
+    /// </summary>
+    private void AvisarDeLoQueFaltaPorPublicar()
+    {
+        var pendientes = PlantillasCompartidas.Comparar(
+            PlantillasCompartidas.LocalSiExiste(), ServicioDeCarpetas.Compartida());
+
+        if (!pendientes.HayAlgo)
+        {
+            SinPublicar.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        var lineas = new List<string>();
+
+        if (pendientes.Nuevas.Count > 0)
+            lineas.Add("Sin publicar: " + string.Join(", ", pendientes.Nuevas));
+
+        if (pendientes.MasNuevas.Count > 0)
+            lineas.Add("Más nuevas aquí que en el laboratorio: " + string.Join(", ", pendientes.MasNuevas));
+
+        lineas.Add(pendientes.Cuantas == 1
+            ? "Hasta que se publique, la usa solo este equipo."
+            : "Hasta que se publiquen, las usa solo este equipo.");
+
+        SinPublicar.Text = string.Join("\n", lineas);
+        SinPublicar.Visibility = Visibility.Visible;
     }
 
     private void AlPublicar(object remitente, RoutedEventArgs args)

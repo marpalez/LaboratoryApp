@@ -29,12 +29,102 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void EstanLasCuatroNormasDelLaboratorio()
     {
-        var ids = Contexto.TodasLasPlantillas().Select(p => p.Meta.Id).ToList();
+        // Por código corto, que identifica la norma; el id lleva además el año.
+        var codigos = Contexto.TodasLasPlantillas().Select(p => p.Meta.CodigoParaFichero).ToList();
 
-        Assert.Contains("60598", ids);
-        Assert.Contains("62031", ids);
-        Assert.Contains("60529", ids);
-        Assert.Contains("62262", ids);
+        Assert.Contains("60598", codigos);
+        Assert.Contains("62031", codigos);
+        Assert.Contains("60529", codigos);
+        Assert.Contains("62262", codigos);
+    }
+
+    /// <summary>
+    /// <b>El id lleva el año de publicación</b> (DD‑95): sin él, publicar la norma nueva remide
+    /// en silencio los ensayos anteriores. Y cada plantilla dice de qué ids viene, que es
+    /// lo que permitió cambiar el esquema sin romper los proyectos ya guardados.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Plantillas))]
+    public void ElIdLlevaElAnioDePublicacion(string fichero)
+    {
+        var meta = Cargar(fichero).Meta;
+
+        Assert.False(string.IsNullOrWhiteSpace(meta.AnioDePublicacion));
+        Assert.Contains(meta.AnioDePublicacion!, meta.Id);
+
+        Assert.True(meta.Responde(meta.Id), "no se reconoce a sí misma");
+        Assert.False(meta.Responde("otra-cosa"));
+    }
+
+    /// <summary>
+    /// <b>Un id antiguo no lo pueden reclamar dos plantillas.</b> Los proyectos guardados
+    /// antes de DD‑95 dicen «60598» a secas, y esa etiqueta significa <i>la que estaba
+    /// instalada entonces</i> — la de 2024. Si la de 2021 la reclamara también, un
+    /// proyecto viejo se mediría contra una u otra según el orden de la carpeta.
+    /// </summary>
+    [Fact]
+    public void CadaIdAnteriorLoReclamaUnaSolaPlantilla()
+    {
+        var repetidos = Contexto.TodasLasPlantillas()
+            .SelectMany(p => (p.Meta.IdsAnteriores ?? []).Select(a => (Anterior: a, p.Meta.Id)))
+            .GroupBy(x => x.Anterior, StringComparer.OrdinalIgnoreCase)
+            .Where(g => g.Count() > 1)
+            .Select(g => $"{g.Key}: {string.Join(", ", g.Select(x => x.Id))}")
+            .ToList();
+
+        Assert.Empty(repetidos);
+
+        // Y la vigente de luminarias sigue respondiendo por el id antiguo.
+        Assert.True(Contexto.Norma("60598").Meta.Responde("60598"));
+    }
+
+    /// <summary>
+    /// El fichero se llama <c>plantilla-&lt;id&gt;_&lt;version&gt;.json</c>, con el año dentro
+    /// del id: es lo que permite que la 2024 y la 2021 estén en la misma carpeta.
+    /// </summary>
+    [Theory]
+    [MemberData(nameof(Plantillas))]
+    public void ElNombreDelFicheroLlevaElIdYLaVersion(string fichero)
+    {
+        var meta = Cargar(fichero).Meta;
+
+        Assert.Equal($"plantilla-{meta.Id}_{meta.Version}.json", fichero);
+
+        // El catálogo de equipos viaja con ella y se nombra igual.
+        Assert.Equal($"equipos-{meta.Id}_{meta.Version}.json", meta.CatalogoEquipos);
+    }
+
+    /// <summary>
+    /// Con la versión en el nombre, publicar una corrección deja las dos plantillas en la
+    /// carpeta. <b>Solo cuenta la más alta</b>: si no, la portada enseñaría dos tarjetas
+    /// de la misma norma y el técnico tendría que adivinar cuál.
+    /// </summary>
+    [Fact]
+    public void DeDosVersionesDeLaMismaNormaSoloSeInstalaLaMasNueva()
+    {
+        var carpeta = Path.Combine(Path.GetTempPath(), "lumnotas-ver-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(carpeta);
+
+        try
+        {
+            var original = Contexto.RutaPlantilla();
+            var meta = Contexto.Plantilla.Meta;
+
+            // La misma plantilla dos veces, con la versión cambiada en el fichero nuevo.
+            File.Copy(original, Path.Combine(carpeta, $"plantilla-{meta.Id}_{meta.Version}.json"));
+            File.WriteAllText(
+                Path.Combine(carpeta, $"plantilla-{meta.Id}_9.9.9.json"),
+                File.ReadAllText(original).Replace($"\"version\": \"{meta.Version}\"", "\"version\": \"9.9.9\""));
+
+            var disponibles = CatalogoDeNormas.Disponibles(carpeta);
+
+            var suya = Assert.Single(disponibles, n => n.Id == meta.Id);
+            Assert.Equal("9.9.9", suya.Version);
+        }
+        finally
+        {
+            Directory.Delete(carpeta, recursive: true);
+        }
     }
 
     [Theory]
@@ -168,11 +258,16 @@ public class PlantillasDeOtrasNormasTests
     /// Con varias normas en un mismo proyecto los datos comparten almacén, así que dos
     /// plantillas distintas no pueden usar el mismo id de bloque: se pisarían los datos.
     /// </summary>
+    /// <remarks>
+    /// Se comparan <b>normas</b>, no plantillas: dos años de la misma norma sí
+    /// comparten ids de bloque —son la misma toma de notas con otra numeración— y no
+    /// pueden coincidir nunca en un mismo proyecto, así que no hay nada que pisarse.
+    /// </remarks>
     [Fact]
     public void NingunBloqueSeLlamaIgualEnDosNormasDistintas()
     {
         var colisiones = Contexto.TodasLasPlantillas()
-            .SelectMany(p => p.Bloques().Select(b => (Norma: p.Meta.Id, b.Id)))
+            .SelectMany(p => p.Bloques().Select(b => (Norma: p.Meta.CodigoParaFichero, b.Id)))
             .GroupBy(x => x.Id)
             .Where(g => g.Select(x => x.Norma).Distinct().Count() > 1)
             .Select(g => $"{g.Key}: {string.Join(", ", g.Select(x => x.Norma).Distinct())}")
@@ -181,22 +276,42 @@ public class PlantillasDeOtrasNormasTests
         Assert.Empty(colisiones);
     }
 
+    /// <summary>
+    /// Dos años de la misma norma <b>no se pueden añadir el uno al otro</b>: un
+    /// servicio se ensaya contra una versión de la norma, no contra dos. Si se admitieran, sus
+    /// apartados compartirían almacén y se pisarían los datos.
+    /// </summary>
+    [Fact]
+    public void UnAnioNoAdmiteOtroAnioDeLaMismaNorma()
+    {
+        foreach (var plantilla in Contexto.TodasLasPlantillas())
+        {
+            var admitidas = plantilla.Meta.NormasCompatibles ?? [];
+
+            var hermanas = Contexto.TodasLasPlantillas()
+                .Where(o => o.Meta.CodigoParaFichero == plantilla.Meta.CodigoParaFichero
+                            && o.Meta.Id != plantilla.Meta.Id);
+
+            Assert.All(hermanas, h => Assert.DoesNotContain(h.Meta.Id, admitidas));
+        }
+    }
+
     [Fact]
     public void ElIkUsaElPrefijoDeMuestraDelLaboratorioParaEseServicio()
     {
-        var ik = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62262");
+        var ik = Contexto.Norma("62262");
         var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
 
         ik.AplicarA(datos);
 
         Assert.Equal("EBP_CLIM12345202601", datos.IdentificadorDeMuestra(1));
-        Assert.Contains("62262", datos.Normas);
+        Assert.Contains(ik.Meta.Id, datos.Normas);
     }
 
     [Fact]
     public void ElMetodoDeGolpeoSoloSeExigeDeIk07EnAdelante()
     {
-        var ik = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62262");
+        var ik = Contexto.Norma("62262");
         var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
 
         datos.Establecer("proyecto", "gradoIk", "IK05", 1);
@@ -214,8 +329,8 @@ public class PlantillasDeOtrasNormasTests
     public void ElInformeIncluyeLosApartadosDeLasNormasAnadidas()
     {
         var lum = Contexto.Plantilla;
-        var led = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62031");
-        var ik = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62262");
+        var led = Contexto.Norma("62031");
+        var ik = Contexto.Norma("62262");
 
         var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 2 };
 
@@ -247,8 +362,16 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void CadaNormaAdmiteSoloLasQueElLaboratorioPermite()
     {
-        var admitidas = Contexto.TodasLasPlantillas()
-            .ToDictionary(p => p.Meta.Id, p => p.Meta.NormasCompatibles ?? []);
+        // Se compara por código corto —quién admite a quién es de la norma, no de la
+        // año— resolviendo cada id admitido contra la plantilla que responde por él.
+        string CodigoDe(string id) => Contexto.TodasLasPlantillas()
+            .Single(p => p.Meta.Responde(id)).Meta.CodigoParaFichero;
+
+        // Por la vigente de cada norma: dos años admiten lo mismo, y con la clave
+        // repetida el diccionario reventaría.
+        var admitidas = new[] { "60598", "62031", "60529", "62262" }.ToDictionary(
+            codigo => codigo,
+            codigo => (Contexto.Norma(codigo).Meta.NormasCompatibles ?? []).Select(CodigoDe).ToList());
 
         // Luminarias no admite ni IP ni IK: los lleva dentro.
         Assert.Equal(["62031"], admitidas["60598"]);
@@ -286,7 +409,7 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void ElIkPideSuGradoObjetivoPorMuestra()
     {
-        var ik = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62262");
+        var ik = Contexto.Norma("62262");
 
         var grado = ik.Proyecto.Campos.Single(c => c.Id == "gradoIk");
         Assert.True(grado.PorMuestra);
@@ -313,7 +436,7 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void ElIkExigeLaTipologiaDeProductoAntesDeEmpezar()
     {
-        var ik = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62262");
+        var ik = Contexto.Norma("62262");
         var campo = ik.Proyecto.Campos.Single(c => c.Id == "partes2");
 
         Assert.Equal("Tipología de producto (luminarias u otros)", campo.Etiqueta);
@@ -341,7 +464,7 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void EnElIkSeExigeElGradoDeCadaMuestraYElIpEsOpcional()
     {
-        var ik = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62262");
+        var ik = Contexto.Norma("62262");
 
         var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 2 };
         datos.Establecer("proyecto", "tecnico1", "D. Martínez");
@@ -382,7 +505,7 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void LosModulosLedPidenTcYSuClasificacion()
     {
-        var led = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62031");
+        var led = Contexto.Norma("62031");
 
         var tc = led.Proyecto.Campos.Single(c => c.Id == "tc");
         Assert.Equal("numero", tc.Tipo);
@@ -400,7 +523,7 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void LaCabeceraDelIkSePuedeCompletar()
     {
-        var ik = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62262");
+        var ik = Contexto.Norma("62262");
         var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 2 };
 
         datos.Establecer("proyecto", "tecnico1", "D. Martínez");
@@ -414,7 +537,7 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void LaCabeceraDeLosModulosLedSePuedeCompletar()
     {
-        var led = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62031");
+        var led = Contexto.Norma("62031");
         var datos = new DatosProyecto { CodigoServicio = "202612345", NumeroMuestras = 2 };
 
         datos.Establecer("proyecto", "tecnico1", "D. Martínez");
@@ -445,7 +568,7 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void EnLa60529ElGradoIpVaPorMuestraYSePideEnTodas()
     {
-        var ip = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "60529");
+        var ip = Contexto.Norma("60529");
 
         var primera = ip.Proyecto.Campos.Single(c => c.Id == "ipPrimeraCifra");
         var segunda = ip.Proyecto.Campos.Single(c => c.Id == "ipSegundaCifra");
@@ -478,7 +601,7 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void LasReglasVenElGradoIpDeclaradoPorMuestra()
     {
-        var ip = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "60529");
+        var ip = Contexto.Norma("60529");
         var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 2 };
 
         var motorVacio = new MotorDeReglas(ip, datos);
@@ -502,7 +625,7 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void LosDatosDeInmersionSoloSePidenConIpx7OIpx8()
     {
-        var ip = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "60529");
+        var ip = Contexto.Norma("60529");
 
         foreach (var id in new[] { "profundidadInmersion", "tiempoInmersion", "temperaturaInmersion" })
             Assert.Equal("R-60529-inmersion", ip.Proyecto.Campos.Single(c => c.Id == id).VisibleSi);
@@ -527,7 +650,7 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void LosDatosDeInmersionSoloSeExigenCuandoAplican()
     {
-        var ip = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "60529");
+        var ip = Contexto.Norma("60529");
 
         var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
         datos.Establecer("proyecto", "tecnico1", "D. Martínez");
@@ -658,7 +781,7 @@ public class PlantillasDeOtrasNormasTests
     [InlineData("62262")]
     public void LaFilaDeMuestraEsIgualEnTodasLasNormas(string norma)
     {
-        var porMuestra = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == norma)
+        var porMuestra = Contexto.Norma(norma)
             .Proyecto.Campos.Where(c => c.PorMuestra).Select(c => c.Id).ToList();
 
         Assert.Equal(["luminariaOrdinaria", "ipPrimeraCifra", "ipSegundaCifra", "gradoIk"], porMuestra);
@@ -726,18 +849,18 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void UnaNormaAnadidaNoCambiaElPrefijoDeLasMuestras()
     {
-        var ik = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62262");
-        var ip = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "60529");
+        var ik = Contexto.Norma("62262");
+        var ip = Contexto.Norma("60529");
         var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
 
         ik.AplicarA(datos);
         ip.AplicarA(datos, principal: false);
 
         Assert.Equal("EBP_CLIM12345202601", datos.IdentificadorDeMuestra(1));
-        Assert.Contains("60529", datos.Normas);
+        Assert.Contains(ip.Meta.Id, datos.Normas);
 
         // Y la principal es la que se aplicó como tal, no la última en llegar.
-        Assert.Equal("62262", datos.NormaPrincipal);
+        Assert.Equal(ik.Meta.Id, datos.NormaPrincipal);
     }
 
     // ---- cuál es la principal la dice el proyecto --------------------------
@@ -754,15 +877,15 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void ConDosNormasDelMismoPatronMandaLaQueElProyectoApunto()
     {
-        var ip = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "60529");
-        var led = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62031");
+        var ip = Contexto.Norma("60529");
+        var led = Contexto.Norma("62031");
 
         // Nace como módulos LED, con el IP añadido detrás.
         var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
         led.AplicarA(datos);
         ip.AplicarA(datos, principal: false);
 
-        Assert.Equal("62031", datos.NormaPrincipal);
+        Assert.Equal(led.Meta.Id, datos.NormaPrincipal);
 
         // El tablero detalla la 62031 y resume la 60529 en una línea, se le pasen las
         // plantillas en el orden que se le pasen.
@@ -781,15 +904,15 @@ public class PlantillasDeOtrasNormasTests
     public void SiLaPrincipalYaNoEstaEntreLasSuyasSeVuelveADeducir()
     {
         var luminarias = Contexto.Plantilla;
-        var led = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62031");
+        var led = Contexto.Norma("62031");
 
         var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
         led.AplicarA(datos);
         luminarias.AplicarA(datos, principal: false);
 
         // Se retira la 62031 del servicio, pero el proyecto sigue apuntándola.
-        datos.Normas.Remove("62031");
-        Assert.Equal("62031", datos.NormaPrincipal);
+        datos.Normas.Remove(led.Meta.Id);
+        Assert.Equal(led.Meta.Id, datos.NormaPrincipal);
 
         // No se cae ni detalla la que ya no está: manda luminarias, como siempre.
         var resumen = AnalizadorDeProyectos.Analizar([luminarias], datos, "x.lumproj", DateTime.Now);
@@ -803,7 +926,8 @@ public class PlantillasDeOtrasNormasTests
     {
         var conClase = Contexto.TodasLasPlantillas()
             .Where(p => p.Proyecto.Campos.Any(c => c.Id == "clase"))
-            .Select(p => p.Meta.Id)
+            .Select(p => p.Meta.CodigoParaFichero)
+            .Distinct()   // luminarias tiene dos años y los dos la piden
             .ToList();
 
         Assert.Equal(["60598"], conClase);
@@ -827,7 +951,7 @@ public class PlantillasDeOtrasNormasTests
     public void ElAvanceSumaElDeTodasLasNormasDelProyecto()
     {
         var lum = Contexto.Plantilla;
-        var ik = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62262");
+        var ik = Contexto.Norma("62262");
         var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
 
         var soloLum = new IndicadorDeAvance(new MotorDeReglas(lum, datos)).Calcular();
@@ -846,8 +970,8 @@ public class PlantillasDeOtrasNormasTests
     [Fact]
     public void CadaNormaExigeSuPropiaCabecera()
     {
-        var ip = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "60529");
-        var ik = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62262");
+        var ip = Contexto.Norma("60529");
+        var ik = Contexto.Norma("62262");
         var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
 
         var faltanIp = RequisitosDelProyecto.Faltantes(ip, datos);

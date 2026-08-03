@@ -44,14 +44,14 @@ public class PersistenciaTests : IDisposable
     public void LaNormaPrincipalSeGuardaConElProyecto()
     {
         var datos = ProyectoDeEjemplo();
-        Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "62031").AplicarA(datos);
+        Contexto.Norma("62031").AplicarA(datos);
         Contexto.Plantilla.AplicarA(datos, principal: false);
 
         _repositorio.Guardar(datos, Ruta, "1.0.0-mvp");
         var leido = _repositorio.Cargar(Ruta);
 
-        Assert.Equal("62031", leido.NormaPrincipal);
-        Assert.Contains("60598", leido.Normas);
+        Assert.Equal(Contexto.Norma("62031").Meta.Id, leido.NormaPrincipal);
+        Assert.Contains(Contexto.Plantilla.Meta.Id, leido.Normas);
     }
 
     /// <summary>

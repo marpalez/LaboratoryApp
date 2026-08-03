@@ -31,7 +31,10 @@ public partial class DialogoCapacidad : Window
     {
         capacidad ??= ServicioDeCapacidad.Capacidad;
 
-        Tarifa.Text = capacidad.EurosPorDia.ToString("0.##", CultureInfo.CurrentCulture);
+        Tarifa.Text = capacidad.EurosPorHora.ToString("0.##", CultureInfo.CurrentCulture);
+        Factor.Text = capacidad.Factor.ToString("0.###", CultureInfo.CurrentCulture);
+        HorasPorDia.Text = capacidad.HorasPorDia.ToString("0.##", CultureInfo.CurrentCulture);
+        ActualizarEquivalencia();
 
         var cultura = EjeDeSemanas.CulturaDelLaboratorio;
         _meses = [.. Enumerable.Range(1, 12).Select(m => new MesEditable
@@ -50,12 +53,56 @@ public partial class DialogoCapacidad : Window
         Avisar(null);
     }
 
+    /// <summary>
+    /// Enseña en qué se traduce la cuenta: los euros por hora que salen y lo que costaría
+    /// una jornada. Es la comprobación de que cuadra con la tarifa del laboratorio, y se
+    /// ve mientras se teclea en vez de descubrirlo en la tabla de carga.
+    /// </summary>
+    private void ActualizarEquivalencia()
+    {
+        if (Equivalencia is null) return;   // durante InitializeComponent aún no existe
+
+        if (Leer(Tarifa) is not { } divisor || divisor <= 0
+            || Leer(Factor) is not { } factor || factor <= 0
+            || Leer(HorasPorDia) is not { } horas || horas <= 0)
+        {
+            Equivalencia.Text = "";
+            return;
+        }
+
+        var porHora = divisor / factor;
+        var ejemplo = 2000 / divisor * factor;
+
+        Equivalencia.Text =
+            $"Sale a {porHora:0.##} € por hora. Una oferta de 2.000 € son {ejemplo:0.#} horas, "
+            + $"unas {ejemplo / horas:0.#} jornadas.";
+    }
+
+    private static double? Leer(System.Windows.Controls.TextBox caja)
+        => double.TryParse(caja.Text.Trim(), NumberStyles.Any, CultureInfo.CurrentCulture, out var valor)
+            ? valor
+            : null;
+
+    private void AlCambiarLaCuenta(object remitente, System.Windows.Controls.TextChangedEventArgs args)
+        => ActualizarEquivalencia();
+
     private void AlGuardar(object remitente, RoutedEventArgs args)
     {
-        if (!double.TryParse(Tarifa.Text.Trim(), NumberStyles.Any, CultureInfo.CurrentCulture, out var tarifa)
-            || tarifa <= 0)
+        if (Leer(Tarifa) is not { } tarifa || tarifa <= 0)
         {
-            Avisar("La tarifa tiene que ser un número mayor que cero.");
+            Avisar("El importe entre el que se divide tiene que ser un número mayor que cero.");
+            return;
+        }
+
+        if (Leer(Factor) is not { } factor || factor <= 0)
+        {
+            Avisar("El factor tiene que ser un número mayor que cero.");
+            return;
+        }
+
+        if (Leer(HorasPorDia) is not { } horasPorDia || horasPorDia <= 0)
+        {
+            Avisar("Las horas de una jornada tienen que ser un número mayor que cero.");
             return;
         }
 
@@ -72,7 +119,9 @@ public partial class DialogoCapacidad : Window
             dias.Add(valor);
         }
 
-        ServicioDeCapacidad.Capacidad.EurosPorDia = tarifa;
+        ServicioDeCapacidad.Capacidad.EurosPorHora = tarifa;
+        ServicioDeCapacidad.Capacidad.Factor = factor;
+        ServicioDeCapacidad.Capacidad.HorasPorDia = horasPorDia;
         ServicioDeCapacidad.Capacidad.DiasPorMes = dias;
 
         try

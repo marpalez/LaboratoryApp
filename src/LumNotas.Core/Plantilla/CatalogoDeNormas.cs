@@ -6,13 +6,50 @@ public sealed record NormaDisponible(string Id, string Titulo, string Ruta)
     /// <summary>Nombre corto para las tarjetas de la portada. Si falta, se usa el largo.</summary>
     public string TituloCorto { get; init; } = "";
 
+    /// <summary>Ids con los que se conoció antes, para reconocer proyectos ya guardados.</summary>
+    public IReadOnlyList<string> IdsAnteriores { get; init; } = [];
+
+    /// <summary>Lo que sale en el nombre del fichero, que es más corto que el id.</summary>
+    public string CodigoDeFichero { get; init; } = "";
+
+    /// <summary>Versión de esta plantilla. Con varias del mismo id, manda la más alta.</summary>
+    public string Version { get; init; } = "";
+
+    /// <summary>Año de publicación, para distinguir dos versiones de la misma norma.</summary>
+    public string AnioDePublicacion { get; init; } = "";
+
+    /// <summary>
+    /// Lo que se enseña en la tarjeta de la portada: el número de norma a secas. El id
+    /// lleva además el año y no cabe — y al técnico le dice menos que «60598».
+    /// </summary>
+    public string Rotulo => string.IsNullOrWhiteSpace(CodigoDeFichero) ? Id : CodigoDeFichero;
+
+    /// <summary>«Luminarias · 2024», para cuando conviven dos años de la misma norma.</summary>
+    public string TituloConAnio => string.IsNullOrWhiteSpace(AnioDePublicacion)
+        ? TituloCorto
+        : $"{TituloCorto} · {AnioDePublicacion}";
+
+    /// <summary>Si es la norma que un proyecto pide, con el id de ahora o con uno viejo.</summary>
+    public bool Responde(string? id)
+        => !string.IsNullOrWhiteSpace(id)
+           && (string.Equals(Id, id, StringComparison.OrdinalIgnoreCase)
+               || IdsAnteriores.Any(a => string.Equals(a, id, StringComparison.OrdinalIgnoreCase)));
+
     public override string ToString() => Titulo;
 }
 
 /// <summary>
 /// Las normas que el laboratorio tiene instaladas. Cada una es un fichero
-/// <c>plantilla-*.json</c> en la carpeta de plantillas: añadir una norma es dejar caer
-/// un fichero ahí, sin tocar ni recompilar la aplicación.
+/// <c>plantilla-&lt;id&gt;_&lt;version&gt;.json</c> en la carpeta de plantillas —por ejemplo
+/// <c>plantilla-60598-1_2024_1.0.0.json</c>—: añadir una norma es dejar caer un fichero
+/// ahí, sin tocar ni recompilar la aplicación.
+/// <para>
+/// El nombre lleva el <b>año de publicación</b> para que dos versiones de la misma norma puedan
+/// convivir en la carpeta, y la <b>versión</b> para saber qué hay instalado sin abrir
+/// nada. De la versión se ocupa <see cref="Disponibles"/>: si de un mismo id hay varias,
+/// <b>solo cuenta la más alta</b> — las anteriores se quedan como respaldo y no aparecen
+/// duplicadas en la portada.
+/// </para>
 /// </summary>
 public static class CatalogoDeNormas
 {
@@ -39,6 +76,12 @@ public static class CatalogoDeNormas
     /// <summary>
     /// Normas instaladas, con luminarias primero por ser la de uso más frecuente y el
     /// resto por título.
+    /// <para>
+    /// <b>De cada id, solo la versión más alta.</b> Con la versión en el nombre del
+    /// fichero, publicar una corrección deja las dos en la carpeta; sin esta regla, la
+    /// portada enseñaría dos tarjetas de la misma norma y el técnico tendría que adivinar
+    /// cuál. La anterior se queda de respaldo y deja de contar.
+    /// </para>
     /// </summary>
     public static IReadOnlyList<NormaDisponible> Disponibles(string? carpeta = null)
     {
@@ -58,7 +101,11 @@ public static class CatalogoDeNormas
                 {
                     TituloCorto = string.IsNullOrWhiteSpace(plantilla.Meta.TituloCorto)
                         ? titulo
-                        : plantilla.Meta.TituloCorto!
+                        : plantilla.Meta.TituloCorto!,
+                    IdsAnteriores = [.. plantilla.Meta.IdsAnteriores ?? []],
+                    CodigoDeFichero = plantilla.Meta.CodigoParaFichero,
+                    Version = plantilla.Meta.Version,
+                    AnioDePublicacion = plantilla.Meta.AnioDePublicacion ?? ""
                 });
             }
             catch (Exception)
@@ -67,7 +114,31 @@ public static class CatalogoDeNormas
             }
         }
 
-        return [.. normas.OrderBy(n => n.Id == "60598" ? 0 : 1).ThenBy(n => n.Titulo, StringComparer.CurrentCulture)];
+        // Luminarias primero. Se mira el código de fichero y no el id, que ahora lleva el
+        // año: si mañana entra la de 2027, sigue saliendo la primera sin tocar nada.
+        return [.. normas.GroupBy(n => n.Id, StringComparer.OrdinalIgnoreCase)
+                         .Select(LaMasNueva)
+                         .OrderBy(n => n.CodigoDeFichero == "60598" ? 0 : 1)
+                         .ThenBy(n => n.Titulo, StringComparer.CurrentCulture)];
+    }
+
+    /// <summary>
+    /// De varios ficheros del mismo id, el de versión más alta. Una versión que no se
+    /// entiende cuenta como la más baja: entre un número raro y uno legible, se instala
+    /// el legible.
+    /// </summary>
+    private static NormaDisponible LaMasNueva(IEnumerable<NormaDisponible> mismasNormas)
+        => mismasNormas
+            .OrderByDescending(n => Version.TryParse(Numero(n.Version), out var v) ? v : new Version(0, 0))
+            .ThenByDescending(n => n.Version, StringComparer.OrdinalIgnoreCase)
+            .First();
+
+    /// <summary>Quita lo que cuelgue detrás del número, como «1.2.0-beta».</summary>
+    private static string Numero(string version)
+    {
+        var texto = (version ?? "").Trim();
+        var corte = texto.IndexOfAny(['-', '+', ' ']);
+        return corte > 0 ? texto[..corte] : texto;
     }
 
     private static string TituloDe(PlantillaEnsayos plantilla)

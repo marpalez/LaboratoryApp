@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
+using LumNotas.Core.Gestion;
 using LumNotas.Core.Plantilla;
 using LumNotas.Storage;
 
@@ -24,7 +25,9 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
         {
             // Desde el calendario se salta al proyecto sin pasar por el explorador.
             AbrirProyecto = AbrirEnPestana,
-            AlCambiarCarpeta = AdoptarCarpetaDelLaboratorio
+            AlCambiarCarpeta = AdoptarCarpetaDelLaboratorio,
+            // Los ficheros ilegibles solo se saben tras escanear.
+            AlExplorar = RefrescarAvisos
         };
 
         NuevaPestana = new Comando(() => AbrirPestana());
@@ -58,6 +61,7 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
         });
 
         RefrescarRecientes();
+        RefrescarAvisos();
         AbrirPestana();
     }
 
@@ -101,6 +105,59 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
 
     /// <summary>Los tres últimos, que es lo que cabe en la portada sin estorbar.</summary>
     public ObservableCollection<ProyectoReciente> UltimosAbiertos { get; } = [];
+
+    /// <summary>
+    /// Lo que este equipo tiene mal configurado. <b>Vacía casi siempre</b>: si no hay nada
+    /// que hacer, el recuadro de la portada no existe.
+    /// </summary>
+    public ObservableCollection<AvisoViewModel> Avisos { get; } = [];
+
+    public bool HayAvisos => Avisos.Count > 0;
+
+    /// <summary>
+    /// Vuelve a mirar cómo está el equipo. Se llama al arrancar, al cambiar de carpeta y
+    /// al terminar cada escaneo — que es cuando se sabe si hay ficheros ilegibles.
+    /// </summary>
+    public void RefrescarAvisos()
+    {
+        var ajustes = Ajustes.Cargar();
+        var compartida = ServicioDeCarpetas.Compartida();
+
+        var pendientes = PlantillasCompartidas.Comparar(
+            PlantillasCompartidas.LocalSiExiste(), compartida);
+
+        var estado = new AvisosDeInicio.Estado(
+            CarpetaDeProyectos: ajustes.CarpetaDeProyectos,
+            ProyectosAccesible: Existe(ajustes.CarpetaDeProyectos),
+            // La elegida, no la que se use de respaldo: el aviso habla de lo configurado.
+            CarpetaCompartida: ajustes.CarpetaCompartida,
+            CompartidaAccesible: Existe(ajustes.CarpetaCompartida),
+            HayNormasPublicadas: ServicioDePlantillas.Origen.EsCompartida,
+            NormasSinPublicar: pendientes.Nuevas,
+            NormasMasNuevas: pendientes.MasNuevas,
+            ProyectosIlegibles: Gestion.Ilegibles);
+
+        Avisos.Clear();
+        foreach (var aviso in AvisosDeInicio.Revisar(estado))
+            Avisos.Add(new AvisoViewModel(aviso, Atender));
+
+        Notificar(nameof(HayAvisos));
+    }
+
+    private static bool Existe(string? carpeta)
+        => !string.IsNullOrWhiteSpace(carpeta) && Directory.Exists(carpeta);
+
+    private void Atender(AccionDeAviso accion)
+    {
+        switch (accion)
+        {
+            case AccionDeAviso.ElegirCarpetas: ElegirCarpetaDelLaboratorio.Execute(null); break;
+            case AccionDeAviso.VerNormas: VerPlantillas.Execute(null); break;
+            case AccionDeAviso.IrAlTablero: IrAVistaDeGestion.Execute(Vista.Tablero); break;
+        }
+
+        RefrescarAvisos();
+    }
 
     public bool HayRecientes => Recientes.Count > 0;
 
@@ -168,6 +225,7 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
 
         Gestion.Carga.Recalcular();
         Notificar(nameof(HayVersionMasNueva));
+        RefrescarAvisos();
     }
     public Comando OcultarAvisoDeVersion { get; }
 
@@ -424,6 +482,24 @@ public enum RespuestaRepetido
     CrearIgualmente,
 
     Cancelar
+}
+
+/// <summary>Un aviso de la portada, con el botón que lo resuelve.</summary>
+public sealed class AvisoViewModel(AvisoDeInicio aviso, Action<AccionDeAviso> atender)
+{
+    public string Texto => aviso.Texto;
+    public string? Detalle => aviso.Detalle;
+    public bool HayDetalle => !string.IsNullOrWhiteSpace(aviso.Detalle);
+    public string Boton => aviso.Boton;
+
+    public bool EsProblema => aviso.Nivel == NivelDeAviso.Problema;
+
+    /// <summary>Rojo si algo no funciona, ámbar si solo está descuadrado.</summary>
+    public string Color => EsProblema ? "#B91C1C" : "#92400E";
+    public string Fondo => EsProblema ? "#FEE2E2" : "#FEF3C7";
+    public string Borde => EsProblema ? "#FECACA" : "#FDE68A";
+
+    public Comando Resolver { get; } = new(() => atender(aviso.Accion));
 }
 
 /// <summary>Entrada de la lista de proyectos recientes.</summary>

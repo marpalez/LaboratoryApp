@@ -18,12 +18,12 @@ public class NombreDeFicheroTests
 
     /// <summary>
     /// El <c>xx</c> y el <c>00</c> se crean así y <b>los lleva el técnico a mano</b>: el
-    /// hueco se sustituye por el número que le toque a esa toma de notas y la edición
+    /// hueco se sustituye por el número que le toque a esa toma de notas y la revisión
     /// sube cuando hay que corregir algo ya emitido. Numerar y reeditar son decisiones
     /// del laboratorio, no del programa.
     /// </summary>
     [Fact]
-    public void ElHuecoYLaEdicionSeCreanParaQueLosPongaElTecnico()
+    public void ElHuecoYLaRevisionSeCreanParaQueLosPongaElTecnico()
     {
         Assert.EndsWith("xx-00", NombreDeTomaDeNotas.Componer("60598", "LEDC42502"));
 

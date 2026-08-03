@@ -27,24 +27,29 @@ public sealed record OrigenDePlantillas(string Carpeta, bool EsCompartida, strin
 /// </summary>
 public static class PlantillasCompartidas
 {
-    /// <summary>Subcarpeta que se busca dentro de la carpeta de proyectos.</summary>
+    /// <summary>Subcarpeta que se busca dentro de la carpeta compartida.</summary>
     public const string NombreDeCarpeta = "plantilla";
 
     private const string Patron = "plantilla-*.json";
     private const string Equipos = "equipos-*.json";
 
-    public static OrigenDePlantillas Resolver(string? carpetaDeProyectos)
+    /// <param name="carpetaCompartida">
+    /// La carpeta compartida del laboratorio, dentro de la cual se busca la subcarpeta
+    /// <c>plantilla</c>. <b>No es la de proyectos</b> —aunque se use como respaldo cuando
+    /// no hay compartida elegida—, y confundirlas hace buscar las normas donde no están.
+    /// </param>
+    public static OrigenDePlantillas Resolver(string? carpetaCompartida)
     {
         var local = LocalSiExiste();
 
-        if (string.IsNullOrWhiteSpace(carpetaDeProyectos))
-            return Devolver(local, "No hay carpeta de proyectos elegida, así que se usan las normas de este equipo.");
+        if (string.IsNullOrWhiteSpace(carpetaCompartida))
+            return Devolver(local, "No hay carpeta compartida elegida, así que se usan las normas de este equipo.");
 
-        var compartida = Path.Combine(carpetaDeProyectos, NombreDeCarpeta);
+        var conNormas = Path.Combine(carpetaCompartida, NombreDeCarpeta);
 
-        if (Tiene(compartida)) return new OrigenDePlantillas(compartida, EsCompartida: true);
+        if (Tiene(conNormas)) return new OrigenDePlantillas(conNormas, EsCompartida: true);
 
-        if (!Directory.Exists(carpetaDeProyectos))
+        if (!Directory.Exists(carpetaCompartida))
             return Devolver(local, "No se pudo llegar a la carpeta compartida; se usan las normas de este equipo.");
 
         return Devolver(local, "Las normas todavía no están publicadas en la carpeta compartida; "
@@ -56,6 +61,70 @@ public static class PlantillasCompartidas
             ? throw new DirectoryNotFoundException(
                 "No se encuentra la carpeta 'plantilla' con las tomas de notas de las normas.")
             : new OrigenDePlantillas(local, EsCompartida: false, aviso);
+
+    /// <summary>
+    /// Normas de este equipo que el laboratorio todavía no tiene.
+    /// <para>
+    /// Una vez publicada la primera tanda, el programa lee de la carpeta compartida y
+    /// <b>deja de mirar la local</b>. Sin esta comparación, añadir una norma —o un año
+    /// nuevo de una— aquí no producía ninguna señal: el fichero estaba en el equipo, no
+    /// aparecía en el programa y nada explicaba por qué.
+    /// </para>
+    /// </summary>
+    /// <param name="Nuevas">Ids que no están publicados.</param>
+    /// <param name="MasNuevas">Ids publicados con una versión anterior a la de aquí.</param>
+    public sealed record SinPublicar(IReadOnlyList<string> Nuevas, IReadOnlyList<string> MasNuevas)
+    {
+        public int Cuantas => Nuevas.Count + MasNuevas.Count;
+
+        public bool HayAlgo => Cuantas > 0;
+
+        public static SinPublicar Nada { get; } = new([], []);
+    }
+
+    /// <summary>
+    /// Compara lo que hay en este equipo con lo publicado. Si la carpeta compartida no
+    /// está elegida no hay nada que comparar: aún se está trabajando en local.
+    /// </summary>
+    public static SinPublicar Comparar(string? carpetaLocal, string? carpetaCompartida)
+    {
+        if (string.IsNullOrWhiteSpace(carpetaLocal) || string.IsNullOrWhiteSpace(carpetaCompartida))
+            return SinPublicar.Nada;
+
+        var conNormas = Path.Combine(carpetaCompartida, NombreDeCarpeta);
+        if (!Tiene(conNormas)) return SinPublicar.Nada;
+
+        var locales = CatalogoDeNormas.Disponibles(carpetaLocal);
+        var publicadas = CatalogoDeNormas.Disponibles(conNormas)
+            .ToDictionary(n => n.Id, n => n.Version, StringComparer.OrdinalIgnoreCase);
+
+        var nuevas = new List<string>();
+        var masNuevas = new List<string>();
+
+        foreach (var local in locales)
+        {
+            if (!publicadas.TryGetValue(local.Id, out var publicada)) nuevas.Add(local.Titulo);
+            else if (EsPosterior(local.Version, publicada)) masNuevas.Add(local.Titulo);
+        }
+
+        return new SinPublicar(nuevas, masNuevas);
+    }
+
+    /// <summary>
+    /// Si la de aquí es posterior a la publicada. Ante un número que no se entiende
+    /// devuelve falso: es preferible no avisar que avisar en falso todos los días.
+    /// </summary>
+    private static bool EsPosterior(string aqui, string publicada)
+        => Version.TryParse(Numero(aqui), out var a)
+           && Version.TryParse(Numero(publicada), out var b)
+           && a > b;
+
+    private static string Numero(string version)
+    {
+        var texto = (version ?? "").Trim();
+        var corte = texto.IndexOfAny(['-', '+', ' ']);
+        return corte > 0 ? texto[..corte] : texto;
+    }
 
     /// <summary>La carpeta de este equipo, o <c>null</c> si tampoco está.</summary>
     public static string? LocalSiExiste()
@@ -75,9 +144,9 @@ public static class PlantillasCompartidas
     /// Copia las normas de este equipo a la carpeta compartida, para que pasen a ser las
     /// de todos. Devuelve cuántos ficheros se han copiado.
     /// </summary>
-    public static int Publicar(string carpetaLocal, string carpetaDeProyectos)
+    public static int Publicar(string carpetaLocal, string carpetaCompartida)
     {
-        var destino = Path.Combine(carpetaDeProyectos, NombreDeCarpeta);
+        var destino = Path.Combine(carpetaCompartida, NombreDeCarpeta);
         Directory.CreateDirectory(destino);
 
         var copiados = 0;

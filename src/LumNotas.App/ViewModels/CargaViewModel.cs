@@ -54,7 +54,8 @@ public sealed class CargaViewModel : ObservableObject
         var sinImporte = filas.Sum(f => f.SinImporte);
         Mensaje = servicios.Count == 0
             ? "No hay servicios con fechas que repartir."
-            : $"{capacidad.EurosPorDia:0.##} € = 1 día de trabajo"
+            : $"Importe ÷ {capacidad.EurosPorHora:0.##} × {capacidad.Factor:0.###} = horas"
+              + $"  ·  {capacidad.HorasPorDia:0.##} h por jornada"
               + (sinImporte == 0 ? "" : $"  ·  {sinImporte} servicio{(sinImporte == 1 ? "" : "s")} sin importe");
 
         Notificar(nameof(HayDatos));

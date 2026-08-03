@@ -1,0 +1,2118 @@
+{
+  "meta": {
+    "id": "60598-1_2021",
+    "codigoDeFichero": "60598",
+    "anioDePublicacion": "2021",
+    "titulo": "Luminarias — EN IEC 60598-1:2021 + A11:2022 y partes -2",
+    "tituloCorto": "Luminarias",
+    "normasCompatibles": ["62031_2020_A11"],
+    "notaCompatibles": "No admite la 60529 ni la 62262: el IP y el IK ya están dentro de esta toma de notas. El IK se elige por muestra y su sección aparece sola en cuanto alguna lo lleva.",
+    "version": "1.0.0",
+    "generadoEl": "2026-08-03",
+    "origen": "TomaDeNotasExcel.xlsx v2.1, con la numeración de secciones de la edición 2021",
+    "reglasDocumentadasEn": "docs/REGLAS-NEGOCIO.md v3.33",
+    "numeracion": "2021",
+    "nota": "Lo que se anota es lo mismo que en la edición 2024; lo que cambia entre ediciones es la numeración de las secciones. Confirmado por el laboratorio el 2026-08-03.",
+
+    "alcance": {
+      "incluye": ["EN/IEC 60598-1:2021", "partes -2", "IK 62262 por muestra"],
+      "excluye": ["módulos LED (62031), que es una toma de notas aparte"]
+    },
+    "catalogoEquipos": "equipos-60598-1_2021_1.0.0.json"
+  },
+
+  "convenciones": {
+    "tiposDeCampo": ["texto", "textoLargo", "numero", "entero", "fecha", "hora", "instante", "booleano", "seleccion", "grupoRepetido"],
+    "tiposDeRegla": {
+      "avisoFecha": "P2 — verdadero (falta) si la fecha está vacía",
+      "faltanDatos": "P3 — si el N/A del apartado es verdadero ⇒ falso; si no ⇒ OR(faltanSi)",
+      "alMenosUna": "P4 — verdadero si alguna opción del checklist está marcada",
+      "exactamenteUna": "P5 — verdadero si hay una y solo una marcada",
+      "todas": "verdadero si todas las opciones del checklist están marcadas",
+      "opcion": "valor de una opción concreta de un checklist",
+      "recuentoDatos": "P6 — verdadero si los datos introducidos alcanzan el umbral",
+      "recuento": "devuelve el número de valores presentes (no booleano)",
+      "duracionMinima": "P7 — verdadero si (fin − inicio) ≥ mínimo",
+      "duracionEnRango": "verdadero si (fin − inicio) está en [min, max]",
+      "rango": "verdadero si el valor del campo está dentro de [min, max]",
+      "noVacio": "verdadero si el campo tiene valor distinto de vacío y de cero",
+      "y": "conjunción de las reglas de 'de'",
+      "o": "disyunción de las reglas de 'de'",
+      "si": "condicional: si 'condicion' ⇒ 'entonces', si no ⇒ 'siNo'",
+      "predicado": "predicado con nombre, implementado en LumNotas.Core (Predicados.cs)",
+      "calculo": "cálculo con nombre, implementado en LumNotas.Core (Calculos.cs)",
+      "aviso": "mensaje al técnico cuando se cumplen las condiciones de 'cuandoTodas'",
+      "peso": "P8 — aportación al indicador de avance"
+    },
+    "referenciaAReglas": "Donde se admite una lista de reglas (faltanSi, de, cuandoTodas) cada elemento es el id de una regla; el prefijo '!' la niega. Ejemplo: [\"R-06-01\", \"!R-11-16\"].",
+    "ambito": "Las reglas sobre campos por muestra admiten 'ambito': 'primeraMuestra' (lo que hace el Excel), 'todasLasMuestras' o 'algunaMuestra'. Si se omite, 'primeraMuestra'.",
+    "notaSobreOrigenExcel": "El campo origenExcel se conserva para poder auditar cada elemento contra el libro original. No lo usa la aplicación en ejecución."
+  },
+
+  "proyecto": {
+    "campos": [
+      { "id": "codigoServicio", "etiqueta": "Código de servicio", "tipo": "texto", "formato": "NNNNNAAAA", "obligatorio": true, "origenExcel": "RESUMEN PROYECTO LUM!D3" },
+      { "id": "tecnico1", "etiqueta": "Técnico 1", "tipo": "texto", "obligatorio": true, "origenExcel": "RESUMEN PROYECTO LUM!C5" },
+      { "id": "tecnico2", "etiqueta": "Técnico 2", "tipo": "texto", "origenExcel": "RESUMEN PROYECTO LUM!C6" },
+      { "id": "numeroMuestras", "etiqueta": "Nº de muestras", "tipo": "entero", "min": 1, "max": 30, "obligatorio": true, "origenExcel": "RESUMEN PROYECTO LUM!D8" },
+      { "id": "ta", "etiqueta": "Ta", "tipo": "numero", "unidad": "ºC", "obligatorio": true, "origenExcel": "RESUMEN PROYECTO LUM!D9" },
+      { "id": "clase", "etiqueta": "Clase", "tipo": "seleccion", "opciones": ["I", "II", "III"], "obligatorio": true, "origenExcel": "Datos ensayos LUM.!D8" },
+      { "id": "partes2", "etiqueta": "Partes -2 aplicables", "tipo": "seleccion", "multiple": true, "obligatorio": true,
+        "opciones": ["-2-1", "-2-2", "-2-3", "-2-4", "-2-5", "-2-7", "-2-10", "-2-13", "-2-18", "-2-22", "OTRO"],
+        "origenExcel": "Datos ensayos LUM.!D6:N6",
+        "nota": "-2-7 aparece en el Excel pero no tiene casilla asociada (D-19)." },
+      { "id": "luminariaOrdinaria", "etiqueta": "Luminaria ordinaria", "tipo": "booleano", "porMuestra": true,
+        "nota": "Atajo del laboratorio: una luminaria ordinaria es IP20, así que al marcarlo se rellena IP2X e IPX0." },
+      { "id": "ipPrimeraCifra", "etiqueta": "Grado IP objetivo — 1ª cifra (sólidos)", "etiquetaCorta": "1ª cifra", "tipo": "seleccion", "porMuestra": true, "obligatorio": true,
+        "opciones": ["IP1X", "IP2X", "IP3X", "IP4X", "IP5X", "IP6X"],
+        "origenExcel": "Datos ensayos LUM.!C11:G12",
+        "nota": "Va por muestra: un mismo servicio puede traer luminarias con objetivos distintos." },
+      { "id": "ipSegundaCifra", "etiqueta": "Grado IP objetivo — 2ª cifra (agua)", "etiquetaCorta": "2ª cifra", "tipo": "seleccion", "porMuestra": true, "obligatorio": true,
+        "opciones": ["IPX0", "IPX1", "IPX2", "IPX3", "IPX4", "IPX5", "IPX6", "IPX7", "IPX8", "IPX9"],
+        "origenExcel": "Datos ensayos LUM.!C9:K10" },
+      { "id": "gradoIk", "etiqueta": "Grado IK objetivo", "etiquetaCorta": "IK", "tipo": "seleccion", "porMuestra": true,
+        "opciones": ["No IK", "IK01", "IK02", "IK03", "IK04", "IK05", "IK06", "IK07", "IK08", "IK09", "IK10", "IK11"],
+        "porDefecto": "No IK",
+        "nota": "Va detrás del grado IP en la fila de la muestra. La sección de ensayo de IK aparece en cuanto alguna muestra lleva un grado distinto de «No IK»." },
+      { "id": "profundidadInmersion", "etiqueta": "Profundidad de inmersión", "tipo": "numero", "unidad": "m",
+        "visibleSi": "R-60598-inmersion", "obligatorio": true,
+        "nota": "Obligatoria solo cuando aparece, es decir, con objetivo IPX7 o IPX8 en alguna muestra." },
+      { "id": "tiempoInmersion", "etiqueta": "Tiempo de inmersión", "tipo": "numero", "unidad": "min",
+        "visibleSi": "R-60598-inmersion", "obligatorio": true },
+      { "id": "temperaturaInmersion", "etiqueta": "Temperatura del agua de inmersión", "tipo": "numero", "unidad": "ºC",
+        "visibleSi": "R-60598-inmersion", "obligatorio": true, "porDefecto": 25 },
+      { "id": "numeracionMuestras", "etiqueta": "Numeración de muestras", "tipo": "seleccion", "opciones": ["automática", "personalizada"], "porDefecto": "automática", "origenExcel": "Datos ensayos LUM.!G7 / I7" },
+      { "id": "inicioNumeracion", "etiqueta": "Iniciar numeración en", "tipo": "entero", "porDefecto": 1, "origenExcel": "RESUMEN PROYECTO LUM!F38" },
+      { "id": "comentariosGenerales", "etiqueta": "Comentarios y notas generales del proyecto", "tipo": "textoLargo", "origenExcel": "RESUMEN PROYECTO LUM!H2" }
+    ],
+    "reglas": [
+      { "id": "R-PROY-completo", "tipo": "predicado", "nombre": "proyectoCompleto",
+        "etiqueta": "La cabecera del proyecto está completa",
+        "descripcion": "Exige código de servicio, técnico 1, Ta, clase, grado IP de cada muestra y partes -2. El técnico 2 es opcional.",
+        "origenExcel": "RESUMEN PROYECTO LUM!B11" },
+      { "id": "R-60598-inmersion", "tipo": "predicado", "nombre": "requiereInmersion",
+        "etiqueta": "Alguna muestra tiene objetivo IPX7 o IPX8",
+        "descripcion": "Solo entonces se anotan la profundidad y la temperatura del agua de inmersión, igual que en la 60529." }
+    ]
+  },
+
+  "muestras": {
+    "min": 1,
+    "max": 30,
+    "nota": "El Excel admitía 8 como máximo; el laboratorio pidió ampliarlo a 30.",
+    "identificador": { "patron": "EBP_SAFE{codigoServicio}", "origenExcel": "RESUMEN PROYECTO LUM!C40:C47" },
+    "campos": [
+      { "id": "numero", "etiqueta": "Nº", "tipo": "entero" },
+      { "id": "observaciones", "etiqueta": "Comentarios y observaciones de la muestra", "tipo": "textoLargo", "origenExcel": "RESUMEN PROYECTO LUM!G38" }
+    ]
+  },
+
+  "secciones": [
+    {
+      "codigo": "generales",
+      "titulo": "Ratings y otros datos generales",
+      "bloques": [
+        {
+          "id": "generales",
+          "codigo": "",
+          "titulo": "Ratings y otros datos generales",
+          "origenExcel": "Toma de notas 60598!B3:N22",
+          "notaNa": "Sin «na»: los ratings y datos generales se toman siempre, así que el apartado no puede marcarse como no aplicable. El Excel sí permitía marcarlo (Datos ensayos LUM.!L20).",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D4:F5" },
+          "comentarios": false,
+          "campos": [
+            { "id": "tension1", "etiqueta": "Verificación y medida de ratings (Tensión 1)", "tipo": "grupoRepetido", "elementos": 1, "porMuestra": true,
+              "campos": [
+                { "id": "tension", "etiqueta": "Tensión", "tipo": "numero", "unidad": "V" },
+                { "id": "corriente", "etiqueta": "Corriente", "tipo": "numero", "unidad": "A" },
+                { "id": "potencia", "etiqueta": "Potencia", "tipo": "numero", "unidad": "W" },
+                { "id": "factorPotencia", "etiqueta": "Fact. Pot (PF)", "tipo": "numero" }
+              ],
+              "origenExcel": "Toma de notas 60598!G7:N10" },
+            { "id": "tension2", "etiqueta": "Verificación y medida de ratings (Tensión 2, si procede)", "tipo": "grupoRepetido", "elementos": 1, "porMuestra": true, "opcional": true,
+              "campos": [
+                { "id": "tension", "etiqueta": "Tensión", "tipo": "numero", "unidad": "V" },
+                { "id": "corriente", "etiqueta": "Corriente", "tipo": "numero", "unidad": "A" },
+                { "id": "potencia", "etiqueta": "Potencia", "tipo": "numero", "unidad": "W" },
+                { "id": "factorPotencia", "etiqueta": "Fact. Pot (PF)", "tipo": "numero" }
+              ],
+              "origenExcel": "Toma de notas 60598!G12:N15" },
+            { "id": "tamano", "etiqueta": "Tamaño de las muestras", "tipo": "grupoRepetido", "elementos": 1, "porMuestra": true,
+              "campos": [
+                { "id": "alto", "etiqueta": "Alto", "tipo": "numero", "unidad": "cm" },
+                { "id": "ancho", "etiqueta": "Ancho", "tipo": "numero", "unidad": "cm" },
+                { "id": "profundo", "etiqueta": "Profundo", "tipo": "numero", "unidad": "cm" }
+              ],
+              "origenExcel": "Toma de notas 60598!G17:N19" }
+          ],
+          "reglas": [
+            { "id": "R-GEN-01", "tipo": "predicado", "nombre": "requiereDimensiones", "etiqueta": "¿Hace falta tamaño?",
+              "descripcion": "El proyecto tiene objetivo IPX3 o IPX4", "origenExcel": "Datos ensayos LUM.!D21" },
+            { "id": "R-GEN-02", "tipo": "recuentoDatos", "campo": "tamano", "umbralPorMuestra": 3, "soloSi": "R-GEN-01",
+              "cuentaCeros": false, "ambito": "todasLasMuestras", "origenExcel": "Datos ensayos LUM.!D22:D24" },
+            { "id": "R-GEN-04", "tipo": "aviso", "texto": "IMPRESCINDIBLE RELLENAR ESTOS DATOS", "cuandoTodas": ["R-GEN-01", "!R-GEN-02"], "origenExcel": "Datos ensayos LUM.!D25" },
+            { "id": "R-GEN-05", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!D27" },
+            { "id": "R-GEN-06", "tipo": "faltanDatos", "faltanSi": ["R-GEN-04", "R-GEN-05"], "origenExcel": "Datos ensayos LUM.!D29",
+              "nota": "Ya no lleva «siNoAplica»: el apartado es obligatorio y no se puede marcar como no aplicable." }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "Anexo A",
+      "titulo": "Verificación partes activas",
+      "bloques": [
+        {
+          "id": "anexoA",
+          "codigo": "Anexo A",
+          "titulo": "Verificación de partes activas",
+          "origenExcel": "Toma de notas 60598!B24:N41",
+          "pesoAvance": 5,
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!L20" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D25:F26" },
+          "equipos": "anexoA.partes-activas",
+          "comentarios": true,
+          "checklists": [
+            { "id": "selv", "etiqueta": "¿Es SELV?", "modo": "exactamenteUna", "opciones": [
+              { "id": "si", "etiqueta": "Sí", "origenExcel": "Datos ensayos LUM.!L13" },
+              { "id": "no", "etiqueta": "No", "origenExcel": "Datos ensayos LUM.!L14" }
+            ] },
+            { "id": "parteActiva", "etiqueta": "¿Es parte activa?", "modo": "exactamenteUna", "opciones": [
+              { "id": "si", "etiqueta": "Sí", "origenExcel": "Datos ensayos LUM.!L15" },
+              { "id": "no", "etiqueta": "No", "origenExcel": "Datos ensayos LUM.!L16" }
+            ] }
+          ],
+          "campos": [
+            { "id": "medidas", "etiqueta": "Medidas para determinar si es parte activa", "tipo": "grupoRepetido",
+              "elementos": 1, "porMuestra": true,
+              "campos": [
+                { "id": "vac", "etiqueta": "Vac", "tipo": "numero", "unidad": "V" },
+                { "id": "vdc", "etiqueta": "Vdc", "tipo": "numero", "unidad": "V" },
+                { "id": "uout", "etiqueta": "Uout (driver)", "tipo": "numero", "unidad": "V" }
+              ],
+              "origenExcel": "Toma de notas 60598!G31:N33" }
+          ],
+          "reglas": [
+            { "id": "R-PA-esSelv", "tipo": "opcion", "checklist": "selv", "opcion": "si", "origenExcel": "Datos ensayos LUM.!L21" },
+            { "id": "R-PA-01", "tipo": "exactamenteUna", "checklist": "selv", "etiqueta": "Selección de SELV coherente", "origenExcel": "Datos ensayos LUM.!M21" },
+            { "id": "R-PA-02a", "tipo": "exactamenteUna", "checklist": "parteActiva", "origenExcel": "Datos ensayos LUM.!M22" },
+            { "id": "R-PA-02", "tipo": "si", "etiqueta": "Si no es SELV, hay que decidir si es parte activa",
+              "condicion": "R-PA-esSelv", "entonces": null, "siNo": "R-PA-02a", "origenExcel": "Datos ensayos LUM.!M22" },
+            { "id": "R-PA-04", "tipo": "recuentoDatos", "campo": "medidas", "umbralPorMuestra": 3,
+              "soloSi": "!R-PA-esSelv", "cuentaCeros": false, "ambito": "todasLasMuestras",
+              "origenExcel": "Datos ensayos LUM.!L24:L26" },
+            { "id": "R-PA-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!L29" },
+            { "id": "R-PA-05", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-PA-00", "!R-PA-01", "!R-PA-02", "!R-PA-04"], "origenExcel": "Datos ensayos LUM.!L31" },
+            { "id": "R-PA-P8", "tipo": "peso", "valor": 5, "aplicaSiNo": "na", "finSiNo": "R-PA-05", "origenExcel": "Datos ensayos LUM.!Z14:AD14" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "3",
+      "codigoAntiguo": "3",
+      "titulo": "Sección 3 - Marcado",
+      "bloques": [
+        {
+          "id": "6",
+          "codigo": "3",
+          "titulo": "Marcado",
+          "origenExcel": "Toma de notas 60598!B43:N53",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!D38" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D44:F45" },
+          "notas": ["Los datos pueden tomarse directamente sobre el TRF"],
+          "equipos": "sec06.marcado",
+          "comentarios": true,
+          "checklists": [
+            { "id": "durabilidad", "etiqueta": "Ensayo de durabilidad del marcado", "modo": "libre",
+              "nota": "En el Excel son casillas sin enlazar: se marcan pero no alimentan ninguna regla. En la aplicación pasan a ser datos reales del ensayo.",
+              "opciones": [
+                { "id": "agua15s", "etiqueta": "15s agua", "porDefecto": true, "origenExcel": "Toma de notas 60598!fila 46 (casilla sin enlace)" },
+                { "id": "hexano15s", "etiqueta": "15s hexano", "porDefecto": true, "origenExcel": "Toma de notas 60598!fila 47 (casilla sin enlace)" }
+              ] }
+          ],
+          "campos": [],
+          "reglas": [
+            { "id": "R-06-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!D40" },
+            { "id": "R-06-02", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-06-01"], "origenExcel": "Datos ensayos LUM.!D42" },
+            { "id": "R-06-P8", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-06-02", "origenExcel": "Datos ensayos LUM.!Z6:AD6" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "4",
+      "codigoAntiguo": "4",
+      "titulo": "Sección 4 - Construcción",
+      "na": { "id": "naSeccion", "etiqueta": "N/A sección 7", "origenExcel": "Datos ensayos LUM.!K39" },
+      "bloques": [
+        {
+          "id": "7.4",
+          "codigo": "4.4",
+          "codigoAntiguo": "4.4",
+          "titulo": "Portalámparas",
+          "origenExcel": "Toma de notas 60598!B57:N80",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K40" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D58:F59" },
+          "equipos": "sec07.04.portalamparas",
+          "comentarios": true,
+          "checklists": [
+            { "id": "ensayos", "etiqueta": "Ensayos realizados", "modo": "alMenosUna", "opciones": [
+              { "id": "fluor7006_47C", "etiqueta": "7006-47C (portalámparas G5) · 15 N", "origenExcel": "Datos ensayos LUM.!C60" },
+              { "id": "fluor7006_60C", "etiqueta": "7006-60C (portalámparas G13) · 30 N", "origenExcel": "Datos ensayos LUM.!C61" },
+              { "id": "fluorOtro", "etiqueta": "Otro tipo fluorescente: indicar en comentarios", "origenExcel": "Datos ensayos LUM.!C62" },
+              { "id": "edisonE14B15", "etiqueta": "E14 ó B15 · 1,2 Nm", "origenExcel": "Datos ensayos LUM.!B60" },
+              { "id": "edisonE26E27B22", "etiqueta": "E26, E27 ó B22 · 2,0 Nm", "origenExcel": "Datos ensayos LUM.!B61" },
+              { "id": "edisonE30E40", "etiqueta": "E30 ó E40 · 4 Nm", "origenExcel": "Datos ensayos LUM.!B62" },
+              { "id": "edisonOtro", "etiqueta": "Otro casquillo: indicar en comentarios", "origenExcel": "Datos ensayos LUM.!B63" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-07.04-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!D57" },
+            { "id": "R-07.04-02", "tipo": "alMenosUna", "checklist": "ensayos", "origenExcel": "Datos ensayos LUM.!D64" },
+            { "id": "R-07.04-03", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-07.04-00", "!R-07.04-02"], "origenExcel": "Datos ensayos LUM.!D66" }
+          ]
+        },
+
+        {
+          "id": "7.6",
+          "codigo": "4.6 y 4.7.2",
+          "codigoAntiguo": "4.6 y 4.7.2",
+          "titulo": "Bornes y conexiones",
+          "origenExcel": "Toma de notas 60598!B82:N110",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K41" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D83:F84" },
+          "equipos": "sec07.06.bloques-conexion",
+          "comentarios": true,
+          "subBloques": [
+            {
+              "id": "7.6.vena",
+              "titulo": "Ensayo de vena 8 mm",
+              "notas": ["Los datos pueden tomarse directamente sobre el TRF"],
+              "checklists": [
+                { "id": "vena", "etiqueta": "Resultado", "modo": "alMenosUna", "opciones": [
+                  { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!D81" },
+                  { "id": "ok", "etiqueta": "OK", "origenExcel": "Datos ensayos LUM.!B83" },
+                  { "id": "noOk", "etiqueta": "No OK", "origenExcel": "Datos ensayos LUM.!C83" }
+                ] }
+              ],
+              "reglas": [
+                { "id": "R-07.06-01", "tipo": "alMenosUna", "checklist": "vena", "origenExcel": "Datos ensayos LUM.!D84" },
+                { "id": "R-07.06-02", "tipo": "faltanDatos", "faltanSi": ["!R-07.06-01"], "origenExcel": "Datos ensayos LUM.!D85" }
+              ]
+            },
+            {
+              "id": "7.6.bloque",
+              "titulo": "Dimensiones del bloque de conexión",
+              "notas": ["Si los datos son comunes a varias muestras puede anotarse sólo para una de ellas"],
+              "checklists": [
+                { "id": "dimensiones", "etiqueta": "Origen de las dimensiones", "modo": "alMenosUna", "opciones": [
+                  { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!L75" },
+                  { "id": "porDefecto", "etiqueta": "Por defecto: 10 mm x 20 mm x 25 mm", "origenExcel": "Datos ensayos LUM.!L76" },
+                  { "id": "fabricante", "etiqueta": "Indicadas por el fabricante", "origenExcel": "Datos ensayos LUM.!L77" }
+                ] }
+              ],
+              "campos": [
+                { "id": "bloque", "etiqueta": "Bloque de conexión", "tipo": "grupoRepetido", "elementos": 1, "porMuestra": true,
+                  "campos": [
+                    { "id": "alto", "etiqueta": "Alto", "tipo": "numero", "unidad": "mm" },
+                    { "id": "ancho", "etiqueta": "Ancho", "tipo": "numero", "unidad": "mm" },
+                    { "id": "profundo", "etiqueta": "Profundo", "tipo": "numero", "unidad": "mm" }
+                  ],
+                  "origenExcel": "Toma de notas 60598!G96:N98" }
+              ],
+              "reglas": [
+                { "id": "R-07.06-03", "tipo": "recuentoDatos", "campo": "bloque", "umbral": 3, "cuentaCeros": true,
+                  "ambito": "todasLasMuestras", "origenExcel": "Datos ensayos LUM.!L78" },
+                { "id": "R-07.06-03b", "tipo": "opcion", "checklist": "dimensiones", "opcion": "fabricante" },
+                { "id": "R-07.06-03c", "tipo": "opcion", "checklist": "dimensiones", "opcion": "na" },
+                { "id": "R-07.06-03d", "tipo": "opcion", "checklist": "dimensiones", "opcion": "porDefecto" },
+                { "id": "R-07.06-04", "tipo": "y", "de": ["R-07.06-03b", "R-07.06-03"], "origenExcel": "Datos ensayos LUM.!L79" },
+                { "id": "R-07.06-05", "tipo": "o", "de": ["R-07.06-03c", "R-07.06-03d", "R-07.06-04"], "origenExcel": "Datos ensayos LUM.!L80" },
+                { "id": "R-07.06-05b", "tipo": "faltanDatos", "faltanSi": ["!R-07.06-05"], "origenExcel": "Datos ensayos LUM.!L81" }
+              ]
+            },
+            {
+              "id": "7.6.cable",
+              "titulo": "Sección del cable",
+              "checklists": [
+                { "id": "seccion", "modo": "libre",
+                  "nota": "En el Excel son casillas sin enlazar: se marcan pero no alimentan ninguna regla (D-22).",
+                  "opciones": [
+                    { "id": "mayorSec5", "etiqueta": "Sección mayor especificada en sec. 5", "origenExcel": "Toma de notas 60598!fila 103" },
+                    { "id": "otra", "etiqueta": "Otra: indicar en comentarios", "origenExcel": "Toma de notas 60598!fila 104" }
+                  ] }
+              ]
+            }
+          ],
+          "reglas": [
+            { "id": "R-07.06-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!D79" },
+            { "id": "R-07.06-06", "tipo": "y", "de": ["R-07.06-01", "R-07.06-05"], "origenExcel": "Datos ensayos LUM.!L84" },
+            { "id": "R-07.06-07", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-07.06-00", "!R-07.06-06"], "origenExcel": "Datos ensayos LUM.!L85" },
+            { "id": "R-07.06-P8", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-07.06-07", "origenExcel": "Datos ensayos LUM.!Z8:AD8" }
+          ]
+        },
+
+        {
+          "id": "7.9",
+          "codigo": "4.9",
+          "codigoAntiguo": "4.9",
+          "titulo": "Revestimientos y manguitos aislantes",
+          "origenExcel": "Toma de notas 60598!B112:N147",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K42" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D113:F114" },
+          "equipos": "sec07.09.revestimientos",
+          "comentarios": true,
+          "notas": ["Aplica a revestimientos y manguitos con temperatura superior a la de la tabla 12.2"],
+          "parametrosFijos": { "temperaturaProgramada": "25 ºC", "humedadProgramada": "93 %" },
+          "checklists": [
+            { "id": "aplicabilidad", "modo": "libre", "opciones": [
+              { "id": "noAplicanAB", "etiqueta": "No son necesarios los ensayos de los apartados a) ni b)", "origenExcel": "Toma de notas 60598!B116" }
+            ] },
+            { "id": "equipoAcondicionamiento", "etiqueta": "Lugar donde se realiza el acondicionamiento", "modo": "alMenosUna", "opciones": [
+              { "id": "eqSafe305", "etiqueta": "Estufa (horno) EQ-SAFE-305", "origenExcel": "Datos ensayos LUM.!D108" },
+              { "id": "eqSafe304", "etiqueta": "Estufa (horno) EQ-SAFE-304 AUTOSTRONG", "origenExcel": "Datos ensayos LUM.!D109" }
+            ] }
+          ],
+          "campos": [
+            { "id": "humedadInicio", "etiqueta": "Ensayo de humedad · inicio", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G122:N123" },
+            { "id": "humedadFin", "etiqueta": "Ensayo de humedad · fin", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G124:N125" },
+            { "id": "estufaInicio", "etiqueta": "Permanencia en estufa · inicio", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G132:N133" },
+            { "id": "estufaFin", "etiqueta": "Permanencia en estufa · fin", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G134:N135" }
+          ],
+          "reglas": [
+            { "id": "R-07.09-01", "tipo": "opcion", "checklist": "aplicabilidad", "opcion": "noAplicanAB", "origenExcel": "Datos ensayos LUM.!D103" },
+            { "id": "R-07.09-02", "tipo": "alMenosUna", "checklist": "equipoAcondicionamiento", "origenExcel": "Datos ensayos LUM.!D110" },
+            { "id": "R-07.09-03a", "tipo": "duracionMinima", "inicio": "humedadInicio", "fin": "humedadFin", "minimo": "48h", "origenExcel": "Datos ensayos LUM.!B117:B119" },
+            { "id": "R-07.09-04a", "tipo": "duracionMinima", "inicio": "estufaInicio", "fin": "estufaFin", "minimo": "240h", "origenExcel": "Datos ensayos LUM.!B123:B125" },
+            { "id": "R-07.09-05a", "tipo": "y", "de": ["R-07.09-03a", "R-07.09-04a"] },
+            { "id": "R-07.09-05", "tipo": "si", "etiqueta": "Si a) y b) no aplican, los tiempos se dan por correctos",
+              "condicion": "R-07.09-01", "entonces": null, "siNo": "R-07.09-05a", "origenExcel": "Datos ensayos LUM.!B119" },
+            { "id": "R-07.09-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!D101" },
+            { "id": "R-07.09-06", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-07.09-00", "!R-07.09-02", "!R-07.09-05"], "origenExcel": "Datos ensayos LUM.!D112" }
+          ]
+        },
+
+        {
+          "id": "7.10",
+          "codigo": "4.10",
+          "codigoAntiguo": "4.10",
+          "titulo": "Aislamiento doble o reforzado",
+          "origenExcel": "Toma de notas 60598!B149:N161",
+          "visibleSi": "!R-07.10-01",
+          "reglaDeCierre": "R-07.10-03",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K43" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D150:F151" },
+          "equipos": "sec07.10.doble-aislamiento",
+          "comentarios": true,
+          "campos": [
+            { "id": "zonas", "etiqueta": "Zonas aplicadas", "tipo": "texto", "porMuestra": true, "origenExcel": "Toma de notas 60598!G152:N152" }
+          ],
+          "reglas": [
+            { "id": "R-07.10-01", "tipo": "predicado", "nombre": "esClaseI",
+              "etiqueta": "No aplica porque es Clase I", "origenExcel": "Datos ensayos LUM.!L99" },
+            { "id": "R-07.10-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!L102" },
+            { "id": "R-07.10-03a", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-07.10-00"] },
+            { "id": "R-07.10-03", "tipo": "si", "etiqueta": "Faltan datos en el apartado",
+              "condicion": "!R-07.10-01", "entonces": "R-07.10-03a", "siNo": false,
+              "origenExcel": "Datos ensayos LUM.!L105" }
+          ]
+        },
+
+        {
+          "id": "7.12",
+          "codigo": "4.12",
+          "codigoAntiguo": "4.12",
+          "titulo": "Tornillos, uniones y conexiones (mm)",
+          "origenExcel": "Toma de notas 60598!B163:N230",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K44" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D164:F165" },
+          "equipos": "sec07.12.tornillos",
+          "comentarios": true,
+          "subBloques": [
+            {
+              "id": "7.12.1",
+              "titulo": "Tornillos",
+              "notas": ["Si los datos son comunes a varias muestras pueden anotarse sólo en una de ellas"],
+              "checklists": [
+                { "id": "sinTornillos", "modo": "unica", "opciones": [
+                  { "id": "sinTornillos", "etiqueta": "La luminaria NO tiene tornillos", "origenExcel": "Datos ensayos LUM.!D140" } ] }
+              ],
+              "campos": [
+                { "id": "tornillos", "etiqueta": "Tornillo", "tipo": "grupoRepetido", "elementos": 5, "ampliable": true, "porMuestra": true,
+                  "campos": [
+                    { "id": "parte", "etiqueta": "Parte", "tipo": "texto" },
+                    { "id": "diametro", "etiqueta": "Diám.", "tipo": "numero", "unidad": "mm" },
+                    { "id": "noBlando", "etiqueta": "No blando", "tipo": "booleano", "nota": "Casilla sin enlazar en el Excel" },
+                    { "id": "noAislante", "etiqueta": "No aislante", "tipo": "booleano", "nota": "Casilla sin enlazar en el Excel" }
+                  ],
+                  "origenExcel": "Toma de notas 60598!G169:N178" }
+              ],
+              "reglas": [
+                { "id": "R-07.12-01", "tipo": "recuentoDatos", "campo": "tornillos", "umbral": 1, "cuentaCeros": false, "ambito": "todasLasMuestras", "origenExcel": "Datos ensayos LUM.!D141" },
+                { "id": "R-07.12-02", "tipo": "faltanDatos", "siNoAplica": "sinTornillos", "faltanSi": ["!R-07.12-01"], "origenExcel": "Datos ensayos LUM.!D143" }
+              ]
+            },
+            {
+              "id": "7.12.4",
+              "titulo": "Uniones atornilladas",
+              "notas": ["Si los datos son comunes a varias muestras pueden anotarse sólo en una de ellas"],
+              "checklists": [
+                { "id": "sinUniones", "modo": "unica", "opciones": [
+                  { "id": "sinUniones", "etiqueta": "La luminaria NO tiene uniones atornilladas", "origenExcel": "Datos ensayos LUM.!D146" } ] }
+              ],
+              "campos": [
+                { "id": "uniones", "etiqueta": "Unión", "tipo": "grupoRepetido", "elementos": 3, "ampliable": true, "porMuestra": true,
+                  "campos": [
+                    { "id": "parte", "etiqueta": "Parte", "tipo": "texto" },
+                    { "id": "m", "etiqueta": "M", "tipo": "numero", "unidad": "mm" }
+                  ],
+                  "origenExcel": "Toma de notas 60598!G190:N195" }
+              ],
+              "reglas": [
+                { "id": "R-07.12-03a", "tipo": "recuentoDatos", "campo": "uniones", "umbral": 1, "cuentaCeros": false, "ambito": "todasLasMuestras", "origenExcel": "Datos ensayos LUM.!D147" },
+                { "id": "R-07.12-03b", "tipo": "faltanDatos", "siNoAplica": "sinUniones", "faltanSi": ["!R-07.12-03a"], "origenExcel": "Datos ensayos LUM.!D149" }
+              ]
+            },
+            {
+              "id": "7.12.portalamparas",
+              "titulo": "Portalámparas",
+              "checklists": [
+                { "id": "portalamparas", "etiqueta": "Tipo de portalámparas", "modo": "alMenosUna", "opciones": [
+                  { "id": "sinPortalamparas", "etiqueta": "La luminaria NO tiene portalámparas", "origenExcel": "Datos ensayos LUM.!J137" },
+                  { "id": "e40", "etiqueta": "E40", "origenExcel": "Datos ensayos LUM.!J135" },
+                  { "id": "e26e27b22", "etiqueta": "E26, E27 y/o B22", "origenExcel": "Datos ensayos LUM.!J136" },
+                  { "id": "e14eb115", "etiqueta": "E14 y/o EB115", "origenExcel": "Datos ensayos LUM.!K135" },
+                  { "id": "e10", "etiqueta": "E10", "origenExcel": "Datos ensayos LUM.!K136" }
+                ] }
+              ],
+              "reglas": [
+                { "id": "R-07.12-04", "tipo": "alMenosUna", "checklist": "portalamparas", "origenExcel": "Datos ensayos LUM.!L138" },
+                { "id": "R-07.12-05", "tipo": "faltanDatos", "faltanSi": ["!R-07.12-04"], "origenExcel": "Datos ensayos LUM.!L139" }
+              ]
+            },
+            {
+              "id": "7.12.5",
+              "titulo": "Prensaestopas",
+              "notas": ["Si los datos son comunes a varias muestras pueden anotarse sólo en una de ellas"],
+              "checklists": [
+                { "id": "sinPrensaestopas", "modo": "unica", "opciones": [
+                  { "id": "sinPrensaestopas", "etiqueta": "La luminaria NO tiene prensaestopas", "origenExcel": "Datos ensayos LUM.!L142" } ] }
+              ],
+              "campos": [
+                { "id": "prensaestopas", "etiqueta": "Prensaestopa", "tipo": "grupoRepetido", "elementos": 3, "ampliable": true, "porMuestra": true,
+                  "campos": [
+                    { "id": "material", "etiqueta": "Material", "tipo": "seleccion", "opciones": ["Metal", "Plástico"], "origenExcel": "Datos ensayos LUM.!J144:L145" },
+                    { "id": "diametro", "etiqueta": "Diám.", "tipo": "numero", "unidad": "mm", "origenExcel": "Toma de notas 60598!G220:N222" }
+                  ] }
+              ],
+              "reglas": [
+                { "id": "R-07.12-06", "tipo": "predicado", "nombre": "prensaestopasDeclarados",
+                  "descripcion": "Está marcado «sin prensaestopas» o al menos un material", "origenExcel": "Datos ensayos LUM.!L147" },
+                { "id": "R-07.12-07", "tipo": "recuento", "campo": "prensaestopas.material", "etiqueta": "Nº de prensaestopas declarados", "origenExcel": "Datos ensayos LUM.!L148" },
+                { "id": "R-07.12-08", "tipo": "recuento", "campo": "prensaestopas.diametro", "ambito": "todasLasMuestras", "etiqueta": "Diámetros introducidos", "origenExcel": "Datos ensayos LUM.!L149" },
+                { "id": "R-07.12-08b", "tipo": "predicado", "nombre": "diametrosCubrenPrensaestopas",
+                  "descripcion": "Los diámetros introducidos (R-07.12-08) alcanzan al número de prensaestopas declarados (R-07.12-07)" },
+                { "id": "R-07.12-09", "tipo": "faltanDatos", "siNoAplica": "sinPrensaestopas",
+                  "faltanSi": ["!R-07.12-06", "!R-07.12-08b"], "origenExcel": "Datos ensayos LUM.!L151" }
+              ]
+            }
+          ],
+          "reglas": [
+            { "id": "R-07.12-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!D138" },
+            { "id": "R-07.12-10", "tipo": "faltanDatos", "etiqueta": "Resultado general del apartado",
+              "faltanSi": ["R-07.12-02", "R-07.12-03b", "R-07.12-05", "R-07.12-09"],
+              "origenExcel": "Datos ensayos LUM.!L153",
+              "defecto": "D-21",
+              "notaDefecto": "El Excel usa IF(D143+D149+L139+L151=4,FALSO,VERDADERO), que solo señala el apartado cuando faltan datos en LOS CUATRO subapartados a la vez. Aquí se implementa la agregación correcta (OR). Ver D-21." },
+            { "id": "R-07.12-11", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-07.12-00", "R-07.12-10"], "origenExcel": "Datos ensayos LUM.!L154" },
+            { "id": "R-07.12-P8", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-07.12-11", "origenExcel": "Datos ensayos LUM.!Z9:AD9" }
+          ]
+        },
+
+        {
+          "id": "7.13",
+          "codigo": "4.13",
+          "codigoAntiguo": "4.13",
+          "titulo": "Resistencia mecánica (impacto)",
+          "origenExcel": "Toma de notas 60598!B233:N251",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K48" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D233:F234" },
+          "equipos": "sec07.13.impacto",
+          "comentarios": true,
+          "notas": [
+            "Compresión (mm) según la tabla 4.13 de la norma",
+            "Los deterioros de acabados no se toman en consideración",
+            "Los datos pueden tomarse directamente sobre el TRF"
+          ],
+          "campos": [
+            { "id": "partesFragiles", "etiqueta": "Parte frágil", "tipo": "grupoRepetido", "elementos": 3, "ampliable": true, "porMuestra": true,
+              "campos": [{ "id": "compresion", "etiqueta": "Compresión", "tipo": "numero", "unidad": "mm" }],
+              "origenExcel": "Toma de notas 60598!G238:N240" },
+            { "id": "otrasPartes", "etiqueta": "Otras partes", "tipo": "grupoRepetido", "elementos": 3, "ampliable": true, "porMuestra": true,
+              "campos": [{ "id": "compresion", "etiqueta": "Compresión", "tipo": "numero", "unidad": "mm" }],
+              "origenExcel": "Toma de notas 60598!G241:N243" }
+          ],
+          "reglas": [
+            { "id": "R-07.13-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!D169" },
+            { "id": "R-07.13-01", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-07.13-00"], "origenExcel": "Datos ensayos LUM.!D171" },
+            { "id": "R-07.13-P8", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-07.13-01", "origenExcel": "Datos ensayos LUM.!Z10:AD10" }
+          ]
+        },
+
+        {
+          "id": "7.14.1",
+          "codigo": "4.14.1",
+          "codigoAntiguo": "4.14",
+          "titulo": "Suspensiones, fijaciones y ensayo de carga",
+          "origenExcel": "Toma de notas 60598!B253:N264",
+          "pesoAvance": 3,
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K50" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D254:F255" },
+          "equipos": "sec07.14.suspensiones",
+          "comentarios": true,
+          "notas": ["Los datos pueden tomarse directamente sobre el TRF"],
+          "campos": [
+            { "id": "pesoLuminaria", "etiqueta": "Peso de la luminaria", "tipo": "numero", "unidad": "kg", "porMuestra": true, "origenExcel": "Toma de notas 60598!G257:N257" },
+            { "id": "pesoParte", "etiqueta": "Peso de la parte", "tipo": "numero", "unidad": "kg", "porMuestra": true, "origenExcel": "Toma de notas 60598!G258:N258" }
+          ],
+          "reglas": [
+            { "id": "R-07.14-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!L169" },
+            { "id": "R-07.14-01", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-07.14-00"], "origenExcel": "Datos ensayos LUM.!L171" },
+            { "id": "R-07.14-P8", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-07.14-01", "origenExcel": "Datos ensayos LUM.!Z11:AD11" }
+          ]
+        },
+
+        {
+          "id": "7.18.1",
+          "codigo": "4.18.1",
+          "codigoAntiguo": "4.18",
+          "titulo": "Resistencia a la corrosión",
+          "origenExcel": "Toma de notas 60598!B266:N287",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K51" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D267:F268" },
+          "equipos": "sec07.18.corrosion",
+          "comentarios": true,
+          "notas": ["Las tolerancias son informativas y no se validan (D-08)"],
+          "checklists": [
+            { "id": "lugar", "etiqueta": "Lugar donde se realiza el ensayo", "modo": "alMenosUna", "opciones": [
+              { "id": "estufa", "etiqueta": "Estufa (EQ-SAFE-305)", "origenExcel": "Datos ensayos LUM.!C190" },
+              { "id": "camara", "etiqueta": "Cámara climática (EQ-SAFE-330)", "origenExcel": "Datos ensayos LUM.!E190" },
+              { "id": "otro", "etiqueta": "Otro: indicar en comentarios", "origenExcel": "Datos ensayos LUM.!G190" }
+            ] },
+            { "id": "solucion", "etiqueta": "Solución utilizada", "modo": "alMenosUna", "opciones": [
+              { "id": "acuosa10", "etiqueta": "Acuosa al 10 %", "origenExcel": "Datos ensayos LUM.!D192" },
+              { "id": "otra", "etiqueta": "Otra: indicar en comentarios", "origenExcel": "Datos ensayos LUM.!D193" }
+            ] }
+          ],
+          "campos": [
+            { "id": "tempSolucion", "etiqueta": "Tª de la solución [20 ± 5 ºC]", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 60598!G278:N278" },
+            { "id": "tempAireCaja", "etiqueta": "Tª del aire en la caja [20 ± 5 ºC]", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 60598!G279:N279" },
+            { "id": "tempEstufa", "etiqueta": "Tª de la estufa [100 ± 5 ºC]", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 60598!G280:N280" }
+          ],
+          "reglas": [
+            { "id": "R-07.18.1-01", "tipo": "alMenosUna", "checklist": "lugar", "origenExcel": "Datos ensayos LUM.!C190:G190" },
+            { "id": "R-07.18.1-02", "tipo": "alMenosUna", "checklist": "solucion", "origenExcel": "Datos ensayos LUM.!D194" },
+            { "id": "R-07.18.1-03", "tipo": "recuentoDatos", "campo": "tempSolucion", "umbral": 1, "cuentaCeros": true, "origenExcel": "Datos ensayos LUM.!D196" },
+            { "id": "R-07.18.1-03b", "tipo": "recuentoDatos", "campo": "tempAireCaja", "umbral": 1, "cuentaCeros": true },
+            { "id": "R-07.18.1-03c", "tipo": "recuentoDatos", "campo": "tempEstufa", "umbral": 1, "cuentaCeros": true },
+            { "id": "R-07.18.1-03d", "tipo": "y", "de": ["R-07.18.1-03", "R-07.18.1-03b", "R-07.18.1-03c"] },
+            { "id": "R-07.18.1-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!D188" },
+            { "id": "R-07.18.1-04", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-07.18.1-00", "!R-07.18.1-02", "!R-07.18.1-03d"], "origenExcel": "Datos ensayos LUM.!D198" }
+          ]
+        },
+
+        {
+          "id": "7.18.2",
+          "codigo": "4.18.2",
+          "titulo": "Season cracking en cobre",
+          "origenExcel": "Toma de notas 60598!B289:N303",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K52" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D290:F291" },
+          "comentarios": true,
+          "notas": [
+            "Ver el Anexo F de la norma",
+            "Si los datos son comunes para todas las muestras puede indicarse sólo para una de ellas"
+          ],
+          "campos": [
+            { "id": "preacondicionamiento", "etiqueta": "Preacondicionamiento (24 h)", "tipo": "texto", "porMuestra": true, "origenExcel": "Toma de notas 60598!G293:N293" },
+            { "id": "ph", "etiqueta": "pH de la solución de NH₄Cl", "tipo": "numero", "porMuestra": true, "origenExcel": "Toma de notas 60598!G294:N294" }
+          ],
+          "reglas": [
+            { "id": "R-07.18.2-01a", "tipo": "recuentoDatos", "campo": "preacondicionamiento", "umbral": 1, "cuentaCeros": false, "origenExcel": "Datos ensayos LUM.!L190" },
+            { "id": "R-07.18.2-01b", "tipo": "recuentoDatos", "campo": "ph", "umbral": 1, "cuentaCeros": false },
+            { "id": "R-07.18.2-01", "tipo": "y", "de": ["R-07.18.2-01a", "R-07.18.2-01b"] },
+            { "id": "R-07.18.2-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!L188" },
+            { "id": "R-07.18.2-02", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-07.18.2-00", "!R-07.18.2-01"], "origenExcel": "Datos ensayos LUM.!L192" }
+          ]
+        },
+
+        {
+          "id": "7.24.2",
+          "codigo": "4.24.2",
+          "codigoAntiguo": "4.24.2",
+          "titulo": "Riesgo retiniano por luz azul",
+          "origenExcel": "Toma de notas 60598!B305:N321",
+          "pesoAvance": 5,
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K53" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D306:F307" },
+          "equipos": "sec07.24.2.luz-azul",
+          "comentarios": true,
+          "notas": ["Los datos pueden estar en registros y cálculos adicionales propios del ensayo"],
+          "checklists": [
+            { "id": "grupoRiesgo", "etiqueta": "Grupo de riesgo", "modo": "alMenosUna", "opciones": [
+              { "id": "rg0", "etiqueta": "RG0", "origenExcel": "Datos ensayos LUM.!D216" },
+              { "id": "rg1", "etiqueta": "RG1", "origenExcel": "Datos ensayos LUM.!D217" },
+              { "id": "rg2", "etiqueta": "RG2", "origenExcel": "Datos ensayos LUM.!D218" }
+            ] },
+            { "id": "origenDatos", "etiqueta": "Para RG2", "modo": "alMenosUna", "opciones": [
+              { "id": "externos", "etiqueta": "Ensayos externos (no realizados por nosotros)", "origenExcel": "Datos ensayos LUM.!D221" },
+              { "id": "propios", "etiqueta": "Ensayos realizados por nosotros (ver excel de resultados)", "origenExcel": "Datos ensayos LUM.!D222" }
+            ] }
+          ],
+          "campos": [
+            { "id": "cct", "etiqueta": "CCT", "tipo": "numero", "unidad": "K", "porMuestra": true, "origenExcel": "Toma de notas 60598!G312:N312" },
+            { "id": "eth", "etiqueta": "Iluminancia RG1/RG2 (Eth)", "tipo": "numero", "unidad": "lux", "porMuestra": true, "origenExcel": "Toma de notas 60598!G313:N313" },
+            { "id": "dmin", "etiqueta": "d mín.", "tipo": "numero", "unidad": "m", "porMuestra": true, "origenExcel": "Toma de notas 60598!G314:N314" }
+          ],
+          "reglas": [
+            { "id": "R-07.24-esRg2", "tipo": "opcion", "checklist": "grupoRiesgo", "opcion": "rg2", "origenExcel": "Datos ensayos LUM.!D218" },
+            { "id": "R-07.24-03", "tipo": "alMenosUna", "checklist": "grupoRiesgo", "origenExcel": "Datos ensayos LUM.!L210" },
+            { "id": "R-07.24-02a", "tipo": "alMenosUna", "checklist": "origenDatos", "origenExcel": "Datos ensayos LUM.!D223" },
+            { "id": "R-07.24-02", "tipo": "si", "etiqueta": "Si es RG2 hacen falta datos externos o ensayo propio",
+              "condicion": "R-07.24-esRg2", "entonces": "R-07.24-02a", "siNo": true, "origenExcel": "Datos ensayos LUM.!D223" },
+            { "id": "R-07.24-04", "tipo": "y", "de": ["R-07.24-03", "R-07.24-02"], "origenExcel": "Datos ensayos LUM.!L211" },
+            { "id": "R-07.24-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!D214" },
+            { "id": "R-07.24-05", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-07.24-00", "!R-07.24-04"], "origenExcel": "Datos ensayos LUM.!L213" },
+            { "id": "R-07.24-P8", "tipo": "peso", "valor": 5, "aplicaSiNo": "na", "finSiNo": "R-07.24-05", "origenExcel": "Datos ensayos LUM.!Z12:AD12" }
+          ]
+        },
+
+        {
+          "id": "7.28",
+          "codigo": "4.28",
+          "codigoAntiguo": "4.28",
+          "titulo": "Fijación de los dispositivos de control sensibles a la temperatura",
+          "origenExcel": "Toma de notas 60598!B323:N346",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K54" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D324:F325" },
+          "equipos": "sec07.28.control-termico",
+          "comentarios": true,
+          "notas": ["Si los datos y resultados son comunes para varias muestras pueden rellenarse sólo para una de ellas"],
+          "checklists": [
+            { "id": "funcionamiento", "etiqueta": "¿Equipo en funcionamiento durante el ensayo?", "modo": "exactamenteUna", "opciones": [
+              { "id": "si", "etiqueta": "Sí", "origenExcel": "Datos ensayos LUM.!B243" },
+              { "id": "no", "etiqueta": "No", "origenExcel": "Datos ensayos LUM.!C243" }
+            ] }
+          ],
+          "campos": [
+            { "id": "tempSuperior", "etiqueta": "Tª superior", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 60598!G327:N327" },
+            { "id": "tempInferior", "etiqueta": "Tª inferior [0 ºC]", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 60598!G328:N328" },
+            { "id": "ciclosSeveridad", "etiqueta": "Nº de ciclos [100]", "tipo": "entero", "porMuestra": true, "origenExcel": "Toma de notas 60598!G329:N329" },
+            { "id": "tiempoExposicion", "etiqueta": "Tiempo de exposición [30 min]", "tipo": "numero", "unidad": "min", "porMuestra": true, "origenExcel": "Toma de notas 60598!G334:N334" },
+            { "id": "tiempoTransferencia", "etiqueta": "Tiempo de transferencia", "tipo": "numero", "unidad": "min", "porMuestra": true, "origenExcel": "Toma de notas 60598!G335:N335" },
+            { "id": "ciclosRealizados", "etiqueta": "Número de ciclos realizados", "tipo": "entero", "porMuestra": true, "origenExcel": "Toma de notas 60598!G336:N336" }
+          ],
+          "reglas": [
+            { "id": "R-07.28-01a", "tipo": "recuentoDatos", "campo": "tempSuperior", "umbral": 1, "cuentaCeros": true, "origenExcel": "Datos ensayos LUM.!D241" },
+            { "id": "R-07.28-01b", "tipo": "recuentoDatos", "campo": "tempInferior", "umbral": 1, "cuentaCeros": true },
+            { "id": "R-07.28-01c", "tipo": "recuentoDatos", "campo": "ciclosSeveridad", "umbral": 1, "cuentaCeros": true },
+            { "id": "R-07.28-01d", "tipo": "recuentoDatos", "campo": "tiempoExposicion", "umbral": 1, "cuentaCeros": true },
+            { "id": "R-07.28-01e", "tipo": "recuentoDatos", "campo": "tiempoTransferencia", "umbral": 1, "cuentaCeros": true },
+            { "id": "R-07.28-01f", "tipo": "recuentoDatos", "campo": "ciclosRealizados", "umbral": 1, "cuentaCeros": true },
+            { "id": "R-07.28-01", "tipo": "y", "de": ["R-07.28-01a", "R-07.28-01b", "R-07.28-01c", "R-07.28-01d", "R-07.28-01e", "R-07.28-01f"] },
+            { "id": "R-07.28-02", "tipo": "exactamenteUna", "checklist": "funcionamiento", "origenExcel": "Datos ensayos LUM.!D244" },
+            { "id": "R-07.28-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!D239" },
+            { "id": "R-07.28-03", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-07.28-00", "!R-07.28-02", "!R-07.28-01"], "origenExcel": "Datos ensayos LUM.!D246" }
+          ]
+        },
+
+        {
+          "id": "7.33",
+          "codigo": "4.33",
+          "titulo": "Luminaria alimentada por cableado de comunicación",
+          "origenExcel": "Toma de notas 60598!B348:N357",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K56" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D349:F350" },
+          "comentarios": true,
+          "reglas": [
+            { "id": "R-07.33-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!L239" },
+            { "id": "R-07.33-01", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-07.33-00"], "origenExcel": "Datos ensayos LUM.!L242" }
+          ]
+        },
+
+        {
+          "id": "7.35",
+          "codigo": "4.35",
+          "titulo": "Protección contra las aspas de un ventilador",
+          "origenExcel": "Toma de notas 60598!B359:N368",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!K58" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D360:F361" },
+          "equipos": "sec07.35.aspas-ventilador",
+          "comentarios": true,
+          "reglas": [
+            { "id": "R-07.35-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!D262" },
+            { "id": "R-07.35-01", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-07.35-00"], "origenExcel": "Datos ensayos LUM.!D265" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "4-partes2",
+      "titulo": "Sección 4 - Construcción y especificaciones partes -2",
+      "notas": [
+        "60598-2-1 y 60598-2-2: sin requisitos adicionales de construcción",
+        "Cada ensayo solo aplica si su parte -2 está marcada en los datos del proyecto",
+        "La fuerza de los ensayos de carga estática la calculaba el Excel; ver la nota de cada apartado"
+      ],
+      "bloques": [
+        {
+          "id": "2-3.3.6.3.1",
+          "codigo": "3.6.3.1",
+          "titulo": "Carga estática (-2-3)",
+          "visibleSi": "R-2-3-aplica",
+          "origenExcel": "Toma de notas 60598!C378:N386",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D379:F380" },
+          "equipos": "p2-3.3.6.3.1.carga-estatica",
+          "comentarios": true,
+          "notas": ["Fuerza (N) = 0,5 · 1,225 · área · 1,2 · v², con v = 45 / 52 / 57 m/s según la altura de montaje"],
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CF22" }
+            ] },
+            { "id": "altura", "etiqueta": "Altura de montaje", "modo": "exactamenteUna", "opciones": [
+              { "id": "hasta8m", "etiqueta": "Altura de montaje de hasta 8 m", "origenExcel": "Datos ensayos LUM.!CF26" },
+              { "id": "entre8y15m", "etiqueta": "Altura de montaje entre 8 m y 15 m", "origenExcel": "Datos ensayos LUM.!CG26" },
+              { "id": "masDe15m", "etiqueta": "Altura de montaje mayor de 15 m", "origenExcel": "Datos ensayos LUM.!CH26" }
+            ] }
+          ],
+          "campos": [
+            { "id": "area", "etiqueta": "Área", "tipo": "numero", "unidad": "m²", "porMuestra": true, "origenExcel": "Toma de notas 60598!G382:N382" },
+            { "id": "fuerza", "etiqueta": "Fuerza", "tipo": "numero", "unidad": "N", "porMuestra": true, "origenExcel": "Toma de notas 60598!G383:N383" }
+          ],
+          "reglas": [
+            { "id": "R-2-3-aplica", "tipo": "predicado", "nombre": "aplicaParte2", "parametro": "-2-3", "origenExcel": "Datos ensayos LUM.!CF20" },
+            { "id": "R-2-3.1-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-3.1-noAplica", "tipo": "o", "de": ["R-2-3.1-na", "!R-2-3-aplica"], "origenExcel": "Datos ensayos LUM.!CF23" },
+            { "id": "R-2-3.1-altura", "tipo": "exactamenteUna", "checklist": "altura", "origenExcel": "Datos ensayos LUM.!CF27" },
+            { "id": "R-2-3.1-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CF31" },
+            { "id": "R-2-3.1-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-3.1-fecha", "!R-2-3.1-altura"] },
+            { "id": "R-2-3.1-falta", "tipo": "si", "condicion": "!R-2-3.1-noAplica", "entonces": "R-2-3.1-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CF33" }
+          ]
+        },
+
+        {
+          "id": "2-3.3.6.5.1",
+          "codigo": "3.6.5.1",
+          "titulo": "Rotura del cristal en fragmentos pequeños (-2-3)",
+          "visibleSi": "R-2-3-aplica",
+          "origenExcel": "Toma de notas 60598!C388:N392",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D389:F390" },
+          "equipos": "p2-3.3.6.5.rotura-cristal",
+          "comentarios": true,
+          "notas": ["Los datos pueden tomarse directamente sobre el TRF"],
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CF36" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-2-3.2-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-3.2-noAplica", "tipo": "o", "de": ["R-2-3.2-na", "!R-2-3-aplica"], "origenExcel": "Datos ensayos LUM.!CF37" },
+            { "id": "R-2-3.2-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CF39" },
+            { "id": "R-2-3.2-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-3.2-fecha"] },
+            { "id": "R-2-3.2-falta", "tipo": "si", "condicion": "!R-2-3.2-noAplica", "entonces": "R-2-3.2-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CF41" }
+          ]
+        },
+
+        {
+          "id": "2-3.3.6.5.2",
+          "codigo": "3.6.5.2",
+          "titulo": "Cristal de gran resistencia al impacto (-2-3)",
+          "visibleSi": "R-2-3-aplica",
+          "origenExcel": "Toma de notas 60598!C394:N398",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D395:F396" },
+          "equipos": "p2-3.3.6.5.2.cristal-resistente",
+          "comentarios": true,
+          "notas": ["Los datos pueden tomarse directamente sobre el TRF"],
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CF44" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-2-3.3-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-3.3-noAplica", "tipo": "o", "de": ["R-2-3.3-na", "!R-2-3-aplica"], "origenExcel": "Datos ensayos LUM.!CF45" },
+            { "id": "R-2-3.3-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CF47" },
+            { "id": "R-2-3.3-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-3.3-fecha"] },
+            { "id": "R-2-3.3-falta", "tipo": "si", "condicion": "!R-2-3.3-noAplica", "entonces": "R-2-3.3-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CF49" }
+          ]
+        },
+
+        {
+          "id": "2-3.3.6.8",
+          "codigo": "3.6.8",
+          "titulo": "Puerta de acceso de luminaria integrada en columna (-2-3)",
+          "visibleSi": "R-2-3-aplica",
+          "origenExcel": "Toma de notas 60598!C400:N404",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D401:F402" },
+          "comentarios": true,
+          "notas": ["Los datos pueden tomarse directamente sobre el TRF"],
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CF52" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-2-3.4-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-3.4-noAplica", "tipo": "o", "de": ["R-2-3.4-na", "!R-2-3-aplica"], "origenExcel": "Datos ensayos LUM.!CF53" },
+            { "id": "R-2-3.4-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CF55" },
+            { "id": "R-2-3.4-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-3.4-fecha"] },
+            { "id": "R-2-3.4-falta", "tipo": "si", "condicion": "!R-2-3.4-noAplica", "entonces": "R-2-3.4-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CF57" }
+          ]
+        },
+
+        {
+          "id": "2-4.4.7.3",
+          "codigo": "4.7.3",
+          "titulo": "Estabilidad en plano inclinado 6º y 15º (-2-4)",
+          "visibleSi": "R-2-4-aplica",
+          "origenExcel": "Toma de notas 60598!C411:N415",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D412:F413" },
+          "equipos": "p2-4.4.7.3.estabilidad",
+          "comentarios": true,
+          "notas": ["Los datos pueden tomarse directamente sobre el TRF"],
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CF70" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-2-4-aplica", "tipo": "predicado", "nombre": "aplicaParte2", "parametro": "-2-4", "origenExcel": "Datos ensayos LUM.!CF68" },
+            { "id": "R-2-4.1-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-4.1-noAplica", "tipo": "o", "de": ["R-2-4.1-na", "!R-2-4-aplica"], "origenExcel": "Datos ensayos LUM.!CF71" },
+            { "id": "R-2-4.1-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CF73" },
+            { "id": "R-2-4.1-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-4.1-fecha"] },
+            { "id": "R-2-4.1-falta", "tipo": "si", "condicion": "!R-2-4.1-noAplica", "entonces": "R-2-4.1-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CF75" }
+          ]
+        },
+
+        {
+          "id": "2-5.5.6.5",
+          "codigo": "5.6.5",
+          "titulo": "Carga estática (-2-5)",
+          "visibleSi": "R-2-5-aplica",
+          "origenExcel": "Toma de notas 60598!C423:N429",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D424:F425" },
+          "equipos": "p2-5.5.6.5.carga-estatica",
+          "comentarios": true,
+          "notas": ["Fuerza (N) = área × 2400. Criterio distinto al de la parte -2-3 (D-13, pendiente de confirmar)"],
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CM37" }
+            ] }
+          ],
+          "campos": [
+            { "id": "area", "etiqueta": "Área", "tipo": "numero", "unidad": "m²", "porMuestra": true, "origenExcel": "Toma de notas 60598!G427:N427" },
+            { "id": "fuerza", "etiqueta": "Fuerza", "tipo": "numero", "unidad": "N", "porMuestra": true, "origenExcel": "Toma de notas 60598!G428:N428" }
+          ],
+          "reglas": [
+            { "id": "R-2-5-aplica", "tipo": "predicado", "nombre": "aplicaParte2", "parametro": "-2-5", "origenExcel": "Datos ensayos LUM.!CM35" },
+            { "id": "R-2-5.1-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-5.1-noAplica", "tipo": "o", "de": ["R-2-5.1-na", "!R-2-5-aplica"], "origenExcel": "Datos ensayos LUM.!CM38" },
+            { "id": "R-2-5.1-area", "tipo": "recuentoDatos", "campo": "area", "umbral": 1, "cuentaCeros": false, "ambito": "todasLasMuestras", "origenExcel": "Datos ensayos LUM.!CM41" },
+            { "id": "R-2-5.1-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CM40" },
+            { "id": "R-2-5.1-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-5.1-fecha", "!R-2-5.1-area"] },
+            { "id": "R-2-5.1-falta", "tipo": "si", "condicion": "!R-2-5.1-noAplica", "entonces": "R-2-5.1-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CM43" }
+          ]
+        },
+
+        {
+          "id": "2-5.5.6.8.1",
+          "codigo": "5.6.8.1",
+          "titulo": "Rotura del cristal en fragmentos pequeños (-2-5)",
+          "visibleSi": "R-2-5-aplica",
+          "origenExcel": "Toma de notas 60598!C430:N434",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D431:F432" },
+          "equipos": "p2-5.5.6.8.1.rotura-cristal",
+          "comentarios": true,
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CM46" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-2-5.2-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-5.2-noAplica", "tipo": "o", "de": ["R-2-5.2-na", "!R-2-5-aplica"], "origenExcel": "Datos ensayos LUM.!CM47" },
+            { "id": "R-2-5.2-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CM49" },
+            { "id": "R-2-5.2-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-5.2-fecha"] },
+            { "id": "R-2-5.2-falta", "tipo": "si", "condicion": "!R-2-5.2-noAplica", "entonces": "R-2-5.2-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CM51" }
+          ]
+        },
+
+        {
+          "id": "2-5.5.6.8.2",
+          "codigo": "5.6.8.2",
+          "titulo": "Cristal de gran resistencia al impacto (-2-5)",
+          "visibleSi": "R-2-5-aplica",
+          "origenExcel": "Toma de notas 60598!C436:N440",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D437:F438" },
+          "equipos": "p2-5.5.6.8.2.cristal-resistente",
+          "comentarios": true,
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CM54" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-2-5.3-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-5.3-noAplica", "tipo": "o", "de": ["R-2-5.3-na", "!R-2-5-aplica"], "origenExcel": "Datos ensayos LUM.!CM55" },
+            { "id": "R-2-5.3-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CM57" },
+            { "id": "R-2-5.3-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-5.3-fecha"] },
+            { "id": "R-2-5.3-falta", "tipo": "si", "condicion": "!R-2-5.3-noAplica", "entonces": "R-2-5.3-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CM59" }
+          ]
+        },
+
+        {
+          "id": "2-10.10.6.2",
+          "codigo": "10.6.2",
+          "titulo": "Estabilidad 15º (-2-10)",
+          "visibleSi": "R-2-10-aplica",
+          "origenExcel": "Toma de notas 60598!C448:N452",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D449:F450" },
+          "equipos": "p2-10.10.6.2.estabilidad",
+          "comentarios": true,
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CM70" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-2-10-aplica", "tipo": "predicado", "nombre": "aplicaParte2", "parametro": "-2-10", "origenExcel": "Datos ensayos LUM.!CM68" },
+            { "id": "R-2-10.1-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-10.1-noAplica", "tipo": "o", "de": ["R-2-10.1-na", "!R-2-10-aplica"], "origenExcel": "Datos ensayos LUM.!CM71" },
+            { "id": "R-2-10.1-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CM73" },
+            { "id": "R-2-10.1-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-10.1-fecha"] },
+            { "id": "R-2-10.1-falta", "tipo": "si", "condicion": "!R-2-10.1-noAplica", "entonces": "R-2-10.1-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CM75" }
+          ]
+        },
+
+        {
+          "id": "2-10.10.6.3",
+          "codigo": "10.6.3",
+          "titulo": "Resistencia al impacto y a la caída (-2-10)",
+          "visibleSi": "R-2-10-aplica",
+          "origenExcel": "Toma de notas 60598!C454:N458",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D455:F456" },
+          "equipos": "p2-10.10.6.3.impacto-caida",
+          "comentarios": true,
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CM78" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-2-10.2-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-10.2-noAplica", "tipo": "o", "de": ["R-2-10.2-na", "!R-2-10-aplica"], "origenExcel": "Datos ensayos LUM.!CM79" },
+            { "id": "R-2-10.2-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CM81" },
+            { "id": "R-2-10.2-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-10.2-fecha"] },
+            { "id": "R-2-10.2-falta", "tipo": "si", "condicion": "!R-2-10.2-noAplica", "entonces": "R-2-10.2-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CM83" }
+          ]
+        },
+
+        {
+          "id": "2-13.13.6.1",
+          "codigo": "13.6.1",
+          "titulo": "Resistencia a la carga estática (-2-13)",
+          "visibleSi": "R-2-13-aplica",
+          "origenExcel": "Toma de notas 60598!C468:N472",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D469:F470" },
+          "equipos": "p2-13.13.6.1.carga-estatica",
+          "comentarios": true,
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CM91" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-2-13-aplica", "tipo": "predicado", "nombre": "aplicaParte2", "parametro": "-2-13", "origenExcel": "Datos ensayos LUM.!CM89" },
+            { "id": "R-2-13.1-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-13.1-noAplica", "tipo": "o", "de": ["R-2-13.1-na", "!R-2-13-aplica"], "origenExcel": "Datos ensayos LUM.!CM92" },
+            { "id": "R-2-13.1-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CM94" },
+            { "id": "R-2-13.1-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-13.1-fecha"] },
+            { "id": "R-2-13.1-falta", "tipo": "si", "condicion": "!R-2-13.1-noAplica", "entonces": "R-2-13.1-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CM96" }
+          ]
+        },
+
+        {
+          "id": "2-18.18.7.2",
+          "codigo": "18.7.2",
+          "titulo": "Impacto mecánico (-2-18)",
+          "visibleSi": "R-2-18-aplica",
+          "origenExcel": "Toma de notas 60598!C481:N485",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D482:F483" },
+          "equipos": "p2-18.18.7.2.impacto",
+          "comentarios": true,
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CF91" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-2-18-aplica", "tipo": "predicado", "nombre": "aplicaParte2", "parametro": "-2-18", "origenExcel": "Datos ensayos LUM.!CF89" },
+            { "id": "R-2-18.1-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-18.1-noAplica", "tipo": "o", "de": ["R-2-18.1-na", "!R-2-18-aplica"], "origenExcel": "Datos ensayos LUM.!CF92" },
+            { "id": "R-2-18.1-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CF94" },
+            { "id": "R-2-18.1-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-18.1-fecha"] },
+            { "id": "R-2-18.1-falta", "tipo": "si", "condicion": "!R-2-18.1-noAplica", "entonces": "R-2-18.1-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CF96" }
+          ]
+        },
+
+        {
+          "id": "2-18.18.7.3",
+          "codigo": "18.7.3",
+          "titulo": "Corrosión (-2-18)",
+          "visibleSi": "R-2-18-aplica",
+          "origenExcel": "Toma de notas 60598!C487:N499",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D488:F489" },
+          "equipos": "p2-18.18.7.3.corrosion",
+          "comentarios": true,
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CF100" }
+            ] }
+          ],
+          "campos": [
+            { "id": "solucion", "etiqueta": "Solución utilizada", "tipo": "texto", "porMuestra": true, "origenExcel": "Toma de notas 60598!C493" }
+          ],
+          "reglas": [
+            { "id": "R-2-18.2-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-18.2-noAplica", "tipo": "o", "de": ["R-2-18.2-na", "!R-2-18-aplica"], "origenExcel": "Datos ensayos LUM.!CF101" },
+            { "id": "R-2-18.2-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CF103" },
+            { "id": "R-2-18.2-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-18.2-fecha"] },
+            { "id": "R-2-18.2-falta", "tipo": "si", "condicion": "!R-2-18.2-noAplica", "entonces": "R-2-18.2-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CF105" }
+          ]
+        },
+
+        {
+          "id": "2-22.22.17.3",
+          "codigo": "22.17.3",
+          "titulo": "Mantenimiento del nivel de iluminación (-2-22)",
+          "visibleSi": "R-2-22-aplica",
+          "origenExcel": "Toma de notas 60598!C504:N519",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D505:F506" },
+          "equipos": "p2-22.22.17.3-22.19",
+          "comentarios": true,
+          "notas": ["Se realiza la carga durante 24 h o el tiempo declarado por el fabricante"],
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CF134" }
+            ] },
+            { "id": "subcontrata", "modo": "libre", "opciones": [
+              { "id": "subcontratado", "etiqueta": "El ensayo se subcontrata", "origenExcel": "Datos ensayos LUM.!CF135" }
+            ] }
+          ],
+          "campos": [
+            { "id": "duracionBateria", "etiqueta": "Tiempo de duración de la batería asignada", "tipo": "numero", "unidad": "h", "porMuestra": true, "origenExcel": "Toma de notas 60598!G511:N511" },
+            { "id": "ilum5s", "etiqueta": "Iluminancia 5 s después del fallo", "tipo": "numero", "unidad": "lux", "porMuestra": true, "origenExcel": "Toma de notas 60598!G512:N512" },
+            { "id": "ilum60s", "etiqueta": "Iluminancia 60 s después del fallo", "tipo": "numero", "unidad": "lux", "porMuestra": true, "origenExcel": "Toma de notas 60598!G513:N513" },
+            { "id": "ilumFinal", "etiqueta": "Iluminancia tras el tiempo de duración de la batería", "tipo": "numero", "unidad": "lux", "porMuestra": true, "origenExcel": "Toma de notas 60598!G514:N514" }
+          ],
+          "reglas": [
+            { "id": "R-2-22-aplica", "tipo": "predicado", "nombre": "aplicaParte2", "parametro": "-2-22", "origenExcel": "Datos ensayos LUM.!CF132" },
+            { "id": "R-2-22.1-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-22.1-sub", "tipo": "opcion", "checklist": "subcontrata", "opcion": "subcontratado" },
+            { "id": "R-2-22.1-noAplica", "tipo": "o", "de": ["R-2-22.1-na", "R-2-22.1-sub", "!R-2-22-aplica"], "origenExcel": "Datos ensayos LUM.!CF137" },
+            { "id": "R-2-22.1-d1", "tipo": "recuentoDatos", "campo": "duracionBateria", "umbral": 1, "cuentaCeros": true, "origenExcel": "Datos ensayos LUM.!CF140" },
+            { "id": "R-2-22.1-d2", "tipo": "recuentoDatos", "campo": "ilum5s", "umbral": 1, "cuentaCeros": true },
+            { "id": "R-2-22.1-d3", "tipo": "recuentoDatos", "campo": "ilum60s", "umbral": 1, "cuentaCeros": true },
+            { "id": "R-2-22.1-d4", "tipo": "recuentoDatos", "campo": "ilumFinal", "umbral": 1, "cuentaCeros": true },
+            { "id": "R-2-22.1-datos", "tipo": "y", "de": ["R-2-22.1-d1", "R-2-22.1-d2", "R-2-22.1-d3", "R-2-22.1-d4"] },
+            { "id": "R-2-22.1-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CF139" },
+            { "id": "R-2-22.1-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-22.1-fecha", "!R-2-22.1-datos"] },
+            { "id": "R-2-22.1-falta", "tipo": "si", "condicion": "!R-2-22.1-noAplica", "entonces": "R-2-22.1-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CF142" }
+          ]
+        },
+
+        {
+          "id": "2-22.22.19",
+          "codigo": "22.19",
+          "titulo": "Funcionamiento a alta temperatura (-2-22)",
+          "visibleSi": "R-2-22-aplica",
+          "origenExcel": "Toma de notas 60598!C521:N533",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D522:F523" },
+          "comentarios": true,
+          "notas": ["Se realiza la carga durante 24 h o el tiempo declarado por el fabricante"],
+          "checklists": [
+            { "id": "na", "modo": "libre", "opciones": [
+              { "id": "na", "etiqueta": "N/A este ensayo", "origenExcel": "Datos ensayos LUM.!CF145" }
+            ] }
+          ],
+          "campos": [
+            { "id": "ilumTa60s", "etiqueta": "Iluminancia a Ta, 60 s después de la desconexión", "tipo": "numero", "unidad": "lux", "porMuestra": true, "origenExcel": "Toma de notas 60598!G526:N526" },
+            { "id": "ilum70c60s", "etiqueta": "Iluminancia a 70 ºC, 60 s después de la desconexión", "tipo": "numero", "unidad": "lux", "porMuestra": true, "origenExcel": "Toma de notas 60598!G527:N527" },
+            { "id": "ilum70c30m", "etiqueta": "Iluminancia a 70 ºC, 30 min después de la desconexión", "tipo": "numero", "unidad": "lux", "porMuestra": true, "origenExcel": "Toma de notas 60598!G528:N528" }
+          ],
+          "reglas": [
+            { "id": "R-2-22.2-na", "tipo": "opcion", "checklist": "na", "opcion": "na" },
+            { "id": "R-2-22.2-noAplica", "tipo": "o", "de": ["R-2-22.2-na", "!R-2-22-aplica"], "origenExcel": "Datos ensayos LUM.!CF146" },
+            { "id": "R-2-22.2-d1", "tipo": "recuentoDatos", "campo": "ilumTa60s", "umbral": 1, "cuentaCeros": true, "origenExcel": "Datos ensayos LUM.!CF149" },
+            { "id": "R-2-22.2-d2", "tipo": "recuentoDatos", "campo": "ilum70c60s", "umbral": 1, "cuentaCeros": true },
+            { "id": "R-2-22.2-d3", "tipo": "recuentoDatos", "campo": "ilum70c30m", "umbral": 1, "cuentaCeros": true },
+            { "id": "R-2-22.2-datos", "tipo": "y", "de": ["R-2-22.2-d1", "R-2-22.2-d2", "R-2-22.2-d3"] },
+            { "id": "R-2-22.2-fecha", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!CF148" },
+            { "id": "R-2-22.2-faltaA", "tipo": "faltanDatos", "faltanSi": ["R-2-22.2-fecha", "!R-2-22.2-datos"] },
+            { "id": "R-2-22.2-falta", "tipo": "si", "condicion": "!R-2-22.2-noAplica", "entonces": "R-2-22.2-faltaA", "siNo": false, "origenExcel": "Datos ensayos LUM.!CF151" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "11",
+      "codigoAntiguo": "11",
+      "titulo": "Sección 11 - Líneas de fuga y distancias en el aire",
+      "bloques": [
+        {
+          "id": "13.2",
+          "codigo": "11.2",
+          "codigoAntiguo": "11.2",
+          "titulo": "LF y DA",
+          "origenExcel": "Toma de notas 60598!B538:N568",
+          "pesoAvance": 5,
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!BN20" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D539:F540" },
+          "equipos": "sec13.02.lf-da",
+          "comentarios": true,
+          "notas": ["Los datos pueden tomarse directamente sobre el TRF"],
+          "subBloques": [
+            {
+              "id": "13.2.menor30kHz",
+              "titulo": "Frecuencia < 30 kHz",
+              "origenExcel": "Toma de notas 60598!G546:N549",
+              "checklists": [
+                { "id": "na", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A - no aplica esta frecuencia", "origenExcel": "Datos ensayos LUM.!BN22" }
+                ] }
+              ],
+              "campos": [
+                { "id": "medidas", "etiqueta": "Líneas de fuga y distancias en el aire", "tipo": "grupoRepetido",
+                  "elementos": 4, "ampliable": true, "porMuestra": true,
+                  "campos": [
+                    { "id": "parte", "etiqueta": "Parte medida", "tipo": "texto" },
+                    { "id": "valor", "etiqueta": "Distancia", "tipo": "numero", "unidad": "mm" }
+                  ] }
+              ],
+              "reglas": [
+                { "id": "R-13-naTabla1", "tipo": "opcion", "checklist": "na", "opcion": "na" }
+              ]
+            },
+            {
+              "id": "13.2.mayor30kHz",
+              "titulo": "Frecuencia > 30 kHz",
+              "origenExcel": "Toma de notas 60598!G558:N561",
+              "checklists": [
+                { "id": "na", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A - no aplica esta frecuencia", "origenExcel": "Datos ensayos LUM.!BN23" }
+                ] }
+              ],
+              "campos": [
+                { "id": "medidas", "etiqueta": "Líneas de fuga y distancias en el aire", "tipo": "grupoRepetido",
+                  "elementos": 4, "ampliable": true, "porMuestra": true,
+                  "campos": [
+                    { "id": "parte", "etiqueta": "Parte medida", "tipo": "texto" },
+                    { "id": "valor", "etiqueta": "Distancia", "tipo": "numero", "unidad": "mm" }
+                  ] }
+              ],
+              "reglas": [
+                { "id": "R-13-naTabla2", "tipo": "opcion", "checklist": "na", "opcion": "na" }
+              ]
+            }
+          ],
+          "reglas": [
+            { "id": "R-13-ambasNa", "tipo": "y", "de": ["R-13-naTabla1", "R-13-naTabla2"],
+              "etiqueta": "Ambas tablas marcadas como N/A", "origenExcel": "Datos ensayos LUM.!BN28" },
+            { "id": "R-13-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BN25" },
+            { "id": "R-13-01a", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-13-00"] },
+            { "id": "R-13-01", "tipo": "si", "etiqueta": "Faltan datos en la sección",
+              "condicion": "!R-13-ambasNa", "entonces": "R-13-01a", "siNo": false, "origenExcel": "Datos ensayos LUM.!BN28" },
+            { "id": "R-13-P8", "tipo": "peso", "valor": 5, "aplicaSiNo": "na", "finSiNo": "R-13-01", "origenExcel": "Datos ensayos LUM.!AH6:AL6" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "7",
+      "codigoAntiguo": "7",
+      "titulo": "Sección 7 - Tierra",
+      "bloques": [
+        {
+          "id": "9",
+          "codigo": "7.2.1 y 7.2.3",
+          "codigoAntiguo": "7",
+          "titulo": "Resistencia de puesta a tierra",
+          "origenExcel": "Toma de notas 60598!B570:N588",
+          "pesoAvance": 3,
+          "visibleSi": "R-09-esClaseI",
+          "reglaDeCierre": "R-09-04",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!T20" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D574:F575" },
+          "equipos": "sec09.tierra",
+          "comentarios": true,
+          "notas": [
+            "Los datos pueden tomarse directamente sobre el TRF",
+            "Condiciones del ensayo: corriente 10 A durante 1 min"
+          ],
+          "checklists": [
+            { "id": "equipo", "etiqueta": "Equipo utilizado", "modo": "alMenosUna", "opciones": [
+              { "id": "eqSafe442", "etiqueta": "EQ-SAFE-442 (Elabo)", "origenExcel": "Datos ensayos LUM.!T28" },
+              { "id": "eqSafe403", "etiqueta": "EQ-SAFE-403 (GW INSTEK)", "origenExcel": "Datos ensayos LUM.!T29" }
+            ] }
+          ],
+          "campos": [
+            { "id": "resistencia", "etiqueta": "Valor", "tipo": "numero", "unidad": "Ω", "porMuestra": true, "origenExcel": "Toma de notas 60598!G577:N577" }
+          ],
+          "reglas": [
+            { "id": "R-09-esClaseI", "tipo": "predicado", "nombre": "esClaseI",
+              "etiqueta": "Solo aplica en Clase I", "origenExcel": "Datos ensayos LUM.!T21" },
+            { "id": "R-09-03", "tipo": "alMenosUna", "checklist": "equipo", "origenExcel": "Datos ensayos LUM.!T31" },
+            { "id": "R-09-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!T24" },
+            { "id": "R-09-04a", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-09-00", "!R-09-03"] },
+            { "id": "R-09-04", "tipo": "si", "etiqueta": "Faltan datos en la sección",
+              "condicion": "R-09-esClaseI", "entonces": "R-09-04a", "siNo": false, "origenExcel": "Datos ensayos LUM.!T34" },
+            { "id": "R-09-P8", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-09-04", "origenExcel": "Datos ensayos LUM.!AH7:AL7" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "5",
+      "codigoAntiguo": "5",
+      "titulo": "Sección 5 - Cableado",
+      "na": { "id": "naSeccion", "etiqueta": "N/A sección 8", "origenExcel": "Datos ensayos LUM.!AB20" },
+      "bloques": [
+        {
+          "id": "8",
+          "codigo": "5",
+          "codigoAntiguo": "5",
+          "titulo": "Cableado externo e interno",
+          "origenExcel": "Toma de notas 60598!B590:N621",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!AB20" },
+          "equipos": "sec08.02.cableado",
+          "comentarios": true,
+          "subBloques": [
+            {
+              "id": "8.2.10.3",
+              "titulo": "Dispositivo de anclaje",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D594:F595" },
+              "notas": ["Puede obtenerse multiplicando la sección de conductores por el número de conductores (datos del TRF y fotos)"],
+              "checklists": [
+                { "id": "naAnclaje", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A dispositivo de anclaje", "origenExcel": "Datos ensayos LUM.!AB22" }
+                ] }
+              ],
+              "campos": [
+                { "id": "dispositivos", "etiqueta": "Dispositivo", "tipo": "grupoRepetido", "elementos": 3, "ampliable": true, "porMuestra": true,
+                  "campos": [{ "id": "seccionNominal", "etiqueta": "Sección nominal total", "tipo": "numero", "unidad": "mm²" }],
+                  "origenExcel": "Toma de notas 60598!G597:N599" }
+              ],
+              "reglas": [
+                { "id": "R-08-01a", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!AB23" },
+                { "id": "R-08-01", "tipo": "faltanDatos", "siNoAplica": "naAnclaje", "faltanSi": ["R-08-01a"], "origenExcel": "Datos ensayos LUM.!AB25" }
+              ]
+            },
+            {
+              "id": "8.4",
+              "titulo": "Idoneidad de conductores de sección reducida",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D609:F610" },
+              "notas": ["Resultados tras la realización de los ensayos (ver 12.4)"],
+              "checklists": [
+                { "id": "naSeccionReducida", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A conductores de sección reducida", "origenExcel": "Datos ensayos LUM.!AB27" }
+                ] },
+                { "id": "resultados", "etiqueta": "Resultados obtenidos", "modo": "todas", "opciones": [
+                  { "id": "tempAislamiento", "etiqueta": "Temp. de aislamiento inferior al valor de la tabla 12.2", "origenExcel": "Datos ensayos LUM.!Z30" },
+                  { "id": "sinDanos", "etiqueta": "No hay daños en el cableado", "origenExcel": "Datos ensayos LUM.!AA30" }
+                ] }
+              ],
+              "reglas": [
+                { "id": "R-08-02", "tipo": "todas", "checklist": "resultados", "origenExcel": "Datos ensayos LUM.!AB31" },
+                { "id": "R-08-03a", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!AB28" },
+                { "id": "R-08-03", "tipo": "faltanDatos", "siNoAplica": "naSeccionReducida",
+                  "faltanSi": ["R-08-03a", "!R-08-02"], "origenExcel": "Datos ensayos LUM.!AB32" }
+              ]
+            }
+          ],
+          "reglas": [
+            { "id": "R-08-04", "tipo": "o", "de": ["R-08-01", "R-08-03"], "origenExcel": "Datos ensayos LUM.!AB36" },
+            { "id": "R-08-05", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-08-04"], "origenExcel": "Datos ensayos LUM.!AB37" },
+            { "id": "R-08-P8", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-08-05", "origenExcel": "Datos ensayos LUM.!AH8:AL8" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "8",
+      "codigoAntiguo": "8",
+      "titulo": "Sección 8 - Protección contra choque eléctrico",
+      "bloques": [
+        {
+          "id": "10",
+          "codigo": "8",
+          "codigoAntiguo": "8",
+          "titulo": "Protección contra choque eléctrico",
+          "origenExcel": "Toma de notas 60598!B623:N639",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!AB44" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D624:F625" },
+          "equipos": "sec10.choque-electrico",
+          "comentarios": true,
+          "notas": ["Los datos pueden tomarse directamente sobre el TRF"],
+          "checklists": [
+            { "id": "equipos", "etiqueta": "Equipos utilizados", "modo": "alMenosUna", "opciones": [
+              { "id": "eqSafe437", "etiqueta": "Multímetro UNI-T (EQ-SAFE-437)", "origenExcel": "Datos ensayos LUM.!AB49" },
+              { "id": "eqSafe428", "etiqueta": "Multímetro FLUKE (EQ-SAFE-428)", "origenExcel": "Datos ensayos LUM.!AB50" },
+              { "id": "eqSafe430", "etiqueta": "Pinza-multímetro UNI-T (EQ-SAFE-430)", "origenExcel": "Datos ensayos LUM.!AB51" },
+              { "id": "eqSafe409", "etiqueta": "Osciloscopio FLUKE (EQ-SAFE-409)", "origenExcel": "Datos ensayos LUM.!AB52" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-10-01", "tipo": "alMenosUna", "checklist": "equipos", "origenExcel": "Datos ensayos LUM.!AB53" },
+            { "id": "R-10-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!AB46" },
+            { "id": "R-10-02", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-10-00", "!R-10-01"], "origenExcel": "Datos ensayos LUM.!AB56" },
+            { "id": "R-10-P8", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-10-02", "origenExcel": "Datos ensayos LUM.!AH8:AL8" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "12",
+      "codigoAntiguo": "12",
+      "titulo": "Sección 12 - Calentamiento y endurancia",
+      "na": { "id": "naSeccion", "etiqueta": "N/A sección 14", "origenExcel": "Datos ensayos LUM.!AJ20" },
+      "bloques": [
+        {
+          "id": "14",
+          "codigo": "12",
+          "codigoAntiguo": "12",
+          "titulo": "Calentamiento y endurancia",
+          "origenExcel": "Toma de notas 60598!B641:N707",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!AJ20" },
+          "equipos": "sec14.endurancia-calentamientos",
+          "comentarios": true,
+          "notas": [
+            "Algunos datos pueden tomarse directamente sobre el TRF",
+            "Los registros primarios de estos apartados están en los excel de calentamiento (fuera de la aplicación, DD-12)"
+          ],
+          "checklists": [
+            { "id": "lugares", "etiqueta": "Se realizan EN (marcar todos los lugares utilizados)", "modo": "alMenosUna", "opciones": [
+              { "id": "camara1", "etiqueta": "CÁMARA 1 (EQ-SAFE-301)", "origenExcel": "Datos ensayos LUM.!AJ23" },
+              { "id": "camara2", "etiqueta": "CÁMARA 2 (EQ-SAFE-302)", "origenExcel": "Datos ensayos LUM.!AJ24" },
+              { "id": "camaraEndurancias", "etiqueta": "CÁMARA ENDURANCIAS DYCOMETAL (EQ-SAFE-328)", "origenExcel": "Datos ensayos LUM.!AJ25" },
+              { "id": "camara3", "etiqueta": "CÁMARA 3 (EQ-SAFE-003)", "origenExcel": "Datos ensayos LUM.!AJ26" }
+            ] },
+            { "id": "equipos", "etiqueta": "Se realizan CON (marcar todos los equipos utilizados)", "modo": "alMenosUna",
+              "nota": "En el Excel los registradores EQ-SAFE-327 y EQ-SAFE-329 se marcaban solos al elegir su cámara.",
+              "opciones": [
+                { "id": "eqSafe327", "etiqueta": "EQ-SAFE-327 (fijo en Cámara 1)", "origenExcel": "Datos ensayos LUM.!AJ32" },
+                { "id": "eqSafe329", "etiqueta": "EQ-SAFE-329 (fijo en Cámara 2)", "origenExcel": "Datos ensayos LUM.!AJ33" },
+                { "id": "eqSafe323", "etiqueta": "Registrador portátil (EQ-SAFE-323)", "origenExcel": "Datos ensayos LUM.!AJ34" },
+                { "id": "eqSafe324", "etiqueta": "Registrador portátil (EQ-SAFE-324)", "origenExcel": "Datos ensayos LUM.!AJ35" }
+              ] }
+          ],
+          "subBloques": [
+            {
+              "id": "14.3",
+              "titulo": "Endurancia",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "fechaPorMuestra": true, "origenExcel": "Toma de notas 60598!D661:F662" },
+              "notas": ["Si hay más de una muestra, marcar las fechas de cada una"],
+              "checklists": [
+                { "id": "naEndurancia", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A endurancia", "origenExcel": "Datos ensayos LUM.!AJ41" }
+                ] }
+              ],
+              "reglas": [
+                { "id": "R-14.3-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!AJ42" },
+                { "id": "R-14.3-01", "tipo": "faltanDatos", "siNoAplica": "naEndurancia", "faltanSi": ["R-14.3-00"], "origenExcel": "Datos ensayos LUM.!AJ43" },
+                { "id": "R-14.3-P8", "tipo": "peso", "valor": 100, "aplicaSiNo": "naEndurancia", "finSiNo": "R-14.3-01", "origenExcel": "Datos ensayos LUM.!AH10:AL10" }
+              ]
+            },
+            {
+              "id": "14.4",
+              "titulo": "Calentamiento / tc (funcionamiento normal)",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "fechaPorMuestra": true, "origenExcel": "Toma de notas 60598!D673:F674" },
+              "checklists": [
+                { "id": "naNormal", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A calentamiento normal", "origenExcel": "Datos ensayos LUM.!AJ46" }
+                ] }
+              ],
+              "reglas": [
+                { "id": "R-14.4-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!AJ47" },
+                { "id": "R-14.4-01", "tipo": "faltanDatos", "siNoAplica": "naNormal", "faltanSi": ["R-14.4-00"], "origenExcel": "Datos ensayos LUM.!AJ48" },
+                { "id": "R-14.4-P8", "tipo": "peso", "valor": 10, "aplicaSiNo": "naNormal", "finSiNo": "R-14.4-01", "origenExcel": "Datos ensayos LUM.!AH11:AL11" }
+              ]
+            },
+            {
+              "id": "14.5",
+              "titulo": "Calentamiento (funcionamiento anormal)",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "fechaPorMuestra": true, "origenExcel": "Toma de notas 60598!D685:F686" },
+              "checklists": [
+                { "id": "naAnormal", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A calentamiento anormal", "origenExcel": "Datos ensayos LUM.!AJ51" }
+                ] }
+              ],
+              "reglas": [
+                { "id": "R-14.5-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!AJ52" },
+                { "id": "R-14.5-01", "tipo": "faltanDatos", "siNoAplica": "naAnormal", "faltanSi": ["R-14.5-00"], "origenExcel": "Datos ensayos LUM.!AJ53" },
+                { "id": "R-14.5-P8", "tipo": "peso", "valor": 10, "aplicaSiNo": "naAnormal", "finSiNo": "R-14.5-01", "origenExcel": "Datos ensayos LUM.!AH12:AL12" }
+              ]
+            },
+            {
+              "id": "14.6",
+              "titulo": "Calentamiento (condiciones de fallo del controlgear)",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "fechaPorMuestra": true, "origenExcel": "Toma de notas 60598!D697:F698" },
+              "checklists": [
+                { "id": "naFallo", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A condiciones de fallo", "origenExcel": "Datos ensayos LUM.!AJ56" }
+                ] }
+              ],
+              "reglas": [
+                { "id": "R-14.6-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!AJ57" },
+                { "id": "R-14.6-01", "tipo": "faltanDatos", "siNoAplica": "naFallo", "faltanSi": ["R-14.6-00"], "origenExcel": "Datos ensayos LUM.!AJ58" },
+                { "id": "R-14.6-P8", "tipo": "peso", "valor": 10, "aplicaSiNo": "naFallo", "finSiNo": "R-14.6-01", "origenExcel": "Datos ensayos LUM.!AH13:AL13" }
+              ]
+            }
+          ],
+          "reglas": [
+            { "id": "R-14-01", "tipo": "alMenosUna", "checklist": "lugares", "origenExcel": "Datos ensayos LUM.!AJ29" },
+            { "id": "R-14-03", "tipo": "alMenosUna", "checklist": "equipos", "origenExcel": "Datos ensayos LUM.!AJ39" },
+            { "id": "R-14-06", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-14.3-01", "R-14.4-01", "R-14.5-01", "R-14.6-01", "!R-14-01", "!R-14-03"],
+              "origenExcel": "Datos ensayos LUM.!AJ61" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "9",
+      "codigoAntiguo": "9",
+      "titulo": "Sección 9 - IP y humedad",
+      "na": { "id": "naSeccion", "etiqueta": "N/A sección 11", "origenExcel": "Datos ensayos LUM.!AR20" },
+      "bloques": [
+        {
+          "id": "11",
+          "codigo": "9",
+          "titulo": "IP / Humedad",
+          "origenExcel": "Toma de notas 60598!B709:N766",
+          "comentarios": true,
+          "equipos": "sec11.ip-humedad",
+          "campos": [
+            { "id": "clasificacionIp1", "etiqueta": "Clasificación IP de las muestras (1)", "tipo": "texto", "porMuestra": true, "origenExcel": "Toma de notas 60598!G711:N711",
+              "nota": "Rellenar solo si es distinta para cada muestra" },
+            { "id": "clasificacionIp2", "etiqueta": "Clasificación IP de las muestras (2)", "tipo": "texto", "porMuestra": true, "origenExcel": "Toma de notas 60598!G712:N712" },
+            { "id": "tamano", "etiqueta": "Tamaño de las muestras", "tipo": "derivado", "de": "generales.tamano", "origenExcel": "Toma de notas 60598!G713:N715" },
+            { "id": "radioArco", "etiqueta": "Radio de arco de lluvia a utilizar", "tipo": "derivado", "unidad": "cm", "porMuestra": true, "regla": "C-07", "origenExcel": "Toma de notas 60598!G716:N716" }
+          ],
+          "reglas": [
+            { "id": "C-04", "tipo": "calculo", "nombre": "semidiagonalBase", "formula": "sqrt((ancho/2)^2 + (profundo/2)^2)", "porMuestra": true, "origenExcel": "Datos ensayos LUM.!AQ29:AX29" },
+            { "id": "C-08", "tipo": "calculo", "nombre": "alturaEfectiva", "formula": "si proyecto.ipSegundaCifra contiene IPX4 entonces alto/2 si no alto", "porMuestra": true, "origenExcel": "Datos ensayos LUM.!AQ25" },
+            { "id": "C-05", "tipo": "calculo", "nombre": "distanciaArco", "formula": "sqrt(alturaEfectiva^2 + semidiagonalBase^2)", "porMuestra": true, "origenExcel": "Datos ensayos LUM.!AQ30:AX30" },
+            { "id": "C-06", "tipo": "calculo", "nombre": "radioMaximo", "formula": "distanciaArco + 20", "unidad": "cm", "porMuestra": true, "origenExcel": "Datos ensayos LUM.!AQ32:AX32" },
+            { "id": "C-07", "tipo": "calculo", "nombre": "radioEnsayo",
+              "arcosDisponibles": [20, 40, 60, 80, 100, 120, 140],
+              "formula": "menor arco disponible que cubre radioMaximo; si radioMaximo > 140 ⇒ 'Cab. Regadera'; si no hay dimensiones ⇒ 'N/A'",
+              "porMuestra": true, "origenExcel": "Datos ensayos LUM.!AQ33:AX33" },
+            { "id": "R-11-06", "tipo": "predicado", "nombre": "requiereCabezaRegadera", "etiqueta": "¿Alguna muestra requiere cabeza de regadera?", "origenExcel": "Datos ensayos LUM.!AV35" },
+            { "id": "R-11-08", "tipo": "aviso", "nivel": "atencion",
+              "texto": "Ojo, equipo muy grande para ensayo con arco de lluvia. Se utiliza cabeza de regadera: DESVIACIÓN AL MÉTODO",
+              "cuandoTodas": ["R-11-06", "R-GEN-01"], "origenExcel": "Datos ensayos LUM.!AR46" },
+            { "id": "R-11-17", "tipo": "recuentoDatos", "campo": "tamano", "umbral": 3, "cuentaCeros": false, "ambito": "todasLasMuestras", "origenExcel": "Datos ensayos LUM.!AR36" },
+            { "id": "R-11-18", "tipo": "si", "etiqueta": "Dimensiones obligatorias cubiertas",
+              "condicion": "R-GEN-01", "entonces": "R-11-17", "siNo": true, "origenExcel": "Datos ensayos LUM.!AR60" },
+            { "id": "R-11-EQ", "tipo": "seleccionAutomaticaEquipos", "origenExcel": "Datos ensayos LUM.!AR45:AR50, AV70",
+              "reglas": [
+                { "id": "R-11-09", "cuando": "IPX1 o IPX2", "equipo": "EQ-SAFE-615", "descripcion": "Caja de goteo" },
+                { "id": "R-11-10", "cuando": "(IPX3 o IPX4) y R-11-06", "equipo": "EQ-SAFE-111", "descripcion": "Cabeza de regadera" },
+                { "id": "R-11-11", "cuando": "IPX3 o IPX4", "equipo": "EQ-SAFE-174", "descripcion": "Arcos de lluvia" },
+                { "id": "R-11-12", "cuando": "IPX5 o IPX6", "equipo": "EQ-SAFE-105", "descripcion": "Boquillas" },
+                { "id": "R-11-13", "cuando": "IPX7 o IPX8", "equipo": "EA-CERT-176+177", "descripcion": "Depósitos de inmersión" },
+                { "id": "R-11-14", "cuando": "IPX9", "equipo": "EQ-SAFE-232", "descripcion": "Sistema IPX9" },
+                { "id": "R-11-15", "cuando": "IP5X o IP6X", "equipo": "EQ-SAFE-326", "descripcion": "Cámara de polvo" }
+              ] },
+            { "id": "R-11-24", "tipo": "faltanDatos", "siNoAplica": "naSeccion",
+              "faltanSi": ["R-11-19", "R-11-21", "R-11-23"], "origenExcel": "Datos ensayos LUM.!AR83" }
+          ],
+          "subBloques": [
+            {
+              "id": "11.2.4-11.2.13",
+              "titulo": "Segunda cifra (agua)",
+              "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!AR54" },
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D722:F723" },
+              "pesoAvance": 5,
+              "comentarios": true,
+              "checklists": [
+                { "id": "verificaciones", "etiqueta": "Verificaciones adicionales", "modo": "libre", "opciones": [
+                  { "id": "tempAgua", "etiqueta": "Temperatura agua igual a Ta ±5ºC", "origenExcel": "Datos ensayos LUM.!AR58" } ] }
+              ],
+              "reglas": [
+                { "id": "R-11-16", "tipo": "predicado", "nombre": "hayGradoSegundaCifra", "etiqueta": "Hay grado marcado para la 2ª cifra", "origenExcel": "Datos ensayos LUM.!AR59" },
+                { "id": "R-11-19a", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!AR57" },
+                { "id": "R-11-19", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-11-19a", "!R-11-16", "!R-11-18"], "origenExcel": "Datos ensayos LUM.!AR62" },
+                { "id": "R-11-P8a", "tipo": "peso", "valor": 5, "aplicaSiNo": "na", "finSiNo": "R-11-19", "origenExcel": "Datos ensayos LUM.!AP8:AT8",
+                  "defecto": "D-03", "notaDefecto": "El Excel usa el N/A del grupo de polvo (AR67) para esta fila de agua. Aquí se usa el correcto (AR55)." }
+              ]
+            },
+            {
+              "id": "11.2.2-11.2.3",
+              "titulo": "Primera cifra (sólidos)",
+              "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!AR66" },
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D737:F738" },
+              "pesoAvance": 5,
+              "comentarios": true,
+              "reglas": [
+                { "id": "R-11-20", "tipo": "predicado", "nombre": "hayGradoPrimeraCifra", "etiqueta": "Hay grado marcado para la 1ª cifra", "origenExcel": "Datos ensayos LUM.!AR70" },
+                { "id": "R-11-21a", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!AR69" },
+                { "id": "R-11-21", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-11-21a", "!R-11-20"], "origenExcel": "Datos ensayos LUM.!AR72" }
+              ]
+            },
+            {
+              "id": "11.3",
+              "titulo": "Ensayo de humedad 48 h",
+              "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!AR75" },
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D748:F749" },
+              "comentarios": true,
+              "parametrosFijos": { "temperaturaProgramada": "25 ºC", "humedadProgramada": "93 %" },
+              "campos": [
+                { "id": "inicio", "etiqueta": "Inicio del ensayo", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G753:N754" },
+                { "id": "fin", "etiqueta": "Fin del ensayo", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G755:N756" }
+              ],
+              "reglas": [
+                { "id": "R-11-22", "tipo": "duracionMinima", "inicio": "inicio", "fin": "fin", "minimo": "48h", "ambito": "primeraMuestra", "origenExcel": "Datos ensayos LUM.!AP86:AP88" },
+                { "id": "R-11-23a", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!AR78" },
+                { "id": "R-11-23", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-11-23a", "!R-11-22"], "origenExcel": "Datos ensayos LUM.!AR80" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "10",
+      "codigoAntiguo": "10",
+      "titulo": "Sección 10 - Resistencia de aislamiento, rigidez dieléctrica y corrientes de fuga",
+      "na": { "id": "naSeccion", "etiqueta": "N/A sección 12", "origenExcel": "Datos ensayos LUM.!BE20" },
+      "bloques": [
+        {
+          "id": "12",
+          "codigo": "10",
+          "codigoAntiguo": "10",
+          "titulo": "Aislamiento, rigidez y corrientes de fuga",
+          "origenExcel": "Toma de notas 60598!B769:N840",
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!BE20" },
+          "comentarios": true,
+          "notas": [
+            "Los puntos de aplicación de la rigidez son los mismos que los de resistencia de aislamiento",
+            "Para partes SELV/PELV se asume que la polaridad diferente son los polos 1 y 2 (secundario)",
+            "Para el resto de partes activas se asume L1-N (o L1, L2, L3 y N con más de una fase)"
+          ],
+          "subBloques": [
+            {
+              "id": "12.2.2",
+              "titulo": "Resistencia de aislamiento",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D772:F773" },
+              "notas": ["Tensión aplicada 500 V durante 1 min", "Los resultados pueden tomarse directamente sobre el TRF"],
+              "checklists": [
+                { "id": "naAislamiento", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A resistencia de aislamiento", "origenExcel": "Datos ensayos LUM.!BE38" }
+                ] },
+                { "id": "equipos", "etiqueta": "Equipos utilizados", "modo": "alMenosUna", "opciones": [
+                  { "id": "eqSafe403", "etiqueta": "EQ-SAFE-403 (GW INSTEK GPT-15004)", "origenExcel": "Datos ensayos LUM.!BE24" },
+                  { "id": "eqSafe404", "etiqueta": "EQ-SAFE-404 (GLC-1000)", "origenExcel": "Datos ensayos LUM.!BE25" },
+                  { "id": "eqSafe402", "etiqueta": "EQ-SAFE-402 (GPT-15002)", "origenExcel": "Datos ensayos LUM.!BE26" }
+                ] }
+              ],
+              "reglas": [
+                { "id": "R-12.2.2-01", "tipo": "alMenosUna", "checklist": "equipos", "origenExcel": "Datos ensayos LUM.!BE32" },
+                { "id": "R-12.2.2-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BE40" },
+                { "id": "R-12.2.2-02", "tipo": "faltanDatos", "siNoAplica": "naAislamiento",
+                  "faltanSi": ["R-12.2.2-00", "!R-12.2.2-01"], "origenExcel": "Datos ensayos LUM.!BE42" }
+              ]
+            },
+            {
+              "id": "12.2.3",
+              "titulo": "Rigidez dieléctrica",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D798:F799" },
+              "notas": ["Los resultados pueden tomarse directamente sobre el TRF"],
+              "checklists": [
+                { "id": "naRigidez", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A rigidez dieléctrica", "origenExcel": "Datos ensayos LUM.!BE46" }
+                ] },
+                { "id": "equipos", "etiqueta": "Equipos utilizados", "modo": "alMenosUna", "opciones": [
+                  { "id": "eqSafe403", "etiqueta": "EQ-SAFE-403 (GPT-15004)", "origenExcel": "Datos ensayos LUM.!BF24" },
+                  { "id": "eqSafe402", "etiqueta": "EQ-SAFE-402 (GPT-15002)", "origenExcel": "Datos ensayos LUM.!BF26" }
+                ] }
+              ],
+              "reglas": [
+                { "id": "R-12.2.3-01", "tipo": "alMenosUna", "checklist": "equipos", "origenExcel": "Datos ensayos LUM.!BF32" },
+                { "id": "R-12.2.3-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BE48" },
+                { "id": "R-12.2.3-02", "tipo": "faltanDatos", "siNoAplica": "naRigidez",
+                  "faltanSi": ["R-12.2.3-00", "!R-12.2.3-01"], "origenExcel": "Datos ensayos LUM.!BE50" }
+              ]
+            },
+            {
+              "id": "12.3",
+              "titulo": "Corrientes de fuga",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D823:F824" },
+              "notas": ["Se anota el valor máximo obtenido para todas las combinaciones del switch de ensayo"],
+              "checklists": [
+                { "id": "naFugas", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A corrientes de fuga", "origenExcel": "Datos ensayos LUM.!BE54" }
+                ] },
+                { "id": "equipos", "etiqueta": "Equipos utilizados", "modo": "alMenosUna", "opciones": [
+                  { "id": "eqSafe441", "etiqueta": "EQ-SAFE-441 (AINUO)", "origenExcel": "Datos ensayos LUM.!BG27" },
+                  { "id": "eqSafe404", "etiqueta": "EQ-SAFE-404 (GLC-1000)", "origenExcel": "Datos ensayos LUM.!BG25" }
+                ] }
+              ],
+              "reglas": [
+                { "id": "R-12.3-01", "tipo": "alMenosUna", "checklist": "equipos", "origenExcel": "Datos ensayos LUM.!BG32" },
+                { "id": "R-12.3-kikusui", "tipo": "predicado", "nombre": "portatilClaseI",
+                  "etiqueta": "Portátil de Clase I", "origenExcel": "Datos ensayos LUM.!BE34" },
+                { "id": "R-12.3-aviso", "tipo": "aviso", "nivel": "atencion",
+                  "texto": "PORTÁTIL CLASE I: ojo, hace falta la red especial de Kikusui para corrientes de fuga",
+                  "cuandoTodas": ["R-12.3-kikusui"], "origenExcel": "Datos ensayos LUM.!BE34" },
+                { "id": "R-12.3-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BE56" },
+                { "id": "R-12.3-02", "tipo": "faltanDatos", "siNoAplica": "naFugas",
+                  "faltanSi": ["R-12.3-00", "!R-12.3-01"], "origenExcel": "Datos ensayos LUM.!BE58" }
+              ]
+            }
+          ],
+          "reglas": [
+            { "id": "R-12-01", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-12.2.2-02", "R-12.2.3-02", "R-12.3-02"], "origenExcel": "Datos ensayos LUM.!BE61" },
+            { "id": "R-12-P8a", "tipo": "peso", "valor": 5, "aplicaSiNo": "na", "finSiNo": "R-12-01",
+              "etiqueta": "Rigidez y resistencia de aislamiento", "origenExcel": "Datos ensayos LUM.!AP9:AT9" },
+            { "id": "R-12-P8b", "tipo": "peso", "valor": 3, "aplicaSiNo": "na", "finSiNo": "R-12.3-02",
+              "etiqueta": "Corrientes de fuga", "origenExcel": "Datos ensayos LUM.!AP10:AT10" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "13",
+      "codigoAntiguo": "13",
+      "titulo": "Sección 13 - Resistencia al fuego",
+      "na": { "id": "naSeccion", "etiqueta": "N/A sección 15", "origenExcel": "Datos ensayos LUM.!BW20" },
+      "bloques": [
+        {
+          "id": "15.2.1",
+          "codigo": "13.2.1",
+          "codigoAntiguo": "13.2",
+          "titulo": "Resistencia al calor (ensayo de bola)",
+          "origenExcel": "Toma de notas 60598!B844:N906",
+          "pesoAvance": 5,
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!BW22" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D845:F846" },
+          "equipos": "sec15.02.bola",
+          "comentarios": true,
+          "notas": [
+            "Los datos de resultados pueden tomarse directamente sobre el TRF.",
+            "Si el material de todas las muestras es idéntico puede rellenarse sólo el de la primera.",
+            "El espesor debe ser de al menos 2,5 mm; pueden apilarse varias muestras para alcanzarlo. Largo y ancho deben ser de al menos 10 mm.",
+            "El termopar de verificación se sitúa a un máximo de 50 mm de la muestra. Tolerancia entre temperatura medida y consigna: ±2 ºC."
+          ],
+          "checklists": [
+            { "id": "origenMuestra", "etiqueta": "Origen de la muestra", "modo": "exactamenteUna", "opciones": [
+              { "id": "corteEbp", "etiqueta": "Corte de una parte del EBP", "origenExcel": "Toma de notas 60598!B849" },
+              { "id": "muestraSeparada", "etiqueta": "Muestra separada suministrada por el fabricante", "origenExcel": "Toma de notas 60598!B850" },
+              { "id": "productoAcabado", "etiqueta": "Producto acabado completo", "origenExcel": "Toma de notas 60598!B851" }
+            ] },
+            { "id": "acondicionamiento", "etiqueta": "Acondicionamiento", "modo": "libre", "opciones": [
+              { "id": "verificado24h", "etiqueta": "Se verifica que la muestra estaba 24 h en el laboratorio (condiciones habituales entre 15 ºC y 35 ºC)", "origenExcel": "Toma de notas 60598!B854" }
+            ] },
+            { "id": "capas", "etiqueta": "Dimensiones y preparación", "modo": "libre", "opciones": [
+              { "id": "requiereCapas", "etiqueta": "El espesor de una sola capa es inferior a 2,5 mm y se requiere apilar varias capas de material", "origenExcel": "Toma de notas 60598!B861" }
+            ] },
+            { "id": "procedimiento", "etiqueta": "Procedimiento de ensayo y retirada del horno", "modo": "todas", "opciones": [
+              { "id": "introduccion30s", "etiqueta": "La muestra se coloca dentro del horno en un tiempo inferior a 30 s", "origenExcel": "Toma de notas 60598!B875" },
+              { "id": "recuperacion5min", "etiqueta": "Tras cerrar la puerta del horno se recupera la temperatura del termopar en ≤ 5 min", "origenExcel": "Toma de notas 60598!B876" },
+              { "id": "inmersionAgua", "etiqueta": "Tras sacar la muestra del horno se sumerge en agua (20 ºC ± 5 ºC, verificado con el termopar)", "origenExcel": "Toma de notas 60598!B880" },
+              { "id": "inmersion4a8min", "etiqueta": "La muestra se sumerge en agua entre 4 y 8 minutos", "origenExcel": "Toma de notas 60598!B884" }
+            ] }
+          ],
+          "campos": [
+            { "id": "numeroCapas", "etiqueta": "Nº de capas", "tipo": "entero", "porMuestra": true, "visibleSi": "R-15.2-02b", "origenExcel": "Toma de notas 60598!G862:N862",
+              "nota": "Apuntaba a «capas.requiereCapas», que es una opción de checklist y no una regla: el campo no llegaba a aparecer nunca. R-15.2-02b evalúa esa misma opción." },
+            { "id": "acondInicio", "etiqueta": "Inicio del acondicionamiento previo (24 h)", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G854:N855" },
+            { "id": "acondFin", "etiqueta": "Fin del acondicionamiento previo (24 h)", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G856:N857" },
+            { "id": "espesor", "etiqueta": "Espesor", "tipo": "numero", "unidad": "mm", "porMuestra": true, "origenExcel": "Toma de notas 60598!G864:N864" },
+            { "id": "largo", "etiqueta": "Largo", "tipo": "numero", "unidad": "mm", "porMuestra": true, "origenExcel": "Toma de notas 60598!G865:N865" },
+            { "id": "ancho", "etiqueta": "Ancho", "tipo": "numero", "unidad": "mm", "porMuestra": true, "origenExcel": "Toma de notas 60598!G866:N866" },
+            { "id": "tempTermopar", "etiqueta": "Temperatura del termopar", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 60598!G868:N868" },
+            { "id": "hornoAcondInicio", "etiqueta": "Inicio del acondicionamiento en horno", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G869:N869", "cambio": "D-05" },
+            { "id": "hornoAcondFin", "etiqueta": "Fin del acondicionamiento en horno", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G870:N870", "cambio": "D-05" },
+            { "id": "ensayoInicio", "etiqueta": "Inicio del ensayo", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G871:N871", "cambio": "D-05" },
+            { "id": "ensayoFin", "etiqueta": "Fin del ensayo", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G872:N872", "cambio": "D-05" },
+            { "id": "tempAgua", "etiqueta": "Temperatura del agua", "tipo": "numero", "unidad": "ºC", "porMuestra": true, "origenExcel": "Toma de notas 60598!G886:N886" },
+            { "id": "tiempoAgua", "etiqueta": "Tiempo en agua", "tipo": "numero", "unidad": "min", "porMuestra": true, "origenExcel": "Toma de notas 60598!G887:N887" },
+            { "id": "tamanoHuella", "etiqueta": "Tamaño de la huella", "tipo": "numero", "unidad": "mm", "porMuestra": true, "origenExcel": "Toma de notas 60598!G889:N889" }
+          ],
+          "reglas": [
+            { "id": "R-15.2-01", "tipo": "exactamenteUna", "checklist": "origenMuestra", "origenExcel": "Datos ensayos LUM.!BU83" },
+            { "id": "R-15.2-02", "tipo": "opcion", "checklist": "acondicionamiento", "opcion": "verificado24h", "origenExcel": "Datos ensayos LUM.!BU85" },
+            { "id": "R-15.2-02b", "tipo": "opcion", "checklist": "capas", "opcion": "requiereCapas", "origenExcel": "Datos ensayos LUM.!BU87" },
+            { "id": "R-15.2-03a", "tipo": "noVacio", "campo": "numeroCapas", "origenExcel": "Toma de notas 60598!G862" },
+            { "id": "R-15.2-03", "tipo": "si", "etiqueta": "Nº de capas indicado si se requiere apilar",
+              "condicion": "R-15.2-02b", "entonces": "R-15.2-03a", "siNo": true, "origenExcel": "Datos ensayos LUM.!BU88" },
+            { "id": "R-15.2-04", "tipo": "rango", "campo": "espesor", "min": 2.5, "origenExcel": "Datos ensayos LUM.!BU91" },
+            { "id": "R-15.2-05a", "tipo": "rango", "campo": "largo", "min": 10, "origenExcel": "Datos ensayos LUM.!BU92" },
+            { "id": "R-15.2-05b", "tipo": "rango", "campo": "ancho", "min": 10, "origenExcel": "Datos ensayos LUM.!BU93" },
+            { "id": "R-15.2-06", "tipo": "y", "de": ["R-15.2-04", "R-15.2-05a", "R-15.2-05b"], "origenExcel": "Datos ensayos LUM.!BU94" },
+            { "id": "R-15.2-07", "tipo": "duracionMinima", "inicio": "hornoAcondInicio", "fin": "hornoAcondFin", "minimo": "180min", "origenExcel": "Datos ensayos LUM.!BU99", "cambio": "D-05" },
+            { "id": "R-15.2-08", "tipo": "duracionEnRango", "inicio": "ensayoInicio", "fin": "ensayoFin", "minimo": "58min", "maximo": "62min", "origenExcel": "Datos ensayos LUM.!BU103", "cambio": "D-05" },
+            { "id": "R-15.2-09", "tipo": "noVacio", "campo": "tempTermopar", "origenExcel": "Datos ensayos LUM.!BU105" },
+            { "id": "R-15.2-10", "tipo": "y", "de": ["R-15.2-07", "R-15.2-08", "R-15.2-09"], "origenExcel": "Datos ensayos LUM.!BU107" },
+            { "id": "R-15.2-11", "tipo": "todas", "checklist": "procedimiento", "origenExcel": "Datos ensayos LUM.!BU111" },
+            { "id": "R-15.2-12", "tipo": "rango", "campo": "tempAgua", "min": 15, "max": 25, "origenExcel": "Datos ensayos LUM.!BU114" },
+            { "id": "R-15.2-13", "tipo": "rango", "campo": "tiempoAgua", "min": 4, "max": 8, "origenExcel": "Datos ensayos LUM.!BU115" },
+            { "id": "R-15.2-13b", "tipo": "y", "de": ["R-15.2-12", "R-15.2-13"], "origenExcel": "Datos ensayos LUM.!BU116" },
+            { "id": "R-15.2-14", "tipo": "duracionMinima", "inicio": "acondInicio", "fin": "acondFin", "minimo": "24h", "origenExcel": "Datos ensayos LUM.!BU119:BU121" },
+            { "id": "R-15.2-15", "tipo": "y", "etiqueta": "Verificación global",
+              "de": ["R-15.2-13b", "R-15.2-11", "R-15.2-10", "R-15.2-09", "R-15.2-08", "R-15.2-07", "R-15.2-06", "R-15.2-03", "R-15.2-02", "R-15.2-01", "R-15.2-14"],
+              "origenExcel": "Datos ensayos LUM.!BU125" },
+            { "id": "R-15.2-16a", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BW25" },
+            { "id": "R-15.2-16", "tipo": "faltanDatos", "siNoAplica": "na", "faltanSi": ["R-15.2-16a", "!R-15.2-15"], "origenExcel": "Datos ensayos LUM.!BW27" },
+            { "id": "R-15.2-P8", "tipo": "peso", "valor": 5, "aplicaSiNo": "na", "finSiNo": "R-15.2-16", "origenExcel": "Datos ensayos LUM.!AP12:AT12" }
+          ]
+        },
+
+        {
+          "id": "15.3.1",
+          "codigo": "13.3.1",
+          "codigoAntiguo": "13.3",
+          "titulo": "Resistencia a la llama (llama de aguja)",
+          "origenExcel": "Toma de notas 60598!B908:N952",
+          "pesoAvance": 5,
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!BW30" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D909:F910" },
+          "equipos": "sec15.03.1.llama-aguja",
+          "comentarios": true,
+          "notas": [
+            "Prescripciones de la norma: tiempo de aplicación 10 s, muestra cortada del EBP, ensayo sobre una única muestra",
+            "Criterio de aceptación: no hay inflamación de la capa de papel y, tras retirar la llama, no hay llamas ni incandescencia; o se extinguen en menos de 30 s",
+            "Si el material de todas las muestras es el mismo puede rellenarse sólo la primera"
+          ],
+          "checklists": [
+            { "id": "previas", "etiqueta": "Verificaciones previas al ensayo", "modo": "todas", "opciones": [
+              { "id": "llama12mm", "etiqueta": "Se realiza el ajuste para una llama de 12 mm", "origenExcel": "Datos ensayos LUM.!BW37" },
+              { "id": "espera5min", "etiqueta": "Se espera 5 min hasta la estabilización del quemador", "origenExcel": "Datos ensayos LUM.!BW38" },
+              { "id": "angulo45", "etiqueta": "Se coloca el tubo del quemador a un ángulo de 45 ± 5º", "origenExcel": "Datos ensayos LUM.!BW39" },
+              { "id": "distancia", "etiqueta": "Distancia muestra-llama: 8 ± 1 mm (ó 5 ± 1 mm si es horizontal)", "origenExcel": "Datos ensayos LUM.!BW40" }
+            ] },
+            { "id": "disposicion", "etiqueta": "Disposición de la muestra de ensayo", "modo": "exactamenteUna", "opciones": [
+              { "id": "vertical", "etiqueta": "Vertical", "origenExcel": "Toma de notas 60598!C927" },
+              { "id": "horizontal", "etiqueta": "Horizontal", "origenExcel": "Toma de notas 60598!D927" }
+            ] },
+            { "id": "resultado", "etiqueta": "Resultado", "modo": "libre", "opciones": [
+              { "id": "noCombustion", "etiqueta": "NO hay combustión", "origenExcel": "Toma de notas 60598!G930" }
+            ] }
+          ],
+          "campos": [
+            { "id": "acondInicio", "etiqueta": "Acondicionamiento 24 h · inicio", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G919:N920" },
+            { "id": "acondFin", "etiqueta": "Acondicionamiento 24 h · fin", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G921:N922" },
+            { "id": "tb", "etiqueta": "Duración de la combustión (tb)", "tipo": "numero", "unidad": "s", "porMuestra": true, "origenExcel": "Toma de notas 60598!G929:N929" }
+          ],
+          "reglas": [
+            { "id": "R-15.3.1-01", "tipo": "duracionMinima", "inicio": "acondInicio", "fin": "acondFin", "minimo": "24h", "origenExcel": "Datos ensayos LUM.!BU134" },
+            { "id": "R-15.3.1-02", "tipo": "exactamenteUna", "checklist": "disposicion", "origenExcel": "Datos ensayos LUM.!BU137" },
+            { "id": "R-15.3.1-hayTb", "tipo": "noVacio", "campo": "tb", "origenExcel": "Datos ensayos LUM.!BU139" },
+            { "id": "R-15.3.1-noComb", "tipo": "opcion", "checklist": "resultado", "opcion": "noCombustion", "origenExcel": "Datos ensayos LUM.!BU140" },
+            { "id": "R-15.3.1-03a", "tipo": "y", "de": ["R-15.3.1-hayTb", "!R-15.3.1-noComb"] },
+            { "id": "R-15.3.1-03b", "tipo": "y", "de": ["!R-15.3.1-hayTb", "R-15.3.1-noComb"] },
+            { "id": "R-15.3.1-03", "tipo": "o", "de": ["R-15.3.1-03a", "R-15.3.1-03b"],
+              "etiqueta": "O hay tiempo de combustión o se marca «no hay combustión», nunca ambos ni ninguno",
+              "origenExcel": "Datos ensayos LUM.!BU141" },
+            { "id": "R-15.3.1-04", "tipo": "todas", "checklist": "previas", "origenExcel": "Datos ensayos LUM.!BW41" },
+            { "id": "R-15.3.1-05", "tipo": "y", "de": ["R-15.3.1-01", "R-15.3.1-02", "R-15.3.1-03"], "origenExcel": "Datos ensayos LUM.!BU145" },
+            { "id": "R-15.3.1-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BW33" },
+            { "id": "R-15.3.1-06", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-15.3.1-00", "!R-15.3.1-04", "!R-15.3.1-05"], "origenExcel": "Datos ensayos LUM.!BW43" },
+            { "id": "R-15.3.1-P8", "tipo": "peso", "valor": 5, "aplicaSiNo": "na", "finSiNo": "R-15.3.1-06", "origenExcel": "Datos ensayos LUM.!AP13:AT13" }
+          ]
+        },
+
+        {
+          "id": "15.3.2",
+          "codigo": "13.3.2",
+          "titulo": "Hilo incandescente",
+          "origenExcel": "Toma de notas 60598!B955:N982",
+          "pesoAvance": 5,
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!BW46" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D956:F957" },
+          "equipos": "sec15.03.2.hilo-incandescente",
+          "comentarios": true,
+          "notas": ["El resto de los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "checklists": [
+            { "id": "previas", "etiqueta": "Verificaciones previas al ensayo", "modo": "todas", "opciones": [
+              { "id": "penetracion7mm", "etiqueta": "Se limita mecánicamente la penetración a 7 ± 0,5 mm", "origenExcel": "Datos ensayos LUM.!BW54" },
+              { "id": "planchaMadera", "etiqueta": "Se coloca la plancha de madera con papel a 200 ± 5 mm", "origenExcel": "Datos ensayos LUM.!BW55" },
+              { "id": "relacionCorriente", "etiqueta": "Se verifica la relación correcta entre corriente y temperatura (± 2 %)", "origenExcel": "Datos ensayos LUM.!BW56" }
+            ] }
+          ],
+          "campos": [
+            { "id": "diametroHilo", "etiqueta": "Diámetro en el extremo del hilo [4 ± 0,07 mm]", "tipo": "numero", "unidad": "mm", "porMuestra": true, "origenExcel": "Toma de notas 60598!G960:N960" },
+            { "id": "espesor", "etiqueta": "Espesor de la muestra", "tipo": "numero", "unidad": "mm", "porMuestra": true, "origenExcel": "Toma de notas 60598!G964:N964" },
+            { "id": "ancho", "etiqueta": "Ancho de la muestra", "tipo": "numero", "unidad": "mm", "porMuestra": true, "origenExcel": "Toma de notas 60598!G965:N965" },
+            { "id": "largo", "etiqueta": "Largo de la muestra", "tipo": "numero", "unidad": "mm", "porMuestra": true, "origenExcel": "Toma de notas 60598!G966:N966" },
+            { "id": "acondInicio", "etiqueta": "Acondicionamiento 24 h · inicio", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G969:N970" },
+            { "id": "acondFin", "etiqueta": "Acondicionamiento 24 h · fin", "tipo": "instante", "porMuestra": true, "origenExcel": "Toma de notas 60598!G971:N972" }
+          ],
+          "reglas": [
+            { "id": "R-15.3.2-01", "tipo": "rango", "campo": "diametroHilo", "min": 3.93, "max": 4.07, "origenExcel": "Datos ensayos LUM.!BX53" },
+            { "id": "R-15.3.2-02a", "tipo": "noVacio", "campo": "espesor", "origenExcel": "Datos ensayos LUM.!BW58" },
+            { "id": "R-15.3.2-02b", "tipo": "noVacio", "campo": "ancho" },
+            { "id": "R-15.3.2-02c", "tipo": "noVacio", "campo": "largo" },
+            { "id": "R-15.3.2-02", "tipo": "y", "de": ["R-15.3.2-02a", "R-15.3.2-02b", "R-15.3.2-02c"], "origenExcel": "Datos ensayos LUM.!BW58" },
+            { "id": "R-15.3.2-03", "tipo": "duracionMinima", "inicio": "acondInicio", "fin": "acondFin", "minimo": "24h", "origenExcel": "Datos ensayos LUM.!BU168" },
+            { "id": "R-15.3.2-04", "tipo": "todas", "checklist": "previas", "origenExcel": "Datos ensayos LUM.!BW57" },
+            { "id": "R-15.3.2-05", "tipo": "y", "de": ["R-15.3.2-01", "R-15.3.2-02", "R-15.3.2-03", "R-15.3.2-04"], "origenExcel": "Datos ensayos LUM.!BW57" },
+            { "id": "R-15.3.2-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BW49" },
+            { "id": "R-15.3.2-06", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-15.3.2-00", "!R-15.3.2-05"], "origenExcel": "Datos ensayos LUM.!BW60" },
+            { "id": "R-15.3.2-P8", "tipo": "peso", "valor": 5, "aplicaSiNo": "na", "finSiNo": "R-15.3.2-06", "origenExcel": "Datos ensayos LUM.!AP14:AT14" }
+          ]
+        },
+
+        {
+          "id": "15.4",
+          "codigo": "13.4",
+          "titulo": "Formación de caminos conductores",
+          "origenExcel": "Toma de notas 60598!B985:N996",
+          "pesoAvance": 10,
+          "na": { "id": "na", "etiqueta": "N/A", "origenExcel": "Datos ensayos LUM.!BW62" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D986:F987" },
+          "equipos": "sec15.04.caminos-conductores",
+          "comentarios": true,
+          "checklists": [
+            { "id": "registro", "modo": "libre", "opciones": [
+              { "id": "enPapel", "etiqueta": "El ensayo se realiza y las notas se toman en formato papel, por no ser un ensayo habitual", "origenExcel": "Toma de notas 60598!B988" }
+            ] }
+          ],
+          "reglas": [
+            { "id": "R-15.4-01", "tipo": "opcion", "checklist": "registro", "opcion": "enPapel", "origenExcel": "Datos ensayos LUM.!BW68" },
+            { "id": "R-15.4-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BW65" },
+            { "id": "R-15.4-02", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-15.4-00", "!R-15.4-01"], "origenExcel": "Datos ensayos LUM.!BW67" },
+            { "id": "R-15.4-P8", "tipo": "peso", "valor": 10, "aplicaSiNo": "na", "finSiNo": "R-15.4-02", "origenExcel": "Datos ensayos LUM.!AP15:AT15" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "16",
+      "titulo": "Sección 16 - Bornes con tornillos",
+      "na": { "id": "naSeccion", "etiqueta": "N/A sección 16", "origenExcel": "Datos ensayos LUM.!BN41" },
+      "bloques": [
+        {
+          "id": "16",
+          "codigo": "16",
+          "titulo": "Bornes de tornillo",
+          "origenExcel": "Toma de notas 60598!B1002:N1020",
+          "na": { "id": "na", "etiqueta": "N/A bornes de tornillo", "origenExcel": "Datos ensayos LUM.!BN44" },
+          "equipos": "sec16.bornes-tornillo",
+          "comentarios": true,
+          "notas": ["Los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "subBloques": [
+            {
+              "id": "16.1",
+              "titulo": "16.1 y 16.2 · Requisitos generales",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D1004:F1005" },
+              "reglas": [
+                { "id": "R-16.1-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BN47" },
+                { "id": "R-16.1-01", "tipo": "faltanDatos", "faltanSi": ["R-16.1-00"], "origenExcel": "Datos ensayos LUM.!BN48" }
+              ]
+            },
+            {
+              "id": "16.3",
+              "titulo": "16.3 · Ensayos mecánicos",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D1011:F1012" },
+              "reglas": [
+                { "id": "R-16.3-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BN50" },
+                { "id": "R-16.3-01", "tipo": "faltanDatos", "faltanSi": ["R-16.3-00"], "origenExcel": "Datos ensayos LUM.!BN51" }
+              ]
+            }
+          ],
+          "reglas": [
+            { "id": "R-16-01", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-16.1-01", "R-16.3-01"], "origenExcel": "Datos ensayos LUM.!BN54" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "17",
+      "titulo": "Sección 17 - Bornes sin tornillo",
+      "na": { "id": "naSeccion", "etiqueta": "N/A sección 17", "origenExcel": "Datos ensayos LUM.!BN59" },
+      "bloques": [
+        {
+          "id": "17",
+          "codigo": "17",
+          "titulo": "Bornes sin tornillo y conexiones eléctricas",
+          "origenExcel": "Toma de notas 60598!B1023:N1048",
+          "na": { "id": "na", "etiqueta": "N/A bornes sin tornillo", "origenExcel": "Datos ensayos LUM.!BN59" },
+          "equipos": "sec17.bornes-sin-tornillo",
+          "comentarios": true,
+          "notas": ["Los datos de resultados pueden tomarse directamente sobre el TRF"],
+          "subBloques": [
+            {
+              "id": "17.1",
+              "titulo": "17.1 y 17.2 · Requisitos generales",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D1025:F1026" },
+              "reglas": [
+                { "id": "R-17.1-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BN62" },
+                { "id": "R-17.1-01", "tipo": "faltanDatos", "faltanSi": ["R-17.1-00"], "origenExcel": "Datos ensayos LUM.!BN63" }
+              ]
+            },
+            {
+              "id": "17.4",
+              "titulo": "17.4 · Bornes y conexiones para cableado interno",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D1032:F1033" },
+              "checklists": [
+                { "id": "naInterno", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A cableado interno", "origenExcel": "Datos ensayos LUM.!BN66" }
+                ] }
+              ],
+              "reglas": [
+                { "id": "R-17.4-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BN68" },
+                { "id": "R-17.4-01", "tipo": "faltanDatos", "siNoAplica": "naInterno", "faltanSi": ["R-17.4-00"], "origenExcel": "Datos ensayos LUM.!BN69" }
+              ]
+            },
+            {
+              "id": "17.5",
+              "titulo": "17.5 · Bornes y conexiones para cableado externo",
+              "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de notas 60598!D1039:F1040" },
+              "notas": ["En el Excel este bloque está rotulado como «cableado interno», igual que 17.4 (D-09)"],
+              "checklists": [
+                { "id": "naExterno", "modo": "libre", "opciones": [
+                  { "id": "na", "etiqueta": "N/A cableado externo", "origenExcel": "Datos ensayos LUM.!BN72" }
+                ] }
+              ],
+              "reglas": [
+                { "id": "R-17.5-00", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Datos ensayos LUM.!BN74" },
+                { "id": "R-17.5-01", "tipo": "faltanDatos", "siNoAplica": "naExterno", "faltanSi": ["R-17.5-00"], "origenExcel": "Datos ensayos LUM.!BN75" }
+              ]
+            }
+          ],
+          "reglas": [
+            { "id": "R-17-01", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-17.1-01", "R-17.4-01", "R-17.5-01"], "origenExcel": "Datos ensayos LUM.!BN77" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "IK",
+      "titulo": "Ensayo de IK - EN/IEC 62262",
+      "nota": "Solo aparece si alguna muestra tiene un grado IK objetivo distinto de «No IK».",
+      "bloques": [
+        {
+          "id": "60598.ik",
+          "codigo": "IK",
+          "titulo": "Resistencia a los impactos mecánicos externos",
+          "origenExcel": "TomaDeNotasExcelCompleta.xlsx — Toma de Notas IP-IK!A128:N163",
+          "pesoAvance": 10,
+          "visibleSi": "R-60598-hayIk",
+          "na": { "id": "na", "etiqueta": "N/A - no se ensaya el IK" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true },
+          "equipos": "ik.62262",
+          "comentarios": true,
+          "campos": [
+            { "id": "gradoIkAlcanzado1", "etiqueta": "Grado IK alcanzado (1)", "tipo": "texto", "porMuestra": true },
+            { "id": "gradoIkAlcanzado2", "etiqueta": "Grado IK alcanzado (2)", "tipo": "texto", "porMuestra": true, "opcional": true,
+              "nota": "Rellenar los dos si el EBP tuviese grados distintos en función de la zona de aplicación." },
+            { "id": "veredicto", "etiqueta": "Veredicto", "tipo": "texto", "porMuestra": true }
+          ],
+          "checklists": [
+            { "id": "metodo", "etiqueta": "Método de ensayo (IK07 a IK11)", "modo": "exactamenteUna",
+              "nota": "Solo hace falta elegirlo para IK07 a IK11. De IK01 a IK06 se usa por defecto el martillo de resorte (Ehb).",
+              "opciones": [
+                { "id": "eha", "etiqueta": "Eha - Método de péndulo de golpeo" },
+                { "id": "ehc", "etiqueta": "Ehc - Método de caída vertical" }
+              ] }
+          ],
+          "subBloques": [
+            {
+              "id": "60598.ik.impactos",
+              "titulo": "Puntos de aplicación de los impactos",
+              "campos": [
+                { "id": "puntos", "etiqueta": "Puntos de aplicación", "tipo": "grupoRepetido", "elementos": 7, "ampliable": true,
+                  "campos": [
+                    { "id": "descripcion", "etiqueta": "Descripción", "tipo": "texto" },
+                    { "id": "impactos", "etiqueta": "Nº impactos", "tipo": "entero" }
+                  ] }
+              ],
+              "reglas": [
+                { "id": "R-60598-ik-impactos", "tipo": "recuentoDatos", "campo": "puntos", "umbral": 2,
+                  "etiqueta": "Al menos un punto de aplicación descrito con su número de impactos" }
+              ]
+            }
+          ],
+          "notas": [
+            "Si el ensayo es IK01 a IK06 se utiliza por defecto el método de martillo de resorte (Ehb).",
+            "No se aplican más de tres golpes en las inmediaciones de un mismo punto, salvo que se indique lo contrario en la toma de notas.",
+            "La muestra se fija de manera que quede pegada a la superficie de ensayo para que no se desplace con el impacto.",
+            "Energía por código: IK01=0,14J · IK02=0,20J · IK03=0,35J · IK04=0,50J · IK05=0,70J · IK06=1J · IK07=2J · IK08=5J · IK09=10J · IK10=20J · IK11=50J."
+          ],
+          "reglas": [
+            { "id": "R-60598-hayIk", "tipo": "predicado", "nombre": "hayGradoIk",
+              "etiqueta": "Alguna muestra tiene grado IK objetivo" },
+            { "id": "R-60598-ik-metodoElegible", "tipo": "predicado", "nombre": "requiereMetodoDeGolpeo",
+              "etiqueta": "El grado objetivo es IK07 o superior, que exige elegir método de ensayo" },
+            { "id": "R-60598-ik-01", "tipo": "avisoFecha", "campo": "ambiente.fecha" },
+            { "id": "R-60598-ik-02", "tipo": "recuentoDatos", "campo": "gradoIkAlcanzado1", "umbralPorMuestra": 1,
+              "etiqueta": "Grado IK alcanzado de cada muestra" },
+            { "id": "R-60598-ik-03", "tipo": "recuentoDatos", "campo": "veredicto", "umbralPorMuestra": 1,
+              "etiqueta": "Veredicto de cada muestra" },
+            { "id": "R-60598-ik-metodo", "tipo": "exactamenteUna", "checklist": "metodo",
+              "etiqueta": "Se ha elegido un único método de ensayo" },
+            { "id": "R-60598-ik-04", "tipo": "si", "condicion": "R-60598-ik-metodoElegible",
+              "entonces": "!R-60598-ik-metodo",
+              "etiqueta": "Para IK07 a IK11 falta elegir el método de ensayo" },
+            { "id": "R-60598-ik-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-60598-ik-01", "!R-60598-ik-02", "!R-60598-ik-03", "R-60598-ik-04", "!R-60598-ik-impactos"] },
+            { "id": "R-60598-ik-peso", "tipo": "peso", "valor": 10, "aplicaSiNo": "na", "finSiNo": "R-60598-ik-cierre" }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "avance": {
+    "modo": "ponderado",
+    "indicadorSecundario": "apartadosCompletados",
+    "nota": "DD-11 / D-18: se mantienen los pesos del Excel y se añade el contador de apartados completados.",
+    "pesoTotalProyectoCompleto": 209
+  }
+}

@@ -15,20 +15,30 @@ public static class Contexto
 
     public static PlantillaEnsayos Plantilla => Cargada.Value;
 
+    /// <remarks>
+    /// Se busca por patrón y no por nombre exacto: el fichero lleva el año y la
+    /// versión —<c>plantilla-60598-1_2024_1.0.0.json</c>— y atarlo al nombre completo
+    /// obligaría a tocar esto en cada publicación.
+    /// </remarks>
     public static string RutaPlantilla()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);
         while (dir is not null)
         {
-            var candidata = Path.Combine(dir.FullName, "plantilla", "plantilla-60598.v1.json");
-            if (File.Exists(candidata)) return candidata;
+            var carpeta = Path.Combine(dir.FullName, "plantilla");
+            if (Directory.Exists(carpeta)
+                && Directory.GetFiles(carpeta, "plantilla-60598*.json").OrderBy(r => r).LastOrDefault() is { } ruta)
+                return ruta;
+
             dir = dir.Parent;
         }
-        throw new FileNotFoundException("No se encuentra plantilla/plantilla-60598.v1.json subiendo desde " + AppContext.BaseDirectory);
+        throw new FileNotFoundException(
+            "No se encuentra plantilla/plantilla-60598*.json subiendo desde " + AppContext.BaseDirectory);
     }
 
     public static string RutaEquipos()
-        => Path.Combine(Path.GetDirectoryName(RutaPlantilla())!, "equipos-60598.v1.json");
+        => Path.Combine(Path.GetDirectoryName(RutaPlantilla())!,
+                        PlantillaEnsayos.Cargar(RutaPlantilla()).Meta.CatalogoEquipos!);
 
     public static string CarpetaDePlantillas() => Path.GetDirectoryName(RutaPlantilla())!;
 
@@ -40,6 +50,22 @@ public static class Contexto
         => Directory.GetFiles(CarpetaDePlantillas(), "plantilla-*.json")
                     .OrderBy(r => r)
                     .Select(PlantillaEnsayos.Cargar);
+
+    /// <summary>
+    /// Una norma instalada, por su <b>código corto</b> —el que sale en el nombre del
+    /// fichero— y no por su id. El id lleva el año (<c>60598-1_2024</c>), así que
+    /// buscar por él obligaría a repasar los tests cada vez que salga un año nuevo;
+    /// el código corto identifica la norma y no cambia.
+    /// </summary>
+    /// <remarks>
+    /// Si hay varias versiones de la misma norma, la de id más alto — que es la más
+    /// reciente. Los tests hablan de la norma vigente salvo que digan otra cosa.
+    /// </remarks>
+    public static PlantillaEnsayos Norma(string codigo)
+        => TodasLasPlantillas()
+            .Where(p => p.Meta.CodigoParaFichero == codigo)
+            .OrderBy(p => p.Meta.Id, StringComparer.Ordinal)
+            .Last();
 
     /// <summary>Proyecto mínimo válido: 1 muestra, clase I, sin nada relleno.</summary>
     public static DatosProyecto ProyectoVacio(int muestras = 1)

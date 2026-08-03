@@ -125,15 +125,13 @@
         <Style x:Key="TarjetaNorma" TargetType="Button">
             <Setter Property="Cursor" Value="Hand"/>
             <!--
-                Encoge con la ventana pero no se estira sin límite: con nombres tan
-                cortos, una tarjeta muy ancha queda vacía. Alineada a la izquierda para
-                que el hueco sobrante quede al final de la fila y no entre tarjetas.
+                Todas exactamente del mismo tamaño. Antes se ajustaban al texto y quedaban
+                desparejas —«IP» estrecha, «Módulos LED» ancha— sin más motivo que la
+                longitud del nombre; con cinco normas eso ya se notaba.
             -->
-            <Setter Property="MinHeight" Value="76"/>
-            <Setter Property="MinWidth" Value="132"/>
-            <Setter Property="MaxWidth" Value="215"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
-            <Setter Property="Margin" Value="0,0,12,12"/>
+            <Setter Property="Width" Value="134"/>
+            <Setter Property="Height" Value="96"/>
+            <Setter Property="Margin" Value="0,0,10,10"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -919,6 +917,38 @@
                                Foreground="#6B7280" FontSize="12" Margin="0,6,0,26" TextWrapping="Wrap"/>
 
                     <!--
+                        Avisos. No existe si no hay nada que hacer: un recuadro que casi
+                        siempre está deja de leerse, y entonces no sirve el día que importa.
+                    -->
+                    <ItemsControl ItemsSource="{Binding DataContext.Avisos, RelativeSource={RelativeSource AncestorType=Window}}"
+                                  Margin="0,0,0,22"
+                                  Visibility="{Binding DataContext.HayAvisos, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolAVisible}}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="10" BorderThickness="1" Padding="16,13" Margin="0,0,0,8"
+                                        Background="{Binding Fondo}" BorderBrush="{Binding Borde}">
+                                    <DockPanel>
+                                        <!-- El botón que lo arregla, al lado de lo que hay que arreglar -->
+                                        <Button DockPanel.Dock="Right" Content="{Binding Boton}"
+                                                Command="{Binding Resolver}"
+                                                Padding="12,6" Margin="14,0,0,0" Cursor="Hand"
+                                                VerticalAlignment="Center"/>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Texto}" TextWrapping="Wrap"
+                                                       FontWeight="SemiBold" FontSize="12"
+                                                       Foreground="{Binding Color}"/>
+                                            <TextBlock Text="{Binding Detalle}" TextWrapping="Wrap"
+                                                       FontSize="11" Margin="0,3,0,0"
+                                                       Foreground="{Binding Color}" Opacity="0.85"
+                                                       Visibility="{Binding HayDetalle, Converter={StaticResource BoolAVisible}}"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!--
                         Izquierda, tomar notas; derecha, gestionar. Son dos oficios distintos y
                         pesan lo mismo, así que la portada se parte por la mitad: dos columnas
                         iguales, sin ancho fijo. Con «*» y «*» nadie puede pedir más de lo que
@@ -927,7 +957,13 @@
                     -->
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <!--
+                                La izquierda algo más ancha: es la que tiene que caber tres
+                                tarjetas de norma por fila. La derecha lleva tres botones y
+                                se apaña con menos, que además es lo que hace que su texto
+                                pase a dos líneas en vez de recortarse.
+                            -->
+                            <ColumnDefinition Width="1.35*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
@@ -946,14 +982,21 @@
                                     <TextBlock Text="TOMA DE NOTAS" Style="{StaticResource RotuloZona}"
                                                Foreground="#2563EB"/>
                                 </StackPanel>
-                                <TextBlock Text="Empieza un servicio nuevo con la norma que toque, o abre el que estés llevando."
+                                <TextBlock Text="Empieza una toma de notas con la norma que toque, o abre una que ya tengas."
                                            TextWrapping="Wrap"
                                            FontSize="12" Foreground="#6B7280" Margin="13,0,0,16"/>
 
+                                <!--
+                                    Se reacomodan solas: caben tres por fila y bajan a dos
+                                    al estrechar la ventana. Con WrapPanel y tarjetas de
+                                    tamaño fijo sale gratis — un UniformGrid habría que
+                                    decirle cuántas columnas, y su ItemsPanelTemplate no
+                                    llega a ver el ancho del contenedor.
+                                -->
                                 <ItemsControl ItemsSource="{Binding Normas}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
-                                            <UniformGrid Columns="2"/>
+                                            <WrapPanel/>
                                         </ItemsPanelTemplate>
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
@@ -963,9 +1006,11 @@
                                                               RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}">
                                                 <StackPanel>
-                                                    <TextBlock Text="{Binding Id}" FontSize="20" FontWeight="Bold"
+                                                    <!-- El número de norma, no el id: el id
+                                                         lleva la edición y no cabe -->
+                                                    <TextBlock Text="{Binding Rotulo}" FontSize="20" FontWeight="Bold"
                                                                Foreground="#2563EB"/>
-                                                    <TextBlock Text="{Binding TituloCorto}" TextWrapping="Wrap"
+                                                    <TextBlock Text="{Binding TituloConAnio}" TextWrapping="Wrap"
                                                                FontSize="12.5" Foreground="#6B7280" Margin="0,3,0,0"/>
                                                 </StackPanel>
                                             </Button>
@@ -979,11 +1024,11 @@
                                      tenerlos juntos aquí era ofrecer dos caminos para una
                                      sola cosa. El alta se queda en «Archivo» y en la barra
                                      del tablero, que es donde está el responsable. -->
-                                <Button Content="Abrir…"
+                                <Button Content="Abrir toma de notas…"
                                         Command="{Binding DataContext.Abrir, RelativeSource={RelativeSource AncestorType=Window}}"
                                         Padding="20,10" Cursor="Hand" HorizontalAlignment="Left"/>
 
-                                <TextBlock Text="ÚLTIMOS ABIERTOS"
+                                <TextBlock Text="ÚLTIMAS TOMAS DE NOTAS"
                                            Style="{StaticResource RotuloZona}" Foreground="#9CA3AF"
                                            Margin="0,20,0,8"
                                            Visibility="{Binding DataContext.HayRecientes, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolAVisible}}"/>
@@ -1571,8 +1616,8 @@
                           ToolTip="Darla de alta con nombre y técnico, para poder planificarla ya"/>
                 <Separator/>
                 <MenuItem Header="Nueva _pestaña" Command="{Binding NuevaPestana}" InputGestureText="Ctrl+T"/>
-                <MenuItem Header="_Abrir otro proyecto…" Command="{Binding Abrir}" InputGestureText="Ctrl+O"/>
-                <MenuItem Header="Proyectos _recientes" ItemsSource="{Binding Recientes}"
+                <MenuItem Header="_Abrir toma de notas…" Command="{Binding Abrir}" InputGestureText="Ctrl+O"/>
+                <MenuItem Header="Tomas de notas _recientes" ItemsSource="{Binding Recientes}"
                           IsEnabled="{Binding HayRecientes}">
                     <MenuItem.ItemContainerStyle>
                         <Style TargetType="MenuItem">
@@ -1711,7 +1756,7 @@
                 </ItemsControl>
 
                 <Button Content="+" Command="{Binding NuevaPestana}" Cursor="Hand"
-                        Width="30" Height="30" FontSize="16" FontWeight="Bold"
+                        Width="30" Height="30" FontSize="16" FontWeight="Bold" Padding="0"
                         Background="Transparent" BorderThickness="0" Foreground="#374151"
                         ToolTip="Abrir otra toma de notas (Ctrl+T)"/>
             </WrapPanel>

@@ -151,7 +151,7 @@ public static class AnalizadorDeProyectos
         // Si la que dice el proyecto ya no está entre las suyas —se quitó desde la toma de
         // notas— no vale de nada: se vuelve a deducir en lugar de detallar una norma que
         // el servicio ya no lleva.
-        var principal = normas.FirstOrDefault(p => p.Meta.Id == datos.NormaPrincipal)
+        var principal = normas.FirstOrDefault(p => p.Meta.Responde(datos.NormaPrincipal))
                         ?? Deducir(normas, datos);
 
         return [principal, .. normas.Where(p => !ReferenceEquals(p, principal))
@@ -175,7 +175,7 @@ public static class AnalizadorDeProyectos
             .Where(p => p.Muestras.Identificador?.Patron == datos.PatronIdentificador)
             .ToList();
 
-        return normas.FirstOrDefault(p => p.Meta.Id == "60598")
+        return normas.FirstOrDefault(p => p.Meta.CodigoParaFichero == "60598")
                ?? (porPatron.Count == 1 ? porPatron[0] : null)
                ?? normas.OrderBy(p => p.Meta.Id, StringComparer.Ordinal).First();
     }

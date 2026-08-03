@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "id": "62262_2002_A1",
+    "idsAnteriores": ["62262"],
+    "codigoDeFichero": "62262",
+    "anioDePublicacion": "2002",
+    "titulo": "Grados IK — EN 62262:2002 + A1:2021",
+    "tituloCorto": "IK",
+    "normasCompatibles": ["60529_2018"],
+    "version": "1.0.0",
+    "generadoEl": "2026-07-31",
+    "origen": "TomaDeNotasExcelCompleta.xlsx v2.1 — hojas «Toma de Notas IP-IK» y «Datos ensayo IK-LUM»",
+    "reglasDocumentadasEn": "docs/REGLAS-NEGOCIO.md v2.2",
+    "alcance": {
+      "incluye": ["EN/IEC 62262 — grados IK", "EN/IEC 60068-2-75 — ensayos de golpe"],
+      "excluye": ["IP (60529), que es una toma de notas aparte"]
+    },
+    "catalogoEquipos": "equipos-62262_2002_A1_1.0.0.json"
+  },
+
+  "proyecto": {
+    "campos": [
+      { "id": "codigoServicio", "etiqueta": "Código de servicio", "tipo": "texto", "formato": "NNNNNAAAA", "obligatorio": true, "origenExcel": "RESUMEN PROYECTO IP-IK!D3" },
+      { "id": "tecnico1", "etiqueta": "Técnico 1", "tipo": "texto", "obligatorio": true, "origenExcel": "RESUMEN PROYECTO IP-IK!C5" },
+      { "id": "tecnico2", "etiqueta": "Técnico 2", "tipo": "texto", "origenExcel": "RESUMEN PROYECTO IP-IK!C6" },
+      { "id": "numeroMuestras", "etiqueta": "Nº de muestras", "tipo": "entero", "min": 1, "max": 30, "obligatorio": true, "origenExcel": "RESUMEN PROYECTO IP-IK!D8" },
+      { "id": "partes2", "etiqueta": "Tipología de producto (luminarias u otros)", "tipo": "seleccion", "multiple": true, "obligatorio": true,
+        "opciones": ["-2-1", "-2-2", "-2-3", "-2-4", "-2-5", "-2-10", "-2-13", "-2-18", "-2-22", "OTRO"],
+        "nota": "Si el producto es una luminaria se marca su parte -2; si es otro tipo de producto, «OTRO». Hasta elegir algo no se muestran los apartados de ensayo." },
+      { "id": "luminariaOrdinaria", "etiqueta": "Luminaria ordinaria", "tipo": "booleano", "porMuestra": true,
+        "nota": "Atajo del laboratorio: una luminaria ordinaria es IP20, así que al marcarlo se rellena IP2X e IPX0." },
+      { "id": "ipPrimeraCifra", "etiqueta": "Grado IP objetivo — 1ª cifra (sólidos)", "etiquetaCorta": "1ª cifra", "tipo": "seleccion", "porMuestra": true,
+        "opciones": ["IP1X", "IP2X", "IP3X", "IP4X", "IP5X", "IP6X"],
+        "nota": "Opcional: un servicio de IK puede llevar IP o no. Se deja en blanco si esa muestra no lo tiene." },
+      { "id": "ipSegundaCifra", "etiqueta": "Grado IP objetivo — 2ª cifra (agua)", "etiquetaCorta": "2ª cifra", "tipo": "seleccion", "porMuestra": true,
+        "opciones": ["IPX0", "IPX1", "IPX2", "IPX3", "IPX4", "IPX5", "IPX6", "IPX7", "IPX8", "IPX9"],
+        "nota": "Opcional: un servicio de IK puede llevar IP o no. Se deja en blanco si esa muestra no lo tiene." },
+      { "id": "gradoIk", "etiqueta": "Grado IK objetivo", "etiquetaCorta": "IK", "tipo": "seleccion", "porMuestra": true, "obligatorio": true,
+        "opciones": ["IK01", "IK02", "IK03", "IK04", "IK05", "IK06", "IK07", "IK08", "IK09", "IK10", "IK11"],
+        "origenExcel": "RESUMEN PROYECTO IP-IK!R12",
+        "nota": "Va por muestra: un mismo servicio puede traer productos con objetivos distintos." },
+      { "id": "profundidadInmersion", "etiqueta": "Profundidad de inmersión", "tipo": "numero", "unidad": "m",
+        "visibleSi": "R-62262-inmersion", "obligatorio": true, "origenExcel": "RESUMEN PROYECTO IP-IK!M23",
+        "nota": "Obligatoria solo cuando aparece, es decir, si alguna muestra lleva objetivo IPX7 o IPX8." },
+      { "id": "tiempoInmersion", "etiqueta": "Tiempo de inmersión", "tipo": "numero", "unidad": "min",
+        "visibleSi": "R-62262-inmersion", "obligatorio": true },
+      { "id": "temperaturaInmersion", "etiqueta": "Temperatura del agua de inmersión", "tipo": "numero", "unidad": "ºC",
+        "visibleSi": "R-62262-inmersion", "obligatorio": true, "porDefecto": 25, "origenExcel": "RESUMEN PROYECTO IP-IK!M24" },
+      { "id": "inicioNumeracion", "etiqueta": "Iniciar numeración en", "tipo": "entero", "porDefecto": 1, "origenExcel": "RESUMEN PROYECTO IP-IK!F36" },
+      { "id": "comentariosGenerales", "etiqueta": "Comentarios y notas generales del proyecto", "tipo": "textoLargo", "origenExcel": "RESUMEN PROYECTO IP-IK!H2" }
+    ],
+    "reglas": [
+      { "id": "R-PROY-completo", "tipo": "predicado", "nombre": "proyectoCompleto",
+        "etiqueta": "La cabecera del proyecto está completa",
+        "descripcion": "Exige código de servicio, técnico 1, nº de muestras, tipología de producto y el grado IK objetivo de cada muestra.",
+        "origenExcel": "RESUMEN PROYECTO IP-IK!B9" },
+      { "id": "R-62262-inmersion", "tipo": "predicado", "nombre": "requiereInmersion",
+        "etiqueta": "Alguna muestra tiene objetivo IPX7 o IPX8",
+        "descripcion": "Aquí el grado IP es opcional, pero si se marca inmersión hacen falta profundidad, tiempo y temperatura del agua, igual que en la 60529." }
+    ]
+  },
+
+  "muestras": {
+    "min": 1,
+    "max": 30,
+    "identificador": {
+      "patron": "EBP_CLIM{codigoServicio}",
+      "nota": "El laboratorio usa CLIM en lugar de SAFE para los servicios de IK."
+    },
+    "campos": [
+      { "id": "numero", "etiqueta": "Nº", "tipo": "entero" },
+      { "id": "observaciones", "etiqueta": "Comentarios y observaciones de la muestra", "tipo": "textoLargo" }
+    ]
+  },
+
+  "secciones": [
+    {
+      "codigo": "generales",
+      "titulo": "Datos generales de las muestras",
+      "bloques": [
+        {
+          "id": "62262.generales",
+          "codigo": "generales",
+          "titulo": "Datos generales de las muestras",
+          "origenExcel": "Toma de Notas IP-IK!A3:N21",
+          "pesoAvance": 2,
+          "comentarios": true,
+          "campos": [
+            { "id": "tamano", "etiqueta": "Tamaño de las muestras", "tipo": "grupoRepetido", "elementos": 1, "porMuestra": true,
+              "origenExcel": "Toma de Notas IP-IK!D5:F8",
+              "campos": [
+                { "id": "alto", "etiqueta": "Alto", "tipo": "numero", "unidad": "cm" },
+                { "id": "ancho", "etiqueta": "Ancho", "tipo": "numero", "unidad": "cm" },
+                { "id": "profundo", "etiqueta": "Profundo", "tipo": "numero", "unidad": "cm" },
+                { "id": "peso", "etiqueta": "Peso", "tipo": "numero", "unidad": "kg" }
+              ] }
+          ],
+          "reglas": [
+            { "id": "R-62262-gen-01", "tipo": "recuentoDatos", "campo": "tamano", "umbralPorMuestra": 3,
+              "etiqueta": "Alto, ancho y profundo de cada muestra" },
+            { "id": "R-62262-gen-cierre", "tipo": "faltanDatos", "faltanSi": ["!R-62262-gen-01"] },
+            { "id": "R-62262-gen-peso", "tipo": "peso", "valor": 2, "finSiNo": "R-62262-gen-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "IK",
+      "titulo": "Ensayo de IK",
+      "bloques": [
+        {
+          "id": "62262.ik",
+          "codigo": "IK",
+          "titulo": "Resistencia a los impactos mecánicos externos",
+          "origenExcel": "Toma de Notas IP-IK!A128:N163",
+          "pesoAvance": 10,
+          "na": { "id": "na", "etiqueta": "N/A - no se ensaya el IK" },
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de Notas IP-IK!D129:F129" },
+          "equipos": "ik.impacto",
+          "comentarios": true,
+          "campos": [
+            { "id": "gradoIkAlcanzado1", "etiqueta": "Grado IK alcanzado (1)", "tipo": "texto", "porMuestra": true, "origenExcel": "Toma de Notas IP-IK!F145" },
+            { "id": "gradoIkAlcanzado2", "etiqueta": "Grado IK alcanzado (2)", "tipo": "texto", "porMuestra": true, "opcional": true, "origenExcel": "Toma de Notas IP-IK!F146",
+              "nota": "Rellenar los dos si el EBP tuviese grados distintos en función de la zona de aplicación." },
+            { "id": "veredicto", "etiqueta": "Veredicto", "tipo": "texto", "porMuestra": true, "origenExcel": "Toma de Notas IP-IK!F149" }
+          ],
+          "checklists": [
+            { "id": "metodo", "etiqueta": "Método de ensayo (IK07 a IK11)", "modo": "exactamenteUna",
+              "nota": "Solo hace falta elegirlo para IK07 a IK11. De IK01 a IK06 se usa por defecto el martillo de resorte (Ehb).",
+              "origenExcel": "Toma de Notas IP-IK!C151:C153",
+              "opciones": [
+                { "id": "eha", "etiqueta": "Eha - Método de péndulo de golpeo", "origenExcel": "Toma de Notas IP-IK!C152" },
+                { "id": "ehc", "etiqueta": "Ehc - Método de caída vertical", "origenExcel": "Toma de Notas IP-IK!C153" }
+              ] }
+          ],
+          "subBloques": [
+            {
+              "id": "62262.ik.impactos",
+              "titulo": "Puntos de aplicación de los impactos",
+              "origenExcel": "Toma de Notas IP-IK!D132:F143",
+              "campos": [
+                { "id": "puntos", "etiqueta": "Puntos de aplicación", "tipo": "grupoRepetido", "elementos": 7, "ampliable": true,
+                  "campos": [
+                    { "id": "descripcion", "etiqueta": "Descripción", "tipo": "texto" },
+                    { "id": "impactos", "etiqueta": "Nº impactos", "tipo": "entero" }
+                  ] }
+              ],
+              "reglas": [
+                { "id": "R-62262-ik-impactos", "tipo": "recuentoDatos", "campo": "puntos", "umbral": 2,
+                  "etiqueta": "Al menos un punto de aplicación descrito con su número de impactos" }
+              ]
+            }
+          ],
+          "notas": [
+            "Si el ensayo es IK01 a IK06 se utiliza por defecto el método de martillo de resorte (Ehb).",
+            "No se aplican más de tres golpes en las inmediaciones de un mismo punto, salvo que se indique lo contrario en la toma de notas.",
+            "La muestra se fija de manera que quede pegada a la superficie de ensayo para que no se desplace con el impacto.",
+            "Información sobre montaje, preacondicionamiento y partes móviles puede tomarse directamente sobre el TRF; las aclaraciones adicionales van en comentarios.",
+            "Energía por código: IK01=0,14J · IK02=0,20J · IK03=0,35J · IK04=0,50J · IK05=0,70J · IK06=1J · IK07=2J · IK08=5J · IK09=10J · IK10=20J · IK11=50J.",
+            "Objeto: resistencia a los impactos mecánicos externos y clasificación de los grados de protección de las envolventes para material eléctrico de tensión asignada ≤ 72,5 kV."
+          ],
+          "reglas": [
+            { "id": "R-62262-ik-metodoElegible", "tipo": "predicado", "nombre": "requiereMetodoDeGolpeo",
+              "etiqueta": "El grado objetivo es IK07 o superior, que exige elegir método de ensayo" },
+            { "id": "R-62262-ik-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de Notas IP-IK!F129" },
+            { "id": "R-62262-ik-02", "tipo": "recuentoDatos", "campo": "gradoIkAlcanzado1", "umbralPorMuestra": 1,
+              "etiqueta": "Grado IK alcanzado de cada muestra", "origenExcel": "Toma de Notas IP-IK!F145" },
+            { "id": "R-62262-ik-03", "tipo": "recuentoDatos", "campo": "veredicto", "umbralPorMuestra": 1,
+              "etiqueta": "Veredicto de cada muestra", "origenExcel": "Toma de Notas IP-IK!F149" },
+            { "id": "R-62262-ik-metodo", "tipo": "exactamenteUna", "checklist": "metodo",
+              "etiqueta": "Se ha elegido un único método de ensayo", "origenExcel": "Toma de Notas IP-IK!B152:B153" },
+            { "id": "R-62262-ik-04", "tipo": "si", "condicion": "R-62262-ik-metodoElegible",
+              "entonces": "!R-62262-ik-metodo",
+              "etiqueta": "Para IK07 a IK11 falta elegir el método de ensayo" },
+            { "id": "R-62262-ik-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-62262-ik-01", "!R-62262-ik-02", "!R-62262-ik-03", "R-62262-ik-04", "!R-62262-ik-impactos"] },
+            { "id": "R-62262-ik-peso", "tipo": "peso", "valor": 10, "aplicaSiNo": "na", "finSiNo": "R-62262-ik-cierre" }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "avance": {
+    "nota": "Los pesos replican la ponderación del Excel: el peso de un apartado solo suma cuando su regla de cierre deja de pedir datos."
+  }
+}

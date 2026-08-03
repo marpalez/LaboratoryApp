@@ -7,13 +7,15 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("equipos-60529.v1.json")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("equipos-60598.v1.json")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("equipos-62031.v1.json")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("equipos-62262.v1.json")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("plantilla-60529.v1.json")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("plantilla-60598.v1.json")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("plantilla-62031.v1.json")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("plantilla-62262.v1.json")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("equipos-60529_2018_1.0.0.json")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("equipos-60598-1_2021_1.0.0.json")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("equipos-60598-1_2024_1.0.0.json")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("equipos-62031_2020_a11_1.0.0.json")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("equipos-62262_2002_a1_1.0.0.json")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("plantilla-60529_2018_1.0.0.json")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("plantilla-60598-1_2021_1.0.0.json")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("plantilla-60598-1_2024_1.0.0.json")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("plantilla-62031_2020_a11_1.0.0.json")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("plantilla-62262_2002_a1_1.0.0.json")]
 
 

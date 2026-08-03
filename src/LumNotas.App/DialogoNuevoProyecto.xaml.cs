@@ -144,7 +144,7 @@ public partial class DialogoNuevoProyecto : Window
 
         // El nombre lo fija el laboratorio y sale de la norma y del código.
         var ruta = Path.Combine(Carpeta.Text, NombreDeTomaDeNotas.ConExtension(
-            plantilla.Meta.Id, nombre, RepositorioDeProyectos.Extension));
+            plantilla.Meta.CodigoParaFichero, nombre, RepositorioDeProyectos.Extension));
 
         // Crear un proyecto no puede pisar otro: dos servicios del mismo cliente con el
         // mismo nombre es un descuido frecuente, y aquí se perdería el trabajo del otro.

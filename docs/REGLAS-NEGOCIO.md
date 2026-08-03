@@ -2,7 +2,7 @@
 
 **Origen:** `TomaDeNotasExcel.xlsx`, plantilla v2.1
 **Extraído el:** 2026-07-29 (última modificación del libro: 2026-07-29)
-**Versión del documento:** 3.26 — documento de traspaso al día
+**Versión del documento:** 3.38 — documento de traspaso al día
 **Actualizado:** 2026‑08‑02
 **Propósito:** nació como documento de revisión previo a programar —cada regla extraída del Excel debía ser **confirmada, corregida o eliminada** por el laboratorio— y hoy es además el **documento de traspaso** de la aplicación: qué hace, por qué se decidió así y qué queda pendiente. Lo que sigue sin confirmar va marcado con ⏳.
 
@@ -29,7 +29,7 @@ Las partes excluidas se conservan en este documento marcadas como 🚫 **fuera d
 |---|---|---|
 | 2026‑07‑29 | Alcance | Solo EN/IEC 60598 (‑1 y partes ‑2). IK y 62031 fuera |
 | 2026‑07‑29 | Edición | Varios técnicos, **por turnos**: un fichero por proyecto con registro de autoría, sin edición simultánea. *(Al implementar quedó en «el último en guardar manda», con la planificación escrita por un solo camino — DD‑50.)* |
-| 2026‑07‑29 | D‑02 | **Numeración canónica: edición 2024** (7 = Construcción, 11 = IP). La antigua queda solo como alias de visualización |
+| 2026‑07‑29 | D‑02 | **Numeración canónica: la de 2024** (7 = Construcción, 11 = IP). La antigua queda solo como alias de visualización |
 | 2026‑07‑29 | D‑04 | Se acepta el comportamiento actual: **un 0 cuenta como dato introducido** |
 | 2026‑07‑29 | D‑05 | Corregido el diagnóstico: los acondicionamientos son correctos. **Se arregla el ensayo de bola** (comparaciones de solo hora) |
 | 2026‑07‑29 | D‑10 | Se acepta para el borrador: el agregador de partes ‑2 **no incluye ‑2‑5 ni ‑2‑22** |
@@ -55,9 +55,18 @@ Las partes excluidas se conservan en este documento marcadas como 🚫 **fuera d
 | 2026‑08‑01 | DD‑33 | **El identificador de muestra sale de la plantilla.** En IK 62262 el laboratorio usa `EBP_CLIM…` en lugar de `EBP_SAFE…` |
 | 2026‑08‑01 | DD‑34 | **Los catálogos de equipos se importan por separado**, uno por norma |
 | 2026‑08‑01 | DD‑35 | **Qué es obligatorio en la cabecera lo decide la plantilla**, no el código: se leen los campos con `obligatorio: true` |
+| 2026‑08‑03 | DD‑102 | **Un solo estilo de botón para toda la aplicación**, con esquinas redondeadas, declarado en `App.xaml` — no en la ventana, porque los diálogos son ventanas aparte y no lo verían. Rehacer la plantilla obliga a dibujar a mano los cuatro estados; encima y pulsado se resuelven **con opacidad y no con un color fijo**, para que funcionen igual sobre el gris de por defecto y sobre los botones que traen el suyo. Los de tamaño fijo —el `+` de pestañas, el zoom del calendario— llevan `Padding="0"`: con el relleno del estilo, el contenido no cabía |
+| 2026‑08‑03 | DD‑101 | **Lo que distingue una norma de otra es el AÑO DE PUBLICACIÓN, no la «edición».** Son dos cosas distintas —la 60598‑1 va por su novena edición y se publicó en 2024— y durante un tiempo este documento y el código llamaron «edición» al año. Corregido en las cinco plantillas (`anioDePublicacion`, **el año y solo el año**), en el código, en los tests y aquí. La designación completa con sus enmiendas vive en `titulo`, que es lo que se lee y lo que sale en el informe |
+| 2026‑08‑03 | DD‑100 | **La portada tiene un recuadro de avisos, y no existe si no hay nada que hacer.** Ocho condiciones sin solaparse: carpeta de proyectos sin elegir o inalcanzable; carpeta compartida sin elegir, inalcanzable o sin normas publicadas; normas locales sin publicar o más nuevas que las publicadas; y ficheros ilegibles en el último escaneo. **Casi todas fallaban en silencio** — sin carpeta de proyectos, las tres vistas de gestión salen vacías y eso es indistinguible de no tener trabajo. Rojo si algo no funciona, ámbar si solo está descuadrado, y cada línea trae el botón que lo arregla. **Nada en verde**: un recuadro que casi siempre está deja de leerse |
+| 2026‑08‑03 | DD‑99 | **`Configuración | Normas instaladas…` avisa de lo que este equipo tiene y el laboratorio no.** Desde que se publica la primera tanda, el programa lee de la carpeta compartida y **deja de mirar la local**: dejar caer una norma nueva no producía ninguna señal — el fichero estaba, no aparecía y nada lo explicaba. Ahora se comparan las dos carpetas y se dice qué falta por publicar, en ámbar y junto al botón que lo resuelve |
+| 2026‑08‑03 | DD‑98 | **Existe la plantilla de luminarias de 2021**, pedida por retrocompatibilidad. **Entre los dos años cambia la numeración de las secciones, no lo que se anota** — confirmado por el laboratorio. Es la de 2024 con la numeración que le toca, sacada de la tabla de equivalencias del propio libro. Las secciones 16 y 17 se quedan con su número de 2024 por no tener equivalente antiguo |
+| 2026‑08‑03 | DD‑97 | **El fichero de plantilla se llama `plantilla-<id>_<version>.json`** —plantilla-60598-1_2024_1.0.0.json—, y su catálogo de equipos igual. El **año** en el nombre es lo que permite que dos convivan en la misma carpeta; la **versión**, saber qué hay instalado sin abrir nada. **De un mismo id solo cuenta la más alta**: si no, publicar una corrección enseñaría dos tarjetas de la misma norma. La tarjeta enseña el número de norma y el año, no el id |
+| 2026‑08‑03 | DD‑96 | **El trabajo se mide en horas, no en días: importe ÷ 105 × 1,3**, a 8 h por jornada. La regla anterior —÷ 80 € = un día— la dio el laboratorio mal y la corrigió: son **80 €/hora**. La cuenta sale a 80,77 €/h, que cuadra con la tarifa. **No es un matiz**: un servicio de 2 000 € pasa de 25 días a poco más de 3 y toda la tabla de carga baja unas ocho veces. Los tres números se editan por separado, con la equivalencia en euros por hora a la vista |
+| 2026‑08‑02 | DD‑95 | **El `id` de una plantilla lleva norma, parte y año de publicación** —`60598-1_2024`— y no solo el número. Hoy es `60598` y el año no está en la identidad, así que publicar la norma nueva **remide en silencio los ensayos anteriores**. La `version` se queda **fuera del id**: se sube por corregir una errata, y meterla dentro dejaría huérfano cada proyecto en cada corrección. Cada plantilla declara `idsAnteriores`, de modo que los proyectos ya guardados siguen encontrando la suya: **la migración vive en el JSON, no en el código**. El **nombre del fichero no cambia** de momento: sigue siendo `TdN_60598_…` |
+| 2026‑08‑02 | DD‑94 | **La versión de plantilla con la que se registró un ensayo se lee y se enseña.** Se guardaba desde el principio y no se leía nunca. El **informe declara la del registro**, no la instalada al imprimir —decir la de hoy es atribuirle al ensayo una plantilla que no se usó—, y al abrir un proyecto grabado con otra versión se avisa, sin bloquear |
 | 2026‑08‑02 | DD‑93 | **La norma pasa a ser obligatoria en el alta**, y el alta sale de la portada. Sin norma no hay apartados que rellenar y el nombre del fichero la lleva dentro, así que dejarla para después obligaba a renombrarlo. En la portada, elegir norma y dar de alta eran dos caminos para lo mismo: el alta se queda en `Archivo` y en la barra del tablero. **Lo que falta se ve en rojo** en el rótulo del campo, y vuelve al gris al rellenarse — como las casillas obligatorias de la toma de notas |
 | 2026‑08‑02 | DD‑92 | **«(sin técnico)» es una opción del filtro de técnico**, no un técnico del catálogo. Aparece sola cuando hay servicios sin responsable y enseña justo esos, que es lo que hay que repartir. Mismo rótulo que usan el calendario y la carga, escrito en un solo sitio. **Crear un técnico llamado «Sin técnico» sería peor**: saldría como persona en todas las tomas de notas y la carga le sumaría días como si tuviera capacidad |
-| 2026‑08‑02 | DD‑91 | **El fichero se llama `TdN_<norma>_<código>xx-00.lumproj`**, p. ej. `TdN_60598_LEDC42502xx-00.lumproj`. El **`xx` es un hueco** para el número de toma de notas —un servicio puede llevar varias familias— y el **`00` es la edición**, que sube al corregir algo ya emitido. **Los pone el técnico renombrando**, no el programa: numerar y reeditar son decisiones del laboratorio, y un programa que las tomara solo acabaría renumerando un registro ya firmado |
+| 2026‑08‑02 | DD‑91 | **El fichero se llama `TdN_<norma>_<código>xx-00.lumproj`**, p. ej. `TdN_60598_LEDC42502xx-00.lumproj`. El **`xx` es un hueco** para el número de toma de notas —un servicio puede llevar varias familias— y el **`00` es la revisión del documento**, que sube al corregir algo ya emitido. **Los pone el técnico renombrando**, no el programa: numerar y reeditar son decisiones del laboratorio, y un programa que las tomara solo acabaría renumerando un registro ya firmado |
 | 2026‑08‑02 | DD‑90 | **Las tomas de notas de un mismo trabajo se enlazan con un campo «Grupo»**, y el calendario las enseña en una sola barra. Resuelve DD‑88: el jefe planifica un trabajo y el técnico sigue viendo las cuatro familias en el tablero. **Manda la cabecera** —la que lleva las fechas—, y el importe va solo en ella; la barra enseña la suma, así que repetirlo deja de ser invisible. El enlace vive dentro de cada fichero, no en un índice aparte |
 | 2026‑08‑02 | DD‑89 | **No hay objeto «proyecto», y no lo habrá.** El registro del ensayo es el `.lumproj` y tiene que estar en la carpeta de tomas de notas de su servicio; un fichero de proyecto aparte sería un documento sin ensayo detrás y **rompería la trazabilidad**. Revierte DD‑83: la portada vuelve a dos zonas y el alta rápida crea una toma de notas, no un proyecto. Lo que agrupa varias tomas de notas de un mismo trabajo se resolverá **enlazándolas** desde el calendario, no creando un fichero por encima |
 | 2026‑08‑02 | DD‑88 | **Un proyecto puede llevar varias familias de luminarias, cada una con su toma de notas.** Es el motivo por el que en su día se decidió no tener objeto «proyecto». Se planifica **el trabajo entero**, y se resuelve enlazando las tomas de notas (DD‑90), no agrupándolas en un fichero |
@@ -318,7 +327,7 @@ Total real de entradas en la hoja de trabajo: **188**, de las cuales 44 eran inv
 
 ## 5. Reglas por sección
 
-> **Numeración canónica: edición 2024** (decisión de 2026‑07‑29), la misma que usa la hoja de toma de notas. La numeración antigua que aparece en `Índice`, en el panel de pesos y en parte de las hojas de equipos se conserva **solo como alias de visualización** y se traduce con la tabla siguiente.
+> **Numeración canónica: la de 2024** (decisión de 2026‑07‑29), la misma que usa la hoja de toma de notas. La numeración antigua que aparece en `Índice`, en el panel de pesos y en parte de las hojas de equipos se conserva **solo como alias de visualización** y se traduce con la tabla siguiente.
 
 ### Equivalencia de numeraciones
 
@@ -722,7 +731,7 @@ Excluido igualmente. Inventario de lo que existe hoy:
 
 - Casillas de clasificación del módulo en `Datos!Q6`, `R6`, `S6`, `T6`: *built‑in sin cubierta*, *built‑in con cubierta*, *independiente*, *integrado*. **Las cuatro están rotas** (`=#REF!`), es decir, ya no hay casilla que las alimente.
 - `Datos!BQ4 = OR(Q6,S6,T6)` → la norma 62031 aplica si el módulo es built‑in, independiente o integrado (obsérvese que `R6`, *built‑in con cubierta*, queda fuera del OR).
-- Ediciones: IEC 62031:2018 / EN 62031:2020 + A11:2021.
+- Designaciones: IEC 62031:2018 / EN 62031:2020 + A11:2021.
 - `Datos!BN14` compone el texto «62031 + IK» para la cabecera del proyecto.
 
 **Consecuencia para el borrador:** `Datos!O6` (¿hay alguna parte ‑2 marcada?) deja de estar roto en cuanto se elimina `S6` de su expresión, y con él se arregla el aviso «FALTA POR MARCAR NORMAS A APLICAR» de `RESUMEN!D25`.
@@ -745,7 +754,7 @@ Excluido igualmente. Inventario de lo que existe hoy:
 
 ---
 
-## 7. Ediciones de normas
+## 7. Designaciones y años de las normas
 
 | ID | Origen | Regla |
 |---|---|---|
@@ -758,7 +767,7 @@ Excluido igualmente. Inventario de lo que existe hoy:
 
 En el borrador, el texto de normas aplicadas se compone únicamente de `R-NOR-01` a `R-NOR-03`, que no dependen de ninguna celda rota.
 
-Catálogo de ediciones vigentes en la plantilla (dato maestro que debe ser editable sin tocar código):
+Catálogo de designaciones vigentes en la plantilla, con su año (dato maestro que debe ser editable sin tocar código):
 
 ```
 60598-1     IEC 60598-1:2024                          EN IEC 60598-1:2024 + A11:2024
@@ -888,7 +897,7 @@ Los IDs son estables: los cerrados se conservan tachados en lugar de renumerar l
 | ID | Gravedad | Descripción | Decisión necesaria |
 |---|---|---|---|
 | ~~**D‑01**~~ | ✅ **Cerrado por alcance** | Las **26 celdas `#REF!`** y las 5 casillas huérfanas pertenecen todas a IK o a 62031: lógica de IK (`AI14`, `AK14`, `AJ14`, `AL14`, `C1058`, `C1065`), aplicabilidad de 62031 (`Q6`, `R6`, `S6`, `T6`, `BQ4`, `BR4`, `BS4`, `BN14`, `O6`), texto de normas (`RESUMEN!B34`, `D21`, `D25`) y panel de avance (`AX5:AY7`). Los dos últimos grupos estaban rotos **de rebote**, no por sí mismos | Ninguna. Al excluir IK y 62031 el borrador queda **sin lógica rota**. Reabrir si se reincorpora alguna de las dos |
-| ~~**D‑02**~~ | ✅ **Resuelto** | **Dos numeraciones de norma conviven**: `Índice`, el panel de pesos y parte de las hojas de equipos usan la antigua; la toma de notas y el resto del motor, la de 2024 | **Canónica: edición 2024.** La antigua queda como alias de visualización. Tabla de equivalencia en la [sección 5](#equivalencia-de-numeraciones). Queda un punto menor por confirmar: el rótulo 5.2 «cableado interno» ↔ 8.2 «cableado externo» |
+| ~~**D‑02**~~ | ✅ **Resuelto** | **Dos numeraciones de norma conviven**: `Índice`, el panel de pesos y parte de las hojas de equipos usan la antigua; la toma de notas y el resto del motor, la de 2024 | **Canónica: la de 2024.** La antigua queda como alias de visualización. Tabla de equivalencia en la [sección 5](#equivalencia-de-numeraciones). Queda un punto menor por confirmar: el rótulo 5.2 «cableado interno» ↔ 8.2 «cableado externo» |
 | **D‑03** | 🟡 Baja | En la sección IP, las etiquetas internas «primera cifra» y «segunda cifra» del motor (`AP54`–`AP72`) están **cruzadas** respecto a su contenido. Funcionalmente los grupos son correctos (cada uno usa su fecha y sus casillas), pero inducen a error | Renombrar al trasladar. Verificar además `AQ8`, que usa el N/A del grupo de polvo para la fila de peso «IPX_» (agua) |
 | ~~**D‑04**~~ | ✅ **Aceptado sin cambio** | Ocho recuentos usan `">=0"` en lugar de `">0"`, de modo que **una celda con 0 cuenta como dato introducido**: `L78` (dimensiones de bloque), `D196` (temperaturas de corrosión), `D241` (7.28), `CF140` y `CF149` (‑2‑22) | Decisión del laboratorio: se replica el comportamiento actual. **Queda documentado como intencionado**, no como defecto, para que nadie lo «arregle» después |
 | **D‑05** | 🟠 Media | **Corregido el diagnóstico inicial.** El patrón P7 de los acondicionamientos (24 h / 48 h / 240 h) **es correcto**: equivale a `duración ≥ N días` (demostración en la [sección 3](#p7--verificación-de-duración-de-acondicionamiento)). El defecto real está en el **ensayo de bola**: `Datos!BU99` (acondicionamiento ≥ 180 min) y `BU103` (ensayo 60 ± 2 min) comparan campos **de solo hora, sin fecha**. Si el ensayo cruza la medianoche la resta sale negativa y la verificación falla, marcando como incompletos ensayos correctos | ✅ **A corregir en la aplicación:** los cuatro campos de tiempo del ensayo de bola (`G869`–`G872`) pasan a ser instante completo (fecha + hora) y las comparaciones se hacen sobre `datetime`. No hay riesgo de aceptar datos malos, solo de rechazar buenos |
@@ -900,7 +909,7 @@ Los IDs son estables: los cerrados se conservan tachados en lugar de renumerar l
 | ~~**D‑11**~~ | ✅ **Resuelto** | La firma del registro se hace **respondiendo a un comentario** de Excel (`RESUMEN!D4`) | **La aplicación no gestiona firmas.** Se firma el PDF impreso, fuera del programa. En consecuencia, los registros son modificables y no hay bloqueo tras firmar (ver DD‑07 y DD‑19) |
 | **D‑12** | 🟡 Baja | `Datos!T26` (datos de ensayo de tierra) se calcula pero **no se usa**; el propio autor anota que los datos van directos al TRF | Decidir si el campo desaparece o se convierte en validación real |
 | **D‑13** | 🟡 Baja | Dos criterios distintos de carga estática: ‑2‑3 usa la fórmula de presión dinámica del viento y ‑2‑5 usa `área × 2400` | Confirmar ambos con la norma |
-| **D‑14** | 🟡 Baja | La edición EN de la parte ‑2‑5 figura como `EN 60598-2-15:2015` (posible errata por `2-5`) | Verificar contra el catálogo de normas |
+| **D‑14** | 🟡 Baja | La designación EN de la parte ‑2‑5 figura como `EN 60598-2-15:2015` (posible errata por `2-5`) | Verificar contra el catálogo de normas |
 | **D‑15** | 🟠 Media | `Datos!L39` (resumen de la sección 7) no cubre las partes ‑2, según nota del propio autor | Definir el árbol de agregación completo de una vez |
 | **D‑16** | 🟡 Baja | Hay equipos y lugares marcados como `AMPLIACIÓN 1`, `AMPLIACIÓN 2`, `PREVISIÓN 1/2`, `EQ-SAFE-3xx`, `RESERVADO COPPER-BS`, con la nota «no está asignado todavía» | Limpiar el catálogo de equipos antes de migrarlo |
 | **D‑17** | 🟡 Baja | El nombre de la hoja `Índice` está corrupto en el fichero (`Ãndice`, problema de codificación) | Sin impacto funcional; se corrige en la migración |
@@ -1049,15 +1058,15 @@ LumNotas.App           interfaz WPF (MVVM)
 
 | Fichero | Contenido |
 |---|---|
-| `plantilla/equipos-60598.v1.json` | Catálogo de equipos completo: **43 grupos, 224 entradas, 89 códigos distintos**. Importación literal desde `BBDD Equipos 60598` (DD‑10), con las notas de uso del laboratorio y la trazabilidad de cada celda de origen |
-| `plantilla/plantilla-60598.v1.json` | **La norma entera como datos**: 16 secciones y 45 apartados, con campos, checklists, subbloques, grupos repetibles, reglas P1‑P8 y los nueve cálculos. ~140 KB |
+| `plantilla/equipos-60598-1_2024_1.0.0.json` | Catálogo de equipos completo: **43 grupos, 224 entradas, 89 códigos distintos**. Importación literal desde `BBDD Equipos 60598` (DD‑10), con las notas de uso del laboratorio y la trazabilidad de cada celda de origen |
+| `plantilla/plantilla-60598-1_2024_1.0.0.json` | **La norma entera como datos**: 16 secciones y 45 apartados, con campos, checklists, subbloques, grupos repetibles, reglas P1‑P8 y los nueve cálculos. ~140 KB |
 | `src/LumNotas.Core` | Motor de reglas: modelo de plantilla, catálogo de equipos, almacén de datos, evaluador de los tipos de regla, predicados y cálculos con nombre, requisitos del proyecto, indicador de avance, estado de apartado y resumen para el tablero. En `Gestion/` vive además todo lo que no es ensayo: eje de semanas ISO, gesto de arrastre, ocupación, lista de técnicos, capacidad mensual, carga por técnico, filtros, **alta de una toma de notas** (`AltaDeProyecto`), **nombre del fichero** (`NombreDeTomaDeNotas`), **aviso de servicios repetidos** (`ProyectosRepetidos`) y **enlace de las familias de un trabajo** (`EnlaceDeTomasDeNotas`) — todo **fuera de la interfaz para poder probarlo** |
 | `src/LumNotas.Storage` | Un fichero `.lumproj` por proyecto (JSON), con **escritura atómica** (temporal + reemplazo) para que OneDrive lo sincronice sin corromperlo. Más la lista de recientes, los ajustes y el explorador de carpetas |
 | `src/LumNotas.Report` | Exportador del informe a HTML con estilos de impresión A4. **Sin dependencias externas** |
 | `src/LumNotas.App` | Interfaz WPF. `VentanaPrincipalViewModel` es la ventana con su barra de pestañas; `DocumentoViewModel` es **un proyecto abierto** (árbol con semáforo y formulario generado desde la plantilla); `GestionViewModel` es la pestaña de gestión, con sus tres vistas (`CalendarioViewModel`, `CargaViewModel`). Las plantillas grandes viven en `Window.Resources` y se eligen por tipo |
 | Ficheros compartidos | Junto a los proyectos, en la carpeta de OneDrive: `tecnicos.json` (la lista del laboratorio) y `capacidad.json` (tarifa y días por mes). Se editan desde `Configuración` y valen para todos |
-| `plantilla/plantilla-62031.v1.json`, `plantilla-60529.v1.json`, `plantilla-62262.v1.json` | Las otras tres normas, con sus catálogos `equipos-62031`, `equipos-60529` y `equipos-62262` |
-| `tests/LumNotas.Core.Tests` | **299 tests, verificados en verde el 2026‑08‑02.** Cubren los ocho patrones, los nueve cálculos, los defectos corregidos, la integridad de la plantilla, el ciclo de guardado, varios proyectos simultáneos, el informe, el tablero y la planificación (semanas ISO, cambio de año, el gesto de arrastre completo, que años lejanos y erratas de año no rompan el eje, y que planificar y anotar no se pisen), y la lista de técnicos (que quitar no toque los proyectos y corregir sí), y la ocupación por técnico (que lo solapado no cuente dos veces), y la carga mensual (tarifa, capacidad, reparto entre meses y que no se pierda trabajo), y el escaneo de la matrioska de clientes (que encuentre lo hondo, que la caché caduque bien, que una rama rota no lo tumbe y que una norma añadida ocupe una sola línea con la cuenta de toda ella) |
+| `plantilla/plantilla-<id>_<version>.json` | Una por norma y año, p. ej. `plantilla-60598-1_2024_1.0.0.json`, con su catálogo `equipos-60598-1_2024_1.0.0.json` al lado |
+| `tests/LumNotas.Core.Tests` | **344 tests, verificados en verde el 2026‑08‑02.** Cubren los ocho patrones, los nueve cálculos, los defectos corregidos, la integridad de la plantilla, el ciclo de guardado, varios proyectos simultáneos, el informe, el tablero y la planificación (semanas ISO, cambio de año, el gesto de arrastre completo, que años lejanos y erratas de año no rompan el eje, y que planificar y anotar no se pisen), y la lista de técnicos (que quitar no toque los proyectos y corregir sí), y la ocupación por técnico (que lo solapado no cuente dos veces), y la carga mensual (tarifa, capacidad, reparto entre meses y que no se pierda trabajo), y el escaneo de la matrioska de clientes (que encuentre lo hondo, que la caché caduque bien, que una rama rota no lo tumbe y que una norma añadida ocupe una sola línea con la cuenta de toda ella) |
 
 Los ficheros de plantilla conservan `origenExcel` en cada elemento para poder auditarlos contra el libro original. Ese campo no se usa en ejecución.
 
@@ -1088,6 +1097,8 @@ Solo **seis reglas** necesitan código a medida (`Predicados.cs`); el resto es c
 | `AltaDeProyectoTests` | Que dar de alta exige **solo el nombre, el técnico y la norma**, y que lo que la norma pide para ensayar **no bloquea el alta** |
 | `NombreDeFicheroTests` | Que el nombre del fichero es el que fija el laboratorio, con las cuatro normas y con el código escrito de cualquier manera |
 | `ProyectosRepetidosTests` | Que un servicio que ya existe se reconoce aunque el código se teclee con otras mayúsculas o espacios, y que un fichero ilegible no provoca un aviso falso |
+| VersionDePlantillaTests | Que la versión con la que se registró vuelve al abrir, que guardar la actualiza y que **el informe declara la del registro** y no la instalada |
+| `CargaTests` | La cuenta del laboratorio en horas, que cuadre con los 80 €/h, el reparto entre meses y que un `capacidad.json` anterior al cambio no deje la carga a cero |
 | `EnlaceTests` | El enlace de las familias de un trabajo: quién hace de cabecera, que el avance y el importe son los del grupo entero y que el enlace sobrevive a que el técnico guarde |
 | `PlantillasDeOtrasNormasTests` | Integridad de **todas** las normas instaladas, no solo la de luminarias: ids únicos, referencias entre reglas, `visibleSi` y `reglaDeCierre`, predicados registrados, grupos de equipos existentes, evaluación sin excepciones, que ningún id de bloque se repita entre normas, qué normas se pueden combinar, el grado por muestra y que cada norma exija su propia cabecera. **Los que vigilan la unificación recorren la carpeta**, no una lista escrita a mano, así que una norma nueva queda cubierta por existir |
 
@@ -1146,7 +1157,11 @@ En la portada se enseñan **tres** recientes, no todos: ahí son un atajo para v
 
 **Cada vista tiene su enlace directo**, no solo el tablero: entrar a gestión y buscar después el botón de la vista eran dos pasos para una sola intención. El menú *Ver · Gestión de proyectos* hace lo contrario a propósito — **respeta la vista en la que se estaba**, porque volver desde el menú a media planificación no debería devolverte al tablero.
 
-Las dos columnas son `*` y `*`, sin ancho fijo ni mínimos: así **nadie puede pedir más ancho del que hay**, que es lo que provocaba el recorte silencioso de WPF (trampa 4 de la sección 14). Verificado en la ventana más pequeña que se admite, 740 px, donde siguen cabiendo las cuatro tarjetas de norma en dos columnas.
+Las dos columnas son `1.35*` y `*`, **en proporción y sin ancho fijo ni mínimos**: así nadie puede pedir más ancho del que hay, que es lo que provocaba el **recorte silencioso de maquetación** de WPF (segunda trampa del calendario). La de la izquierda se lleva algo más porque es la que tiene que caber tres tarjetas de norma en fila; la de gestión se apaña con menos.
+
+**Las tarjetas de norma son todas del mismo tamaño y se recolocan solas** (DD‑102): tres por fila cuando cabe y dos al estrechar la ventana. Es un `WrapPanel` con tarjetas de tamaño fijo, no un `UniformGrid` — a este hay que decirle cuántas columnas, y **desde un `ItemsPanelTemplate` no se llega al ancho del contenedor** (quinta trampa, abajo). Antes se ajustaban al texto y quedaban desparejas: «IP» estrecha y «Módulos LED» ancha, sin más motivo que la longitud del nombre.
+
+Los tres botones de gestión **encogen dejando que su texto pase a dos líneas** en vez de recortarse, que es lo que permite ganar el sitio de la tercera columna. Verificado en la ventana más pequeña que se admite, 740 px: cinco tarjetas iguales en dos filas y los rótulos de gestión partidos, sin nada recortado.
 
 En cuanto se elige norma o se abre un fichero, esa misma pestaña pasa a ser la toma de notas. Para volver, **`Ver | Inicio`**: salta a una pestaña vacía si la hay y abre una si no queda ninguna — no cierra nada ni deja pestañas iguales acumuladas.
 
@@ -1272,6 +1287,8 @@ Basta con apuntar a `clientes`: se busca en ella **y en todas sus subcarpetas**,
 
 Si la carpeta compartida se deja en blanco **se usa la de proyectos**, para no romper una instalación que las tenga juntas.
 
+> **Los ficheros compartidos se escriben donde diga la configuración, y eso incluye equivocarse.** El 2026‑08‑03 aparecieron un `tecnicos.json` y un `capacidad.json` sueltos **en la carpeta del código fuente**, de cuando esa era la carpeta configurada. No se rompió nada —la aplicación simplemente no los leía y usaba los valores de partida—, pero durante días la lista de técnicos que se veía no era la que alguien había editado. Si algo editado no aparece, lo primero es mirar `Configuración | Carpetas`, que dice de dónde sale cada cosa.
+
 Se eligen en **`Configuración | Carpetas: proyectos y compartida…`** —el menú las nombra las dos porque en «Carpeta del laboratorio…», en singular, no se adivinaba que dentro estuvieran ambas—, que enseña de cada una qué contiene —proyectos encontrados, normas publicadas, técnicos, tarifa y versión— y avisa en rojo si una ruta guardada ha dejado de estar accesible. **Se pregunta sola la primera vez** que se abre el programa en un equipo.
 
 > La carpeta compartida tiene que ser **de lectura para todo el mundo**, aunque solo unos pocos escriban en ella. Si los técnicos no pudieran leerla, se quedarían sin normas ni lista de técnicos.
@@ -1292,9 +1309,70 @@ Resuelto el 2026‑08‑02. Hasta entonces la carpeta `plantilla` viajaba **junt
 | No están publicadas todavía | Las del equipo, **avisando** |
 | No se llega a la carpeta (OneDrive sin conexión) | Las del equipo, **avisando** |
 
+**Y avisa de lo que este equipo tiene y el laboratorio no** (DD‑99). Publicada la primera tanda, el programa lee de la carpeta compartida y **deja de mirar la local**: dejar caer una norma nueva en `plantilla/` no producía **ninguna** señal — el fichero estaba, no aparecía en el programa y nada lo explicaba. Ahora se comparan las dos carpetas y se dice qué falta por publicar, distinguiendo lo que no está de lo que está con una versión anterior. En ámbar y junto al botón que lo resuelve.
+
 El aviso importa tanto como la resolución: seguir trabajando con una versión distinta a la del compañero **no puede pasar inadvertido**. Se ve en `Configuración | Normas instaladas…`, que además lista las normas con su versión y tiene el botón **«Publicar en la carpeta compartida»** — que es la migración entera, de «cada equipo con su copia» a «una sola versión para todos».
 
 Las plantillas y sus catálogos de equipos **se publican juntos**: el catálogo se busca al lado de su plantilla, así que separarlos dejaría apartados sin equipos.
+
+### Cómo se identifica una norma
+
+El `id` de una plantilla lleva **norma, parte y año de publicación** (DD‑95):
+
+| | |
+|---|---|
+| `id` | `60598-1_2024` · `62031_2020_A11` · `60529_2018` · `62262_2002_A1` — **por la designación EN**, que es contra la que ensaya el laboratorio |
+| `idsAnteriores` | `["60598"]` — con lo que se conoció antes |
+| `codigoDeFichero` | `60598` — lo corto, que es lo que va en el nombre del fichero |
+| `anioDePublicacion` | `2024` — **el año y solo el año**, para poder enseñarlo sin descomponer el id |
+| `titulo` | La designación completa, con sus enmiendas: «Módulos LED — EN 62031:2020 + A11:2021». **Sale en el informe**, así que es lo que dice contra qué norma se ensayó |
+| `version` | `1.0.0` — **nuestra**, y va aparte |
+
+> **Año de publicación, no «edición»** (DD‑101). Una norma tiene las dos cosas y no son lo mismo: la 60598‑1 va por su novena edición, y lo que el laboratorio usa para distinguir una de otra —y lo que lleva el id— es **el año**. Durante un tiempo este documento y el código llamaron «edición» al año; está corregido.
+
+**El año está en la identidad porque un ensayo hecho contra la norma de un año tiene que seguir midiéndose contra esa.** Cuando el id era solo `60598`, publicar la norma nueva sustituía el fichero y **remedía en silencio** todos los ensayos anteriores.
+
+**La versión se queda fuera del id.** Se sube por corregir una errata nuestra; meterla dentro crearía una identidad nueva en cada corrección y **dejaría huérfano cada proyecto**.
+
+**El fichero se llama `plantilla-<id>_<version>.json`** (DD‑97): `plantilla-60598-1_2024_1.0.0.json`, con su catálogo de equipos al lado y con el mismo nombre. El **año** va dentro porque es lo que permite que la de 2024 y la de 2021 estén en la misma carpeta; la **versión**, para saber qué hay instalado sin abrir nada.
+
+**Dos años de la misma norma conviven sin tocar código**: son dos ficheros con ids distintos, y el catálogo lista lo que haya en la carpeta. Dos tarjetas en la portada — la vieja para lo que está en marcha, la nueva para lo que empiece. La tarjeta enseña el **número de norma** y el año debajo (*«60598 · Luminarias · 2024»*); el id entero no cabe y al técnico le dice menos.
+
+> **De un mismo id, solo cuenta la versión más alta.** Con la versión en el nombre, publicar una corrección deja las dos plantillas en la carpeta; sin esta regla la portada enseñaría dos tarjetas de la misma norma y habría que adivinar cuál. La anterior se queda de respaldo y deja de contar.
+
+**La migración vive en el JSON, no en C#.** Cada proyecto guardado lleva el id que existía el día que se guardó; `idsAnteriores` dice que sigue siendo la misma norma. Cambiar el esquema no rompió ningún proyecto y no hizo falta convertir nada.
+
+> **El nombre del fichero no cambia**: sigue siendo `TdN_60598_…`. Por eso `codigoDeFichero` va aparte del id — el id creció y el laboratorio quiere el nombre corto.
+
+#### La 60598-1 de 2021
+
+Pedida el 2026‑08‑03 **por retrocompatibilidad**: el laboratorio necesita poder trabajar contra la **EN 60598‑1:2021 + A11:2022**. Existe como `plantilla-60598-1_2021_1.0.0.json`, con id `60598-1_2021`, y convive con la 2024 en la misma carpeta.
+
+**Entre los dos años cambia la numeración de las secciones, no lo que se anota** (DD‑98). Así que la plantilla de 2021 es la de 2024 con la numeración que le toca: 3 Marcado, 4 Construcción, 5 Cableado, 7 Tierra, 8 Choque, 9 IP, 10 Aislamiento, 11 Líneas de fuga, 12 Endurancia, 13 Fuego. Sale de la tabla de equivalencias de la sección 5, extraída del propio libro.
+
+Se planteó la duda de si además cambiaba algún límite, método o ensayo —los dos libros del laboratorio traen **una sola** hoja «Toma de notas 60598», así que el Excel no lo aclaraba— y **lo confirmó el laboratorio**: no cambia. Queda anotado en `meta.nota` del propio fichero, con la fecha.
+
+**Las secciones 16 y 17 —bornes con y sin tornillo— se quedan con su número de 2024**, porque no tienen equivalente en la tabla de numeraciones antiguas del libro.
+
+**Dos años de la misma norma no se pueden mezclar en un servicio**: ninguna se declara compatible con la otra, y hay un test que lo vigila. Comparten ids de bloque —son la misma toma de notas con otra numeración— y en un mismo proyecto se pisarían los datos.
+
+**Solo la 2024 declara `idsAnteriores: ["60598"]`.** Los proyectos guardados antes de DD‑95 dicen «60598» a secas, y eso significa *la que estaba instalada entonces*, que era la 2024. Si la 2021 lo reclamara también, un proyecto viejo se mediría contra una u otra según el orden de la carpeta; hay un test que impide que dos plantillas reclamen el mismo id anterior.
+
+### Con qué versión de la plantilla se registró cada ensayo
+
+Cada `.lumproj` guarda la versión de la plantilla con la que se escribió. **Se guardaba desde el principio y no se leía nunca**: estaba en el fichero para quien lo abriera con un editor. Ahora vuelve al proyecto al abrirlo (DD‑94), y con eso:
+
+- **El informe declara la versión con la que se registró**, no la instalada el día que se imprime. Si no coinciden, dice las dos: `1.0.0 (registrado) · 1.1.0 (instalada al generar este informe)`. Antes declaraba siempre la de hoy, que es atribuirle al ensayo una plantilla que no se usó.
+- **Al abrir un proyecto grabado con otra versión se avisa.** No bloquea: evita que el técnico vea cambiar el avance de un día para otro y lo tome por un fallo suyo cuando fue una corrección de la plantilla.
+
+**Subir la versión y cambiar el `id` no son lo mismo**, y la diferencia no es de formato: es si los ensayos ya hechos siguen valiendo.
+
+| | Qué cambió | Lo ya guardado |
+|---|---|---|
+| **`version` 1.0.0 → 1.1.0** | Nuestra transcripción: una errata, un campo que faltaba, una regla mal escrita | Sigue valiendo. El ensayo fue el mismo; lo que estaba mal era nuestra copia |
+| **`id` nuevo** | La norma: otro año, otro criterio, otro ensayo | No es comparable, y debe seguir midiéndose contra la suya |
+
+> **Dentro de un mismo `id`, los identificadores de campo solo se añaden — nunca se renombran.** Los datos se guardan por `bloque/campo/muestra`; renombrar un campo deja los datos viejos huérfanos **sin error y sin aviso**, en blanco, y el técnico no sabe por qué. Si hace falta renombrar, es que ya no es la misma toma de notas y toca `id` nuevo.
 
 ### Saber qué versión del programa se está usando
 
@@ -1382,14 +1460,14 @@ El nombre lo fija el laboratorio (DD‑91) y se lee de un vistazo en el explorad
 ```
 TdN_60598_LEDC42502xx-00.lumproj
 └─┬─┘ └─┬─┘ └───┬───┘└┬┘ └┬┘
-  │     │       │     │   └── edición
+  │     │       │     │   └── revisión del documento
   │     │       │     └────── nº de toma de notas
   │     │       └──────────── código de servicio
   │     └──────────────────── la norma principal
   └────────────────────────── es una toma de notas
 ```
 
-**El `xx` y el `00` los pone el técnico**, renombrando el fichero. El `xx` es un hueco a la vista: un servicio puede llevar varias familias y cada una lleva su número. El `00` es la edición, y sube a `01` cuando hay que corregir algo ya emitido.
+**El `xx` y el `00` los pone el técnico**, renombrando el fichero. El `xx` es un hueco a la vista: un servicio puede llevar varias familias y cada una lleva su número. El `00` es la revisión del documento, y sube a `01` cuando hay que corregir algo ya emitido.
 
 **El programa no los gestiona, y es a propósito**: numerar familias y decidir que algo se reedita son decisiones del laboratorio. Un programa que las tomara solo acabaría renumerando un registro ya firmado.
 
@@ -1455,9 +1533,10 @@ Pedida el 2026‑08‑06. El tablero dice *qué falta*, el calendario *cuándo*,
 
 **Cómo se calcula**, con la regla del laboratorio:
 
-1. **Trabajo de un servicio = importe de la oferta ÷ 80 €.** Es como lo calcula la empresa: una oferta de 2 000 € son 25 días de trabajo.
-2. **Reparto entre meses** en proporción a los **días entre semana** que el servicio tiene en cada uno. Los fines de semana no cuentan.
-3. **Comparación con la capacidad del mes**, que no es igual todo el año.
+1. **Trabajo de un servicio, en horas: importe ÷ 105 × 1,3.** Es la cuenta con la que el laboratorio estima el trabajo, y sale a **80,77 € por hora** — cuadra con la tarifa de 80 €/h que factura. Una oferta de 2 000 € son unas **25 horas**.
+2. **De horas a jornadas**, dividiendo entre las **8 horas** que tiene un día. Hace falta porque la capacidad del mes se declara en días. Esas 25 horas son algo más de **tres jornadas**.
+3. **Reparto entre meses** en proporción a los **días entre semana** que el servicio tiene en cada uno. Los fines de semana no cuentan.
+4. **Comparación con la capacidad del mes**, que no es igual todo el año.
 
 | Mes | Días de trabajo que caben |
 |---|---|
@@ -1465,9 +1544,11 @@ Pedida el 2026‑08‑06. El tablero dice *qué falta*, el calendario *cuándo*,
 | Diciembre | **15** (tres semanas) |
 | Los demás | **22** |
 
-La tarifa y los doce valores se editan en **`Configuración | Capacidad y tarifa…`** y se guardan junto a la lista de técnicos, en la carpeta compartida.
+**Los tres números de la cuenta se editan por separado** —divisor, factor y horas por jornada— y no reducidos a uno solo: así el diálogo enseña la misma fórmula que usa el laboratorio y se reconoce. Debajo se ve en qué se traduce (*«Sale a 80,77 € por hora»*), que es la comprobación de que sigue cuadrando con la tarifa. Se editan en **`Configuración | Capacidad y tarifa…`**, con los doce valores del calendario, y se guardan junto a la lista de técnicos en la carpeta compartida.
 
-Verde por debajo del 85 %, ámbar hasta el 100 %, **rojo por encima**: ahí el técnico está sobrevendido. Un servicio de 2 000 € planificado entero en agosto sale al **250 %**, que es exactamente el aviso que se buscaba — medio laboratorio está de vacaciones.
+> **La regla anterior era ÷ 80 € = 1 **día**, y estaba mal** (DD‑96). El laboratorio lo corrigió el 2026‑08‑03: son **80 €/hora**, no por día. La diferencia no es de matiz — un servicio de 2 000 € pasa de 25 días a poco más de 3, y **toda la tabla de carga baja unas ocho veces**. Un `capacidad.json` escrito con la regla vieja no trae los campos nuevos y se rellena con los de partida, así que no deja la carga a cero.
+
+Verde por debajo del 85 %, ámbar hasta el 100 %, **rojo por encima**: ahí el técnico está sobrevendido. Un servicio de 10 000 € planificado entero en agosto sale al **155 %**, que es exactamente el aviso que se buscaba — medio laboratorio está de vacaciones.
 
 **Dos cosas que conviene tener presentes:**
 
@@ -1547,6 +1628,8 @@ Al llegar al borde de la vista, **el calendario se desplaza solo** mientras se a
 
 > **Cuarta trampa de WPF.** El clic sobre la barra dejó de abrir el diálogo al añadir el arrastre: `ArrastreDeBarra` suelta la captura del ratón en el `PreviewMouseLeftButtonUp`, y al perder la captura WPF **da el `Click` del botón por cancelado**. La solución no es devolver el evento sino asumirlo: el comportamiento decide si el gesto fue clic o arrastre y ejecuta lo que toque. Filtros: técnico, estado, norma y «ver archivados»; el técnico y la norma se rellenan con lo que haya en los proyectos, no con una lista fija.
 
+> **Quinta trampa de WPF.** **Dentro de un `ItemsPanelTemplate` no resuelven las ataduras**: ni `ElementName` ni `RelativeSource AncestorType=ItemsControl`. La plantilla se aplica fuera del árbol donde viven esos nombres, así que la atadura no falla con ruido —simplemente no llega nunca el valor y el panel se queda con el suyo de por defecto. Costó un rato en la portada, intentando decirle a un `UniformGrid` cuántas columnas según el ancho. **Si hace falta que el panel reaccione al tamaño, se usa un `WrapPanel` con elementos de tamaño fijo**, que se recoloca solo y no necesita que nadie le cuente nada.
+
 **Cómo convive con la toma de notas** (DD‑53). La planificación está dentro del `.lumproj`, pero:
 
 - `RepositorioDeProyectos.ActualizarPlanificacion` es lo único que la escribe: relee el fichero, cambia ese trozo y lo vuelve a guardar entero, **sin tocar un solo dato de ensayo**;
@@ -1573,15 +1656,18 @@ Sin esa segunda regla, el técnico que tuviera el proyecto abierto desde hacía 
 | **Informe** | HTML A4 con portada, un apartado por página, equipos, comentarios y avisos |
 | **Gestión de proyectos** | Tres vistas de la misma carpeta —tablero, calendario y carga— con **un solo juego de filtros**: estado, técnico y norma. Ninguna opción general trae lo terminado ni lo archivado, y **«(sin técnico)» se puede pedir** para ver lo que falta por repartir. El tablero da columna por proyecto y tarjeta por sección pendiente; cada norma añadida ocupa una sola línea |
 | **Calendario** | Línea de tiempo en semanas ISO, **agrupada por técnico responsable**: estado, recepción de muestras, archivado y aviso de fuera de plazo. **Las barras se arrastran**: el centro mueve, los bordes cambian inicio o fin. Pulsarlas abre su configuración |
-| **Carga por técnico** | Tabla técnicos × meses en porcentaje de ocupación. El trabajo sale del importe de la oferta (÷ 80 €) y se reparte entre meses por días entre semana, contra una capacidad de 22 días —10 en agosto, 15 en diciembre— |
+| **Carga por técnico** | Tabla técnicos × meses en porcentaje de ocupación. El trabajo sale del importe (÷ 105 × 1,3 = horas, a 8 h por jornada) y se reparte entre meses por días entre semana, contra una capacidad de 22 días —10 en agosto, 15 en diciembre— |
 | **Técnicos** | Lista compartida del laboratorio, elegible en Técnico 1 y 2 de las cuatro normas. Se edita en `Configuración`; corregir un nombre se propaga a los proyectos, quitarlo no los toca |
 | **Cuatro normas** | 60598‑1, 62031, 60529 (IP) y 62262 (IK), cada una con su plantilla y su catálogo de equipos, elegibles desde la portada. Ver sección 16 |
 | **Portada** | Partida por la mitad: normas, abrir y los **tres últimos abiertos** a la izquierda; tablero, calendario y carga a la derecha, cada uno con enlace directo. Encabezada por el nombre del programa y su **versión** |
 | **Alta rápida** | `Archivo \| Nueva toma de notas…` crea el `.lumproj` con **nombre, técnico y norma**, sin pasar por la cabecera ni por «Guardar como». Lo que falta se ve en rojo. El responsable ya tiene tarjeta que planificar antes de que exista un dato de ensayo |
-| **Nombre de fichero** | `TdN_60598_LEDC42502xx-00.lumproj`, compuesto en un solo sitio para los dos caminos que crean fichero. El `xx` y la edición los lleva el técnico |
+| **Nombre de fichero** | `TdN_60598_LEDC42502xx-00.lumproj`, compuesto en un solo sitio para los dos caminos que crean fichero. El `xx` y la revisión los lleva el técnico |
 | **Aviso de duplicados** | Al crear una toma de notas se comprueba si ese servicio ya existe en la carpeta, comparando sin mayúsculas ni espacios. Se ofrece abrir la que hay, o crear otra a sabiendas |
 | **Trabajos de varias familias** | Campo **«Grupo»** en la planificación: las tomas de notas del mismo trabajo se enlazan y el calendario las enseña en **una sola barra**, con el avance y el importe sumados. El tablero las sigue viendo por separado |
 | **Reportar un problema** | `Ayuda` da el correo de quien mantiene el programa con los datos que hacen falta para reproducir un fallo y acceso al registro de errores |
+| **Normas con año** | El `id` de una plantilla lleva norma, parte y año (`60598-1_2024`), y el fichero se llama `plantilla-<id>_<version>.json`. **Dos años de la misma norma conviven en la misma carpeta**; de un mismo id solo cuenta la versión más alta. Los proyectos guardados con el id antiguo siguen encontrando la suya por `idsAnteriores` |
+| **Trazabilidad de plantilla** | Cada `.lumproj` guarda con qué versión se registró, el informe **declara esa** y no la instalada al imprimir, y al abrir un proyecto grabado con otra versión se avisa |
+| **Carga en horas** | El trabajo se mide `importe ÷ 105 × 1,3` = horas, a 8 h por jornada — la cuenta del laboratorio, que sale a 80,77 €/h. Los tres números se editan por separado, con la equivalencia a la vista |
 | **Grado por muestra** | IP e IK se eligen en la fila de cada muestra, con el atajo «Luminaria ordinaria». La fila es idéntica en las tres normas que la usan |
 | **Dos carpetas de OneDrive** | Una de proyectos y otra compartida (normas, técnicos, tarifa, versión). Se eligen en `Configuración` y se preguntan solas la primera vez |
 | **Una versión para todos** | Las normas se leen de la carpeta compartida y se publican desde `Configuración`; `Ayuda \| Acerca de` enseña la versión y avisa si el laboratorio ha publicado una más nueva |
@@ -1628,7 +1714,7 @@ dotnet test "…\AplicacionTomaNotas\LumNotas.sln"
 dotnet run --project "…\AplicacionTomaNotas\src\LumNotas.App"
 ```
 
-Si los **299 tests** pasan, el motor y las cuatro plantillas están sanos. La mayoría de los cambios de norma se hacen **editando el JSON de esa norma** en `plantilla/`, sin tocar código; añadir una norma entera es dejar caer un fichero `plantilla-*.json` en esa carpeta.
+Si los **344 tests** pasan, el motor y las cuatro plantillas están sanos. La mayoría de los cambios de norma se hacen **editando el JSON de esa norma** en `plantilla/`, sin tocar código; añadir una norma entera es dejar caer un fichero `plantilla-*.json` en esa carpeta.
 
 **Dónde poner cada cosa**, que es lo que más se ha repetido al construir esto:
 
@@ -1639,7 +1725,7 @@ Si los **299 tests** pasan, el motor y las cuatro plantillas están sanos. La ma
 | Un filtro nuevo del tablero | `GestionViewModel`, **no** en una vista: valen para las tres |
 | Algo compartido por el laboratorio | La carpeta compartida, y reflejado en `Configuración \| Carpetas…` |
 
-**Ninguno de los 299 tests toca la interfaz**, así que lo que se apoye en WPF hay que escribirlo de forma que la lógica quede fuera. No es purismo: en este equipo no se pueden automatizar los eventos de ratón, y sacar la lógica del gesto al núcleo fue la única manera de comprobar el arrastre del calendario.
+**Ninguno de los 344 tests toca la interfaz**, así que lo que se apoye en WPF hay que escribirlo de forma que la lógica quede fuera. No es purismo: en este equipo no se pueden automatizar los eventos de ratón, y sacar la lógica del gesto al núcleo fue la única manera de comprobar el arrastre del calendario.
 
 ### Punto ciego cerrado
 
@@ -1665,10 +1751,10 @@ Además aparece `Datos ensayo IK-LUM`, el motor de cálculo del IK para luminari
 
 | Norma | Fichero | Secciones | Apartados |
 |---|---|---|---|
-| Luminarias — EN/IEC 60598‑1 y partes ‑2 | `plantilla-60598.v1.json` | 16 | 45 |
-| Módulos LED — EN/IEC 62031 | `plantilla-62031.v1.json` | 16 | 26 |
-| Grados IP — EN/IEC 60529 | `plantilla-60529.v1.json` | 3 | 3 |
-| Grados IK — EN/IEC 62262 | `plantilla-62262.v1.json` | 2 | 2 |
+| Luminarias — EN IEC 60598‑1:2024 + A11:2024 | `plantilla-60598-1_2024_1.0.0.json` | 16 | 45 |
+| Módulos LED — EN 62031:2020 + A11:2021 | `plantilla-62031_2020_A11_1.0.0.json` | 16 | 26 |
+| Grados IP — EN 60529:2018 | `plantilla-60529_2018_1.0.0.json` | 3 | 3 |
+| Grados IK — EN 62262:2002 + A1:2021 | `plantilla-62262_2002_A1_1.0.0.json` | 2 | 2 |
 
 Cada una trae su catálogo de equipos importado por separado (DD‑34): `equipos-60598`, `equipos-62031` (20 grupos), `equipos-60529` (3 grupos) y `equipos-62262` (1 grupo).
 

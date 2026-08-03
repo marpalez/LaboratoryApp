@@ -139,9 +139,13 @@ public sealed class ExploradorDeProyectos(RepositorioDeProyectos repositorio, st
         Core.Datos.DatosProyecto datos, IReadOnlyDictionary<string, PlantillaEnsayos> instaladas,
         PlantillaEnsayos porDefecto)
     {
+        // Por id exacto y, si no, por los que la plantilla dice haber tenido antes: los
+        // proyectos guardados llevan el id que existía el día que se guardaron (DD‑95).
         var suyas = datos.Normas
-            .Select(id => instaladas.GetValueOrDefault(id))
+            .Select(id => instaladas.GetValueOrDefault(id)
+                          ?? instaladas.Values.FirstOrDefault(p => p.Meta.Responde(id)))
             .OfType<PlantillaEnsayos>()
+            .Distinct()
             .ToList();
 
         return suyas.Count > 0 ? suyas : [porDefecto];

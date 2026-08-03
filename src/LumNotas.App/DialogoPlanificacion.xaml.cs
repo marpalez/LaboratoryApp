@@ -59,8 +59,11 @@ public partial class DialogoPlanificacion : Window
     {
         if (LeerImporte() is { } importe && importe > 0)
         {
-            var dias = ServicioDeCapacidad.Capacidad.DiasDeTrabajo(importe);
-            Trabajo.Text = $"≈ {dias:0.#} días de trabajo";
+            // En horas, que es como lo mide el laboratorio, y en jornadas, que es la
+            // unidad de la tabla de carga.
+            var capacidad = ServicioDeCapacidad.Capacidad;
+            Trabajo.Text = $"≈ {capacidad.HorasDeTrabajo(importe):0.#} h "
+                           + $"({capacidad.DiasDeTrabajo(importe):0.#} jornadas)";
             return;
         }
 

@@ -11,9 +11,30 @@
         <TextBlock Margin="0,4,0,18" Foreground="#6B7280" FontSize="12" TextWrapping="Wrap"
                    Text="Con estos números se calcula la carga de cada técnico. Se guardan junto a la lista de técnicos."/>
 
-        <TextBlock Text="Euros de oferta que equivalen a un día de trabajo" Foreground="#374151"
+        <!-- La cuenta del laboratorio: importe ÷ 105 × 1,3 = horas. Se enseña tal cual
+             en vez de reducirla a un solo número, para que se reconozca. -->
+        <TextBlock Text="Horas de trabajo que supone una oferta" Foreground="#374151"
+                   FontSize="12" Margin="0,0,0,6"/>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+            <TextBlock Text="Importe  ÷" VerticalAlignment="Center" Foreground="#6B7280" FontSize="12"/>
+            <TextBox x:Name="Tarifa" Width="70" Padding="5,4" Margin="6,0"
+                     TextChanged="AlCambiarLaCuenta"/>
+            <TextBlock Text="×" VerticalAlignment="Center" Foreground="#6B7280" FontSize="12"/>
+            <TextBox x:Name="Factor" Width="70" Padding="5,4" Margin="6,0"
+                     TextChanged="AlCambiarLaCuenta"/>
+            <TextBlock Text="=  horas" VerticalAlignment="Center" Foreground="#6B7280" FontSize="12"/>
+        </StackPanel>
+
+        <TextBlock x:Name="Equivalencia" FontSize="11" Foreground="#9CA3AF" Margin="0,0,0,14"
+                   TextWrapping="Wrap"/>
+
+        <TextBlock Text="Horas que tiene una jornada" Foreground="#374151"
                    FontSize="12" Margin="0,0,0,4"/>
-        <TextBox x:Name="Tarifa" Width="120" HorizontalAlignment="Left" Padding="5,4" Margin="0,0,0,18"/>
+        <TextBlock Text="Para pasar las horas a días, que es como se declara la capacidad de cada mes."
+                   Foreground="#9CA3AF" FontSize="11" Margin="0,0,0,4"/>
+        <TextBox x:Name="HorasPorDia" Width="70" HorizontalAlignment="Left" Padding="5,4"
+                 Margin="0,0,0,18" TextChanged="AlCambiarLaCuenta"/>
 
         <TextBlock Text="Días de trabajo que caben en cada mes" Foreground="#374151"
                    FontSize="12" Margin="0,0,0,6"/>

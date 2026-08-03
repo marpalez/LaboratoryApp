@@ -64,6 +64,10 @@ public sealed class RepositorioDeProyectos
         };
 
         EscribirDeFormaAtomica(ruta, JsonSerializer.Serialize(documento, Opciones));
+
+        // Lo guardado pasa a ser lo registrado: si no, exportar justo después del guardado
+        // seguiría diciendo la versión con la que se abrió.
+        datos.VersionDePlantillaGuardada = versionPlantilla;
     }
 
     public DatosProyecto Cargar(string ruta) => CargarCompleto(ruta).Datos;
@@ -84,7 +88,12 @@ public sealed class RepositorioDeProyectos
             // Los proyectos guardados antes de que se apuntara no la traen: se quedan en
             // null y el tablero la deduce, como hacía siempre.
             NormaPrincipal = documento.NormaPrincipal,
-            PatronIdentificador = documento.PatronIdentificador ?? DatosProyecto.PatronPorDefecto
+            PatronIdentificador = documento.PatronIdentificador ?? DatosProyecto.PatronPorDefecto,
+            // Con qué versión de la plantilla se registró. Se escribía desde el principio
+            // y no se leía nunca: estaba en el fichero para quien lo abriera a mano.
+            VersionDePlantillaGuardada = string.IsNullOrWhiteSpace(documento.VersionPlantilla)
+                ? null
+                : documento.VersionPlantilla
         };
 
         foreach (var norma in documento.Normas) datos.Normas.Add(norma);

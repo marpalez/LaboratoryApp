@@ -51,7 +51,7 @@ public class AltaDeProyectoTests
         Assert.Equal("ANTAR2504", datos.CodigoServicio);
         Assert.Equal("Javier Ibor", datos.Tecnico1);
         Assert.Null(datos.Tecnico2);
-        Assert.Equal("60598", datos.NormaPrincipal);
+        Assert.Equal(Contexto.Plantilla.Meta.Id, datos.NormaPrincipal);
     }
 
     [Fact]
@@ -61,8 +61,8 @@ public class AltaDeProyectoTests
             "ANTAR2504", "Javier Ibor", "Mario Madrigal", Contexto.Plantilla);
 
         Assert.Equal("Mario Madrigal", datos.Tecnico2);
-        Assert.Equal("60598", datos.NormaPrincipal);
-        Assert.Contains("60598", datos.Normas);
+        Assert.Equal(Contexto.Plantilla.Meta.Id, datos.NormaPrincipal);
+        Assert.Contains(Contexto.Plantilla.Meta.Id, datos.Normas);
     }
 
     /// <summary>

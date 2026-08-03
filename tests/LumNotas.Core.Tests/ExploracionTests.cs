@@ -197,6 +197,11 @@ public class ExploracionTests : IDisposable
     private static IReadOnlyDictionary<string, PlantillaEnsayos> Instaladas()
         => Contexto.TodasLasPlantillas().ToDictionary(p => p.Meta.Id);
 
+    /// <remarks>
+    /// Las normas se apuntan con el <b>id antiguo</b> —«60598», sin año— a propósito:
+    /// así estos tests son además la prueba de que un proyecto guardado antes de DD‑95
+    /// sigue encontrando su plantilla por <c>idsAnteriores</c>.
+    /// </remarks>
     private string ConNormas(string servicio, params string[] normas)
     {
         var carpeta = Path.Combine(_clientes, "antares", servicio, "01", "tomadenotas");
@@ -262,14 +267,14 @@ public class ExploracionTests : IDisposable
     public void LaLineaDeUnaNormaAnadidaResumeTodaSuTomaDeNotas()
     {
         var ruta = ConNormas("antar2601", "60598", "62031");
-        var normas = Instaladas();
         var datos = _repositorio.Cargar(ruta);
+        var led = Contexto.Norma("62031");
 
         var juntas = AnalizadorDeProyectos.Analizar(
-            [normas["60598"], normas["62031"]], datos, ruta, DateTime.Now);
+            [Contexto.Plantilla, led], datos, ruta, DateTime.Now);
 
         // La 62031 medida por su cuenta, sección a sección.
-        var sola = AnalizadorDeProyectos.Analizar([normas["62031"]], datos, ruta, DateTime.Now);
+        var sola = AnalizadorDeProyectos.Analizar([led], datos, ruta, DateTime.Now);
 
         var linea = Assert.Single(juntas.SeccionesPendientes, s => s.Titulo.Contains("62031"));
 
@@ -292,7 +297,7 @@ public class ExploracionTests : IDisposable
         var resumen = new ExploradorDeProyectos(_repositorio, _cache)
             .Explorar(_clientes, Instaladas(), Contexto.Plantilla).Single();
 
-        var deIp = Contexto.TodasLasPlantillas().Single(p => p.Meta.Id == "60529");
+        var deIp = Contexto.Norma("60529");
 
         Assert.True(resumen.SeccionesAplicables <= deIp.Secciones.Count,
             "Un proyecto de IP no puede tener más secciones que la propia norma de IP.");

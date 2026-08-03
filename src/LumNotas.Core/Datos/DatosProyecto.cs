@@ -63,6 +63,20 @@ public sealed class DatosProyecto
     /// </summary>
     public string? NormaPrincipal { get; set; }
 
+    /// <summary>
+    /// Versión de la plantilla <b>con la que se registró</b> este ensayo, leída del
+    /// fichero al abrirlo.
+    /// <para>
+    /// No es la de la plantilla instalada hoy: si el laboratorio ha publicado una
+    /// corrección desde entonces, son distintas, y la que vale para el informe es esta.
+    /// Decir la de hoy sería atribuirle al ensayo una plantilla que no se usó.
+    /// </para>
+    /// <para>
+    /// Vacía en un proyecto que aún no se ha guardado nunca.
+    /// </para>
+    /// </summary>
+    public string? VersionDePlantillaGuardada { get; set; }
+
     public const string CampoTecnico1 = "tecnico1";
     public const string CampoTecnico2 = "tecnico2";
 

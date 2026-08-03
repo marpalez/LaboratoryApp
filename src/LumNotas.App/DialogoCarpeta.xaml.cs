@@ -129,8 +129,8 @@ public partial class DialogoCarpeta : Window
             : "Técnicos: sin fichero — se usa la lista de partida", "#4B5563");
 
         Linea(File.Exists(Path.Combine(enUso, CapacidadMensual.NombreDeFichero))
-            ? $"Tarifa: {CapacidadMensual.Cargar(enUso).EurosPorDia:0.##} € por día de trabajo"
-            : "Tarifa: sin fichero — se usan 80 € por día", "#4B5563");
+            ? $"Tarifa: {CapacidadMensual.Cargar(enUso).EurosPorHoraEfectivos:0.##} € por hora de trabajo"
+            : $"Tarifa: sin fichero — se usan {new CapacidadMensual().EurosPorHoraEfectivos:0.##} € por hora", "#4B5563");
 
         Linea(ControlDeVersion.Leer(enUso) is { } version
             ? $"Versión publicada: {version.Version}"

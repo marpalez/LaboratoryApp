@@ -231,6 +231,13 @@ public sealed class GestionViewModel : ObservableObject
     /// <summary>Lo que hay que rehacer cuando cambia la carpeta; lo resuelve la ventana.</summary>
     public Action? AlCambiarCarpeta { get; set; }
 
+    /// <summary>Se avisa al terminar de leer la carpeta: los avisos de la portada cuentan
+    /// los ficheros que no se pudieron leer, y eso solo se sabe tras escanear.</summary>
+    public Action? AlExplorar { get; set; }
+
+    /// <summary>Tomas de notas del último escaneo que no se pudieron leer.</summary>
+    public int Ilegibles => _ultimos.Count(p => p.Error is not null);
+
     /// <summary>
     /// Qué proyectos se están mirando, para las tres vistas a la vez. Cambiarlo
     /// <b>no vuelve a escanear</b>: se filtra lo que ya se leyó, así que es instantáneo.
@@ -353,6 +360,7 @@ public sealed class GestionViewModel : ObservableObject
         Rellenar(Normas, todos.SelectMany(p => p.Normas), ref _norma, nameof(Norma));
 
         Repartir(reencuadrar: false);
+        AlExplorar?.Invoke();
     }
 
     private TimeSpan _leidoEn;

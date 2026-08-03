@@ -5,10 +5,11 @@ namespace LumNotas.Core.Tests;
 /// <summary>
 /// Carga de trabajo por técnico y mes.
 /// <para>
-/// El laboratorio mide el trabajo de un servicio dividiendo el importe de su oferta
-/// entre 80 €: 2 000 € son 25 días. Esos días se reparten entre los meses que abarca el
-/// servicio, en proporción a sus días entre semana, y se comparan con lo que cabe en
-/// cada mes —22 días, salvo agosto (10) y diciembre (15)—.
+/// El laboratorio mide el trabajo de un servicio <b>en horas</b>: divide el importe de
+/// su oferta entre 105 y multiplica por 1,3. Una oferta de 2 000 € son unas 25 horas,
+/// algo más de tres jornadas de ocho. Esas jornadas se reparten entre los meses que
+/// abarca el servicio, en proporción a sus días entre semana, y se comparan con lo que
+/// cabe en cada mes —22 días, salvo agosto (10) y diciembre (15)—.
 /// </para>
 /// </summary>
 public class CargaTests : IDisposable
@@ -26,10 +27,6 @@ public class CargaTests : IDisposable
     // ---- la tarifa y el calendario laboral ---------------------------------
 
     [Fact]
-    public void DosMilEurosSonVeinticincoDiasDeTrabajo()
-        => Assert.Equal(25, new CapacidadMensual().DiasDeTrabajo(2000));
-
-    [Fact]
     public void AgostoYDiciembreSonMesesCortos()
     {
         var capacidad = new CapacidadMensual();
@@ -39,16 +36,44 @@ public class CargaTests : IDisposable
         Assert.Equal(15, capacidad.Dias(12));
     }
 
+    /// <summary>
+    /// La cuenta del laboratorio: <b>importe ÷ 105 × 1,3 = horas</b>. Una oferta de
+    /// 2 000 € son unas 25 horas, algo más de tres jornadas.
+    /// </summary>
+    [Fact]
+    public void ElTrabajoSeMideEnHoras()
+    {
+        var capacidad = new CapacidadMensual();
+
+        Assert.Equal(2000d / 105 * 1.3, capacidad.HorasDeTrabajo(2000), 6);
+        Assert.Equal(24.8, capacidad.HorasDeTrabajo(2000), 1);
+
+        // Y en jornadas, que es la unidad de la tabla de carga.
+        Assert.Equal(capacidad.HorasDeTrabajo(2000) / 8, capacidad.DiasDeTrabajo(2000), 6);
+        Assert.Equal(3.1, capacidad.DiasDeTrabajo(2000), 1);
+    }
+
+    /// <summary>
+    /// La cuenta tiene que cuadrar con la tarifa que factura el laboratorio, 80 €/hora.
+    /// No da 80 exactos —105 ÷ 1,3 son 80,77— y por eso se comprueba con margen: si
+    /// alguien cambia el divisor o el factor y se aleja de la tarifa, se ve aquí.
+    /// </summary>
+    [Fact]
+    public void LaCuentaCuadraConLaTarifaDelLaboratorio()
+        => Assert.InRange(new CapacidadMensual().EurosPorHoraEfectivos, 79, 82);
+
     [Fact]
     public void LaTarifaYLaCapacidadSobrevivenAlGuardado()
     {
-        var capacidad = new CapacidadMensual { EurosPorDia = 95 };
+        var capacidad = new CapacidadMensual { EurosPorHora = 95, Factor = 1.2, HorasPorDia = 7.5 };
         capacidad.DiasPorMes[7] = 8;
         capacidad.Guardar(_carpeta);
 
         var leida = CapacidadMensual.Cargar(_carpeta);
 
-        Assert.Equal(95, leida.EurosPorDia);
+        Assert.Equal(95, leida.EurosPorHora);
+        Assert.Equal(1.2, leida.Factor);
+        Assert.Equal(7.5, leida.HorasPorDia);
         Assert.Equal(8, leida.Dias(8));
     }
 
@@ -60,8 +85,27 @@ public class CargaTests : IDisposable
 
         var leida = CapacidadMensual.Cargar(_carpeta);
 
-        Assert.Equal(CapacidadMensual.EurosPorDiaPorDefecto, leida.EurosPorDia);
+        Assert.Equal(CapacidadMensual.EurosPorHoraPorDefecto, leida.EurosPorHora);
+        Assert.Equal(CapacidadMensual.FactorPorDefecto, leida.Factor);
         Assert.Equal(12, leida.DiasPorMes.Count);
+    }
+
+    /// <summary>
+    /// Un <c>capacidad.json</c> escrito antes de pasar a horas no trae ninguno de los
+    /// campos nuevos. No puede dejar la carga en cero: se rellenan con los de partida.
+    /// </summary>
+    [Fact]
+    public void UnFicheroAnteriorAlCambioAHorasSeCompleta()
+    {
+        File.WriteAllText(Path.Combine(_carpeta, CapacidadMensual.NombreDeFichero),
+            """{ "EurosPorDia": 80, "DiasPorMes": [22,22,22,22,22,22,22,10,22,22,22,15] }""");
+
+        var leida = CapacidadMensual.Cargar(_carpeta);
+
+        Assert.Equal(CapacidadMensual.EurosPorHoraPorDefecto, leida.EurosPorHora);
+        Assert.Equal(CapacidadMensual.FactorPorDefecto, leida.Factor);
+        Assert.Equal(CapacidadMensual.HorasPorDiaPorDefecto, leida.HorasPorDia);
+        Assert.True(leida.DiasDeTrabajo(2000) > 0);
     }
 
     // ---- días entre semana -------------------------------------------------
@@ -159,14 +203,15 @@ public class CargaTests : IDisposable
     [Fact]
     public void UnAgostoSobrevendidoPasaDelCienPorCien()
     {
+        // 10 000 € son 124 horas: 15,5 jornadas en un agosto que solo tiene 10.
         var (_, filas) = CargaPorTecnico.Calcular(
-            [Servicio("Daniel Martínez", "2026-08-03", "2026-08-28", 2000)], new CapacidadMensual());
+            [Servicio("Daniel Martínez", "2026-08-03", "2026-08-28", 10000)], new CapacidadMensual());
 
         var agosto = filas[0].Meses.Single(c => c.Mes == 8);
 
-        Assert.Equal(25, agosto.Dias, 3);
+        Assert.Equal(15.5, agosto.Dias, 1);
         Assert.Equal(10, agosto.Capacidad);
-        Assert.Equal(250, agosto.Porcentaje, 1);
+        Assert.InRange(agosto.Porcentaje, 154, 156);
     }
 
     [Fact]
@@ -177,9 +222,9 @@ public class CargaTests : IDisposable
 
         var septiembre = filas[0].Meses.Single(c => c.Mes == 9);
 
-        Assert.Equal(10, septiembre.Dias, 3);       // 800 / 80
+        Assert.Equal(1.24, septiembre.Dias, 2);     // 800 ÷ 105 × 1,3 = 9,9 h
         Assert.Equal(22, septiembre.Capacidad);
-        Assert.InRange(septiembre.Porcentaje, 45, 46);
+        Assert.InRange(septiembre.Porcentaje, 5, 6);
     }
 
     [Fact]
@@ -191,7 +236,7 @@ public class CargaTests : IDisposable
         ], new CapacidadMensual());
 
         Assert.Single(filas);
-        Assert.Equal(20, filas[0].Meses.Single(c => c.Mes == 9).Dias, 3);
+        Assert.Equal(2.48, filas[0].Meses.Single(c => c.Mes == 9).Dias, 2);
     }
 
     /// <summary>
@@ -208,7 +253,7 @@ public class CargaTests : IDisposable
         ], new CapacidadMensual());
 
         Assert.Equal(2, filas[0].SinImporte);
-        Assert.Equal(10, filas[0].Meses.Single(c => c.Mes == 9).Dias, 3);
+        Assert.Equal(1.24, filas[0].Meses.Single(c => c.Mes == 9).Dias, 2);
     }
 
     [Fact]

@@ -31,7 +31,7 @@ public class PlantillaTests
     public void LaPlantillaSeCarga()
     {
         var p = Contexto.Plantilla;
-        Assert.Equal("60598", p.Meta.Id);
+        Assert.Equal("60598", p.Meta.CodigoParaFichero);
         Assert.Equal("2024", p.Meta.Numeracion);
 
         // El IK dejó de estar excluido: se elige por muestra y tiene su propia sección.

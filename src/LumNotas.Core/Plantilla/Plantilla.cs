@@ -76,7 +76,57 @@ public sealed class PlantillaEnsayos
 
 public sealed class Meta
 {
+    /// <summary>
+    /// Qué norma, qué parte y <b>de qué año</b>: <c>60598-1_2024</c>.
+    /// <para>
+    /// El <b>año de publicación</b> forma parte de la identidad porque un ensayo hecho
+    /// contra la norma de un año tiene que seguir midiéndose contra esa. Cuando el id no
+    /// lo llevaba, publicar la norma nueva <b>remedía en silencio</b> todos los ensayos
+    /// anteriores.
+    /// </para>
+    /// <para>
+    /// <b><see cref="Version"/> se queda fuera del id</b>: se sube por corregir una errata
+    /// nuestra, y meterla dentro dejaría huérfano cada proyecto en cada corrección.
+    /// </para>
+    /// </summary>
     public string Id { get; init; } = "";
+
+    /// <summary>
+    /// Ids con los que se conoció antes esta misma norma y año. Es lo que permite cambiar
+    /// el esquema de identificación sin romper los proyectos ya guardados: cada uno lleva
+    /// escrito el id que existía el día que se guardó, y aquí se dice que sigue siendo
+    /// esta.
+    /// <para>
+    /// La migración vive en el JSON, como todo lo demás — no en un <c>switch</c> de C#
+    /// que haya que ampliar cada vez.
+    /// </para>
+    /// </summary>
+    public List<string>? IdsAnteriores { get; init; }
+
+    /// <summary>
+    /// Lo que sale en el nombre del fichero: <c>TdN_<b>60598</b>_LEDC42502xx-00</c>.
+    /// <para>
+    /// Va aparte del id a propósito. El id creció para llevar la parte y el año, y el
+    /// laboratorio quiere que el nombre del fichero siga siendo corto. Si falta, se usa
+    /// el id entero.
+    /// </para>
+    /// </summary>
+    public string? CodigoDeFichero { get; init; }
+
+    /// <summary>
+    /// El <b>año de publicación</b> de la norma, para poder enseñarlo sin descomponer el id.
+    /// <para>
+    /// Es el año y solo el año: <c>2021</c>, no <c>2021+A11:2022</c>. La designación
+    /// completa —con sus enmiendas— va en <see cref="Titulo"/>, que es lo que se lee y lo
+    /// que sale en el informe.
+    /// </para>
+    /// <para>
+    /// <b>No es la «edición» de la norma.</b> Una norma tiene edición —la 8, la 9— y año
+    /// de publicación, y no son lo mismo; lo que el laboratorio usa para distinguirlas, y
+    /// lo que lleva el id, es el año.
+    /// </para>
+    /// </summary>
+    public string? AnioDePublicacion { get; init; }
     /// <summary>Nombre con el que la norma se ofrece al técnico. Si falta, se usa el id.</summary>
     public string? Titulo { get; init; }
 
@@ -97,6 +147,19 @@ public sealed class Meta
     public string? Numeracion { get; init; }
     public Alcance? Alcance { get; init; }
     public string? CatalogoEquipos { get; init; }
+
+    /// <summary>Para el nombre del fichero: el código corto si lo hay, y si no el id.</summary>
+    public string CodigoParaFichero => string.IsNullOrWhiteSpace(CodigoDeFichero) ? Id : CodigoDeFichero;
+
+    /// <summary>
+    /// Si esta plantilla es la que corresponde a un id guardado en un proyecto, sea el
+    /// suyo de ahora o uno de los que tuvo antes. Se compara sin distinguir mayúsculas
+    /// porque el id lo escribe una persona en el JSON.
+    /// </summary>
+    public bool Responde(string? id)
+        => !string.IsNullOrWhiteSpace(id)
+           && (string.Equals(Id, id, StringComparison.OrdinalIgnoreCase)
+               || (IdsAnteriores?.Any(a => string.Equals(a, id, StringComparison.OrdinalIgnoreCase)) ?? false));
 }
 
 public sealed class Alcance

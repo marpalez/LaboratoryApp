@@ -29,6 +29,14 @@ public class PlantillasCompartidasTests : IDisposable
 
     private string CarpetaCompartida() => Path.Combine(_proyectos, PlantillasCompartidas.NombreDeCarpeta);
 
+    /// <summary>
+    /// Cuántos ficheros hay instalados en este equipo. Se cuenta, no se escribe: añadir
+    /// una norma —o un año nuevo de una— es dejar caer un fichero, y estos tests no deben tener
+    /// que enterarse.
+    /// </summary>
+    private static int Instaladas(string patron)
+        => Directory.GetFiles(Contexto.CarpetaDePlantillas(), patron).Length;
+
     private void PublicarUnaNorma(string version = "1.0.0")
     {
         var destino = CarpetaCompartida();
@@ -114,8 +122,8 @@ public class PlantillasCompartidasTests : IDisposable
         var publicadas = Directory.GetFiles(CarpetaCompartida(), "plantilla-*.json");
         var equipos = Directory.GetFiles(CarpetaCompartida(), "equipos-*.json");
 
-        Assert.Equal(4, publicadas.Length);
-        Assert.Equal(4, equipos.Length);
+        Assert.Equal(Instaladas("plantilla-*.json"), publicadas.Length);
+        Assert.Equal(Instaladas("equipos-*.json"), equipos.Length);
         Assert.Equal(publicadas.Length + equipos.Length, copiados);
     }
 
@@ -127,7 +135,62 @@ public class PlantillasCompartidasTests : IDisposable
         var origen = PlantillasCompartidas.Resolver(_proyectos);
 
         Assert.True(origen.EsCompartida);
-        Assert.Equal(4, CatalogoDeNormas.Disponibles(origen.Carpeta).Count);
+        Assert.Equal(CatalogoDeNormas.Disponibles(Contexto.CarpetaDePlantillas()).Count,
+                     CatalogoDeNormas.Disponibles(origen.Carpeta).Count);
+    }
+
+    // ---- lo que este equipo tiene y el laboratorio no ----------------------
+
+    /// <summary>
+    /// Desde que se publica la primera tanda, el programa lee de la carpeta compartida y
+    /// <b>deja de mirar la local</b>. Añadir una norma aquí no producía ninguna señal: el
+    /// fichero estaba, no aparecía en el programa y nada explicaba por qué.
+    /// </summary>
+    [Fact]
+    public void UnaNormaNuevaEnEsteEquipoSeAvisaComoSinPublicar()
+    {
+        PlantillasCompartidas.Publicar(Contexto.CarpetaDePlantillas(), _proyectos);
+
+        // Lo publicado es exactamente lo que hay aquí: nada pendiente.
+        Assert.False(PlantillasCompartidas
+            .Comparar(Contexto.CarpetaDePlantillas(), _proyectos).HayAlgo);
+
+        // Llega una norma a este equipo y todavía no está publicada.
+        File.Delete(Path.Combine(CarpetaCompartida(), "plantilla-60529_2018_1.0.0.json"));
+
+        var pendientes = PlantillasCompartidas.Comparar(Contexto.CarpetaDePlantillas(), _proyectos);
+
+        Assert.Equal(1, pendientes.Cuantas);
+        Assert.Contains(pendientes.Nuevas, t => t.Contains("60529"));
+        Assert.Empty(pendientes.MasNuevas);
+    }
+
+    /// <summary>
+    /// Y si la de aquí es una corrección de una que ya está publicada, también hay que
+    /// avisar: si no, este equipo trabajaría con una versión que los demás no tienen.
+    /// </summary>
+    [Fact]
+    public void UnaVersionMasNuevaEnEsteEquipoTambienSeAvisa()
+    {
+        PlantillasCompartidas.Publicar(Contexto.CarpetaDePlantillas(), _proyectos);
+
+        // Se rebaja la publicada, como si aquí se hubiera corregido la plantilla.
+        var publicada = Path.Combine(CarpetaCompartida(), "plantilla-60529_2018_1.0.0.json");
+        File.WriteAllText(publicada,
+            File.ReadAllText(publicada).Replace("\"version\": \"1.0.0\"", "\"version\": \"0.9.0\""));
+
+        var pendientes = PlantillasCompartidas.Comparar(Contexto.CarpetaDePlantillas(), _proyectos);
+
+        Assert.Empty(pendientes.Nuevas);
+        Assert.Contains(pendientes.MasNuevas, t => t.Contains("60529"));
+    }
+
+    /// <summary>Sin carpeta compartida no hay nada que comparar: se sigue en local.</summary>
+    [Fact]
+    public void SinCarpetaCompartidaNoSeAvisaDeNada()
+    {
+        Assert.False(PlantillasCompartidas.Comparar(Contexto.CarpetaDePlantillas(), null).HayAlgo);
+        Assert.False(PlantillasCompartidas.Comparar(Contexto.CarpetaDePlantillas(), _proyectos).HayAlgo);
     }
 
     /// <summary>Publicar dos veces actualiza, no duplica ni falla.</summary>
@@ -138,8 +201,9 @@ public class PlantillasCompartidasTests : IDisposable
         PlantillasCompartidas.Publicar(Contexto.CarpetaDePlantillas(), _proyectos);
         PlantillasCompartidas.Publicar(Contexto.CarpetaDePlantillas(), _proyectos);
 
-        // Las cuatro del laboratorio más la de prueba, que no se toca por no venir de local.
-        Assert.Equal(5, Directory.GetFiles(CarpetaCompartida(), "plantilla-*.json").Length);
+        // Las del laboratorio más la de prueba, que no se toca por no venir de local.
+        Assert.Equal(Instaladas("plantilla-*.json") + 1,
+                     Directory.GetFiles(CarpetaCompartida(), "plantilla-*.json").Length);
     }
 
     /// <summary>

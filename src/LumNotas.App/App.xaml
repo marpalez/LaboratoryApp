@@ -3,5 +3,80 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:LumNotas.App">
     <Application.Resources>
+
+        <!--
+            El botón de toda la aplicación. Está aquí y no en la ventana porque los
+            diálogos son ventanas aparte y no verían un estilo declarado en MainWindow.
+
+            WPF no da esquinas redondeadas a un Button: hay que rehacer la plantilla sobre
+            un Border. Al hacerlo se pierde el aspecto del sistema, así que los cuatro
+            estados —normal, encima, pulsado y desactivado— hay que dibujarlos a mano.
+
+            Todo lo que se pueda poner desde fuera se toma con TemplateBinding: hay
+            botones que fijan su propio color de fondo —el azul de «Guardar», el verde
+            azulado de gestión— y tienen que seguir mandando ellos.
+        -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#F3F4F6"/>
+            <Setter Property="Foreground" Value="#1F2937"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="14,7"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Caja"
+                                CornerRadius="8"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter x:Name="Contenido"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              RecognizesAccessKey="True"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <!--
+                                Encima y pulsado se resuelven con opacidad y no con un
+                                color fijo: así funcionan igual sobre el gris de por
+                                defecto y sobre los botones que traen su propio color.
+                            -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Caja" Property="Opacity" Value="0.88"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Caja" Property="Opacity" Value="0.72"/>
+                                <!-- Un pelo hacia abajo: es lo que hace que se sienta pulsado -->
+                                <Setter TargetName="Caja" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <TranslateTransform Y="1"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Caja" Property="Opacity" Value="0.45"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Los desplegables, con algo más de aire para que no queden apretados al lado
+             de los botones nuevos. No se les rehace la plantilla: un ComboBox son cuatro
+             piezas —caja, flecha, desplegable y elemento seleccionado— y redondear la de
+             fuera obliga a redibujarlas todas. No compensa por una esquina. -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Padding" Value="6,4"/>
+        </Style>
+
     </Application.Resources>
 </Application>
