@@ -9,8 +9,14 @@ using LumNotas.Core.Gestion;
 namespace LumNotas.App;
 
 /// <summary>
-/// Arrastrar una barra del calendario con el ratón: el centro la mueve entera, los
-/// bordes cambian solo el inicio o solo el fin.
+/// Arrastrar un trabajo del calendario con el ratón: el centro lo mueve entero, los bordes
+/// de fuera cambian solo el inicio o solo el fin.
+/// <para>
+/// Se coge <b>por cualquiera de sus tarjetas</b> —un trabajo con cuatro familias son
+/// cuatro tarjetas pegadas— y se mueven todas a la vez, porque es un solo trabajo. Los
+/// bordes que quedan <b>entre dos familias</b> no estiran nada todavía: mueven el trabajo,
+/// como el centro.
+/// </para>
 /// <para>
 /// Aquí solo se traducen gestos a llamadas; <b>la aritmética está en
 /// <see cref="TarjetaPlanViewModel"/></b>, que sí se puede probar. Se activa desde el
@@ -41,6 +47,7 @@ public static class ArrastreDeBarra
     private const double Salto = 16;
 
     private static FrameworkElement? _barra;
+    private static TrozoDeBarraViewModel? _trozo;
     private static TarjetaPlanViewModel? _tarjeta;
     private static Point _origen;
     private static bool _arrastrando;
@@ -63,6 +70,23 @@ public static class ArrastreDeBarra
     public static void SetActivo(DependencyObject destino, bool valor) => destino.SetValue(ActivoProperty, valor);
 
     public static bool GetActivo(DependencyObject destino) => (bool)destino.GetValue(ActivoProperty);
+
+    /// <summary>
+    /// Marca la fila contra la que se mide el recorrido del ratón.
+    /// <para>
+    /// Hace falta desde que un trabajo son varias tarjetas: el panel que las contiene se
+    /// desplaza con ellas al arrastrar, así que medir contra el padre inmediato daría un
+    /// recorrido que se persigue a sí mismo y la barra no se movería. La fila, en cambio,
+    /// solo se desplaza con el calendario —que es justo lo que el arrastre necesita para
+    /// seguir al ratón cuando llega al borde.
+    /// </para>
+    /// </summary>
+    public static readonly DependencyProperty CarrilProperty = DependencyProperty.RegisterAttached(
+        "Carril", typeof(bool), typeof(ArrastreDeBarra), new PropertyMetadata(false));
+
+    public static void SetCarril(DependencyObject destino, bool valor) => destino.SetValue(CarrilProperty, valor);
+
+    public static bool GetCarril(DependencyObject destino) => (bool)destino.GetValue(CarrilProperty);
 
     private static void AlActivar(DependencyObject destino, DependencyPropertyChangedEventArgs args)
     {
@@ -87,18 +111,19 @@ public static class ArrastreDeBarra
     private static void AlPulsar(object remitente, MouseButtonEventArgs args)
     {
         if (remitente is not FrameworkElement elemento ||
-            elemento.DataContext is not TarjetaPlanViewModel tarjeta ||
-            !tarjeta.SePuedeArrastrar) return;
+            elemento.DataContext is not TrozoDeBarraViewModel trozo ||
+            !trozo.Tarjeta.SePuedeArrastrar) return;
 
         _barra = elemento;
-        _tarjeta = tarjeta;
+        _trozo = trozo;
+        _tarjeta = trozo.Tarjeta;
         _arrastrando = false;
         _pista = Ancestro<ScrollViewer>(elemento);
 
-        // El origen se mide contra el padre, que no se mueve: la barra sí lo hace.
-        _origen = args.GetPosition(Padre(elemento));
+        // El origen se mide contra la fila, que no se mueve: las tarjetas sí lo hacen.
+        _origen = args.GetPosition(Carril(elemento));
 
-        tarjeta.EmpezarArrastre(ModoDe(elemento, args.GetPosition(elemento).X));
+        _tarjeta.EmpezarArrastre(ModoDe(elemento, args.GetPosition(elemento).X, trozo));
         elemento.CaptureMouse();
         Latido.Start();
     }
@@ -122,8 +147,8 @@ public static class ArrastreDeBarra
 
         _pista.ScrollToHorizontalOffset(_pista.HorizontalOffset + paso);
 
-        // El padre se desplaza con el contenido, así que el recorrido crece solo.
-        _tarjeta.Arrastrar(Mouse.GetPosition(Padre(_barra)).X - _origen.X);
+        // La fila se desplaza con el contenido, así que el recorrido crece solo.
+        _tarjeta.Arrastrar(Mouse.GetPosition(Carril(_barra)).X - _origen.X);
     }
 
     private static void AlMover(object remitente, MouseEventArgs args)
@@ -133,14 +158,14 @@ public static class ArrastreDeBarra
         if (_barra != elemento || _tarjeta is null)
         {
             // Sin arrastre en curso, el cursor anuncia qué haría cada zona.
-            if (elemento.DataContext is TarjetaPlanViewModel t && t.SePuedeArrastrar)
-                elemento.Cursor = ModoDe(elemento, args.GetPosition(elemento).X) == ModoArrastre.Mover
+            if (elemento.DataContext is TrozoDeBarraViewModel t && t.Tarjeta.SePuedeArrastrar)
+                elemento.Cursor = ModoDe(elemento, args.GetPosition(elemento).X, t) == ModoArrastre.Mover
                     ? Cursors.SizeAll
                     : Cursors.SizeWE;
             return;
         }
 
-        var recorrido = args.GetPosition(Padre(elemento)).X - _origen.X;
+        var recorrido = args.GetPosition(Carril(elemento)).X - _origen.X;
 
         if (!_arrastrando && Math.Abs(recorrido) < Umbral) return;
 
@@ -150,9 +175,11 @@ public static class ArrastreDeBarra
 
     private static void AlSoltar(object remitente, MouseButtonEventArgs args)
     {
-        if (remitente is not FrameworkElement elemento || _barra != elemento || _tarjeta is null) return;
+        if (remitente is not FrameworkElement elemento || _barra != elemento ||
+            _tarjeta is null || _trozo is null) return;
 
         var tarjeta = _tarjeta;
+        var trozo = _trozo;
         var huboArrastre = _arrastrando;
 
         Terminar(elemento);
@@ -161,8 +188,10 @@ public static class ArrastreDeBarra
         // clic por cancelado. Así que aquí se decide qué era el gesto y se actúa.
         args.Handled = true;
 
+        // Un clic abre la planificación de la familia que se ha pulsado, no la de la
+        // cabecera: es lo que gana el trabajo al dibujarse por tarjetas.
         if (huboArrastre) tarjeta.SoltarArrastre();
-        else tarjeta.Planificar.Execute(null);   // fue un clic: se abre su configuración
+        else trozo.Planificar.Execute(null);
     }
 
     /// <summary>
@@ -187,6 +216,7 @@ public static class ArrastreDeBarra
     {
         Latido.Stop();
         _barra = null;
+        _trozo = null;
         _tarjeta = null;
         _pista = null;
         _arrastrando = false;
@@ -203,14 +233,30 @@ public static class ArrastreDeBarra
         return null;
     }
 
-    private static ModoArrastre ModoDe(FrameworkElement elemento, double x)
+    /// <summary>
+    /// Qué haría el gesto según dónde se pulse. <b>Solo estiran los bordes de fuera</b>: el
+    /// izquierdo de la primera familia y el derecho de la última. Los de dentro son
+    /// fronteras entre dos familias, y mover una frontera es otra cosa que todavía no se
+    /// hace; hasta entonces se comportan como el centro, que es lo que menos sorprende.
+    /// </summary>
+    private static ModoArrastre ModoDe(FrameworkElement elemento, double x, TrozoDeBarraViewModel trozo)
     {
         if (elemento.ActualWidth < AnchoMinimoConBordes) return ModoArrastre.Mover;
-        if (x <= Borde) return ModoArrastre.Inicio;
-        if (x >= elemento.ActualWidth - Borde) return ModoArrastre.Fin;
+        if (trozo.EsPrimera && x <= Borde) return ModoArrastre.Inicio;
+        if (trozo.EsUltima && x >= elemento.ActualWidth - Borde) return ModoArrastre.Fin;
         return ModoArrastre.Mover;
     }
 
-    private static IInputElement Padre(FrameworkElement elemento)
-        => elemento.Parent as IInputElement ?? elemento;
+    /// <summary>
+    /// La fila marcada con <see cref="CarrilProperty"/>, contra la que se mide el recorrido.
+    /// Si no la hay se cae al padre inmediato, que es lo que se hacía cuando un trabajo era
+    /// una sola barra.
+    /// </summary>
+    private static IInputElement Carril(FrameworkElement elemento)
+    {
+        for (DependencyObject? nodo = elemento; nodo is not null; nodo = VisualTreeHelper.GetParent(nodo))
+            if (nodo is FrameworkElement candidato && GetCarril(candidato)) return candidato;
+
+        return elemento.Parent as IInputElement ?? elemento;
+    }
 }

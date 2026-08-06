@@ -4,9 +4,11 @@
     "idsAnteriores": ["62031", "62031_2018"],
     "codigoDeFichero": "62031",
     "anioDePublicacion": "2020",
-    "titulo": "Módulos LED — EN 62031:2020 + A11:2021",
+    "edicion": "2",
+    "titulo": "Módulos LED — EN IEC 62031:2020 + A11:2021",
     "tituloCorto": "Módulos LED",
-    "normasCompatibles": ["60529_2018", "62262_2002_A1"],
+    "designacion": "EN IEC 62031:2020 + A11:2021",
+    "normasCompatibles": ["60529_1991", "62262_2002_A1"],
     "notaCompatibles": "El laboratorio no fijó esta lista; se admiten IP e IK porque la 62031 no los lleva dentro. Pendiente de confirmar.",
     "version": "1.0.0",
     "generadoEl": "2026-07-31",
@@ -22,7 +24,11 @@
 
   "proyecto": {
     "campos": [
-      { "id": "codigoServicio", "etiqueta": "Código de servicio", "tipo": "texto", "formato": "NNNNNAAAA", "obligatorio": true, "origenExcel": "RESUMEN 62031!D3" },
+      { "id": "codigoTomaDeNotas", "etiqueta": "Código de la toma de notas", "tipo": "texto", "obligatorio": true, "nota": "Ejemplo: TECNO260201-00" },
+      { "id": "acreditacion", "etiqueta": "Acreditación", "tipo": "seleccion", "multiple": true, "obligatorio": true,
+        "opciones": ["Sin acreditar", "ENAC", "ENEC", "CB"], "opcionExcluyente": "Sin acreditar",
+        "nota": "Un servicio puede ser varias a la vez. «Sin acreditar» es excluyente." },
+      { "id": "codigoServicio", "etiqueta": "Código de servicio", "tipo": "texto", "formato": "NNNNNAAAA", "obligatorio": true, "nota": "Ejemplo: TECNO2602", "origenExcel": "RESUMEN 62031!D3" },
       { "id": "tecnico1", "etiqueta": "Técnico 1", "tipo": "texto", "obligatorio": true, "origenExcel": "RESUMEN 62031!C5" },
       { "id": "tecnico2", "etiqueta": "Técnico 2", "tipo": "texto", "origenExcel": "RESUMEN 62031!C6" },
       { "id": "numeroMuestras", "etiqueta": "Nº de muestras", "tipo": "entero", "min": 1, "max": 30, "obligatorio": true, "origenExcel": "RESUMEN 62031!D8" },

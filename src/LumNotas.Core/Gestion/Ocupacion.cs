@@ -53,9 +53,9 @@ public static class Ocupacion
         var cuantos = $"{proyectos} proyecto{(proyectos == 1 ? "" : "s")}";
 
         if (dias <= 0) return cuantos;
-        if (dias < 7) return $"{cuantos} · {dias} día{(dias == 1 ? "" : "s")}";
+        if (dias < 7) return $"{cuantos} | {dias} día{(dias == 1 ? "" : "s")}";
 
         var semanas = (int)Math.Ceiling(dias / 7.0);
-        return $"{cuantos} · {semanas} semana{(semanas == 1 ? "" : "s")}";
+        return $"{cuantos} | {semanas} semana{(semanas == 1 ? "" : "s")}";
     }
 }

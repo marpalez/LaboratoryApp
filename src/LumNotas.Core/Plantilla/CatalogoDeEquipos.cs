@@ -72,5 +72,5 @@ public sealed class EquipoDelCatalogo
     /// <summary>Etiqueta para la interfaz y el informe.</summary>
     public string Etiqueta => string.IsNullOrWhiteSpace(Descripcion)
         ? CodigoLiteral
-        : $"{CodigoLiteral} · {Descripcion}";
+        : $"{CodigoLiteral} | {Descripcion}";
 }

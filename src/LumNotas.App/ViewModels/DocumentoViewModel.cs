@@ -22,6 +22,25 @@ public sealed class ServiciosDeVentana
     public Action<string>? AbrirEnElVisor { get; set; }
 
     /// <summary>
+    /// Decir que algo <b>no</b> ha salido: no se pudo abrir, guardar o exportar, o falta
+    /// algo para poder guardar.
+    /// <para>
+    /// <b>Interrumpe a propósito</b> (2026‑08‑06). Antes esto se escribía en una franja
+    /// oscura al pie de la ventana, que se quitó por ocupar sitio permanente para no decir
+    /// nada casi siempre. Pero un «no se pudo guardar» no puede quedarse sin decir, y una
+    /// franja que casi siempre está vacía es justo la que nadie mira el día que importa.
+    /// Con una ventana no hay forma de pasarlo por alto.
+    /// </para>
+    /// <para>
+    /// Solo para lo que falla. <b>Las confirmaciones se quitaron</b> —«Guardado en…»,
+    /// «Abierto…»— porque ya se ven por otro lado: la ruta está bajo el título y el punto
+    /// de cambios sin guardar desaparece solo. Un diálogo cada vez que se guarda sería un
+    /// estorbo en un trabajo donde se guarda cada pocos minutos.
+    /// </para>
+    /// </summary>
+    public Action<string>? Avisar { get; set; }
+
+    /// <summary>
     /// Editor de la lista de técnicos. Devuelve las correcciones de nombre hechas, o
     /// <c>null</c> si no se tocó nada.
     /// </summary>
@@ -44,7 +63,7 @@ public sealed class ServiciosDeVentana
 
     /// <summary>
     /// Alta de un proyecto para planificarlo. Recibe la carpeta donde abrir el examinador
-    /// y devuelve la ruta del <c>.lumproj</c> creado, o <c>null</c> si se canceló.
+    /// y devuelve la ruta del <c>.lmnlab</c> creado, o <c>null</c> si se canceló.
     /// </summary>
     public Func<string?, string?>? CrearProyecto { get; set; }
 
@@ -57,6 +76,54 @@ public sealed class ServiciosDeVentana
     /// pestañas, y así la del técnico se queda intacta con lo que llevara anotado.
     /// </remarks>
     public Func<string, string?, RespuestaRepetido?>? ComprobarSiYaExiste { get; set; }
+
+    /// <summary>
+    /// Salta a gestión, vista calendario, buscando ese servicio. Lo resuelve la ventana,
+    /// que es quien lleva las pestañas y conoce el tablero.
+    /// </summary>
+    public Action<DestinoDelCalendario>? VerEnElCalendario { get; set; }
+
+    /// <summary>
+    /// Diálogo de planificación: recibe el título y una copia de lo que hay, y devuelve lo
+    /// editado o <c>null</c> si se canceló. Es el mismo que abre el tablero.
+    /// </summary>
+    public Func<string, Planificacion, Planificacion?>? PedirPlanificacion { get; set; }
+
+    /// <summary>
+    /// Pregunta si el servicio pasa a terminado o archivado. Sale al acabar de exportar y
+    /// cuando la toma de notas se completa.
+    /// </summary>
+    public Func<string, RespuestaCierre>? PreguntarSiSeCierra { get; set; }
+}
+
+/// <summary>
+/// A qué va el calendario cuando se salta desde una toma de notas: qué buscar y con qué
+/// filtros, para que el servicio <b>aparezca de verdad</b>.
+/// <para>
+/// Al principio esto solo llevaba el código y no tocaba nada más. Daba pie a confusión
+/// (2026‑08‑05): un servicio terminado o archivado no pasa el filtro de «En desarrollo»,
+/// así que el botón llevaba a un calendario vacío y parecía roto.
+/// </para>
+/// </summary>
+/// <param name="Codigo">Las once primeras del código, que es lo que se escribe en la caja de buscar.</param>
+/// <param name="Estado">
+/// El estado que hay que poner para que se vea, o <c>null</c> si con el que haya vale. Solo
+/// se fuerza en los dos casos que esconden: terminado y archivado.
+/// </param>
+/// <param name="Tecnico">El responsable, para dejar su fila a la vista.</param>
+public sealed record DestinoDelCalendario(string Codigo, string? Estado, string? Tecnico);
+
+/// <summary>Qué se hace con un servicio que ya está listo.</summary>
+public enum RespuestaCierre
+{
+    /// <summary>Dejarlo como está.</summary>
+    Cancelar,
+
+    /// <summary>Terminado, pero sigue en el calendario.</summary>
+    Terminado,
+
+    /// <summary>Terminado y fuera del calendario.</summary>
+    Archivado
 }
 
 /// <summary>
@@ -94,7 +161,29 @@ public sealed class DocumentoViewModel : ObservableObject
         GuardarComo = new Comando(() => GuardarProyecto(pedirRuta: true), () => !SinProyecto);
         ExportarInforme = new Comando(Exportar, () => !SinProyecto);
         AlternarIndice = new Comando(() => IndiceVisible = !IndiceVisible);
+
+        Planificacion = new PlanificacionViewModel(
+            repositorio,
+            () => _ruta,
+            () => _datos.CodigoTomaDeNotas,
+            () => _datos.Tecnico1 ?? "",
+            destino => _servicios.VerEnElCalendario?.Invoke(destino),
+            (titulo, actual) => _servicios.PedirPlanificacion?.Invoke(titulo, actual),
+            () => FechasDelEnsayo.De(_datos));
     }
+
+    /// <summary>
+    /// La planificación del servicio, para verla con el ensayo delante. Es una pestaña más
+    /// del índice, encima de la cabecera: lo primero que se mira al abrir es para cuándo
+    /// era y si han llegado las muestras.
+    /// </summary>
+    public PlanificacionViewModel Planificacion { get; }
+
+    /// <summary>Lleva al panel de planificación desde la barra de arriba.</summary>
+    public Comando VerPlanificacion => _verPlanificacion ??= new Comando(
+        () => PanelActual = Planificacion, () => !SinProyecto);
+
+    private Comando? _verPlanificacion;
 
     /// <summary>Normas instaladas, para la portada de la pestaña vacía.</summary>
     public IReadOnlyList<NormaDisponible> Normas { get; }
@@ -133,30 +222,23 @@ public sealed class DocumentoViewModel : ObservableObject
     // ---- rótulos -----------------------------------------------------------
 
     /// <summary>
-    /// Las partes se separan con «|» y el punto de «sin guardar» va al final. Antes el
-    /// separador era también un punto y se leía «ALVEI2306 • · Luminarias», que parecen
-    /// dos separadores seguidos.
+    /// Lo que se lee en la lengüeta de la pestaña: el código de la toma de notas, que es
+    /// lo que distingue una familia de otra cuando hay varias del mismo trabajo abiertas.
     /// </summary>
-    private const string Separador = " | ";
-
-    private string MarcaDeCambios => _hayCambiosSinGuardar ? " •" : "";
-
-    private string Codigo => string.IsNullOrWhiteSpace(_datos.CodigoServicio)
-        ? "(sin código)"
-        : _datos.CodigoServicio;
-
-    /// <summary>Lo que se lee en la lengüeta de la pestaña.</summary>
     public string Rotulo
-    {
-        get
-        {
-            if (SinProyecto) return "Nueva pestaña";
+        => SinProyecto
+            ? RotulosDeTomaDeNotas.PestanaVacia
+            : RotulosDeTomaDeNotas.Pestana(_datos.CodigoTomaDeNotas, _hayCambiosSinGuardar);
 
-            var norma = Plantilla!.Meta.TituloCorto ?? Plantilla.Meta.Id;
-            return $"{Codigo}{Separador}{norma}{MarcaDeCambios}";
-        }
-    }
-
+    /// <summary>
+    /// El título que encabeza la toma de notas, y también el de la ventana de Windows.
+    /// <para>
+    /// Los dos dicen lo mismo a propósito: la designación de la norma y el código son
+    /// exactamente lo que ya lleva dentro el nombre del fichero
+    /// —<c>TdN_60598_TECNO260201-00.lmnlab</c>—, así que la barra de tareas no pierde
+    /// nada y se lee mejor.
+    /// </para>
+    /// </summary>
     public string Titulo
     {
         get
@@ -165,8 +247,8 @@ public sealed class DocumentoViewModel : ObservableObject
             // se lee del ejecutable para no repetirlo escrito en otro sitio más.
             if (SinProyecto) return ServicioDeVersion.Nombre;
 
-            var nombre = _ruta is null ? "sin guardar" : Path.GetFileName(_ruta);
-            return $"Toma de notas{Separador}{Codigo}{Separador}{nombre}{MarcaDeCambios}";
+            return RotulosDeTomaDeNotas.Titulo(
+                Plantilla!.Meta.ComoSeLlamaLaNorma, _datos.CodigoTomaDeNotas, _hayCambiosSinGuardar);
         }
     }
 
@@ -208,6 +290,10 @@ public sealed class DocumentoViewModel : ObservableObject
         {
             if (!Establecer(ref _panelActual, value)) return;
             _idApartadoActual = (value as BloqueViewModel)?.Codigo;
+
+            // Al entrar se relee del disco: el responsable puede haber movido las fechas
+            // desde el calendario mientras esta pestaña llevaba media hora abierta.
+            if (value is PlanificacionViewModel plan) plan.Recargar();
         }
     }
 
@@ -233,7 +319,7 @@ public sealed class DocumentoViewModel : ObservableObject
 
     /// <summary>
     /// Abre un proyecto por ruta. Lo usan el diálogo, la lista de recientes y el
-    /// arranque con un fichero como argumento (doble clic sobre el .lumproj).
+    /// arranque con un fichero como argumento (doble clic sobre el .lmnlab).
     /// </summary>
     /// <summary>
     /// Vuelve a leer la lista de técnicos en la ficha de proyecto. Lo llama la ventana
@@ -281,12 +367,16 @@ public sealed class DocumentoViewModel : ObservableObject
             ReconstruirPaneles();
             _alAbrirFichero(ruta);
             Anunciar();
-            Mensaje = $"Abierto {ruta}" + AvisoDeVersionDePlantilla();
+
+            // Que se ha abierto ya se ve: está en pantalla. Lo que sí hay que decir es que
+            // se registró con otra versión de la norma, porque eso cambia lo que se pide.
+            if (AvisoDeVersionDePlantilla() is { Length: > 0 } aviso) _servicios.Avisar?.Invoke(aviso);
+
             return true;
         }
         catch (Exception ex)
         {
-            Mensaje = $"No se pudo abrir: {ex.Message}";
+            _servicios.Avisar?.Invoke($"No se pudo abrir:\n\n{ex.Message}\n\n{ruta}");
             return false;
         }
     }
@@ -309,13 +399,12 @@ public sealed class DocumentoViewModel : ObservableObject
         Guardar.Revisar();
         GuardarComo.Revisar();
         ExportarInforme.Revisar();
+        VerPlanificacion.Revisar();
         Cambio?.Invoke();
     }
 
     /// <summary>Avisa a la ventana de que hay que refrescar menús y título.</summary>
     public Action? Cambio { get; set; }
-
-    public string Mensaje { get; private set; } = "";
 
     // ---- normas añadidas al proyecto ---------------------------------------
 
@@ -406,6 +495,13 @@ public sealed class DocumentoViewModel : ObservableObject
         Paneles.Clear();
         Arbol.Clear();
 
+        // La planificación es un panel más, pero NO va en el árbol: se llega por su botón
+        // de la barra de arriba, junto a «Guardar» y «Exportar». El árbol es el índice del
+        // ensayo, y esto no es ensayo — colgarlo ahí lo hacía parecer un apartado que hay
+        // que rellenar.
+        Paneles.Add(Planificacion);
+        Planificacion.Recargar();
+
         Paneles.Add(_cabecera);
         Arbol.Add(_cabecera);
 
@@ -451,7 +547,7 @@ public sealed class DocumentoViewModel : ObservableObject
 
             foreach (var apartado in apartados) Paneles.Add(apartado);
 
-            var titulo = prefijo is null ? seccion.Titulo : $"{prefijo} · {seccion.Titulo}";
+            var titulo = prefijo is null ? seccion.Titulo : $"{prefijo} | {seccion.Titulo}";
             Arbol.Add(new SeccionViewModel(titulo, apartados));
         }
     }
@@ -480,12 +576,29 @@ public sealed class DocumentoViewModel : ObservableObject
 
         // Si el apartado abierto acaba de dejar de aplicar, se vuelve a la cabecera: pasa
         // al desmarcar una parte -2, al cambiar la clase o al vaciar un dato de cabecera.
+        // Se nombra, y no se coge el primero: desde que la planificación va delante, el
+        // primero ya no es la cabecera.
         if (PanelActual is BloqueViewModel actual && (bloquear || !actual.Visible))
-            PanelActual = Paneles.FirstOrDefault();
+            PanelActual = _cabecera;
 
         Notificar(nameof(Contador));
         Notificar(nameof(Titulo));
         Notificar(nameof(Rotulo));
+
+        AvisarSiSeAcabo();
+    }
+
+    /// <summary>
+    /// Cuando no queda ni un apartado por rellenar, se ofrece cerrar el servicio. Es el
+    /// momento en que el técnico levanta la vista, y también el momento en que se olvida
+    /// de que el calendario sigue diciendo que esto está en curso.
+    /// </summary>
+    private void AvisarSiSeAcabo()
+    {
+        if (_avance is not { } avance) return;
+        if (avance.ApartadosAplicables == 0 || avance.ApartadosCompletados < avance.ApartadosAplicables) return;
+
+        PreguntarSiSeCierra("Ya no queda ningún apartado por rellenar.", soloUnaVez: true);
     }
 
     private void AlCambiarUnDato()
@@ -507,6 +620,17 @@ public sealed class DocumentoViewModel : ObservableObject
     {
         if (SinProyecto) return;
 
+        // Sin código ni técnico el fichero no se puede ni nombrar ni atribuir, así que no
+        // se escribe. Se lleva la vista a la cabecera: ahí están los dos, en rojo — decir
+        // que falta algo sin enseñar dónde obliga a buscarlo.
+        if (!RequisitosParaGuardar.SePuede(_datos))
+        {
+            PanelActual = Paneles.FirstOrDefault(p => p is ProyectoViewModel) ?? PanelActual;
+            Cambio?.Invoke();
+            _servicios.Avisar?.Invoke(RequisitosParaGuardar.Aviso(_datos));
+            return;
+        }
+
         try
         {
             if (pedirRuta || _ruta is null)
@@ -516,11 +640,11 @@ public sealed class DocumentoViewModel : ObservableObject
                 // haberse puesto a tomar notas sin saber que el suyo ya existía.
                 if (!ProsigueAunqueYaExista()) return;
 
-                // El nombre lo fija el laboratorio: TdN_60598_LEDC42502xx-00.lumproj
-                // El código corto, no el id: el id lleva edición y el laboratorio quiere
-                // el nombre del fichero como estaba (DD‑95).
+                // El nombre lo fija el laboratorio: TdN_60598_TECNO260201-00.lmnlab
+                // El código corto de la norma, no el id: el id lleva el año y el
+                // laboratorio quiere el nombre del fichero como estaba (DD‑95).
                 var sugerido = NombreDeTomaDeNotas.ConExtension(
-                    Plantilla!.Meta.CodigoParaFichero, _datos.CodigoServicio,
+                    Plantilla!.Meta.CodigoParaFichero, _datos.CodigoTomaDeNotas,
                     RepositorioDeProyectos.Extension);
 
                 var elegida = _servicios.PedirFicheroParaGuardar?.Invoke(sugerido);
@@ -531,7 +655,9 @@ public sealed class DocumentoViewModel : ObservableObject
             _repositorio.Guardar(_datos, _ruta, Plantilla!.Meta.Version);
             _hayCambiosSinGuardar = false;
             _alAbrirFichero(_ruta);
-            Mensaje = $"Guardado en {_ruta}  ({DateTime.Now:HH:mm:ss})";
+
+            // Que se ha guardado se ve sin decirlo: desaparece el punto de «sin guardar»
+            // de la pestaña y del título, y la ruta está debajo del título.
             Notificar(nameof(Titulo));
             Notificar(nameof(Rotulo));
             Notificar(nameof(Ubicacion));
@@ -539,8 +665,8 @@ public sealed class DocumentoViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            Mensaje = $"No se pudo guardar: {ex.Message}";
             Cambio?.Invoke();
+            _servicios.Avisar?.Invoke($"No se pudo guardar:\n\n{ex.Message}\n\n{_ruta}");
         }
     }
 
@@ -557,8 +683,8 @@ public sealed class DocumentoViewModel : ObservableObject
         return string.IsNullOrWhiteSpace(guardada) || string.IsNullOrWhiteSpace(actual)
                || guardada == actual
             ? ""
-            : $"   ⚠ Se registró con la plantilla {guardada} y la instalada es la {actual}: "
-              + "puede cambiar lo que se pide o lo que aplica.";
+            : $"Esta toma de notas se registró con la plantilla {guardada} y la instalada "
+              + $"es la {actual}.\n\nPuede cambiar lo que se pide o lo que aplica.";
     }
 
     /// <summary>
@@ -572,7 +698,7 @@ public sealed class DocumentoViewModel : ObservableObject
 
         // Si elige abrir el que ya existe, lo abre la ventana en una pestaña aparte —esta
         // se queda como está, con lo que hubiera anotado— y aquí solo hay que no seguir.
-        return _servicios.ComprobarSiYaExiste(_datos.CodigoServicio, _ruta)
+        return _servicios.ComprobarSiYaExiste(_datos.CodigoTomaDeNotas, _ruta)
             is null or RespuestaRepetido.CrearIgualmente;
     }
 
@@ -582,7 +708,14 @@ public sealed class DocumentoViewModel : ObservableObject
 
         try
         {
-            var sugerido = $"Toma de notas {_datos.CodigoServicio}{ExportadorDeInforme.Extension}";
+            // El mismo nombre que el .lmnlab, cambiando solo la extensión: el HTML y el
+            // fichero de trabajo son el mismo ensayo, y con nombres distintos —«Toma de
+            // notas ANTAR2504» frente a «TdN_60598_ANTAR250401-00»— no se emparejaban ni
+            // en la carpeta ni de un vistazo.
+            var sugerido = NombreDeTomaDeNotas.ConExtension(
+                Plantilla!.Meta.CodigoParaFichero, _datos.CodigoTomaDeNotas,
+                ExportadorDeInforme.Extension);
+
             var destino = _servicios.PedirFicheroParaInforme?.Invoke(sugerido);
             if (string.IsNullOrWhiteSpace(destino)) return;
 
@@ -592,15 +725,67 @@ public sealed class DocumentoViewModel : ObservableObject
                     new ExportadorDeInforme.NormaAdicional(a.Plantilla, a.Catalogo))]
             }.Exportar(_datos, destino);
 
-            Mensaje = $"Informe generado en {destino}. Ábrelo en Word o pulsa Ctrl+P para guardarlo como PDF.";
+            // Que se ha exportado se ve: el informe se abre solo, a continuación.
+
+            // Se pregunta con el fichero ya escrito pero ANTES de abrirlo en el visor.
+            // Al revés no funcionaba: abrir el HTML lanza el navegador, el navegador se
+            // queda en primer plano y Windows no deja que otra aplicación se ponga
+            // delante, así que la ventana salía detrás y parecía que no salía.
+            PreguntarSiSeCierra("Acabas de exportar la toma de notas.", soloUnaVez: false);
+
             _servicios.AbrirEnElVisor?.Invoke(destino);
         }
         catch (Exception ex)
         {
-            Mensaje = $"No se pudo generar el informe: {ex.Message}";
+            _servicios.Avisar?.Invoke($"No se pudo exportar:\n\n{ex.Message}");
         }
 
         Cambio?.Invoke();
+    }
+
+    /// <summary>
+    /// Si ya se ha preguntado en esta pestaña. <b>Se pregunta una vez</b>: el estado se
+    /// recalcula con cada tecla, y sin esto la ventana saltaría sola una y otra vez
+    /// mientras se rellena el último apartado.
+    /// </summary>
+    private bool _yaSePreguntoElCierre;
+
+    /// <summary>
+    /// Ofrece dejar el servicio terminado o archivado.
+    /// </summary>
+    /// <param name="soloUnaVez">
+    /// Cierto cuando lo dispara que la toma de notas se complete: ahí hay que frenarse,
+    /// porque el estado se recalcula con cada tecla. <b>Falso al exportar</b>, y entonces
+    /// se pregunta siempre, esté la toma de notas terminada o a medias: exportar es el
+    /// momento en que el trabajo sale por la puerta, y es justo cuando se olvida dejar el
+    /// estado puesto — que era el motivo de todo esto. Cancelar sigue estando.
+    /// </param>
+    private void PreguntarSiSeCierra(string motivo, bool soloUnaVez)
+    {
+        // Sin fichero no hay dónde escribir el estado. Se dice, porque callarse aquí es
+        // exactamente el fallo que esta pregunta viene a evitar: el técnico entrega el
+        // informe y el calendario sigue diciendo que el trabajo está en curso.
+        if (_ruta is null)
+        {
+            if (!soloUnaVez)
+                _servicios.Avisar?.Invoke(
+                    "Guarda la toma de notas para poder dejar el servicio como terminado.");
+            return;
+        }
+
+        if (soloUnaVez && _yaSePreguntoElCierre) return;
+
+        Planificacion.Recargar();
+        if (soloUnaVez && Planificacion.YaEstaCerrado) return;
+        if (_servicios.PreguntarSiSeCierra is not { } preguntar) return;
+
+        if (soloUnaVez) _yaSePreguntoElCierre = true;
+
+        switch (preguntar(motivo))
+        {
+            case RespuestaCierre.Terminado: Planificacion.Cerrar(archivar: false); break;
+            case RespuestaCierre.Archivado: Planificacion.Cerrar(archivar: true); break;
+        }
     }
 
     /// <summary>

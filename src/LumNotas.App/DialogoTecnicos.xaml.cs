@@ -40,12 +40,42 @@ public partial class DialogoTecnicos : Window
     {
         ServicioDeTecnicos.Recargar();
 
-        Explicacion.Text = ServicioDeTecnicos.EsCompartida
-            ? "La lista se guarda en la carpeta de proyectos, así que el cambio lo verá todo el laboratorio."
-            : "Todavía no hay carpeta de proyectos elegida, así que la lista se guarda solo en este equipo. "
-              + "Elige la carpeta en «Gestión de proyectos» para compartirla.";
+        Explicacion.Text = DondeSeGuarda();
+        Explicacion.ToolTip = ServicioDeTecnicos.Carpeta();
 
         Refrescar();
+    }
+
+    /// <summary>
+    /// Dónde va a parar la lista, dicho con el nombre de la carpeta que es.
+    /// <para>
+    /// Decía «la carpeta de proyectos» y eso <b>era mentira desde que las dos carpetas se
+    /// separaron</b>: la lista se guarda en la <b>compartida</b>, y solo cae a la de
+    /// proyectos como respaldo. Es justo el texto que lee quien mantiene la lista para
+    /// saber si lo que acaba de escribir lo va a ver alguien más, así que equivocarse aquí
+    /// es peor que no decir nada.
+    /// </para>
+    /// <para>
+    /// Son <b>tres</b> casos y antes se contaban dos: la compartida elegida, el respaldo en
+    /// la de proyectos —que también comparte el laboratorio, pero conviene saber que se
+    /// está usando— y ninguna de las dos, que es cuando el cambio se queda en este equipo.
+    /// </para>
+    /// </summary>
+    private static string DondeSeGuarda()
+    {
+        if (!ServicioDeTecnicos.EsCompartida)
+            return "No hay ninguna carpeta del laboratorio elegida, así que la lista se guarda solo en "
+                 + "este equipo y no la verá nadie más. Elígela en "
+                 + "«Configuración | Carpetas: proyectos y compartida».";
+
+        var compartida = ServicioDeCarpetas.CompartidaElegida;
+
+        if (!string.IsNullOrWhiteSpace(compartida)
+            && string.Equals(compartida, ServicioDeTecnicos.Carpeta(), StringComparison.OrdinalIgnoreCase))
+            return "La lista se guarda en la carpeta compartida, así que el cambio lo verá todo el laboratorio.";
+
+        return "Todavía no hay carpeta compartida elegida: la lista se guarda en la de proyectos, que "
+             + "también ve todo el laboratorio.";
     }
 
     private void Refrescar(string? seleccionar = null)

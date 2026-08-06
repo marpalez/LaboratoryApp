@@ -15,7 +15,26 @@ public sealed class DatosProyecto
     private readonly Dictionary<string, bool> _checklists = [];
     private readonly Dictionary<string, HashSet<string>> _selecciones = [];
 
+    /// <summary>
+    /// El que identifica <b>esta</b> toma de notas, no el servicio: un servicio con
+    /// cuatro familias de luminarias tiene cuatro, y es el que da nombre al fichero
+    /// (<c>TECNO260201-00</c> → <c>TdN_60598_TECNO260201-00.lmnlab</c>).
+    /// <para>
+    /// Las dos últimas parejas las lleva el laboratorio a mano: <c>01</c> es qué familia
+    /// del servicio y <c>00</c> la edición, que sube cuando hay que corregir algo ya
+    /// emitido. El programa no las genera a propósito — numerar y reeditar son decisiones
+    /// del laboratorio, no del software.
+    /// </para>
+    /// </summary>
+    public string CodigoTomaDeNotas { get; set; } = "";
+
+    /// <summary>
+    /// El del servicio, que es lo que comparten las cuatro familias del ejemplo de
+    /// arriba. Sale de las nueve primeras del código de la toma de notas
+    /// (<see cref="CodigoDeServicio"/>) y **se puede corregir a mano**.
+    /// </summary>
     public string CodigoServicio { get; set; } = "";
+
     public int NumeroMuestras { get; set; } = 1;
 
     // ---- identidad del proyecto -------------------------------------------
@@ -24,11 +43,26 @@ public sealed class DatosProyecto
     // lleve además módulos LED. Las cuatro plantillas lo declaran igual en su
     // cabecera —y ahí sigue guardado, que este paso no toca el formato del fichero—
     // pero el resto del programa ya no lo busca por su clave. Cuando la identidad
-    // pase a tener su propio sitio en el `.lumproj`, se cambia aquí y no en las seis
+    // pase a tener su propio sitio en el `.lmnlab`, se cambia aquí y no en las seis
     // líneas que había repartidas por cuatro proyectos.
 
     /// <summary>El bloque donde las plantillas declaran la cabecera del servicio.</summary>
     public const string Cabecera = "proyecto";
+
+    /// <summary>
+    /// Laboratorios de fuera que han hecho parte del ensayo, con qué ensayo y por qué.
+    /// <para>
+    /// <b>Es opcional y son tantos como haga falta</b>: lo normal es ninguno, y cuando los
+    /// hay pueden ser dos. El nombre va a mano y no de una lista cerrada: los laboratorios
+    /// cambian, y obligar a mantener un catálogo para poder escribir «IMQ Italia» sería
+    /// poner una puerta donde no hace falta.
+    /// </para>
+    /// <para>
+    /// El motivo se pide junto al ensayo a propósito. Para una auditoría, «fotobiología —
+    /// no tenemos cámara» explica una subcontratación; «fotobiología» a secas, no.
+    /// </para>
+    /// </summary>
+    public List<Colaborador> Colaboradores { get; init; } = [];
 
     /// <summary>
     /// Responsable del proyecto: el que sale en el tablero y por el que se filtra el
@@ -247,6 +281,36 @@ public sealed class DatosProyecto
 
         return maximo;
     }
+
+    /// <summary>
+    /// Si en un ámbito hay algo escrito: un valor con contenido o una casilla marcada.
+    /// Sirve para distinguir un apartado <b>sin empezar</b> de uno <b>a medias</b>, que
+    /// para las reglas de la plantilla son lo mismo —a las dos les faltan datos— pero
+    /// para el que tiene que terminar el ensayo no lo son en absoluto.
+    /// <para>
+    /// <b>Un <c>false</c> no cuenta.</b> En este almacén «sin contestar» y «contestado
+    /// que no» se guardan igual de indistinguibles, así que darlo por escrito dejaría
+    /// medio proyecto pareciendo empezado sin que nadie hubiera tocado nada.
+    /// </para>
+    /// </summary>
+    public bool HayAlgoEn(string ambito)
+        => _valores.Any(p => p.Key.Bloque == ambito && TieneContenido(p.Value))
+           || _checklists.Any(p => p.Value && EsRutaDe(p.Key, ambito));
+
+    private static bool TieneContenido(object? valor) => valor switch
+    {
+        null => false,
+        bool marcado => marcado,
+        string texto => !string.IsNullOrWhiteSpace(texto),
+        _ => true
+    };
+
+    // La barra se compara aparte para que un apartado no se cuele por ser prefijo de
+    // otro: «7.4» no debe llevarse lo escrito en «7.41».
+    private static bool EsRutaDe(string ruta, string ambito)
+        => ruta.Length > ambito.Length
+           && ruta[ambito.Length] == '/'
+           && ruta.StartsWith(ambito, StringComparison.Ordinal);
 
     // ---- N/A --------------------------------------------------------------
 

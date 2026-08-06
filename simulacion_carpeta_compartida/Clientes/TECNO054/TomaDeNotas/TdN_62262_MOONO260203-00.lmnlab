@@ -1,0 +1,46 @@
+{
+  "formato": "lmnlab/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-06T14:53:13.8949511+02:00",
+  "codigoTomaDeNotas": "MOONO260203-00",
+  "colaboradores": [],
+  "codigoServicio": "MOONO2602",
+  "numeroMuestras": 1,
+  "normas": [
+    "62262_2002_A1"
+  ],
+  "normaPrincipal": "62262_2002_A1",
+  "patronIdentificador": "EBP_CLIM{codigoServicio}",
+  "planificacion": {
+    "inicio": "2026-02-12T00:00:00",
+    "fin": "2026-02-23T00:00:00",
+    "estado": "terminado",
+    "archivado": true,
+    "importe": 3113,
+    "ensayoDesde": "2026-02-12T00:00:00",
+    "ensayoHasta": "2026-02-23T00:00:00",
+    "fechasBloqueadas": false
+  },
+  "selecciones": {},
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Raúl González"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico2",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Daniel Martínez"
+    }
+  ],
+  "na": [],
+  "checklists": []
+}

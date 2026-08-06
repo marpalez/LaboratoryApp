@@ -49,8 +49,13 @@ public sealed class SeccionViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Semáforo de la sección: rojo si a cualquier apartado le faltan datos, gris si
-    /// todos son N/A, verde si están todos resueltos.
+    /// Semáforo de la sección: apagado si todos sus apartados son N/A, verde si están
+    /// todos resueltos, ámbar si hay trabajo hecho pero queda algo, y sin empezar si no
+    /// se ha tocado nada.
+    /// <para>
+    /// Un apartado completo cuenta como empezar: una sección con seis apartados y uno
+    /// terminado está en marcha, aunque en los otros cinco no haya nada escrito.
+    /// </para>
     /// </summary>
     public EstadoApartado Estado
     {
@@ -58,22 +63,43 @@ public sealed class SeccionViewModel : ObservableObject
         {
             if (Apartados.Count == 0) return EstadoApartado.SinReglas;
             if (Apartados.All(a => a.Estado == EstadoApartado.NoAplica)) return EstadoApartado.NoAplica;
-            if (Apartados.Any(a => a.Estado == EstadoApartado.FaltanDatos)) return EstadoApartado.FaltanDatos;
-            return EstadoApartado.Completo;
+            if (!Apartados.Any(a => EstadoDeApartado.EstaPendiente(a.Estado))) return EstadoApartado.Completo;
+
+            return Apartados.Any(a => a.Estado is EstadoApartado.Empezado or EstadoApartado.Completo)
+                ? EstadoApartado.Empezado
+                : EstadoApartado.FaltanDatos;
         }
     }
 
+    /// <summary>Frase entera de la sección. Va en la ayuda emergente, donde hay sitio.</summary>
     public string Resumen
     {
         get
         {
-            var aplicables = Apartados.Count(a => a.Estado != EstadoApartado.NoAplica);
-            if (aplicables == 0) return $"{Apartados.Count} apartados · no aplica";
-
-            var completos = Apartados.Count(a => a.Estado == EstadoApartado.Completo);
-            return $"{completos} de {aplicables} completos";
+            var (completos, aplicables) = Cuenta();
+            return aplicables == 0
+                ? $"{Apartados.Count} apartados | no aplica"
+                : $"{completos} de {aplicables} completos";
         }
     }
+
+    /// <summary>
+    /// La misma cuenta encogida —«3/12»— para la píldora del árbol. Ahí sustituye al
+    /// punto de color: dice lo mismo que él y además cuánto queda, en el mismo sitio y
+    /// sin gastar un segundo renglón.
+    /// </summary>
+    public string Progreso
+    {
+        get
+        {
+            var (completos, aplicables) = Cuenta();
+            return aplicables == 0 ? "N/A" : $"{completos}/{aplicables}";
+        }
+    }
+
+    private (int Completos, int Aplicables) Cuenta()
+        => (Apartados.Count(a => a.Estado == EstadoApartado.Completo),
+            Apartados.Count(a => a.Estado != EstadoApartado.NoAplica));
 
     public void Refrescar()
     {
@@ -89,5 +115,6 @@ public sealed class SeccionViewModel : ObservableObject
         Notificar(nameof(Visible));
         Notificar(nameof(Estado));
         Notificar(nameof(Resumen));
+        Notificar(nameof(Progreso));
     }
 }

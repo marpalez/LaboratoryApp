@@ -70,6 +70,21 @@
             </Setter>
         </Style>
 
+        <!--
+            Botones de tamaño fijo que solo llevan un símbolo: el «+» de pestañas, el de
+            plegar el índice, el zoom del calendario.
+
+            El relleno del estilo de arriba —14 px a cada lado— se come un botón de 30 ó
+            34 px: al símbolo le quedan cuatro, y en vez de avisar, WPF lo encoge y lo
+            recorta. Pasó dos veces antes de escribir esto, así que la excepción vive aquí
+            con nombre y no repetida a mano en cada botón.
+
+            El tamaño de letra lo pone cada uno: depende de lo grande que sea el botón.
+        -->
+        <Style x:Key="BotonIcono" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+
         <!-- Los desplegables, con algo más de aire para que no queden apretados al lado
              de los botones nuevos. No se les rehace la plantilla: un ComboBox son cuatro
              piezas —caja, flecha, desplegable y elemento seleccionado— y redondear la de

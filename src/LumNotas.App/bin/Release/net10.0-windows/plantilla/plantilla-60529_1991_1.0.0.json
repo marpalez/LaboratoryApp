@@ -1,0 +1,215 @@
+{
+  "meta": {
+    "id": "60529_1991",
+    "idsAnteriores": ["60529"],
+    "codigoDeFichero": "60529",
+    "anioDePublicacion": "1991",
+    "edicion": "2.2",
+    "titulo": "Grados de protección IP — EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02 + AC:2016-12 + corrigendum May 1993",
+    "tituloCorto": "Grados de protección IP",
+    "designacion": "EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02 + AC:2016-12 + corrigendum May 1993",
+    "normasCompatibles": ["62262_2002_A1"],
+    "version": "1.0.0",
+    "generadoEl": "2026-07-31",
+    "origen": "TomaDeNotasExcelCompleta.xlsx v2.1 — hojas «Toma de Notas IP-IK» y «Datos ensayo IP-IK»",
+    "reglasDocumentadasEn": "docs/REGLAS-NEGOCIO.md v2.2",
+    "alcance": {
+      "incluye": ["EN/IEC 60529 — grados de protección IP"],
+      "excluye": ["IK (62262), que es una toma de notas aparte"]
+    },
+    "nota": "En el Excel el IP y el IK comparten hoja. El laboratorio pidió separarlos en dos tomas de notas independientes.",
+    "catalogoEquipos": "equipos-60529_1991_1.0.0.json"
+  },
+
+  "proyecto": {
+    "campos": [
+      { "id": "codigoTomaDeNotas", "etiqueta": "Código de la toma de notas", "tipo": "texto", "obligatorio": true, "nota": "Ejemplo: TECNO260201-00" },
+      { "id": "acreditacion", "etiqueta": "Acreditación", "tipo": "seleccion", "multiple": true, "obligatorio": true,
+        "opciones": ["Sin acreditar", "ENAC", "ENEC", "CB"], "opcionExcluyente": "Sin acreditar",
+        "nota": "Un servicio puede ser varias a la vez. «Sin acreditar» es excluyente." },
+      { "id": "codigoServicio", "etiqueta": "Código de servicio", "tipo": "texto", "formato": "NNNNNAAAA", "obligatorio": true, "nota": "Ejemplo: TECNO2602", "origenExcel": "RESUMEN PROYECTO IP-IK!D3" },
+      { "id": "tecnico1", "etiqueta": "Técnico 1", "tipo": "texto", "obligatorio": true, "origenExcel": "RESUMEN PROYECTO IP-IK!C5" },
+      { "id": "tecnico2", "etiqueta": "Técnico 2", "tipo": "texto", "origenExcel": "RESUMEN PROYECTO IP-IK!C6" },
+      { "id": "numeroMuestras", "etiqueta": "Nº de muestras", "tipo": "entero", "min": 1, "max": 30, "obligatorio": true, "origenExcel": "RESUMEN PROYECTO IP-IK!D8" },
+      { "id": "luminariaOrdinaria", "etiqueta": "Luminaria ordinaria", "tipo": "booleano", "porMuestra": true,
+        "nota": "Atajo del laboratorio: una luminaria ordinaria es IP20, así que al marcarlo se rellena IP2X e IPX0." },
+      { "id": "ipPrimeraCifra", "etiqueta": "Grado IP objetivo — 1ª cifra (sólidos)", "etiquetaCorta": "1ª cifra", "tipo": "seleccion", "porMuestra": true, "obligatorio": true,
+        "opciones": ["IP1X", "IP2X", "IP3X", "IP4X", "IP5X", "IP6X"],
+        "origenExcel": "RESUMEN PROYECTO IP-IK!I14",
+        "nota": "Va por muestra, como en el Excel: un mismo servicio puede traer productos con grados distintos." },
+      { "id": "ipSegundaCifra", "etiqueta": "Grado IP objetivo — 2ª cifra (agua)", "etiquetaCorta": "2ª cifra", "tipo": "seleccion", "porMuestra": true, "obligatorio": true,
+        "opciones": ["IPX0", "IPX1", "IPX2", "IPX3", "IPX4", "IPX5", "IPX6", "IPX7", "IPX8", "IPX9"],
+        "origenExcel": "RESUMEN PROYECTO IP-IK!L14" },
+      { "id": "gradoIk", "etiqueta": "Grado IK objetivo", "etiquetaCorta": "IK", "tipo": "seleccion", "porMuestra": true,
+        "opciones": ["No IK", "IK01", "IK02", "IK03", "IK04", "IK05", "IK06", "IK07", "IK08", "IK09", "IK10", "IK11"],
+        "porDefecto": "No IK",
+        "nota": "La fila de muestra es la misma en todas las normas. Si el servicio lleva IK, se añade la 62262 y sus apartados salen aquí." },
+      { "id": "profundidadInmersion", "etiqueta": "Profundidad de inmersión", "tipo": "numero", "unidad": "m",
+        "visibleSi": "R-60529-inmersion", "obligatorio": true, "origenExcel": "RESUMEN PROYECTO IP-IK!M23",
+        "nota": "Obligatoria solo cuando aparece, es decir, con objetivo IPX7 o IPX8." },
+      { "id": "tiempoInmersion", "etiqueta": "Tiempo de inmersión", "tipo": "numero", "unidad": "min",
+        "visibleSi": "R-60529-inmersion", "obligatorio": true },
+      { "id": "temperaturaInmersion", "etiqueta": "Temperatura del agua de inmersión", "tipo": "numero", "unidad": "ºC",
+        "visibleSi": "R-60529-inmersion", "obligatorio": true, "porDefecto": 25, "origenExcel": "RESUMEN PROYECTO IP-IK!M24" },
+      { "id": "inicioNumeracion", "etiqueta": "Iniciar numeración en", "tipo": "entero", "porDefecto": 1, "origenExcel": "RESUMEN PROYECTO IP-IK!F36" },
+      { "id": "comentariosGenerales", "etiqueta": "Comentarios y notas generales del proyecto", "tipo": "textoLargo", "origenExcel": "RESUMEN PROYECTO IP-IK!H2" }
+    ],
+    "reglas": [
+      { "id": "R-PROY-completo", "tipo": "predicado", "nombre": "proyectoCompleto",
+        "etiqueta": "La cabecera del proyecto está completa",
+        "descripcion": "Exige código de servicio, técnico 1, nº de muestras y las dos cifras del grado IP objetivo de cada muestra.",
+        "origenExcel": "RESUMEN PROYECTO IP-IK!B9" },
+      { "id": "R-60529-inmersion", "tipo": "predicado", "nombre": "requiereInmersion",
+        "etiqueta": "Alguna muestra tiene objetivo IPX7 o IPX8",
+        "descripcion": "Solo entonces se anotan la profundidad y la temperatura del agua de inmersión." }
+    ]
+  },
+
+  "muestras": {
+    "min": 1,
+    "max": 30,
+    "nota": "El Excel admitía 3 como máximo; el laboratorio pidió 30 en todas las tomas de notas.",
+    "identificador": { "patron": "EBP_SAFE{codigoServicio}", "origenExcel": "RESUMEN PROYECTO IP-IK!C38:C40" },
+    "campos": [
+      { "id": "numero", "etiqueta": "Nº", "tipo": "entero" },
+      { "id": "observaciones", "etiqueta": "Comentarios y observaciones de la muestra", "tipo": "textoLargo", "origenExcel": "RESUMEN PROYECTO IP-IK!B42" }
+    ]
+  },
+
+  "secciones": [
+    {
+      "codigo": "generales",
+      "titulo": "Grados de protección IP — EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02 + AC:2016-12 + corrigendum May 1993",
+      "bloques": [
+        {
+          "id": "60529.generales",
+          "codigo": "generales",
+          "titulo": "Grados de protección IP — EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02 + AC:2016-12 + corrigendum May 1993",
+          "origenExcel": "Toma de Notas IP-IK!A3:N21",
+          "pesoAvance": 2,
+          "comentarios": true,
+          "campos": [
+            { "id": "tamano", "etiqueta": "Tamaño de las muestras", "tipo": "grupoRepetido", "elementos": 1, "porMuestra": true,
+              "origenExcel": "Toma de Notas IP-IK!D5:F8",
+              "campos": [
+                { "id": "alto", "etiqueta": "Alto", "tipo": "numero", "unidad": "cm" },
+                { "id": "ancho", "etiqueta": "Ancho", "tipo": "numero", "unidad": "cm" },
+                { "id": "profundo", "etiqueta": "Profundo", "tipo": "numero", "unidad": "cm" },
+                { "id": "peso", "etiqueta": "Peso", "tipo": "numero", "unidad": "kg" }
+              ] }
+          ],
+          "reglas": [
+            { "id": "R-60529-gen-01", "tipo": "recuentoDatos", "campo": "tamano", "umbralPorMuestra": 3,
+              "etiqueta": "Alto, ancho y profundo de cada muestra",
+              "origenExcel": "Toma de Notas IP-IK!F5:F8" },
+            { "id": "R-60529-gen-cierre", "tipo": "faltanDatos", "faltanSi": ["!R-60529-gen-01"] },
+            { "id": "R-60529-gen-peso", "tipo": "peso", "valor": 2, "finSiNo": "R-60529-gen-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "5",
+      "titulo": "Grados de protección IP — EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02 + AC:2016-12 + corrigendum May 1993",
+      "bloques": [
+        {
+          "id": "60529.primeraCifra",
+          "codigo": "5.1 y 5.2",
+          "titulo": "Grados de protección IP — EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02 + AC:2016-12 + corrigendum May 1993",
+          "origenExcel": "Toma de Notas IP-IK!A23:N85",
+          "pesoAvance": 5,
+          "na": { "id": "na", "etiqueta": "N/A - no se ensaya la primera cifra" },
+          "visibleSi": "R-60529-hayPrimeraCifra",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de Notas IP-IK!F26:F28" },
+          "equipos": "ip.primeraCifra",
+          "comentarios": true,
+          "campos": [
+            { "id": "duracionIp5x", "etiqueta": "Si IP5X, indicar duración", "tipo": "numero", "unidad": "h", "porMuestra": true,
+              "visibleSi": "R-60529-esIp5x", "origenExcel": "Toma de Notas IP-IK!D27" },
+            { "id": "resultado", "etiqueta": "Resultado", "tipo": "texto", "porMuestra": true, "origenExcel": "Toma de Notas IP-IK!F29" },
+            { "id": "infoIp5x6x", "etiqueta": "Información adicional sobre IP5X/IP6X", "tipo": "textoLargo", "origenExcel": "Toma de Notas IP-IK!C71:C72" }
+          ],
+          "notas": [
+            "Revisar el veredicto antes de cerrar el apartado.",
+            "Información adicional sobre este proyecto puede anotarse directamente sobre el word del TRF o en comentarios del mismo."
+          ],
+          "reglas": [
+            { "id": "R-60529-hayPrimeraCifra", "tipo": "predicado", "nombre": "hayGradoPrimeraCifra",
+              "etiqueta": "Se ha marcado alguna primera cifra IP objetivo" },
+            { "id": "R-60529-esIp5x", "tipo": "predicado", "nombre": "requiereDuracionIp5x",
+              "etiqueta": "El grado objetivo incluye IP5X, que exige duración de ensayo" },
+            { "id": "R-60529-05-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de Notas IP-IK!F26" },
+            { "id": "R-60529-05-02", "tipo": "recuentoDatos", "campo": "resultado", "umbralPorMuestra": 1,
+              "etiqueta": "Resultado de cada muestra", "origenExcel": "Toma de Notas IP-IK!F29" },
+            { "id": "R-60529-05-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-60529-05-01", "!R-60529-05-02"] },
+            { "id": "R-60529-05-peso", "tipo": "peso", "valor": 5, "aplicaSiNo": "na", "finSiNo": "R-60529-05-cierre" }
+          ]
+        }
+      ]
+    },
+
+    {
+      "codigo": "6",
+      "titulo": "Grados de protección IP — EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02 + AC:2016-12 + corrigendum May 1993",
+      "bloques": [
+        {
+          "id": "60529.segundaCifra",
+          "codigo": "6",
+          "titulo": "Grados de protección IP — EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02 + AC:2016-12 + corrigendum May 1993",
+          "origenExcel": "Toma de Notas IP-IK!B90:N120",
+          "pesoAvance": 5,
+          "na": { "id": "na", "etiqueta": "N/A - no se ensaya la segunda cifra" },
+          "visibleSi": "R-60529-haySegundaCifra",
+          "ambiente": { "temperatura": true, "humedad": true, "fecha": true, "origenExcel": "Toma de Notas IP-IK!F91:F93" },
+          "equipos": "ip.segundaCifra",
+          "comentarios": true,
+          "campos": [
+            { "id": "radioArco", "etiqueta": "Radio de arco utilizado IPX3/IPX4", "tipo": "numero", "unidad": "cm", "porMuestra": true,
+              "visibleSi": "R-60529-requiereArco", "origenExcel": "Toma de Notas IP-IK!D103",
+              "nota": "El arco elegido es el más pequeño que cubre la muestra. Para IPX4 el alto cuenta la mitad." },
+            { "id": "resultado", "etiqueta": "Resultado", "tipo": "texto", "porMuestra": true, "origenExcel": "Toma de Notas IP-IK!F94" }
+          ],
+          "subBloques": [
+            {
+              "id": "60529.segundaCifra.medios",
+              "titulo": "Grados de protección IP — EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02 + AC:2016-12 + corrigendum May 1993",
+              "origenExcel": "Toma de Notas IP-IK!B107:E118",
+              "campos": [
+                { "id": "medios", "etiqueta": "Medios de ensayo, caudal y duración", "tipo": "grupoRepetido", "elementos": 11,
+                  "nota": "Una fila por grado, en el orden del Excel: IPX1, IPX2, IPX3 arco, IPX3 regadera, IPX4 arco, IPX4 regadera, IPX5, IPX6, IPX7, IPX8, IPX9.",
+                  "campos": [
+                    { "id": "grado", "etiqueta": "Grado", "tipo": "texto" },
+                    { "id": "medios", "etiqueta": "Medios de ensayo", "tipo": "texto" },
+                    { "id": "caudal", "etiqueta": "Caudal", "tipo": "texto" },
+                    { "id": "duracion", "etiqueta": "Duración", "tipo": "texto" }
+                  ] }
+              ]
+            }
+          ],
+          "notas": [
+            "Revisar el veredicto antes de cerrar el apartado.",
+            "Información adicional sobre este proyecto puede anotarse directamente sobre el word del TRF o en comentarios del mismo."
+          ],
+          "reglas": [
+            { "id": "R-60529-haySegundaCifra", "tipo": "predicado", "nombre": "hayGradoSegundaCifra",
+              "etiqueta": "Se ha marcado alguna segunda cifra IP objetivo" },
+            { "id": "R-60529-requiereArco", "tipo": "predicado", "nombre": "requiereDimensiones",
+              "etiqueta": "El grado objetivo incluye IPX3 o IPX4, que se ensayan con arco" },
+            { "id": "R-60529-06-01", "tipo": "avisoFecha", "campo": "ambiente.fecha", "origenExcel": "Toma de Notas IP-IK!F91" },
+            { "id": "R-60529-06-02", "tipo": "recuentoDatos", "campo": "resultado", "umbralPorMuestra": 1,
+              "etiqueta": "Resultado de cada muestra", "origenExcel": "Toma de Notas IP-IK!F94" },
+            { "id": "R-60529-06-cierre", "tipo": "faltanDatos", "siNoAplica": "na",
+              "faltanSi": ["R-60529-06-01", "!R-60529-06-02"] },
+            { "id": "R-60529-06-peso", "tipo": "peso", "valor": 5, "aplicaSiNo": "na", "finSiNo": "R-60529-06-cierre" }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "avance": {
+    "nota": "Los pesos replican la ponderación del Excel: el peso de un apartado solo suma cuando su regla de cierre deja de pedir datos."
+  }
+}

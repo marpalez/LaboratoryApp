@@ -74,7 +74,7 @@ public static class AvisosDeInicio
                 NivelDeAviso.Problema,
                 "No hay carpeta de proyectos elegida.",
                 "El tablero, el calendario y la carga están vacíos hasta que se elija.",
-                AccionDeAviso.ElegirCarpetas, "Elegir carpetas…"));
+                AccionDeAviso.ElegirCarpetas, "Elegir carpetas"));
         }
         else if (!estado.ProyectosAccesible)
         {
@@ -82,7 +82,7 @@ public static class AvisosDeInicio
                 NivelDeAviso.Problema,
                 "No se puede llegar a la carpeta de proyectos. Comprueba que OneDrive esté sincronizado.",
                 estado.CarpetaDeProyectos,
-                AccionDeAviso.ElegirCarpetas, "Elegir carpetas…"));
+                AccionDeAviso.ElegirCarpetas, "Elegir carpetas"));
         }
     }
 
@@ -98,7 +98,7 @@ public static class AvisosDeInicio
                 NivelDeAviso.Atencion,
                 "No hay carpeta compartida.",
                 "Las normas, los técnicos y la tarifa salen de este equipo y no los ve nadie más.",
-                AccionDeAviso.ElegirCarpetas, "Elegir carpetas…"));
+                AccionDeAviso.ElegirCarpetas, "Elegir carpetas"));
             return;
         }
 
@@ -109,7 +109,7 @@ public static class AvisosDeInicio
                 "No se puede llegar a la carpeta compartida. Se están usando las normas, "
                 + "los técnicos y la tarifa de este equipo.",
                 estado.CarpetaCompartida,
-                AccionDeAviso.ElegirCarpetas, "Elegir carpetas…"));
+                AccionDeAviso.ElegirCarpetas, "Elegir carpetas"));
             return;
         }
 
@@ -121,7 +121,7 @@ public static class AvisosDeInicio
                 NivelDeAviso.Atencion,
                 "Las normas todavía no están publicadas en la carpeta compartida.",
                 "Cada equipo está usando su copia.",
-                AccionDeAviso.VerNormas, "Normas instaladas…"));
+                AccionDeAviso.VerNormas, "Normas instaladas"));
         }
     }
 
@@ -136,8 +136,8 @@ public static class AvisosDeInicio
                 sinPublicar.Count == 1
                     ? "Hay una norma en este equipo que el laboratorio no tiene."
                     : $"Hay {sinPublicar.Count} normas en este equipo que el laboratorio no tiene.",
-                string.Join(" · ", sinPublicar),
-                AccionDeAviso.VerNormas, "Normas instaladas…"));
+                string.Join(" | ", sinPublicar),
+                AccionDeAviso.VerNormas, "Normas instaladas"));
 
         // Aparte del anterior a propósito: no es «falta algo», es que este equipo está
         // trabajando con una plantilla corregida que los demás no tienen — que es
@@ -148,12 +148,12 @@ public static class AvisosDeInicio
                 masNuevas.Count == 1
                     ? "Una norma de este equipo es más nueva que la publicada. Los demás siguen con la anterior."
                     : $"{masNuevas.Count} normas de este equipo son más nuevas que las publicadas. Los demás siguen con las anteriores.",
-                string.Join(" · ", masNuevas),
-                AccionDeAviso.VerNormas, "Normas instaladas…"));
+                string.Join(" | ", masNuevas),
+                AccionDeAviso.VerNormas, "Normas instaladas"));
     }
 
     /// <summary>
-    /// Un <c>.lumproj</c> corrupto sale marcado en el tablero, pero quien no lo abra no se
+    /// Un <c>.lmnlab</c> corrupto sale marcado en el tablero, pero quien no lo abra no se
     /// entera — y es lo que nadie descubre hasta que necesita el fichero.
     /// </summary>
     private static void Proyectos(Estado estado, List<AvisoDeInicio> avisos)

@@ -6,7 +6,7 @@ namespace LumNotas.Storage;
 /// <summary>
 /// Lo que ya se sabe de cada proyecto, guardado entre sesiones.
 /// <para>
-/// El tablero **lee entero** cada <c>.lumproj</c> para calcular su estado, y en el
+/// El tablero **lee entero** cada <c>.lmnlab</c> para calcular su estado, y en el
 /// laboratorio los proyectos cuelgan de una matrioska de carpetas de clientes con años
 /// de historia. Sin esto, cada arranque volvía a leer y analizar todos los proyectos,
 /// aunque no hubiera cambiado ninguno.
@@ -66,11 +66,20 @@ public sealed class CacheDeResumenes
     /// tamaño <b>y la plantilla</b>: el resumen sale de aplicar las reglas de una norma,
     /// así que al publicar una versión nueva deja de valer.
     /// </summary>
+    /// <summary>
+    /// Qué campos lleva el resumen. <b>Hay que subirlo al añadirle uno</b>: lo guardado
+    /// con la forma anterior no lo trae, y sin esta comprobación el listado enseñaría
+    /// huecos en blanco durante días —hasta que cada fichero se tocara por su cuenta—
+    /// sin que nada explicara por qué.
+    /// </summary>
+    public const string Formato = "2";
+
     public ResumenDeProyecto? Recuperar(FileInfo fichero, string plantilla)
         => _entradas.TryGetValue(fichero.FullName, out var entrada)
            && entrada.Ticks == fichero.LastWriteTimeUtc.Ticks
            && entrada.Tamano == fichero.Length
            && entrada.Plantilla == plantilla
+           && entrada.Version == Formato
             ? entrada.Resumen
             : null;
 
@@ -85,6 +94,7 @@ public sealed class CacheDeResumenes
             Ticks = fichero.LastWriteTimeUtc.Ticks,
             Tamano = fichero.Length,
             Plantilla = plantilla,
+            Version = Formato,
             Resumen = resumen
         };
 
@@ -138,6 +148,10 @@ public sealed class CacheDeResumenes
         public long Ticks { get; set; }
         public long Tamano { get; set; }
         public string Plantilla { get; set; } = "";
+
+        /// <summary>Qué campos llevaba el resumen cuando se guardó. Ver <see cref="Formato"/>.</summary>
+        public string Version { get; set; } = "";
+
         public ResumenDeProyecto? Resumen { get; set; }
     }
 }

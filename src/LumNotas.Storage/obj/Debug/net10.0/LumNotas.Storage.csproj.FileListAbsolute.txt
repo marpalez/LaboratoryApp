@@ -1,0 +1,18 @@
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\bin\Debug\net10.0\LumNotas.Storage.deps.json
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\bin\Debug\net10.0\LumNotas.Storage.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\bin\Debug\net10.0\LumNotas.Storage.pdb
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\bin\Debug\net10.0\LumNotas.Core.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\bin\Debug\net10.0\LumNotas.Core.pdb
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\obj\Debug\net10.0\LumNotas.Storage.csproj.AssemblyReference.cache
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\obj\Debug\net10.0\LumNotas.Storage.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\obj\Debug\net10.0\LumNotas.Storage.AssemblyInfoInputs.cache
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\obj\Debug\net10.0\LumNotas.Storage.AssemblyInfo.cs
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\obj\Debug\net10.0\LumNotas.Storage.csproj.CoreCompileInputs.cache
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\obj\Debug\net10.0\LumNotas.63DBBB1C.Up2Date
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\obj\Debug\net10.0\LumNotas.Storage.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\obj\Debug\net10.0\refint\LumNotas.Storage.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\obj\Debug\net10.0\LumNotas.Storage.pdb
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Storage\obj\Debug\net10.0\ref\LumNotas.Storage.dll
+C:\Users\Invitado\AppData\Local\Temp\claude\C--Users-Invitado-Desktop-Archivos-windows-Desarrollo-de-aplicaciones-AplicacionTomaNotas\bc0e740c-2577-4b97-bb6f-7e2f89139c4b\scratchpad\build\LumNotas.Storage.deps.json
+C:\Users\Invitado\AppData\Local\Temp\claude\C--Users-Invitado-Desktop-Archivos-windows-Desarrollo-de-aplicaciones-AplicacionTomaNotas\bc0e740c-2577-4b97-bb6f-7e2f89139c4b\scratchpad\build\LumNotas.Storage.dll
+C:\Users\Invitado\AppData\Local\Temp\claude\C--Users-Invitado-Desktop-Archivos-windows-Desarrollo-de-aplicaciones-AplicacionTomaNotas\bc0e740c-2577-4b97-bb6f-7e2f89139c4b\scratchpad\build\LumNotas.Storage.pdb

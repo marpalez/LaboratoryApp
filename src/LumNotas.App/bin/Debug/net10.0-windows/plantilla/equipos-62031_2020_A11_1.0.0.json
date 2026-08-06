@@ -1,0 +1,360 @@
+{
+  "meta": {
+    "id": "equipos-62031",
+    "version": "1.0.0",
+    "generadoEl": "2026-07-31",
+    "origen": "TomaDeNotasExcelCompleta.xlsx v2.1 — hoja \"BBDD Equipos 62031\"",
+    "criterio": "Importación literal (DD-10) y por separado de cada norma (decisión del laboratorio, 2026-07-31). Se conservan los marcadores de reserva y ampliación tal como aparecen en la hoja."
+  },
+
+  "notasDeUso": [
+    "En caso de utilizar equipos adicionales debe indicarse en el apartado \"otros\".",
+    "Las casillas coloreadas (excepto amarillo) indican equipos alternativos: solo se marcan los que procedan.",
+    "Los equipos de casilla en blanco se asumen utilizados por ser equipos por defecto.",
+    "Las celdas amarillas del Excel señalan novedades o avisos para llamar la atención del técnico."
+  ],
+
+  "grupos": [
+    {
+      "id": "sec06.marcado",
+      "seccion": "6",
+      "titulo": "6. Verificación del marcado",
+      "origenExcel": "BBDD Equipos 62031!C5:D9",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "RC-SAFE-011", "codigos": ["RC-SAFE-011"], "descripcion": "Hexano", "origenExcel": "BBDD Equipos 62031!C6" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!C7" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro digital", "origenExcel": "BBDD Equipos 62031!C8" }
+      ]
+    },
+    {
+      "id": "sec07.tornillo",
+      "seccion": "7",
+      "titulo": "7.1. Bornes de tornillo",
+      "origenExcel": "BBDD Equipos 62031!G5:H18",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-428", "codigos": ["EQ-SAFE-428"], "descripcion": "Multímetro Fluke", "origenExcel": "BBDD Equipos 62031!G6" },
+        { "codigoLiteral": "EQ-SAFE-430", "codigos": ["EQ-SAFE-430"], "descripcion": "Multímetro / pinza UNI-T", "origenExcel": "BBDD Equipos 62031!G7" },
+        { "codigoLiteral": "EQ-SAFE-425", "codigos": ["EQ-SAFE-425"], "descripcion": "Multímetro de laboratorio", "origenExcel": "BBDD Equipos 62031!G8" },
+        { "codigoLiteral": "EQ-SAFE-206", "codigos": ["EQ-SAFE-206"], "descripcion": "Pie de rey", "origenExcel": "BBDD Equipos 62031!G9" },
+        { "codigoLiteral": "EQ-SAFE-207", "codigos": ["EQ-SAFE-207"], "descripcion": "Micrómetro", "origenExcel": "BBDD Equipos 62031!G10" },
+        { "codigoLiteral": "EQ-SAFE-222", "codigos": ["EQ-SAFE-222"], "descripcion": "Juego de galgas", "origenExcel": "BBDD Equipos 62031!G11" },
+        { "codigoLiteral": "EQ-SAFE-214", "codigos": ["EQ-SAFE-214"], "descripcion": "Atornillador dinamométrico 60 cNm", "origenExcel": "BBDD Equipos 62031!G12" },
+        { "codigoLiteral": "EQ-SAFE-215", "codigos": ["EQ-SAFE-215"], "descripcion": "Atornillador dinamométrico 260 cNm", "origenExcel": "BBDD Equipos 62031!G13" },
+        { "codigoLiteral": "EQ-SAFE-213", "codigos": ["EQ-SAFE-213"], "descripcion": "Dinamómetro 500 N", "origenExcel": "BBDD Equipos 62031!G14" },
+        { "codigoLiteral": "EQ-SAFE-221", "codigos": ["EQ-SAFE-221"], "descripcion": "Dinamómetro 10 N", "origenExcel": "BBDD Equipos 62031!G15" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro", "origenExcel": "BBDD Equipos 62031!G16" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!G17" }
+      ]
+    },
+    {
+      "id": "sec07.sinTornillo",
+      "seccion": "7",
+      "titulo": "7.1. Bornes sin tornillo",
+      "origenExcel": "BBDD Equipos 62031!G22:H34",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-428", "codigos": ["EQ-SAFE-428"], "descripcion": "Multímetro Fluke", "origenExcel": "BBDD Equipos 62031!G23" },
+        { "codigoLiteral": "EQ-SAFE-430", "codigos": ["EQ-SAFE-430"], "descripcion": "Multímetro / pinza UNI-T", "origenExcel": "BBDD Equipos 62031!G24" },
+        { "codigoLiteral": "EQ-SAFE-425", "codigos": ["EQ-SAFE-425"], "descripcion": "Multímetro de laboratorio", "origenExcel": "BBDD Equipos 62031!G25" },
+        { "codigoLiteral": "EQ-SAFE-206", "codigos": ["EQ-SAFE-206"], "descripcion": "Pie de rey", "origenExcel": "BBDD Equipos 62031!G26" },
+        { "codigoLiteral": "EQ-SAFE-207", "codigos": ["EQ-SAFE-207"], "descripcion": "Micrómetro", "origenExcel": "BBDD Equipos 62031!G27" },
+        { "codigoLiteral": "EQ-SAFE-222", "codigos": ["EQ-SAFE-222"], "descripcion": "Juego de galgas", "origenExcel": "BBDD Equipos 62031!G28" },
+        { "codigoLiteral": "EQ-SAFE-330", "codigos": ["EQ-SAFE-330"], "descripcion": "Cámara climática", "origenExcel": "BBDD Equipos 62031!G29" },
+        { "codigoLiteral": "EQ-SAFE-213", "codigos": ["EQ-SAFE-213"], "descripcion": "Dinamómetro 500 N", "origenExcel": "BBDD Equipos 62031!G30" },
+        { "codigoLiteral": "EQ-SAFE-221", "codigos": ["EQ-SAFE-221"], "descripcion": "Dinamómetro 10 N", "origenExcel": "BBDD Equipos 62031!G31" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro", "origenExcel": "BBDD Equipos 62031!G32" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!G33" }
+      ]
+    },
+    {
+      "id": "sec08.tierra",
+      "seccion": "8",
+      "titulo": "8. (9.1 a 9.5) Continuidad del circuito de tierra",
+      "origenExcel": "BBDD Equipos 62031!K5:L10",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-442", "codigos": ["EQ-SAFE-442"], "descripcion": "Medidor de continuidad de tierra (ELABO)", "origenExcel": "BBDD Equipos 62031!K6" },
+        { "codigoLiteral": "EQ-SAFE-403", "codigos": ["EQ-SAFE-403"], "descripcion": "Medidor de continuidad de tierra (GW INSTEK GPT-15004)", "origenExcel": "BBDD Equipos 62031!K7" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!K8" },
+        { "codigoLiteral": "EQ-SAFE-207", "codigos": ["EQ-SAFE-207"], "descripcion": "Micrómetro (diámetro de hilos, si es necesario)", "origenExcel": "BBDD Equipos 62031!K9" }
+      ]
+    },
+    {
+      "id": "sec09.contacto",
+      "seccion": "9",
+      "titulo": "(-) 10.1 Protección contra contacto accidental",
+      "origenExcel": "BBDD Equipos 62031!O5:P11",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-601", "codigos": ["EQ-SAFE-601"], "descripcion": "Indicador de contacto eléctrico", "origenExcel": "BBDD Equipos 62031!O6" },
+        { "codigoLiteral": "EQ-SAFE-106", "codigos": ["EQ-SAFE-106"], "descripcion": "Dedo articulado", "origenExcel": "BBDD Equipos 62031!O7" },
+        { "codigoLiteral": "EQ-SAFE-221", "codigos": ["EQ-SAFE-221"], "descripcion": "Dinamómetro 10 N", "origenExcel": "BBDD Equipos 62031!O8" },
+        { "codigoLiteral": "EQ-SAFE-213", "codigos": ["EQ-SAFE-213"], "descripcion": "Dinamómetro 500 N", "origenExcel": "BBDD Equipos 62031!O9" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!O10" }
+      ]
+    },
+    {
+      "id": "sec09.condensador",
+      "seccion": "9",
+      "titulo": "- (10.2) Descarga del condensador",
+      "origenExcel": "BBDD Equipos 62031!O15:P21",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-409", "codigos": ["EQ-SAFE-409"], "descripcion": "Osciloscopio", "origenExcel": "BBDD Equipos 62031!O16" },
+        { "codigoLiteral": "EQ-SAFE-428", "codigos": ["EQ-SAFE-428"], "descripcion": "Multímetro Fluke", "origenExcel": "BBDD Equipos 62031!O17" },
+        { "codigoLiteral": "EQ-SAFE-437", "codigos": ["EQ-SAFE-437"], "descripcion": "Multímetro de laboratorio UNI-T", "origenExcel": "BBDD Equipos 62031!O18" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro", "origenExcel": "BBDD Equipos 62031!O19" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!O20" }
+      ]
+    },
+    {
+      "id": "sec09.mbts",
+      "seccion": "9",
+      "titulo": "- (10.3) y/o (10.4) Verificación MBTS",
+      "origenExcel": "BBDD Equipos 62031!O25:P33",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-409", "codigos": ["EQ-SAFE-409"], "descripcion": "Osciloscopio", "origenExcel": "BBDD Equipos 62031!O26" },
+        { "codigoLiteral": "EQ-SAFE-428", "codigos": ["EQ-SAFE-428"], "descripcion": "Multímetro Fluke", "origenExcel": "BBDD Equipos 62031!O27" },
+        { "codigoLiteral": "EQ-SAFE-437", "codigos": ["EQ-SAFE-437"], "descripcion": "Multímetro de laboratorio UNI-T", "origenExcel": "BBDD Equipos 62031!O28" },
+        { "codigoLiteral": "EQ-SAFE-430", "codigos": ["EQ-SAFE-430"], "descripcion": "Pinza UNI-T", "origenExcel": "BBDD Equipos 62031!O29" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro", "origenExcel": "BBDD Equipos 62031!O30" },
+        { "codigoLiteral": "EQ-SAFE-402", "codigos": ["EQ-SAFE-402"], "descripcion": "Equipo de rigidez GW INSTEK GPT-15002", "origenExcel": "BBDD Equipos 62031!O31" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!O32" }
+      ]
+    },
+    {
+      "id": "sec10.aislamiento",
+      "seccion": "10",
+      "titulo": "(-) 11 Resistencia de aislamiento y humedad",
+      "origenExcel": "BBDD Equipos 62031!S5:T10",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-330", "codigos": ["EQ-SAFE-330"], "descripcion": "Cámara climática", "origenExcel": "BBDD Equipos 62031!S6" },
+        { "codigoLiteral": "EQ-SAFE-403", "codigos": ["EQ-SAFE-403"], "descripcion": "Medidor de resistencia de aislamiento GW INSTEK GPT-15004", "origenExcel": "BBDD Equipos 62031!S7" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro digital", "origenExcel": "BBDD Equipos 62031!S9" }
+      ]
+    },
+    {
+      "id": "sec11.rigidez",
+      "seccion": "11",
+      "titulo": "(-) 12 Rigidez dieléctrica",
+      "origenExcel": "BBDD Equipos 62031!W5:X10",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-402", "codigos": ["EQ-SAFE-402"], "descripcion": "Rigidez dieléctrica GW INSTEK GPT-15002", "origenExcel": "BBDD Equipos 62031!W6" },
+        { "codigoLiteral": "EQ-SAFE-403", "codigos": ["EQ-SAFE-403"], "descripcion": "Rigidez dieléctrica GW INSTEK GPT-15004", "origenExcel": "BBDD Equipos 62031!W7" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!W9" }
+      ]
+    },
+    {
+      "id": "sec12.fallo",
+      "seccion": "12",
+      "titulo": "12.1 Condiciones de fallo",
+      "origenExcel": "BBDD Equipos 62031!AA5:AB11",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-206", "codigos": ["EQ-SAFE-206"], "descripcion": "Pie de rey", "origenExcel": "BBDD Equipos 62031!AA6" },
+        { "codigoLiteral": "EQ-SAFE-222", "codigos": ["EQ-SAFE-222"], "descripcion": "Juego de galgas", "origenExcel": "BBDD Equipos 62031!AA7" },
+        { "codigoLiteral": "EQ-SAFE-428", "codigos": ["EQ-SAFE-428"], "descripcion": "Multímetro (Fluke)", "origenExcel": "BBDD Equipos 62031!AA8" },
+        { "codigoLiteral": "EQ-SAFE-425", "codigos": ["EQ-SAFE-425"], "descripcion": "Multímetro de precisión de laboratorio TEKTRONIK", "origenExcel": "BBDD Equipos 62031!AA9" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!AA10" }
+      ]
+    },
+    {
+      "id": "sec12.sobrepotencia",
+      "seccion": "12",
+      "titulo": "12.2 Condición de sobrepotencia",
+      "origenExcel": "BBDD Equipos 62031!AA15:AB22",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-428", "codigos": ["EQ-SAFE-428"], "descripcion": "Multímetro (Fluke)", "origenExcel": "BBDD Equipos 62031!AA16" },
+        { "codigoLiteral": "EQ-SAFE-425", "codigos": ["EQ-SAFE-425"], "descripcion": "Multímetro de precisión de laboratorio TEKTRONIK", "origenExcel": "BBDD Equipos 62031!AA17" },
+        { "codigoLiteral": "EQ-SAFE-409", "codigos": ["EQ-SAFE-409"], "descripcion": "Osciloscopio", "origenExcel": "BBDD Equipos 62031!AA18" },
+        { "codigoLiteral": "EQ-SAFE-618", "codigos": ["EQ-SAFE-618"], "descripcion": "Sistema de resistencias e inducción configurable", "origenExcel": "BBDD Equipos 62031!AA19" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!AA20" },
+        { "codigoLiteral": "EQ-EMCO-308", "codigos": ["EQ-EMCO-308"], "descripcion": "Fuente de alimentación", "origenExcel": "BBDD Equipos 62031!AA21" }
+      ]
+    },
+    {
+      "id": "sec14.construccion",
+      "seccion": "14",
+      "titulo": "- (15) Construcción",
+      "origenExcel": "BBDD Equipos 62031!AE5:AE8",
+      "permiteOtros": true,
+      "nota": "Los ensayos de esta sección se verifican por inspección o mediante ensayos de otras secciones de la norma. Ver el listado de equipos de la sección correspondiente.",
+      "equipos": []
+    },
+    {
+      "id": "sec15.lineasDeFuga",
+      "seccion": "15",
+      "titulo": "- (16) Líneas de fuga y distancias en el aire",
+      "origenExcel": "BBDD Equipos 62031!AI5:AJ15",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-207", "codigos": ["EQ-SAFE-207"], "descripcion": "Micrómetro", "origenExcel": "BBDD Equipos 62031!AI6" },
+        { "codigoLiteral": "EQ-SAFE-206", "codigos": ["EQ-SAFE-206"], "descripcion": "Pie de rey", "origenExcel": "BBDD Equipos 62031!AI7" },
+        { "codigoLiteral": "EQ-SAFE-428", "codigos": ["EQ-SAFE-428"], "descripcion": "Flexómetro", "origenExcel": "BBDD Equipos 62031!AI8", "nota": "El Excel asocia este código a «Flexómetro» en esta columna y a «Multímetro Fluke» en otras (posible errata de la hoja)." },
+        { "codigoLiteral": "EQ-SAFE-605", "codigos": ["EQ-SAFE-605"], "descripcion": "Lámina de cinta 0,1-2,00 mm", "origenExcel": "BBDD Equipos 62031!AI9" },
+        { "codigoLiteral": "EQ-SAFE-222", "codigos": ["EQ-SAFE-222"], "descripcion": "Juego de galgas", "origenExcel": "BBDD Equipos 62031!AI10" },
+        { "codigoLiteral": "EQ-SAFE-409", "codigos": ["EQ-SAFE-409"], "descripcion": "Osciloscopio", "origenExcel": "BBDD Equipos 62031!AI11" },
+        { "codigoLiteral": "EQ-SAFE-440", "codigos": ["EQ-SAFE-440"], "descripcion": "Vatímetro", "origenExcel": "BBDD Equipos 62031!AI12" },
+        { "codigoLiteral": "EQ-SAFE-437", "codigos": ["EQ-SAFE-437"], "descripcion": "Multímetro digital UNI-T", "origenExcel": "BBDD Equipos 62031!AI13" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!AI14" }
+      ]
+    },
+    {
+      "id": "sec16.tornillos",
+      "seccion": "16",
+      "titulo": "- (4.12) Tornillos, conexiones mecánicas y prensaestopas",
+      "origenExcel": "BBDD Equipos 62031!AM5:AN15",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-213", "codigos": ["EQ-SAFE-213"], "descripcion": "Dinamómetro", "origenExcel": "BBDD Equipos 62031!AM6" },
+        { "codigoLiteral": "EQ-SAFE-216", "codigos": ["EQ-SAFE-216"], "descripcion": "Llave dinamométrica", "origenExcel": "BBDD Equipos 62031!AM7" },
+        { "codigoLiteral": "EQ-SAFE-206", "codigos": ["EQ-SAFE-206"], "descripcion": "Pie de rey", "origenExcel": "BBDD Equipos 62031!AM8" },
+        { "codigoLiteral": "EQ-SAFE-207", "codigos": ["EQ-SAFE-207"], "descripcion": "Micrómetro digital", "origenExcel": "BBDD Equipos 62031!AM9" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!AM10" },
+        { "codigoLiteral": "EQ-SAFE-214", "codigos": ["EQ-SAFE-214"], "descripcion": "Atornillador dinamométrico 60 cNm", "origenExcel": "BBDD Equipos 62031!AM11" },
+        { "codigoLiteral": "EQ-SAFE-215", "codigos": ["EQ-SAFE-215"], "descripcion": "Atornillador dinamométrico 260 cNm", "origenExcel": "BBDD Equipos 62031!AM12" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro digital", "origenExcel": "BBDD Equipos 62031!AM13" },
+        { "codigoLiteral": "EQ-SAFE-212", "codigos": ["EQ-SAFE-212"], "descripcion": "Flexómetro", "origenExcel": "BBDD Equipos 62031!AM14" }
+      ]
+    },
+    {
+      "id": "sec17.bola",
+      "seccion": "17",
+      "titulo": "- (18.1) Resistencia al calor — ensayo de bola",
+      "origenExcel": "BBDD Equipos 62031!AQ5:AR16",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-305", "codigos": ["EQ-SAFE-305"], "descripcion": "Estufa", "origenExcel": "BBDD Equipos 62031!AQ6" },
+        { "codigoLiteral": "EQ-SAFE-323", "codigos": ["EQ-SAFE-323"], "descripcion": "Registrador", "origenExcel": "BBDD Equipos 62031!AQ7" },
+        { "codigoLiteral": "EQ-SAFE-324", "codigos": ["EQ-SAFE-324"], "descripcion": "Registrador 20 canales Graphtec", "origenExcel": "BBDD Equipos 62031!AQ8" },
+        { "codigoLiteral": "EQ-SAFE-329", "codigos": ["EQ-SAFE-329"], "descripcion": "Registrador 20 canales Graphtec (maletín)", "origenExcel": "BBDD Equipos 62031!AQ9" },
+        { "codigoLiteral": "EQ-SAFE-318", "codigos": ["EQ-SAFE-318"], "descripcion": "Comprobador de termopares de 2 canales", "origenExcel": "BBDD Equipos 62031!AQ10" },
+        { "codigoLiteral": "EQ-SAFE-104", "codigos": ["EQ-SAFE-104"], "descripcion": "Presión con bola", "origenExcel": "BBDD Equipos 62031!AQ11" },
+        { "codigoLiteral": "EQ-SAFE-604", "codigos": ["EQ-SAFE-604"], "descripcion": "Microscopio", "origenExcel": "BBDD Equipos 62031!AQ12" },
+        { "codigoLiteral": "EQ-SAFE-121", "codigos": ["EQ-SAFE-121"], "descripcion": "Regla graduada", "origenExcel": "BBDD Equipos 62031!AQ13" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!AQ14" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro", "origenExcel": "BBDD Equipos 62031!AQ15" }
+      ]
+    },
+    {
+      "id": "sec17.pcb",
+      "seccion": "17",
+      "titulo": "- (18.2) Circuito impreso",
+      "origenExcel": "BBDD Equipos 62031!AQ20:AR26",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-307", "codigos": ["EQ-SAFE-307"], "descripcion": "Llama de aguja", "origenExcel": "BBDD Equipos 62031!AQ21" },
+        { "codigoLiteral": "EQ-SAFE-308", "codigos": ["EQ-SAFE-308"], "descripcion": "Mechero Bunsen", "origenExcel": "BBDD Equipos 62031!AQ22" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro", "origenExcel": "BBDD Equipos 62031!AQ23" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!AQ24" },
+        { "codigoLiteral": "RC-SAFE-013", "codigos": ["RC-SAFE-013"], "descripcion": "Gas propano", "origenExcel": "BBDD Equipos 62031!AQ25" }
+      ]
+    },
+    {
+      "id": "sec17.llamaAguja",
+      "seccion": "17",
+      "titulo": "- (18.4) Resistencia a la llama y a la inflamación",
+      "origenExcel": "BBDD Equipos 62031!AQ29:AR35",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-307", "codigos": ["EQ-SAFE-307"], "descripcion": "Llama de aguja", "origenExcel": "BBDD Equipos 62031!AQ30" },
+        { "codigoLiteral": "EQ-SAFE-308", "codigos": ["EQ-SAFE-308"], "descripcion": "Mechero Bunsen", "origenExcel": "BBDD Equipos 62031!AQ31" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro", "origenExcel": "BBDD Equipos 62031!AQ32" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!AQ33" },
+        { "codigoLiteral": "RC-SAFE-013", "codigos": ["RC-SAFE-013"], "descripcion": "Gas propano", "origenExcel": "BBDD Equipos 62031!AQ34" }
+      ]
+    },
+    {
+      "id": "sec17.hiloIncandescente",
+      "seccion": "17",
+      "titulo": "- (18.3) Hilo incandescente",
+      "origenExcel": "BBDD Equipos 62031!AQ38:AR42",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-306", "codigos": ["EQ-SAFE-306"], "descripcion": "Equipo de hilo incandescente", "origenExcel": "BBDD Equipos 62031!AQ39" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro", "origenExcel": "BBDD Equipos 62031!AQ40" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!AQ41" }
+      ]
+    },
+    {
+      "id": "sec17.caminos",
+      "seccion": "17",
+      "titulo": "13.4 Formación de caminos conductores",
+      "origenExcel": "BBDD Equipos 62031!AQ46:AR54",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-444", "codigos": ["EQ-SAFE-444"], "descripcion": "Banco de pruebas eléctricas", "origenExcel": "BBDD Equipos 62031!AQ47" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro", "origenExcel": "BBDD Equipos 62031!AQ48" },
+        { "codigoLiteral": "EQ-SAFE-222", "codigos": ["EQ-SAFE-222"], "descripcion": "Galgas", "origenExcel": "BBDD Equipos 62031!AQ49" },
+        { "codigoLiteral": "EQ-SAFE-206", "codigos": ["EQ-SAFE-206"], "descripcion": "Pie de rey", "origenExcel": "BBDD Equipos 62031!AQ50" },
+        { "codigoLiteral": "EQ-SAFE-405", "codigos": ["EQ-SAFE-405"], "descripcion": "Conductímetro", "origenExcel": "BBDD Equipos 62031!AQ51" },
+        { "codigoLiteral": "RC-CERT-026; RC-CERT-027; RC-CERT-028", "codigos": ["RC-CERT-026", "RC-CERT-027", "RC-CERT-028"], "descripcion": "Soluciones de conductividad", "origenExcel": "BBDD Equipos 62031!AQ52" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!AQ53" }
+      ]
+    },
+    {
+      "id": "sec18.corrosion",
+      "seccion": "18",
+      "titulo": "- (4.18) Resistencia a la corrosión",
+      "origenExcel": "BBDD Equipos 62031!AU5:AV11",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-305", "codigos": ["EQ-SAFE-305"], "descripcion": "Estufa", "origenExcel": "BBDD Equipos 62031!AU6" },
+        { "codigoLiteral": "EQ-SAFE-330", "codigos": ["EQ-SAFE-330"], "descripcion": "Cámara climática", "origenExcel": "BBDD Equipos 62031!AU7" },
+        { "codigoLiteral": "RC-SAFE-001", "codigos": ["RC-SAFE-001"], "descripcion": "Cloruro de amonio", "origenExcel": "BBDD Equipos 62031!AU8" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!AU9" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro digital", "origenExcel": "BBDD Equipos 62031!AU10" }
+      ]
+    },
+    {
+      "id": "sec20.calor",
+      "seccion": "20",
+      "titulo": "Ensayo de temperatura anormal según anexo D",
+      "origenExcel": "BBDD Equipos 62031!AY5:AZ13",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro", "origenExcel": "BBDD Equipos 62031!AY6" },
+        { "codigoLiteral": "EQ-SAFE-327", "codigos": ["EQ-SAFE-327"], "descripcion": "Medidor de temperatura de 40 canales (cámara 1)", "origenExcel": "BBDD Equipos 62031!AY7" },
+        { "codigoLiteral": "EQ-SAFE-329", "codigos": ["EQ-SAFE-329"], "descripcion": "Medidor de temperatura de 40 canales (cámara 2)", "origenExcel": "BBDD Equipos 62031!AY8" },
+        { "codigoLiteral": "EQ-SAFE-323", "codigos": ["EQ-SAFE-323"], "descripcion": "Registrador de 40 canales Graphtec portátil", "origenExcel": "BBDD Equipos 62031!AY9" },
+        { "codigoLiteral": "EQ-SAFE-324", "codigos": ["EQ-SAFE-324"], "descripcion": "Registrador de 40 canales Graphtec portátil", "origenExcel": "BBDD Equipos 62031!AY10" },
+        { "codigoLiteral": "XX-XXX-xxx", "codigos": [], "descripcion": "Reservado para ampliación", "origenExcel": "BBDD Equipos 62031!AY11", "nota": "Marcador de ampliación conservado del Excel (DD-10)." },
+        { "codigoLiteral": "EQ-SAFE-403", "codigos": ["EQ-SAFE-403"], "descripcion": "Equipo de rigidez dieléctrica GW INSTEK GPT-15004", "origenExcel": "BBDD Equipos 62031!AY12" }
+      ]
+    },
+    {
+      "id": "sec21.luzAzul",
+      "seccion": "21",
+      "titulo": "21.2. Riesgo retiniano de luz azul",
+      "origenExcel": "BBDD Equipos 62031!BC5:BD8",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-415", "codigos": ["EQ-SAFE-415"], "descripcion": "Espectrofotómetro", "origenExcel": "BBDD Equipos 62031!BC6" },
+        { "codigoLiteral": "EQ-SAFE-212", "codigos": ["EQ-SAFE-212"], "descripcion": "Flexómetro", "origenExcel": "BBDD Equipos 62031!BC7" }
+      ]
+    },
+    {
+      "id": "partesActivas",
+      "seccion": "partesActivas",
+      "titulo": "Anexo A — identificación de partes activas",
+      "origenExcel": "BBDD Equipos 62031!BG5:BH14",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-437", "codigos": ["EQ-SAFE-437"], "descripcion": "Multímetro UNI-T", "origenExcel": "BBDD Equipos 62031!BG6" },
+        { "codigoLiteral": "EQ-SAFE-428", "codigos": ["EQ-SAFE-428"], "descripcion": "Multímetro Fluke", "origenExcel": "BBDD Equipos 62031!BG7" },
+        { "codigoLiteral": "EQ-SAFE-430", "codigos": ["EQ-SAFE-430"], "descripcion": "Multímetro / pinza UNI-T", "origenExcel": "BBDD Equipos 62031!BG8" },
+        { "codigoLiteral": "EQ-SAFE-404", "codigos": ["EQ-SAFE-404"], "descripcion": "Corrientes de fuga GW INSTEK GLC-1000", "origenExcel": "BBDD Equipos 62031!BG9" },
+        { "codigoLiteral": "EQ-SAFE-441", "codigos": ["EQ-SAFE-441"], "descripcion": "Corrientes de fuga AINUO", "origenExcel": "BBDD Equipos 62031!BG10" },
+        { "codigoLiteral": "EQ-SAFE-409", "codigos": ["EQ-SAFE-409"], "descripcion": "Osciloscopio", "origenExcel": "BBDD Equipos 62031!BG11" },
+        { "codigoLiteral": "EQ-SAFE-608", "codigos": ["EQ-SAFE-608"], "descripcion": "Resistencia para partes activas", "origenExcel": "BBDD Equipos 62031!BG12" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos 62031!BG13" }
+      ]
+    }
+  ]
+}

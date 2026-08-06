@@ -3,7 +3,16 @@ using LumNotas.Core.Plantilla;
 
 namespace LumNotas.Core.Motor;
 
-public enum EstadoApartado { SinReglas, FaltanDatos, Completo, NoAplica }
+/// <summary>
+/// En qué punto está un apartado. <c>Empezado</c> va el último a propósito: añadirlo en
+/// medio cambiaría el número de los que ya existían.
+/// <para>
+/// No hay estado de «fallo», y no es un olvido: en este laboratorio una toma de notas
+/// rellena es siempre satisfactoria, así que lo único que hay que saber de un apartado
+/// es cuánto le queda.
+/// </para>
+/// </summary>
+public enum EstadoApartado { SinReglas, FaltanDatos, Completo, NoAplica, Empezado }
 
 /// <summary>
 /// Decide si un apartado se muestra y en qué estado está. Vive en el núcleo porque lo
@@ -26,8 +35,26 @@ public static class EstadoDeApartado
         var regla = ReglaDeCierre(bloque);
         if (regla is null) return EstadoApartado.SinReglas;
 
-        return motor.EsVerdadera(regla) ? EstadoApartado.FaltanDatos : EstadoApartado.Completo;
+        if (!motor.EsVerdadera(regla)) return EstadoApartado.Completo;
+
+        // A la regla de cierre solo le consta que faltan datos. Que falten habiendo ya
+        // algo escrito es otra cosa —hay un ensayo a medias— y el que tiene que
+        // terminarlo necesita verlo.
+        return HayAlgoEscrito(datos, bloque) ? EstadoApartado.Empezado : EstadoApartado.FaltanDatos;
     }
+
+    /// <summary>
+    /// Un apartado que aplica y todavía no está resuelto, esté vacío o a medias. Lo
+    /// preguntan el índice y el tablero de gestión, y tiene que querer decir lo mismo en
+    /// los dos: un apartado empezado sigue siendo trabajo pendiente.
+    /// </summary>
+    public static bool EstaPendiente(EstadoApartado estado)
+        => estado is EstadoApartado.FaltanDatos or EstadoApartado.Empezado;
+
+    // Los subapartados guardan lo suyo bajo su propio id —la sección 12 tiene tres, cada
+    // uno con su fecha—, así que mirar solo el del apartado dejaría fuera casi todo.
+    private static bool HayAlgoEscrito(DatosProyecto datos, Bloque bloque)
+        => datos.HayAlgoEn(bloque.Id) || bloque.SubBloques.Any(sub => datos.HayAlgoEn(sub.Id));
 
     /// <summary>
     /// Regla que determina el estado. La plantilla puede fijarla con <c>reglaDeCierre</c>;

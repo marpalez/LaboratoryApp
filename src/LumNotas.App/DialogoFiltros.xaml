@@ -1,0 +1,111 @@
+<Window x:Class="LumNotas.App.DialogoFiltros"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Filtros"
+        SizeToContent="Height" Width="420" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        FontFamily="Segoe UI" FontSize="13" Background="White">
+
+    <Window.Resources>
+        <Style TargetType="TextBlock" x:Key="Etiqueta">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="Pista">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="#9CA3AF"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+    </Window.Resources>
+
+    <StackPanel Margin="26,22">
+        <TextBlock Text="Filtros" FontSize="17" FontWeight="Bold" Foreground="#111827"/>
+        <TextBlock Margin="0,4,0,18" Foreground="#6B7280" FontSize="12" TextWrapping="Wrap"
+                   Text="Se aplican al elegirlos."/>
+
+        <TextBlock Text="Mostrar" Style="{StaticResource Etiqueta}"/>
+        <TextBlock Style="{StaticResource Pista}"
+                   Text="«En desarrollo» deja fuera lo terminado y lo archivado. Para buscar un servicio antiguo, «Cualquier estado»."/>
+        <ComboBox ItemsSource="{Binding Estados}" SelectedItem="{Binding Estado}"
+                  Padding="6,5" Margin="0,0,0,14"/>
+
+        <TextBlock Text="Técnico" Style="{StaticResource Etiqueta}"/>
+        <ComboBox ItemsSource="{Binding Tecnicos}" SelectedItem="{Binding Tecnico}"
+                  Padding="6,5" Margin="0,0,0,14"/>
+
+        <!--
+            De aquí abajo, en parejas. Son valores cortos —«IP65», «ENAC», «60598-1_2024»—
+            y con una fila para cada uno la ventana se iba de alto sin ganar nada: había
+            que desplazarse para ver los seis a la vez, que es justo lo que esta ventana
+            existe para evitar. Se emparejan los que se leen juntos.
+        -->
+        <Grid Margin="0,0,0,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="14"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="Norma" Style="{StaticResource Etiqueta}"/>
+                <ComboBox ItemsSource="{Binding Normas}" SelectedItem="{Binding Norma}" Padding="6,5"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Acreditación" Style="{StaticResource Etiqueta}"/>
+                <ComboBox ItemsSource="{Binding OpcionesAcreditacion}"
+                          SelectedItem="{Binding Acreditacion}" Padding="6,5"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Los grados, que vinieron de la BBDD. Las listas salen de lo que de verdad hay
+             en los proyectos leídos: una lista fija ofrecería grados que nadie ha ensayado
+             nunca y escondería los que sí. -->
+        <Grid Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="14"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel>
+                <TextBlock Text="Grado IP" Style="{StaticResource Etiqueta}"/>
+                <ComboBox ItemsSource="{Binding OpcionesIp}" SelectedItem="{Binding Ip}" Padding="6,5"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Grado IK" Style="{StaticResource Etiqueta}"/>
+                <ComboBox ItemsSource="{Binding OpcionesIk}" SelectedItem="{Binding Ik}" Padding="6,5"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Periodo de ensayo. Sale de las fechas que la toma de notas apunta sola al
+             darse por terminada, así que solo encuentra servicios cerrados. -->
+        <TextBlock Text="Ensayado entre" Style="{StaticResource Etiqueta}"/>
+        <TextBlock Style="{StaticResource Pista}"
+                   Text="Solo salen los servicios terminados: son los que tienen apuntado cuándo se ensayaron."/>
+        <Grid Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="14"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <DatePicker SelectedDate="{Binding Desde}" Padding="6,5"/>
+            <DatePicker Grid.Column="2" SelectedDate="{Binding Hasta}" Padding="6,5"/>
+        </Grid>
+
+        <!-- Aquí iba un recuadro repitiendo por escrito lo que ya dicen los seis
+             desplegables de arriba. Fuera: con la ventana abierta se leen directamente, y
+             quien la tiene cerrada sigue teniéndolo en el consejo emergente del botón,
+             que es donde de verdad hacía falta. -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
+            <Button Content="Quitar filtros" Click="AlQuitar" Padding="14,9" Cursor="Hand"/>
+            <Button Content="Cerrar" Click="AlCerrar" IsDefault="True" IsCancel="True"
+                    Padding="22,9" Margin="8,0,0,0" Cursor="Hand"
+                    Background="#0F766E" Foreground="White" BorderThickness="0"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

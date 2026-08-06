@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "id": "equipos-60529",
+    "version": "1.0.0",
+    "generadoEl": "2026-07-31",
+    "origen": "TomaDeNotasExcelCompleta.xlsx v2.1 — hoja \"BBDD Equipos IP-IK\", columnas del ensayo de IP",
+    "criterio": "Importación literal (DD-10) y por separado de cada norma (decisión del laboratorio, 2026-07-31). En el Excel el IP y el IK comparten hoja; aquí se reparten en dos catálogos."
+  },
+
+  "notasDeUso": [
+    "En caso de utilizar equipos adicionales debe indicarse en el apartado \"otros\".",
+    "Las casillas coloreadas (excepto amarillo) indican equipos alternativos: solo se marcan los que procedan.",
+    "Los equipos de casilla en blanco se asumen utilizados por ser equipos por defecto. Si alguno no se ha utilizado debe eliminarse, tacharse o indicarse \"NO\".",
+    "Las celdas amarillas del Excel señalan novedades o avisos para llamar la atención del técnico."
+  ],
+
+  "grupos": [
+    {
+      "id": "ip.primeraCifra",
+      "seccion": "5",
+      "titulo": "Ensayos de IP: primera cifra",
+      "origenExcel": "BBDD Equipos IP-IK!C19:D30",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-106", "codigos": ["EQ-SAFE-106"], "descripcion": "Dedo de prueba articulado", "origenExcel": "BBDD Equipos IP-IK!C20" },
+        { "codigoLiteral": "EQ-SAFE-107 EQ-SAFE-112", "codigos": ["EQ-SAFE-107", "EQ-SAFE-112"], "descripcion": "Varilla 50 mm diámetro / Bola 50 mm diámetro", "origenExcel": "BBDD Equipos IP-IK!C21" },
+        { "codigoLiteral": "EQ-SAFE-006", "codigos": ["EQ-SAFE-006"], "descripcion": "Varilla 2,5 mm diámetro", "origenExcel": "BBDD Equipos IP-IK!C22" },
+        { "codigoLiteral": "EQ-SAFE-110", "codigos": ["EQ-SAFE-110"], "descripcion": "Esfera 12,5 mm diámetro", "origenExcel": "BBDD Equipos IP-IK!C23" },
+        { "codigoLiteral": "EQ-SAFE-109", "codigos": ["EQ-SAFE-109"], "descripcion": "Varilla 1 mm diámetro", "origenExcel": "BBDD Equipos IP-IK!C24" },
+        { "codigoLiteral": "EQ-SAFE-326", "codigos": ["EQ-SAFE-326"], "descripcion": "Cámara de polvo", "origenExcel": "BBDD Equipos IP-IK!C25" },
+        { "codigoLiteral": "EQ-SAFE-212", "codigos": ["EQ-SAFE-212"], "descripcion": "Flexómetro", "origenExcel": "BBDD Equipos IP-IK!C26" },
+        { "codigoLiteral": "EQ-SAFE-407", "codigos": ["EQ-SAFE-407"], "descripcion": "Cronómetro digital", "origenExcel": "BBDD Equipos IP-IK!C27" },
+        { "codigoLiteral": "EQ-SAFE-206", "codigos": ["EQ-SAFE-206"], "descripcion": "Pie de rey", "origenExcel": "BBDD Equipos IP-IK!C28" },
+        { "codigoLiteral": "EQ-SAFE-202", "codigos": ["EQ-SAFE-202"], "descripcion": "Balanza y plataforma", "origenExcel": "BBDD Equipos IP-IK!C29" }
+      ]
+    },
+    {
+      "id": "ip.segundaCifra",
+      "seccion": "6",
+      "titulo": "Ensayos de IP: segunda cifra",
+      "origenExcel": "BBDD Equipos IP-IK!C5:D16",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-174 + EQ-SAFE-210", "codigos": ["EQ-SAFE-174", "EQ-SAFE-210"], "descripcion": "Arco de lluvia + caudalímetro", "origenExcel": "BBDD Equipos IP-IK!C6" },
+        { "codigoLiteral": "EQ-SAFE-105", "codigos": ["EQ-SAFE-105"], "descripcion": "Boquillas", "origenExcel": "BBDD Equipos IP-IK!C7" },
+        { "codigoLiteral": "EQ-SAFE-111", "codigos": ["EQ-SAFE-111"], "descripcion": "Cabeza de regadera (si el radio necesario es mayor de 120 cm o por método de ensayo)", "origenExcel": "BBDD Equipos IP-IK!C8" },
+        { "codigoLiteral": "EQ-SAFE-608", "codigos": ["EQ-SAFE-608"], "descripcion": "Depósitos de inmersión", "origenExcel": "BBDD Equipos IP-IK!C9" },
+        { "codigoLiteral": "EQ-SAFE-615", "codigos": ["EQ-SAFE-615"], "descripcion": "Caja de goteo", "origenExcel": "BBDD Equipos IP-IK!C10" },
+        { "codigoLiteral": "EQ-SAFE-232", "codigos": ["EQ-SAFE-232"], "descripcion": "Boquillas de tobera + pulverizador + bomba de presión", "origenExcel": "BBDD Equipos IP-IK!C11" },
+        { "codigoLiteral": "EQ-SAFE-299", "codigos": ["EQ-SAFE-299"], "descripcion": "Caudalímetro", "origenExcel": "BBDD Equipos IP-IK!C12" },
+        { "codigoLiteral": "RESERVADO", "codigos": [], "descripcion": "---", "origenExcel": "BBDD Equipos IP-IK!C13", "nota": "Marcador de reserva conservado del Excel (DD-10)." },
+        { "codigoLiteral": "EQ-SAFE-318", "codigos": ["EQ-SAFE-318"], "descripcion": "Comprobador de temperatura", "origenExcel": "BBDD Equipos IP-IK!C14" },
+        { "codigoLiteral": "EQ-SAFE-202", "codigos": ["EQ-SAFE-202"], "descripcion": "Balanza y plataforma", "origenExcel": "BBDD Equipos IP-IK!C15" }
+      ]
+    },
+    {
+      "id": "ambientales",
+      "seccion": "generales",
+      "titulo": "Condiciones ambientales",
+      "origenExcel": "BBDD Equipos IP-IK!C33:D36",
+      "permiteOtros": true,
+      "equipos": [
+        { "codigoLiteral": "EQ-SAFE-308; EQ-SAFE-309", "codigos": ["EQ-SAFE-308", "EQ-SAFE-309"], "descripcion": "Termohigrómetros", "origenExcel": "BBDD Equipos IP-IK!C34" },
+        { "codigoLiteral": "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313", "codigos": ["EQ-SAFE-311", "EQ-SAFE-312", "EQ-SAFE-313"], "descripcion": "Termohigrómetro", "origenExcel": "BBDD Equipos IP-IK!C35" }
+      ]
+    }
+  ]
+}

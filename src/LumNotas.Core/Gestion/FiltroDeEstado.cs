@@ -13,7 +13,15 @@ namespace LumNotas.Core.Gestion;
 /// </summary>
 public static class FiltroDeEstado
 {
-    /// <summary>Ni terminado ni archivado: en lo que se está trabajando.</summary>
+    /// <summary>
+    /// Todo lo que no está archivado, terminados incluidos (2026‑08‑05).
+    /// <para>
+    /// Antes dejaba fuera lo terminado, y eso escondía trabajo que sigue vivo: un servicio
+    /// terminado la semana pasada se sigue mirando —hay que facturarlo, el cliente
+    /// pregunta— y desaparecer del tablero no ayudaba a nadie. <b>Lo único excluyente es
+    /// archivar</b>, que es un gesto deliberado y quiere decir «quítamelo de en medio».
+    /// </para>
+    /// </summary>
     public const string EnDesarrollo = "En desarrollo";
 
     /// <summary>
@@ -28,24 +36,37 @@ public static class FiltroDeEstado
     public const string Archivados = "Archivados";
 
     /// <summary>
-    /// Lo que se ofrece, con «En desarrollo» primero por ser lo que se mira a diario.
-    /// Lo terminado y lo archivado se piden a propósito, cada uno por su nombre.
+    /// Todo a la vez, archivado incluido. <b>Es lo que hace buscable la BBDD</b>: desde que
+    /// los filtros son un solo juego para las cuatro vistas, sin esta opción no había forma
+    /// de ver a la vez lo terminado y lo archivado, y encontrar un servicio de hace tres
+    /// años obligaba a ir probando estados de uno en uno hasta acertar.
+    /// <para>
+    /// No se pone por defecto y sigue sin ser lo normal: con lo terminado dentro, la carga
+    /// mensual sale inflada por trabajo que ya no existe. Se pide a sabiendas.
+    /// </para>
+    /// </summary>
+    public const string Cualquiera = "Cualquier estado";
+
+    /// <summary>
+    /// Lo que se ofrece, con «En desarrollo» primero por ser lo que se mira a diario y
+    /// «Cualquier estado» al final, que es el cajón de buscar cosas viejas.
     /// </summary>
     public static IReadOnlyList<string> Opciones =>
-        [EnDesarrollo, .. Planificacion.Estados.Select(Planificacion.EtiquetaDe), Archivados];
+        [EnDesarrollo, .. Planificacion.Estados.Select(Planificacion.EtiquetaDe), Archivados, Cualquiera];
 
     /// <summary>
     /// Si un proyecto entra en lo que se está mirando.
     /// <para>
-    /// <b>Ninguna opción general trae lo terminado ni lo archivado.</b> Para verlos hay
-    /// que pedirlos por su nombre —«Terminado», «Archivados»—, igual que quien busca
-    /// «En curso» no quiere lo que se apartó de en medio.
+    /// <b>Lo único que esconde es archivar.</b> «En desarrollo» trae todo lo demás,
+    /// terminados incluidos; pedir un estado concreto —«En curso», «Terminado»— trae ese y
+    /// solo ese, y sigue dejando fuera lo archivado, porque quien busca «En curso» no
+    /// quiere lo que se apartó de en medio.
     /// </para>
     /// </summary>
     public static bool Pasa(Planificacion plan, string? filtro) => filtro switch
     {
-        null or "" or EnDesarrollo or Todos =>
-            !plan.Archivado && plan.Estado != EstadoDeProyecto.Terminado,
+        null or "" or EnDesarrollo or Todos => !plan.Archivado,
+        Cualquiera => true,
         Archivados => plan.Archivado,
         _ => !plan.Archivado && Planificacion.EtiquetaDe(plan.Estado) == filtro
     };

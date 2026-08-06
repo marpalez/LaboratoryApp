@@ -19,15 +19,42 @@ public sealed record NormaDisponible(string Id, string Titulo, string Ruta)
     public string AnioDePublicacion { get; init; } = "";
 
     /// <summary>
+    /// La designación con sus enmiendas: <c>EN IEC 60598-1:2024 + A11:2024</c>. Es lo que
+    /// hay que enseñar donde se listan las normas instaladas — con el nombre corto, las
+    /// dos plantillas de la 60598 aparecían como «Luminarias» y «Luminarias».
+    /// </summary>
+    public string Designacion { get; init; } = "";
+
+    /// <summary>Cómo se llama, con lo más preciso que tenga.</summary>
+    public string ComoSeLlama => string.IsNullOrWhiteSpace(Designacion) ? Titulo : Designacion;
+
+    /// <summary>
     /// Lo que se enseña en la tarjeta de la portada: el número de norma a secas. El id
     /// lleva además el año y no cabe — y al técnico le dice menos que «60598».
     /// </summary>
     public string Rotulo => string.IsNullOrWhiteSpace(CodigoDeFichero) ? Id : CodigoDeFichero;
 
-    /// <summary>«Luminarias · 2024», para cuando conviven dos años de la misma norma.</summary>
+    /// <summary>«Luminarias | 2024», para cuando conviven dos años de la misma norma.</summary>
     public string TituloConAnio => string.IsNullOrWhiteSpace(AnioDePublicacion)
         ? TituloCorto
-        : $"{TituloCorto} · {AnioDePublicacion}";
+        : $"{TituloCorto} | {AnioDePublicacion}";
+
+    /// <summary>Edición de la norma, si la plantilla la declara. Ver <c>Meta.Edicion</c>.</summary>
+    public string Edicion { get; init; } = "";
+
+    /// <summary>
+    /// El subtexto de la tarjeta de la portada: «Luminarias Ed.9». Ahí arriba va la
+    /// designación completa, que es lo que distingue dos años de la misma norma; esto dice
+    /// de qué trata, en una línea.
+    /// <para>
+    /// <b>Sin edición declarada se queda solo el nombre.</b> Un «Ed.» sin número detrás
+    /// parece un dato a medio escribir, y las tres normas que aún no la tienen no deberían
+    /// enseñarlo hasta que el laboratorio lo diga.
+    /// </para>
+    /// </summary>
+    public string DescripcionConEdicion => string.IsNullOrWhiteSpace(Edicion)
+        ? TituloCorto
+        : $"{TituloCorto}  |  Ed. {Edicion}";
 
     /// <summary>Si es la norma que un proyecto pide, con el id de ahora o con uno viejo.</summary>
     public bool Responde(string? id)
@@ -105,7 +132,9 @@ public static class CatalogoDeNormas
                     IdsAnteriores = [.. plantilla.Meta.IdsAnteriores ?? []],
                     CodigoDeFichero = plantilla.Meta.CodigoParaFichero,
                     Version = plantilla.Meta.Version,
-                    AnioDePublicacion = plantilla.Meta.AnioDePublicacion ?? ""
+                    AnioDePublicacion = plantilla.Meta.AnioDePublicacion ?? "",
+                    Edicion = plantilla.Meta.Edicion ?? "",
+                    Designacion = plantilla.Meta.ComoSeLlamaLaNorma
                 });
             }
             catch (Exception)

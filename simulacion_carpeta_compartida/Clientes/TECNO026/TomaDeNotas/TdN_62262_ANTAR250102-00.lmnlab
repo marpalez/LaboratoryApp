@@ -1,0 +1,46 @@
+{
+  "formato": "lmnlab/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-06T14:53:13.5432885+02:00",
+  "codigoTomaDeNotas": "ANTAR250102-00",
+  "colaboradores": [],
+  "codigoServicio": "ANTAR2501",
+  "numeroMuestras": 1,
+  "normas": [
+    "62262_2002_A1"
+  ],
+  "normaPrincipal": "62262_2002_A1",
+  "patronIdentificador": "EBP_CLIM{codigoServicio}",
+  "planificacion": {
+    "inicio": "2025-01-22T00:00:00",
+    "fin": "2025-02-09T00:00:00",
+    "estado": "terminado",
+    "archivado": true,
+    "importe": 2692,
+    "ensayoDesde": "2025-01-22T00:00:00",
+    "ensayoHasta": "2025-02-09T00:00:00",
+    "fechasBloqueadas": false
+  },
+  "selecciones": {},
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Daniel Pastor"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico2",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Javier Ibor"
+    }
+  ],
+  "na": [],
+  "checklists": []
+}

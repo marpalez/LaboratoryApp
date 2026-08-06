@@ -33,14 +33,14 @@ public class VariosProyectosTests : IDisposable
     public void TresProyectosEnTresCarpetas_SonIndependientes()
     {
         // Proyecto 1: marcado terminado.
-        var uno = new DatosProyecto { CodigoServicio = "111112026", NumeroMuestras = 1 };
+        var uno = new DatosProyecto { CodigoTomaDeNotas = "11111202601-00", CodigoServicio = "111112026", NumeroMuestras = 1 };
         uno.Establecer("6", "ambiente.fecha", new DateTime(2026, 7, 20));
 
         // Proyecto 2: marcado sin empezar, con 4 muestras.
-        var dos = new DatosProyecto { CodigoServicio = "222222026", NumeroMuestras = 4 };
+        var dos = new DatosProyecto { CodigoTomaDeNotas = "22222202601-00", CodigoServicio = "222222026", NumeroMuestras = 4 };
 
         // Proyecto 3: marcado marcado como no aplica.
-        var tres = new DatosProyecto { CodigoServicio = "333332026", NumeroMuestras = 2 };
+        var tres = new DatosProyecto { CodigoTomaDeNotas = "33333202601-00", CodigoServicio = "333332026", NumeroMuestras = 2 };
         tres.EstablecerNa("6/na", true);
 
         _repositorio.Guardar(uno, RutaDe("111112026"), "1.0.0-mvp");
@@ -70,8 +70,8 @@ public class VariosProyectosTests : IDisposable
     [Fact]
     public void GuardarUnProyectoNoTocaLosDemas()
     {
-        var uno = new DatosProyecto { CodigoServicio = "111112026", NumeroMuestras = 1 };
-        var dos = new DatosProyecto { CodigoServicio = "222222026", NumeroMuestras = 1 };
+        var uno = new DatosProyecto { CodigoTomaDeNotas = "11111202601-00", CodigoServicio = "111112026", NumeroMuestras = 1 };
+        var dos = new DatosProyecto { CodigoTomaDeNotas = "22222202601-00", CodigoServicio = "222222026", NumeroMuestras = 1 };
         _repositorio.Guardar(uno, RutaDe("111112026"), "1.0.0-mvp");
         _repositorio.Guardar(dos, RutaDe("222222026"), "1.0.0-mvp");
 
@@ -87,7 +87,7 @@ public class VariosProyectosTests : IDisposable
     [Fact]
     public void CadaProyectoRecuerdaLaVersionDePlantillaConLaQueNacio()
     {
-        var datos = new DatosProyecto { CodigoServicio = "111112026", NumeroMuestras = 1 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "11111202601-00", CodigoServicio = "111112026", NumeroMuestras = 1 };
         _repositorio.Guardar(datos, RutaDe("111112026"), "1.0.0-mvp");
 
         Assert.Contains("\"versionPlantilla\": \"1.0.0-mvp\"", File.ReadAllText(RutaDe("111112026")));

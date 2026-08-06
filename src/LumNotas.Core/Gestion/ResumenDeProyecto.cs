@@ -15,10 +15,48 @@ public sealed record ResumenDeProyecto
 {
     public required string Ruta { get; init; }
     public required string Nombre { get; init; }
+
+    /// <summary>
+    /// El de esta toma de notas. Es lo que distingue dos familias del mismo servicio, así
+    /// que es con lo que se busca un duplicado de verdad — por el de servicio saldrían
+    /// repetidas las cuatro familias de un trabajo, que es lo normal y no un error.
+    /// </summary>
+    public string CodigoTomaDeNotas { get; init; } = "";
+
     public string CodigoServicio { get; init; } = "";
+
+    /// <summary>El responsable, por el que se filtra.</summary>
     public string Tecnico { get; init; } = "";
+
+    /// <summary>El segundo, si lo hay. Solo se enseña; no filtra ni ordena nada.</summary>
+    public string Tecnico2 { get; init; } = "";
+
     public int NumeroMuestras { get; init; }
     public DateTime Modificado { get; init; }
+
+    // ---- lo que hace falta para buscar un servicio de hace meses -------------
+    //
+    // Sube aquí y no se relee del fichero a propósito: el listado recorre cientos de
+    // proyectos, y el escaneo ya los ha abierto todos una vez.
+
+    /// <summary>ENAC, ENEC, CB… o «Sin acreditar». Un servicio puede llevar varias.</summary>
+    public IReadOnlyList<string> Acreditaciones { get; init; } = [];
+
+    /// <summary>Laboratorios de fuera que participaron. Lo normal es ninguno.</summary>
+    public IReadOnlyList<string> Colaboradores { get; init; } = [];
+
+    /// <summary>El IP mayor de sus muestras, como <c>IP54</c>. Vacío si no lleva.</summary>
+    public string GradoIp { get; init; } = "";
+
+    /// <summary>El IK mayor de sus muestras, como <c>IK08</c>. Vacío si no lleva.</summary>
+    public string GradoIk { get; init; } = "";
+
+    /// <summary>
+    /// La norma con la que nació, **ya legible** —«EN IEC 60598‑1:2024 + A11:2024»— y no
+    /// su id. En una columna, el id no le dice nada a nadie; y guardarlo resuelto aquí
+    /// evita que el listado tenga que cargar las plantillas para traducirlo.
+    /// </summary>
+    public string NormaPrincipal { get; init; } = "";
 
     /// <summary>Normas que lleva el servicio, para poder filtrar el calendario por ellas.</summary>
     public IReadOnlyList<string> Normas { get; init; } = [];
@@ -34,6 +72,30 @@ public sealed record ResumenDeProyecto
     /// </summary>
     public int SeccionesCompletadas { get; init; }
     public int SeccionesAplicables { get; init; }
+
+    /// <summary>
+    /// Cómo se encabeza este servicio en el tablero y en el calendario: <c>TECNO260201</c>,
+    /// las once primeras del código de la toma de notas — servicio y número de familia,
+    /// sin la edición del documento.
+    /// <para>
+    /// Vive aquí y no en cada vista para que las dos digan lo mismo. Si el proyecto es
+    /// anterior a que existiera ese código, se cae al de servicio y, en último término, al
+    /// nombre del fichero: una tarjeta sin rótulo no se puede ni señalar.
+    /// </para>
+    /// </summary>
+    public string Rotulo
+    {
+        get
+        {
+            var conFamilia = CodigoDeServicio.ConFamilia(CodigoTomaDeNotas);
+            if (!string.IsNullOrWhiteSpace(conFamilia)) return conFamilia;
+
+            return string.IsNullOrWhiteSpace(CodigoServicio) ? Nombre : CodigoServicio;
+        }
+    }
+
+    /// <summary>Cómo lo declara la plantilla. Se lee del almacén general, como partes ‑2.</summary>
+    public const string CampoDeAcreditacion = "acreditacion";
 
     /// <summary>Motivo por el que no se pudo leer. Si tiene valor, el resto no es fiable.</summary>
     public string? Error { get; init; }
@@ -103,8 +165,16 @@ public static class AnalizadorDeProyectos
         {
             Ruta = ruta,
             Nombre = Path.GetFileNameWithoutExtension(ruta),
+            CodigoTomaDeNotas = datos.CodigoTomaDeNotas,
             CodigoServicio = datos.CodigoServicio,
             Tecnico = datos.Tecnico1 ?? "",
+            Tecnico2 = datos.Tecnico2 ?? "",
+            Acreditaciones = [.. datos.Seleccion(ResumenDeProyecto.CampoDeAcreditacion)
+                                     .OrderBy(a => a, StringComparer.CurrentCulture)],
+            Colaboradores = [.. datos.Colaboradores.Where(c => c.TieneAlgo).Select(c => c.Laboratorio.Trim())],
+            GradoIp = GradosDelServicio.IpMaximo(datos),
+            GradoIk = GradosDelServicio.IkMaximo(datos),
+            NormaPrincipal = ordenadas[0].Meta.ComoSeLlamaLaNorma,
             NumeroMuestras = datos.NumeroMuestras,
             Modificado = modificado,
             Normas = [.. datos.Normas.OrderBy(n => n)],
@@ -131,8 +201,10 @@ public static class AnalizadorDeProyectos
             var aplicables = estados.Count(e => e != EstadoApartado.NoAplica);
             if (aplicables == 0) continue;
 
+            // Un apartado empezado sigue contando como pendiente: al tablero le importa
+            // lo que queda por hacer, y a medias no está hecho.
             yield return new SeccionPendiente(
-                seccion.Titulo, estados.Count(e => e == EstadoApartado.FaltanDatos), aplicables);
+                seccion.Titulo, estados.Count(EstadoDeApartado.EstaPendiente), aplicables);
         }
     }
 

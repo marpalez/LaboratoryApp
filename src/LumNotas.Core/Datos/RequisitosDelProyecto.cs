@@ -51,7 +51,14 @@ public static class RequisitosDelProyecto
 
     private static bool TieneValor(Campo campo, DatosProyecto datos) => campo.Id switch
     {
-        // Los dos campos que no viven en el almacén general.
+        // Los campos que no viven en el almacén general.
+
+        // No basta con que tenga algo escrito: se exige entero (2026‑08‑06). Es la misma
+        // regla que el alta, y por el mismo motivo — de él salen el código de servicio, el
+        // identificador de las muestras y el nombre del fichero. Aquí solo esconde los
+        // apartados de ensayo; **guardar se sigue pudiendo**, o un proyecto anterior a la
+        // regla se quedaría atrapado sin poder escribirse en disco.
+        "codigoTomaDeNotas" => CodigoDeServicio.EstaCompleto(datos.CodigoTomaDeNotas),
         "codigoServicio" => !string.IsNullOrWhiteSpace(datos.CodigoServicio)
                             && datos.CodigoServicio != CodigoSinAsignar,
         "numeroMuestras" => datos.NumeroMuestras >= 1,

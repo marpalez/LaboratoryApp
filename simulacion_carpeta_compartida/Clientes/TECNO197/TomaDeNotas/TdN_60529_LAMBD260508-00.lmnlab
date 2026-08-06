@@ -1,0 +1,271 @@
+{
+  "formato": "lmnlab/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-06T14:53:15.8427744+02:00",
+  "codigoTomaDeNotas": "LAMBD260508-00",
+  "colaboradores": [],
+  "codigoServicio": "LAMBD2605",
+  "numeroMuestras": 4,
+  "normas": [
+    "60529_2018"
+  ],
+  "normaPrincipal": "60529_2018",
+  "patronIdentificador": "EBP_SAFE{codigoServicio}",
+  "planificacion": {
+    "inicio": "2026-05-29T00:00:00",
+    "fin": "2026-06-10T00:00:00",
+    "estado": "pendienteCliente",
+    "archivado": true,
+    "importe": 4070,
+    "fechasBloqueadas": false
+  },
+  "selecciones": {
+    "acreditacion": [
+      "ENAC"
+    ]
+  },
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Mario Madrigal"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico2",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Raúl González"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ta",
+      "muestra": 0,
+      "tipo": "numero",
+      "valor": "55"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "luminariaOrdinaria",
+      "muestra": 1,
+      "tipo": "bool",
+      "valor": "false"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipPrimeraCifra",
+      "muestra": 1,
+      "tipo": "texto",
+      "valor": "IP2X"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipSegundaCifra",
+      "muestra": 1,
+      "tipo": "texto",
+      "valor": "IPX3"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "luminariaOrdinaria",
+      "muestra": 2,
+      "tipo": "bool",
+      "valor": "false"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipPrimeraCifra",
+      "muestra": 2,
+      "tipo": "texto",
+      "valor": "IP5X"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipSegundaCifra",
+      "muestra": 2,
+      "tipo": "texto",
+      "valor": "IPX4"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "luminariaOrdinaria",
+      "muestra": 4,
+      "tipo": "bool",
+      "valor": "false"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipPrimeraCifra",
+      "muestra": 4,
+      "tipo": "texto",
+      "valor": "IP4X"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipSegundaCifra",
+      "muestra": 4,
+      "tipo": "texto",
+      "valor": "IPX8"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipSegundaCifra",
+      "muestra": 3,
+      "tipo": "texto",
+      "valor": "IPX5"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "temperaturaInmersion",
+      "muestra": 0,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipPrimeraCifra",
+      "muestra": 3,
+      "tipo": "texto",
+      "valor": "IP4X"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "profundidadInmersion",
+      "muestra": 0,
+      "tipo": "numero",
+      "valor": "2"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tiempoInmersion",
+      "muestra": 0,
+      "tipo": "numero",
+      "valor": "30"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].alto",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "50"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].ancho",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "50"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].profundo",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "50"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].peso",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "2"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].alto",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "20"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].ancho",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "20"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].profundo",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "20"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].peso",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "2"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].alto",
+      "muestra": 3,
+      "tipo": "numero",
+      "valor": "10"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].ancho",
+      "muestra": 3,
+      "tipo": "numero",
+      "valor": "10"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].profundo",
+      "muestra": 3,
+      "tipo": "numero",
+      "valor": "10"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].peso",
+      "muestra": 3,
+      "tipo": "numero",
+      "valor": "2"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].alto",
+      "muestra": 4,
+      "tipo": "numero",
+      "valor": "303"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].ancho",
+      "muestra": 4,
+      "tipo": "numero",
+      "valor": "30"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].profundo",
+      "muestra": 4,
+      "tipo": "numero",
+      "valor": "30"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "tamano[0].peso",
+      "muestra": 4,
+      "tipo": "numero",
+      "valor": "30"
+    },
+    {
+      "ambito": "60529.generales",
+      "campo": "comentarios",
+      "muestra": 0,
+      "tipo": "nulo"
+    }
+  ],
+  "na": [],
+  "checklists": []
+}

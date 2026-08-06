@@ -38,13 +38,21 @@
             </StackPanel>
         </Grid>
 
-        <Grid Margin="0,-8,0,14">
+        <Grid Margin="0,-8,0,10">
             <TextBlock x:Name="Semana" Foreground="#6B7280" FontSize="11" VerticalAlignment="Center"/>
             <!-- Sin fechas, el servicio vuelve a la banda de pendientes de planificar -->
             <Button x:Name="BotonQuitarFechas" Content="Quitar fechas" Click="AlQuitarFechas"
                     HorizontalAlignment="Right" Padding="10,3" FontSize="11" Cursor="Hand"
                     ToolTip="Deja el servicio como pendiente de planificar"/>
         </Grid>
+
+        <!-- Lo comprometido con el cliente se blinda: en el calendario se planifica
+             arrastrando, y un roce con el ratón mueve un trabajo sin que nadie se entere. -->
+        <CheckBox x:Name="Bloquear" Content="Bloquear fechas" Click="AlBloquear"
+                  Margin="0,0,0,4" Cursor="Hand"
+                  ToolTip="Impide cambiarlas aquí, arrastrando la tarjeta y al recolocar un trabajo agrupado"/>
+        <TextBlock Text="Con el candado puesto, estas fechas no las mueve nadie: ni este diálogo, ni el arrastre, ni la cadena de un trabajo agrupado."
+                   Foreground="#9CA3AF" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,14"/>
 
         <Grid Margin="0,0,0,16">
             <Grid.ColumnDefinitions>

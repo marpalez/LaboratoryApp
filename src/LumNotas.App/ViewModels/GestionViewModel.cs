@@ -29,6 +29,9 @@ public sealed class GestionViewModel : ObservableObject
     private string _estado = FiltroDeEstado.EnDesarrollo;
     private string _tecnico = Cualquiera;
     private string _norma = Cualquiera;
+    private string _ip = Cualquiera;
+    private string _ik = Cualquiera;
+    private string _acreditacion = Cualquiera;
 
     /// <summary>Lo último que se leyó del disco, sin filtrar. Filtrar no vuelve a escanear.</summary>
     private IReadOnlyList<ResumenDeProyecto> _ultimos = [];
@@ -41,11 +44,13 @@ public sealed class GestionViewModel : ObservableObject
         _repositorio = repositorio;
         _explorador = new ExploradorDeProyectos(repositorio);
         Calendario = new CalendarioViewModel(Planificar, ruta => AbrirProyecto?.Invoke(ruta), Guardar);
+        Bbdd.Abrir = ruta => AbrirProyecto?.Invoke(ruta);
 
         Refrescar = new Comando(Explorar);
         VerTablero = new Comando(() => VistaActual = Vista.Tablero);
         VerCalendario = new Comando(() => VistaActual = Vista.Calendario);
         VerCarga = new Comando(() => VistaActual = Vista.Carga);
+        VerBbdd = new Comando(() => VistaActual = Vista.Bbdd);
         ElegirCarpeta = new Comando(() =>
         {
             var elegida = PedirCarpeta?.Invoke(Carpeta);
@@ -56,13 +61,20 @@ public sealed class GestionViewModel : ObservableObject
         if (!string.IsNullOrWhiteSpace(Carpeta)) Explorar();
     }
 
-    public ObservableCollection<ResumenDeProyecto> Proyectos { get; } = [];
+    /// <summary>
+    /// Lo que enseña el tablero. En bloque y no elemento a elemento: con 250 proyectos, un
+    /// aviso por cada uno costaba más de un segundo de ventana congelada.
+    /// </summary>
+    public ColeccionEnBloque<ResumenDeProyecto> Proyectos { get; } = [];
 
     /// <summary>La otra vista de los mismos proyectos: la línea de tiempo.</summary>
     public CalendarioViewModel Calendario { get; }
 
     /// <summary>Y la tercera: cuánta carga soporta cada técnico cada mes.</summary>
     public CargaViewModel Carga { get; } = new();
+
+    /// <summary>Y la cuarta: el listado de todo, para buscar un servicio de hace meses.</summary>
+    public BbddViewModel Bbdd { get; } = new();
 
     /// <summary>Abrir un proyecto en una pestaña; lo resuelve la ventana.</summary>
     public Action<string>? AbrirProyecto { get; set; }
@@ -115,23 +127,28 @@ public sealed class GestionViewModel : ObservableObject
             Notificar(nameof(VistaTablero));
             Notificar(nameof(VistaCalendario));
             Notificar(nameof(VistaCarga));
+            Notificar(nameof(VistaBbdd));
         }
     }
 
     public bool VistaTablero => _vista == Vista.Tablero;
     public bool VistaCalendario => _vista == Vista.Calendario;
     public bool VistaCarga => _vista == Vista.Carga;
+    public bool VistaBbdd => _vista == Vista.Bbdd;
 
     public Comando VerTablero { get; }
     public Comando VerCalendario { get; }
     public Comando VerCarga { get; }
+    public Comando VerBbdd { get; }
 
     /// <summary>Abre el diálogo de planificación de un servicio y guarda lo que se decida.</summary>
     private void Planificar(ResumenDeProyecto proyecto)
     {
         if (PedirPlanificacion is null) return;
 
-        var titulo = string.IsNullOrWhiteSpace(proyecto.CodigoServicio) ? proyecto.Nombre : proyecto.CodigoServicio;
+        // El mismo rótulo que en el tablero y el calendario: el diálogo se abre desde
+        // ellos, y que la ventana se llame de otra forma hace dudar de si es el mismo.
+        var titulo = proyecto.Rotulo;
         if (PedirPlanificacion(titulo, proyecto.Planificacion.Copia()) is { } nueva) Guardar(proyecto, nueva);
     }
 
@@ -141,10 +158,23 @@ public sealed class GestionViewModel : ObservableObject
     /// esté editando otro técnico. Lo usan el diálogo y el arrastre de las barras.
     /// </summary>
     private void Guardar(ResumenDeProyecto proyecto, Planificacion nueva)
+        => Guardar([(proyecto, nueva)]);
+
+    /// <summary>
+    /// Guarda de una vez todo lo que ha cambiado un mismo gesto. El arrastre de un trabajo
+    /// enlazado mueve varias familias a la vez, y escribirlas una a una haría que la cadena
+    /// se recolocara contra datos a medio guardar — peleándose consigo misma.
+    /// </summary>
+    private void Guardar(IReadOnlyList<(ResumenDeProyecto Proyecto, Planificacion Plan)> cambios)
     {
+        if (cambios.Count == 0) return;
+
+        Aviso = "";
+
         try
         {
-            _repositorio.ActualizarPlanificacion(proyecto.Ruta, nueva);
+            foreach (var (proyecto, plan) in cambios)
+                _repositorio.ActualizarPlanificacion(proyecto.Ruta, plan);
         }
         catch (Exception ex)
         {
@@ -152,10 +182,81 @@ public sealed class GestionViewModel : ObservableObject
             return;
         }
 
-        // No hace falta vaciar la caché: el fichero acaba de cambiar de fecha, así que
-        // solo ese se relee. Tirarla entera obligaría a releer cientos por uno.
+        // Un solo cambio es alguien tecleando; varios de golpe son un arrastre, que mueve
+        // el trabajo entero sin cambiar el orden. Solo en el primer caso hay una «recién
+        // editada» que deba ganar los empates de fecha.
+        Recolocar(cambios, editada: cambios.Count == 1 ? cambios[0].Proyecto : null);
+
+        // No hace falta vaciar la caché: los ficheros acaban de cambiar de fecha, así que
+        // solo esos se releen. Tirarla entera obligaría a releer cientos por uno.
         Explorar();
     }
+
+    /// <summary>
+    /// Pone en fila el trabajo cuando se guarda una toma de notas enlazada (DD‑123): cada
+    /// una empieza al día siguiente de que acabe la anterior, y el orden lo dan las fechas
+    /// de inicio.
+    /// <para>
+    /// <b>Escribe en ficheros que nadie ha abierto</b>, así que se dice: el aviso nombra las
+    /// que se han movido. Que el programa recoloque por su cuenta y en silencio sería la
+    /// forma más rápida de que nadie se fíe del calendario.
+    /// </para>
+    /// </summary>
+    private void Recolocar(
+        IReadOnlyList<(ResumenDeProyecto Proyecto, Planificacion Plan)> cambios,
+        ResumenDeProyecto? editada)
+    {
+        var grupo = cambios.Select(c => c.Plan.Grupo).FirstOrDefault(g => !string.IsNullOrWhiteSpace(g));
+        if (grupo is null) return;
+
+        // Lo del último escaneo es de antes de guardar, así que se le aplica encima lo que
+        // se acaba de escribir.
+        var reciente = cambios.ToDictionary(c => c.Proyecto.Ruta, c => c.Plan, StringComparer.OrdinalIgnoreCase);
+
+        var miembros = _ultimos
+            .Select(m => reciente.TryGetValue(m.Ruta, out var plan) ? m with { Planificacion = plan } : m)
+            .Where(m => EnlaceDeTomasDeNotas.EsElMismoGrupo(m.Planificacion.Grupo, grupo))
+            .ToList();
+
+        if (miembros.Count < 2) return;
+
+        var suya = editada is null ? null : miembros.FirstOrDefault(m => m.Ruta == editada.Ruta);
+        var movidas = new List<string>();
+
+        foreach (var (otro, plan) in CadenaDelGrupo.Recolocar(miembros, suya, DateTime.Today))
+        {
+            try
+            {
+                _repositorio.ActualizarPlanificacion(otro.Ruta, plan);
+                movidas.Add(otro.Rotulo);
+            }
+            catch (Exception ex)
+            {
+                Mensaje = $"No se pudo recolocar «{otro.Rotulo}»: {ex.Message}";
+                return;
+            }
+        }
+
+        if (movidas.Count > 0)
+            Aviso = $"Se {(movidas.Count == 1 ? "ha recolocado" : "han recolocado")} " +
+                    $"{string.Join(", ", movidas)}: cada toma de notas del trabajo empieza al " +
+                    "día siguiente de que acabe la anterior.";
+    }
+
+    private string _aviso = "";
+
+    /// <summary>
+    /// Lo que el programa ha hecho por su cuenta en ficheros que nadie había abierto. Va
+    /// aparte de <see cref="Mensaje"/> porque el escaneo lo pisaría al terminar de leer, y
+    /// entonces nadie se enteraría de que se le han movido fechas a tres tomas de notas.
+    /// </summary>
+    public string Aviso
+    {
+        get => _aviso;
+        private set { if (Establecer(ref _aviso, value)) Notificar(nameof(HayAviso)); }
+    }
+
+    public bool HayAviso => !string.IsNullOrWhiteSpace(Aviso);
 
     // ---- como pestaña ------------------------------------------------------
 
@@ -247,7 +348,7 @@ public sealed class GestionViewModel : ObservableObject
     public string Estado
     {
         get => _estado;
-        set { if (Establecer(ref _estado, value)) Repartir(reencuadrar: true); }
+        set { if (Establecer(ref _estado, value)) TrasFiltrar(); }
     }
 
     /// <summary>Técnicos y normas que hay en los proyectos, con «(todos)» al principio.</summary>
@@ -262,17 +363,156 @@ public sealed class GestionViewModel : ObservableObject
     public string Tecnico
     {
         get => _tecnico;
-        set { if (Establecer(ref _tecnico, value)) Repartir(reencuadrar: true); }
+        set { if (Establecer(ref _tecnico, value)) TrasFiltrar(); }
     }
 
     public string Norma
     {
         get => _norma;
-        set { if (Establecer(ref _norma, value)) Repartir(reencuadrar: true); }
+        set { if (Establecer(ref _norma, value)) TrasFiltrar(); }
     }
 
+    /// <summary>
+    /// Grado IP, grado IK y acreditación. Estaban solo en la BBDD, y eran igual de útiles
+    /// en las otras tres: «los IP65 que están en marcha» es una pregunta de tablero. Los
+    /// datos ya estaban leídos, así que traerlos aquí no cuesta un solo fichero más.
+    /// </summary>
+    public string Ip
+    {
+        get => _ip;
+        set { if (Establecer(ref _ip, value)) TrasFiltrar(); }
+    }
+
+    public string Ik
+    {
+        get => _ik;
+        set { if (Establecer(ref _ik, value)) TrasFiltrar(); }
+    }
+
+    public string Acreditacion
+    {
+        get => _acreditacion;
+        set { if (Establecer(ref _acreditacion, value)) TrasFiltrar(); }
+    }
+
+    /// <summary>Lo que ofrecen los tres desplegables, según lo que haya en los proyectos.</summary>
+    public ObservableCollection<string> OpcionesIp { get; } = [Cualquiera];
+    public ObservableCollection<string> OpcionesIk { get; } = [Cualquiera];
+    public ObservableCollection<string> OpcionesAcreditacion { get; } = [Cualquiera];
+
+    private string _busqueda = "";
+
+    /// <summary>
+    /// La caja de buscar del tablero, el calendario y la carga. Busca en lo mismo que la
+    /// del listado —código, técnicos, norma, acreditación, colaboradores— porque quien
+    /// recuerda un servicio no sabe por qué dato lo recuerda.
+    /// <para>
+    /// <b>Es un filtro más</b>, no una vista aparte: se suma a estado, técnico y norma en
+    /// vez de sustituirlos. Buscar «antar» con «En desarrollo» puesto enseña los de
+    /// Antares que están en marcha, que es lo que se pregunta desde el tablero. Para
+    /// buscar entre todo, incluido lo archivado, está la BBDD.
+    /// </para>
+    /// <para>
+    /// La caja va a la vista, y por eso no cuenta en el rótulo «Filtros (2)»: ese número
+    /// avisa de lo que aparta trabajo <b>sin verse</b>, y esto se está viendo.
+    /// </para>
+    /// </summary>
+    public string Busqueda
+    {
+        get => _busqueda;
+        set { if (Establecer(ref _busqueda, value ?? "")) TrasFiltrar(); }
+    }
+
+    private DateTime? _desde;
+    private DateTime? _hasta;
+
+    /// <summary>
+    /// Periodo de ensayo, para responder «¿qué se hizo en el primer trimestre?». Se compara
+    /// contra las fechas que la toma de notas apuntó sola al darse por terminada, así que
+    /// solo encuentra servicios cerrados — que es justo lo que se busca al preguntar por un
+    /// periodo pasado.
+    /// </summary>
+    public DateTime? Desde
+    {
+        get => _desde;
+        set { if (Establecer(ref _desde, value)) TrasFiltrar(); }
+    }
+
+    public DateTime? Hasta
+    {
+        get => _hasta;
+        set { if (Establecer(ref _hasta, value)) TrasFiltrar(); }
+    }
+
+    /// <summary>Todos los filtros y la búsqueda, tal y como están ahora mismo.</summary>
+    private FiltrosDeGestion Filtros => new()
+    {
+        Estado = Estado,
+        Tecnico = Tecnico,
+        Norma = Norma,
+        Ip = Ip,
+        Ik = Ik,
+        Acreditacion = Acreditacion,
+        Texto = Busqueda,
+        Desde = Desde,
+        Hasta = Hasta
+    };
+
     /// <summary>Lo que se ofrece cuando no se quiere filtrar por eso.</summary>
-    public const string Cualquiera = "(todos)";
+    public const string Cualquiera = ResumenDeFiltros.Cualquiera;
+
+    // ---- lo que delata el botón de filtros ---------------------------------
+    //
+    // Los tres filtros viven dentro de un diálogo, así que desde la barra no se ve qué
+    // hay puesto. Sin esto, alguien mira el tablero, no encuentra su servicio y cree que
+    // se ha perdido —cuando lo que hay es un técnico elegido la semana pasada.
+
+    /// <summary>«Filtros», o «Filtros (2)» cuando alguno está apartando trabajo.</summary>
+    public string RotuloFiltros => ResumenDeFiltros.Rotulo(Filtros);
+
+    /// <summary>Si hay que destacar el botón por estar filtrando.</summary>
+    public bool HayFiltros => ResumenDeFiltros.Cuantos(Filtros) > 0;
+
+    /// <summary>Qué se está viendo, para el consejo emergente y la línea de estado.</summary>
+    public string DetalleFiltros => ResumenDeFiltros.Detalle(Filtros);
+
+    /// <summary>
+    /// Deja los filtros como al abrir el programa. <b>La caja de buscar también</b>: quien
+    /// pulsa «Quitar filtros» quiere volver a verlo todo, y dejarle un texto escondiendo
+    /// media carpeta sería justo lo que venía a arreglar.
+    /// </summary>
+    public void QuitarFiltros()
+    {
+        _estado = FiltroDeEstado.EnDesarrollo;
+        _tecnico = Cualquiera;
+        _norma = Cualquiera;
+        _ip = Cualquiera;
+        _ik = Cualquiera;
+        _acreditacion = Cualquiera;
+        _busqueda = "";
+        _desde = null;
+        _hasta = null;
+
+        Notificar(nameof(Estado));
+        Notificar(nameof(Tecnico));
+        Notificar(nameof(Norma));
+        Notificar(nameof(Ip));
+        Notificar(nameof(Ik));
+        Notificar(nameof(Acreditacion));
+        Notificar(nameof(Busqueda));
+        Notificar(nameof(Desde));
+        Notificar(nameof(Hasta));
+        TrasFiltrar();
+    }
+
+    /// <summary>Refiltra y refresca lo que enseña el botón. Los tres pasan por aquí.</summary>
+    private void TrasFiltrar()
+    {
+        Repartir(reencuadrar: true);
+        Notificar(nameof(RotuloFiltros));
+        Notificar(nameof(HayFiltros));
+        Notificar(nameof(DetalleFiltros));
+    }
 
     public string Mensaje
     {
@@ -305,9 +545,10 @@ public sealed class GestionViewModel : ObservableObject
         if (!HayCarpeta)
         {
             _ultimos = [];
-            Proyectos.Clear();
+            Proyectos.Vaciar();
             Calendario.Cargar([]);
             Carga.Cargar([]);
+            Bbdd.Cargar([]);
             Mensaje = "Elige la carpeta donde el laboratorio guarda los proyectos.";
             return;
         }
@@ -358,6 +599,10 @@ public sealed class GestionViewModel : ObservableObject
         Rellenar(Tecnicos, todos.Select(p => p.Tecnico), ref _tecnico, nameof(Tecnico),
                  CargaPorTecnico.SinTecnico);
         Rellenar(Normas, todos.SelectMany(p => p.Normas), ref _norma, nameof(Norma));
+        Rellenar(OpcionesIp, todos.Select(p => p.GradoIp), ref _ip, nameof(Ip));
+        Rellenar(OpcionesIk, todos.Select(p => p.GradoIk), ref _ik, nameof(Ik));
+        Rellenar(OpcionesAcreditacion, todos.SelectMany(p => p.Acreditaciones),
+                 ref _acreditacion, nameof(Acreditacion));
 
         Repartir(reencuadrar: false);
         AlExplorar?.Invoke();
@@ -375,41 +620,42 @@ public sealed class GestionViewModel : ObservableObject
     /// </param>
     private void Repartir(bool reencuadrar)
     {
-        var visibles = _ultimos.Where(Pasa).ToList();
+        var filtros = Filtros;
+        var visibles = _ultimos.Where(filtros.Pasa).ToList();
 
         Calendario.Cargar(visibles, reencuadrar);
         Carga.Cargar(visibles);
 
-        Proyectos.Clear();
-        foreach (var proyecto in visibles) Proyectos.Add(proyecto);
+        // El listado recibe lo mismo que las otras tres. Antes recibía todo, saltándose el
+        // filtro; ahora los filtros son un solo juego para las cuatro vistas, y eso
+        // incluye el estado: para buscar algo archivado hay que poner «Estado» en
+        // «(todos)», y el botón lo dice sin abrirlo.
+        Bbdd.Cargar(visibles);
+        Proyectos.Reemplazar(visibles);
 
-        var ocultos = _ultimos.Count - visibles.Count;
-
-        Mensaje = _ultimos.Count == 0
-            ? $"No hay proyectos en {Carpeta}"
-            : $"{visibles.Count} proyecto{(visibles.Count == 1 ? "" : "s")}"
-              + (ocultos == 0 ? "" : $" · {ocultos} fuera del filtro")
-              + $" · leídos en {_leidoEn.TotalSeconds:0.0} s"
-              + $" · actualizado a las {DateTime.Now:HH:mm}";
+        _visibles = visibles.Count;
+        _actualizadoA = DateTime.Now;
+        Mensaje = ResumenDeLoLeido();
     }
 
-    private bool Pasa(ResumenDeProyecto proyecto)
-    {
-        if (!FiltroDeEstado.Pasa(proyecto.Planificacion, Estado)) return false;
-
-        if (Tecnico != Cualquiera && !EsSuyo(proyecto)) return false;
-
-        return Norma == Cualquiera || proyecto.Normas.Contains(Norma);
-    }
+    private int _visibles;
+    private DateTime _actualizadoA;
 
     /// <summary>
-    /// Si el servicio lo lleva el técnico elegido. <b>«(sin técnico)» es una opción más</b>:
-    /// pedirlo enseña justo los que están sin asignar, que es lo que hay que repartir.
+    /// La línea de estado de debajo de la barra. Vale igual para las cuatro vistas: desde
+    /// que los filtros son un solo juego, todas enseñan lo mismo.
     /// </summary>
-    private bool EsSuyo(ResumenDeProyecto proyecto)
-        => Tecnico == CargaPorTecnico.SinTecnico
-            ? string.IsNullOrWhiteSpace(proyecto.Tecnico)
-            : string.Equals(proyecto.Tecnico, Tecnico, StringComparison.CurrentCultureIgnoreCase);
+    private string ResumenDeLoLeido()
+    {
+        if (_ultimos.Count == 0) return $"No hay proyectos en {Carpeta}";
+
+        var ocultos = _ultimos.Count - _visibles;
+
+        return $"{_visibles} proyecto{(_visibles == 1 ? "" : "s")}"
+               + (ocultos == 0 ? "" : $" | {ocultos} fuera del filtro")
+               + $" | leídos en {_leidoEn.TotalSeconds:0.0} s"
+               + $" | actualizado a las {_actualizadoA:HH:mm}";
+    }
 
     /// <summary>
     /// Rehace la lista de un desplegable con los valores que hay en los proyectos. Si el
@@ -436,7 +682,12 @@ public sealed class GestionViewModel : ObservableObject
         destino.Add(Cualquiera);
 
         // Al final, después de las personas: es un cajón, no un compañero más.
-        if (etiquetaSiFalta is not null && todos.Any(string.IsNullOrWhiteSpace))
+        //
+        // Y solo si no está ya: desde que el catálogo arranca con «(sin técnico)» dentro,
+        // puede haber proyectos que lo lleven escrito. Sin esta comprobación el
+        // desplegable ofrecía la misma opción dos veces.
+        if (etiquetaSiFalta is not null && todos.Any(string.IsNullOrWhiteSpace)
+            && !lista.Contains(etiquetaSiFalta, StringComparer.CurrentCultureIgnoreCase))
             lista.Add(etiquetaSiFalta);
 
         foreach (var valor in lista) destino.Add(valor);
@@ -458,7 +709,10 @@ public enum Vista
     Calendario,
 
     /// <summary>Si cabe: cuánta carga soporta cada técnico cada mes.</summary>
-    Carga
+    Carga,
+
+    /// <summary>El listado de todo, con buscador. Solo lee.</summary>
+    Bbdd
 }
 
 /// <summary>Ajustes de la aplicación, guardados en el perfil del usuario.</summary>

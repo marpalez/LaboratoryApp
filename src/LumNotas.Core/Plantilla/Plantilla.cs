@@ -127,6 +127,22 @@ public sealed class Meta
     /// </para>
     /// </summary>
     public string? AnioDePublicacion { get; init; }
+    /// <summary>
+    /// Edición de la norma —la 9, la 10—, tal como la declare el laboratorio.
+    /// <para>
+    /// <b>No es el año de publicación</b>, y este programa ya los confundió una vez
+    /// (DD‑101): una norma tiene edición y tiene año, y no van a la par. Lo que identifica
+    /// a la plantilla, y lo que lleva el id, sigue siendo <see cref="AnioDePublicacion"/>;
+    /// la edición <b>solo se enseña</b>, y por eso vive en un campo aparte en vez de
+    /// deducirse de nada.
+    /// </para>
+    /// <para>
+    /// <b>Opcional.</b> La plantilla que no la declare simplemente no la enseña — que es
+    /// mejor que enseñar un «Ed.» suelto sin número detrás.
+    /// </para>
+    /// </summary>
+    public string? Edicion { get; init; }
+
     /// <summary>Nombre con el que la norma se ofrece al técnico. Si falta, se usa el id.</summary>
     public string? Titulo { get; init; }
 
@@ -135,6 +151,28 @@ public sealed class Meta
     /// informe sigue usando el título completo, que es lo que espera un documento.
     /// </summary>
     public string? TituloCorto { get; init; }
+
+    /// <summary>
+    /// La designación de la norma con sus enmiendas: <c>EN IEC 60598-1:2024 + A11:2024</c>.
+    /// <para>
+    /// Es lo que encabeza la toma de notas abierta. Ahí <b>no vale «Luminarias»</b>: el
+    /// laboratorio tiene dos años de la misma norma instalados a la vez y el técnico tiene
+    /// que ver contra cuál está anotando, sin abrir nada más.
+    /// </para>
+    /// <para>
+    /// Se declara aparte y no se recorta del <see cref="Titulo"/> porque la designación la
+    /// fija la norma, no una regla de C# sobre dónde está el guion. Si falta se usa el
+    /// título entero: una plantilla que no la declare sigue funcionando.
+    /// </para>
+    /// </summary>
+    public string? Designacion { get; init; }
+
+    /// <summary>Con qué se encabeza la toma de notas: la designación, o lo que haya.</summary>
+    public string ComoSeLlamaLaNorma
+        => Primero(Designacion, Titulo, TituloCorto, Id);
+
+    private static string Primero(params string?[] candidatos)
+        => candidatos.FirstOrDefault(c => !string.IsNullOrWhiteSpace(c)) ?? "";
 
     /// <summary>
     /// Normas que se pueden añadir a esta en un mismo servicio. Luminarias no admite la
@@ -276,6 +314,13 @@ public sealed class Campo
     public List<Campo> Campos { get; init; } = [];
     public List<string> Opciones { get; init; } = [];
     public bool Multiple { get; init; }
+
+    /// <summary>
+    /// En un campo de varias opciones, la que <b>no admite compañía</b>: marcarla borra
+    /// las demás y marcar cualquier otra la quita. En la acreditación es «Sin acreditar».
+    /// Se declara aquí para que un campo nuevo con la misma forma no tenga que tocar código.
+    /// </summary>
+    public string? OpcionExcluyente { get; init; }
     /// <summary>Para campos derivados: ruta "ambito.campo" de la que se toma el valor.</summary>
     public string? De { get; init; }
     public string? Nota { get; init; }

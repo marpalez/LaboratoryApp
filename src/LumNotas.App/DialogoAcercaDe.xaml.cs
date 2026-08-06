@@ -46,15 +46,21 @@ public partial class DialogoAcercaDe : Window
         else
         {
             Pintar(0xF3, 0xF4, 0xF6, 0xE5, 0xE7, 0xEB);
-            Titulo.Text = "Todavía no hay ninguna versión publicada";
+            Titulo.Text = $"Todavía no hay ninguna versión publicada de {ServicioDeVersion.Nombre}";
             Detalle.Text = ServicioDeVersion.HayCarpetaCompartida
-                ? "Publica esta si es la que debe usar el laboratorio."
+                ? "Publica esta versión si es la que deben utilizar el resto de equipos."
                 : "Elige antes la carpeta de proyectos en «Gestión de proyectos».";
         }
 
         var origen = ServicioDePlantillas.Origen;
-        Normas.Text = string.Join("   ·   ", CatalogoDeNormas.Disponibles(origen.Carpeta)
-            .Select(n => $"{n.TituloCorto} v{PlantillaEnsayos.Cargar(n.Ruta).Meta.Version}"));
+
+        // Una por línea y con su designación completa. Con el nombre corto y todas
+        // seguidas se leía «Luminarias v1.0.0 · Luminarias v1.0.0»: las dos plantillas de
+        // la 60598 eran indistinguibles justo en la ventana que existe para saber qué hay
+        // instalado. La versión sale del catálogo, que ya la trae — cargar las cinco
+        // plantillas enteras solo para leer un número era trabajo de más.
+        Normas.Text = string.Join("\n", CatalogoDeNormas.Disponibles(origen.Carpeta)
+            .Select(n => $"· {n.ComoSeLlama}   (plantilla v{n.Version})"));
 
         OrigenNormas.Text = (origen.EsCompartida ? "De la carpeta del laboratorio: " : "De este equipo: ")
                             + origen.Carpeta;

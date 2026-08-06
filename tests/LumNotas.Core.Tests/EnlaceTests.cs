@@ -20,7 +20,7 @@ public class EnlaceTests
         double? importe = null, int completadas = 0, int aplicables = 10)
         => new()
         {
-            Ruta = $@"C:\clientes\{codigo}.lumproj",
+            Ruta = $@"C:\clientes\{codigo}.lmnlab",
             Nombre = codigo,
             CodigoServicio = codigo,
             SeccionesCompletadas = completadas,
@@ -186,13 +186,13 @@ public class EnlaceTests
             var repositorio = new RepositorioDeProyectos();
             var ruta = Path.Combine(carpeta, "FAM-A" + RepositorioDeProyectos.Extension);
 
-            repositorio.Guardar(new DatosProyecto { CodigoServicio = "FAM-A" }, ruta, "1.0.0");
+            repositorio.Guardar(new DatosProyecto { CodigoTomaDeNotas = "FAM-A01-00", CodigoServicio = "FAM-A" }, ruta, "1.0.0");
             repositorio.ActualizarPlanificacion(ruta, new Planificacion { Grupo = "ANTAR2504" });
 
             Assert.Equal("ANTAR2504", repositorio.LeerPlanificacion(ruta).Grupo);
 
             // El técnico guarda su toma de notas: la planificación se conserva releyéndola.
-            repositorio.Guardar(new DatosProyecto { CodigoServicio = "FAM-A", NumeroMuestras = 3 }, ruta, "1.0.0");
+            repositorio.Guardar(new DatosProyecto { CodigoTomaDeNotas = "FAM-A01-00", CodigoServicio = "FAM-A", NumeroMuestras = 3 }, ruta, "1.0.0");
 
             Assert.Equal("ANTAR2504", repositorio.LeerPlanificacion(ruta).Grupo);
         }

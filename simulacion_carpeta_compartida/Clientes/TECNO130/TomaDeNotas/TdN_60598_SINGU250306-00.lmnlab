@@ -1,0 +1,207 @@
+{
+  "formato": "lmnlab/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-06T14:53:14.9630638+02:00",
+  "codigoTomaDeNotas": "SINGU250306-00",
+  "colaboradores": [],
+  "codigoServicio": "SINGU2503",
+  "numeroMuestras": 2,
+  "normas": [
+    "60598-1_2021",
+    "62031_2020_A11"
+  ],
+  "normaPrincipal": "60598-1_2021",
+  "patronIdentificador": "EBP_SAFE{codigoServicio}",
+  "planificacion": {
+    "inicio": "2025-03-06T00:00:00",
+    "fin": "2025-03-14T00:00:00",
+    "estado": "terminado",
+    "archivado": true,
+    "importe": 2480,
+    "ensayoDesde": "2025-03-06T00:00:00",
+    "ensayoHasta": "2025-03-14T00:00:00",
+    "fechasBloqueadas": false
+  },
+  "selecciones": {
+    "partes2": [
+      "-2-2"
+    ],
+    "acreditacion": [
+      "ENAC"
+    ]
+  },
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Javier Salvador"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "clase",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "II"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico2",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Mario Madrigal"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ta",
+      "muestra": 0,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "luminariaOrdinaria",
+      "muestra": 1,
+      "tipo": "bool",
+      "valor": "true"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipPrimeraCifra",
+      "muestra": 1,
+      "tipo": "texto",
+      "valor": "IP2X"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipSegundaCifra",
+      "muestra": 1,
+      "tipo": "texto",
+      "valor": "IPX0"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "luminariaOrdinaria",
+      "muestra": 2,
+      "tipo": "bool",
+      "valor": "true"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipPrimeraCifra",
+      "muestra": 2,
+      "tipo": "texto",
+      "valor": "IP2X"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipSegundaCifra",
+      "muestra": 2,
+      "tipo": "texto",
+      "valor": "IPX0"
+    },
+    {
+      "ambito": "anexoA",
+      "campo": "ambiente.fecha",
+      "muestra": 0,
+      "tipo": "instante",
+      "valor": "2026-10-10T00:00:00.0000000"
+    },
+    {
+      "ambito": "anexoA",
+      "campo": "medidas[0].vac",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "anexoA",
+      "campo": "medidas[0].vac",
+      "muestra": 2,
+      "tipo": "nulo"
+    },
+    {
+      "ambito": "anexoA",
+      "campo": "medidas[0].vdc",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "anexoA",
+      "campo": "medidas[0].vdc",
+      "muestra": 2,
+      "tipo": "nulo"
+    },
+    {
+      "ambito": "anexoA",
+      "campo": "medidas[0].uout",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "anexoA",
+      "campo": "medidas[0].uout",
+      "muestra": 2,
+      "tipo": "nulo"
+    },
+    {
+      "ambito": "6",
+      "campo": "ambiente.fecha",
+      "muestra": 0,
+      "tipo": "instante",
+      "valor": "2025-10-10T00:00:00.0000000"
+    },
+    {
+      "ambito": "7.4",
+      "campo": "ambiente.fecha",
+      "muestra": 0,
+      "tipo": "instante",
+      "valor": "2026-10-10T00:00:00.0000000"
+    },
+    {
+      "ambito": "7.6.bloque",
+      "campo": "bloque[0].alto",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "50"
+    },
+    {
+      "ambito": "7.6.bloque",
+      "campo": "bloque[0].ancho",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "50"
+    },
+    {
+      "ambito": "7.6.bloque",
+      "campo": "bloque[0].profundo",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "50"
+    },
+    {
+      "ambito": "7.6",
+      "campo": "ambiente.fecha",
+      "muestra": 0,
+      "tipo": "instante",
+      "valor": "2026-10-10T00:00:00.0000000"
+    }
+  ],
+  "na": [],
+  "checklists": [
+    "anexoA/selv/si",
+    "7.4/ensayos/edisonOtro",
+    "7.6.bloque/dimensiones/fabricante",
+    "7.6.cable/seccion/mayorSec5",
+    "7.6/equipos/EQ-SAFE-206",
+    "7.6/equipos/EQ-SAFE-207",
+    "7.6/equipos/EQ-SAFE-311+EQ-SAFE-312+EQ-SAFE-313",
+    "7.6.vena/vena/ok"
+  ]
+}

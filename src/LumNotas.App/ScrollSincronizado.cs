@@ -51,4 +51,47 @@ public static class ScrollSincronizado
         // Por si el maestro ya estaba desplazado cuando se enganchó.
         seguidor.ScrollToHorizontalOffset(maestro.HorizontalOffset);
     }
+
+    // ---- vertical, y en los dos sentidos -----------------------------------
+
+    /// <summary>
+    /// Ata dos <see cref="ScrollViewer"/> por el desplazamiento vertical, <b>en los dos
+    /// sentidos</b>: mueva uno el que mueva —la rueda del ratón sobre los nombres o la
+    /// barra de la derecha—, el otro le sigue.
+    /// <para>
+    /// Lo necesita el calendario desde que la barra horizontal tiene que verse siempre.
+    /// Para eso, quien desplaza en vertical ya no es un solo <c>ScrollViewer</c> que
+    /// envuelva las dos columnas —ahí dentro la barra horizontal quedaba al final del
+    /// contenido, y con veinte proyectos solo asomaba al bajar del todo—, sino uno por
+    /// columna. Y dos columnas que se desplazan por su cuenta se desalinean.
+    /// </para>
+    /// </summary>
+    public static readonly DependencyProperty EnVerticalConProperty = DependencyProperty.RegisterAttached(
+        "EnVerticalCon", typeof(ScrollViewer), typeof(ScrollSincronizado),
+        new PropertyMetadata(null, AlCambiarVertical));
+
+    public static void SetEnVerticalCon(DependencyObject destino, ScrollViewer? valor)
+        => destino.SetValue(EnVerticalConProperty, valor);
+
+    public static ScrollViewer? GetEnVerticalCon(DependencyObject destino)
+        => (ScrollViewer?)destino.GetValue(EnVerticalConProperty);
+
+    private static void AlCambiarVertical(DependencyObject destino, DependencyPropertyChangedEventArgs args)
+    {
+        if (destino is not ScrollViewer uno || args.NewValue is not ScrollViewer otro) return;
+
+        Atar(uno, otro);
+        Atar(otro, uno);
+
+        uno.ScrollToVerticalOffset(otro.VerticalOffset);
+
+        // Solo se escribe si de verdad hay diferencia. Sin esta comprobación, cada uno
+        // contestaría al movimiento del otro y se quedarían rebotando.
+        static void Atar(ScrollViewer origen, ScrollViewer destino)
+            => origen.ScrollChanged += (_, e) =>
+            {
+                if (Math.Abs(destino.VerticalOffset - e.VerticalOffset) > 0.5)
+                    destino.ScrollToVerticalOffset(e.VerticalOffset);
+            };
+    }
 }

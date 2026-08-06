@@ -21,9 +21,23 @@ namespace LumNotas.Core.Gestion;
 /// </summary>
 public static class AltaDeProyecto
 {
-    public const string CampoNombre = "Nombre";
+    public const string CampoNombre = "Código de la toma de notas";
     public const string CampoTecnico = "Técnico 1";
     public const string CampoNorma = "Norma";
+
+    /// <summary>
+    /// Lo que ocupa un código completo: <c>TECNO260201-00</c>. Cinco del cliente, cuatro
+    /// de año y mes, dos de familia, el guion y dos de edición.
+    /// <para>
+    /// <b>Se exige exacto al dar de alta y también en la cabecera</b> (2026‑08‑06). La regla
+    /// vive en <see cref="CodigoDeServicio"/>, junto a las otras dos longitudes que se
+    /// recortan de este mismo código, para que los dos caminos no puedan discrepar.
+    /// </para>
+    /// </summary>
+    public const int LongitudDelCodigo = CodigoDeServicio.LongitudCompleta;
+
+    /// <summary>Si el código está completo. Vacío no lo está.</summary>
+    public static bool CodigoCompleto(string? codigo) => CodigoDeServicio.EstaCompleto(codigo);
 
     /// <summary>
     /// Qué falta para poder crear. <b>Esta lista es corta y tiene que seguir siéndolo</b>:
@@ -40,7 +54,7 @@ public static class AltaDeProyecto
     public static IReadOnlyList<string> Faltan(string? nombre, string? tecnico1, string? norma)
     {
         var faltan = new List<string>();
-        if (string.IsNullOrWhiteSpace(nombre)) faltan.Add(CampoNombre);
+        if (!CodigoCompleto(nombre)) faltan.Add(CampoNombre);
         if (string.IsNullOrWhiteSpace(tecnico1)) faltan.Add(CampoTecnico);
         if (string.IsNullOrWhiteSpace(norma)) faltan.Add(CampoNorma);
         return faltan;
@@ -50,8 +64,13 @@ public static class AltaDeProyecto
         => Faltan(nombre, tecnico1, norma).Count == 0;
 
     /// <summary>
-    /// El proyecto recién nacido: nombre, responsable y, si se ha elegido, la norma con
+    /// El proyecto recién nacido: código, responsable y, si se ha elegido, la norma con
     /// la que va a trabajar. Nada más — ni una muestra, ni una casilla.
+    /// <para>
+    /// Lo que se teclea es el <b>código de la toma de notas</b>, que es lo que da nombre
+    /// al fichero; el de servicio sale de sus nueve primeras
+    /// (<see cref="CodigoDeServicio"/>) y el técnico lo corrige después si hiciera falta.
+    /// </para>
     /// </summary>
     /// <param name="principal">
     /// La norma con la que se va a ensayar, que queda apuntada como principal. El tipo
@@ -64,7 +83,8 @@ public static class AltaDeProyecto
     {
         var datos = new DatosProyecto
         {
-            CodigoServicio = nombre.Trim(),
+            CodigoTomaDeNotas = nombre.Trim(),
+            CodigoServicio = CodigoDeServicio.Derivar(nombre),
             // Una muestra, que es lo que tiene un servicio hasta que se diga otra cosa.
             NumeroMuestras = 1,
             Tecnico1 = tecnico1.Trim()

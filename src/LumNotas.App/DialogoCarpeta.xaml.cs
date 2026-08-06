@@ -59,9 +59,8 @@ public partial class DialogoCarpeta : Window
             Pintar(EstadoProyectos, Verde);
             TituloProyectos.Text = "Carpeta elegida";
 
-            var cuantos = Directory
-                .EnumerateFiles(carpeta, "*" + RepositorioDeProyectos.Extension, SearchOption.AllDirectories)
-                .Count();
+            var cuantos = RepositorioDeProyectos.Patrones
+                .Sum(p => Directory.EnumerateFiles(carpeta, p, SearchOption.AllDirectories).Count());
 
             RutaProyectos.Text = $"{carpeta}\n{cuantos} proyecto{(cuantos == 1 ? "" : "s")} encontrado"
                                  + (cuantos == 1 ? "" : "s");

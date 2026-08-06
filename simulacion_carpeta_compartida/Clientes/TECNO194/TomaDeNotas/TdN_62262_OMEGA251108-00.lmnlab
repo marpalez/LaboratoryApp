@@ -1,0 +1,44 @@
+{
+  "formato": "lmnlab/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-06T14:53:15.8011612+02:00",
+  "codigoTomaDeNotas": "OMEGA251108-00",
+  "colaboradores": [],
+  "codigoServicio": "OMEGA2511",
+  "numeroMuestras": 1,
+  "normas": [
+    "62262_2002_A1"
+  ],
+  "normaPrincipal": "62262_2002_A1",
+  "patronIdentificador": "EBP_CLIM{codigoServicio}",
+  "planificacion": {
+    "inicio": "2025-11-06T00:00:00",
+    "fin": "2025-11-15T00:00:00",
+    "estado": "planificado",
+    "archivado": true,
+    "importe": 3036,
+    "fechasBloqueadas": false
+  },
+  "selecciones": {},
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Daniel Pastor"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico2",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Javier Ibor"
+    }
+  ],
+  "na": [],
+  "checklists": []
+}

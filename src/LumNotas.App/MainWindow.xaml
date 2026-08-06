@@ -4,7 +4,7 @@
         xmlns:vm="clr-namespace:LumNotas.App.ViewModels"
         xmlns:local="clr-namespace:LumNotas.App"
         Title="{Binding Titulo}" Height="820" Width="1280"
-        MinHeight="520" MinWidth="740"
+        MinHeight="520" MinWidth="620"
         FontFamily="Segoe UI" FontSize="13" Background="#F5F6F8">
 
     <Window.Resources>
@@ -12,6 +12,7 @@
         <local:FaltaAColorConverter x:Key="FaltaAColor"/>
         <BooleanToVisibilityConverter x:Key="BoolAVisible"/>
         <local:DesplazamientoAMargen x:Key="Desplazamiento"/>
+        <local:AnchoDelIndice x:Key="AnchoIndice"/>
 
         <!--
             Caja de cartón con las solapas abiertas: «las muestras ya están aquí».
@@ -20,6 +21,10 @@
             tarjeta gris.
         -->
         <Geometry x:Key="IconoCaja">M1,3 H13 V13 H1 Z M1,6.5 H13 M7,3 V6.5</Geometry>
+
+        <!-- Candado: las fechas de este trabajo están blindadas y no las mueve el arrastre.
+             Mismo tamaño y mismo trazo que la caja, para que convivan en la tarjeta. -->
+        <Geometry x:Key="IconoCandado">M2.5,6.5 H11.5 V13 H2.5 Z M4.5,6.5 V4.5 A2.5,2.5 0 0 1 9.5,4.5 V6.5</Geometry>
 
         <!-- Caja de texto obligatoria: borde rojo y más grueso mientras esté vacía -->
         <Style x:Key="Obligatorio" TargetType="TextBox">
@@ -81,7 +86,7 @@
             <Setter Property="BorderBrush" Value="#E5E7EB"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="14"/>
-            <Setter Property="Padding" Value="22,20"/>
+            <Setter Property="Padding" Value="16,16"/>
         </Style>
 
         <!-- Rótulo de zona, con su barrita de color delante -->
@@ -96,6 +101,117 @@
             norma: WPF no redondea un Button, así que la plantilla se rehace sobre un
             Border. Ocupa todo el ancho de su zona porque son una lista, no una rejilla.
         -->
+        <!--
+            El acceso destacado de la zona de gestión: mismo tamaño y misma forma que los
+            demás, pero relleno del verde del laboratorio. Se usa para lo único que aquí
+            no es mirar sino crear, así que tiene que distinguirse de un vistazo.
+        -->
+        <Style x:Key="AccesoGestionPrincipal" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Caja" CornerRadius="10" Padding="12,10"
+                                Background="#0F766E" BorderBrush="#0F766E" BorderThickness="1">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Caja" Property="Background" Value="#115E59"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--
+            El azul de la zona de toma de notas, gemelo del verde de gestión: mismo
+            tamaño, mismo redondeo, mismo gesto. Cada mitad de la portada tiene un solo
+            botón lleno de color, y es el que se pulsa más.
+        -->
+        <Style x:Key="AccesoTomaDeNotasPrincipal" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Caja" CornerRadius="10" Padding="12,10"
+                                Background="#2563EB" BorderBrush="#2563EB" BorderThickness="1">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Caja" Property="Background" Value="#1D4ED8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--
+            Una toma de notas reciente. Se dibuja como fila con caja, no como enlace
+            suelto: son cinco y en fila de texto azul no se distinguía dónde acababa una
+            y empezaba la siguiente. El código manda; la carpeta va debajo y en gris,
+            porque lo que se busca es el servicio, no dónde está.
+        -->
+        <Style x:Key="FilaReciente" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="0,0,12,3"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Caja" CornerRadius="6" Padding="9,4"
+                                Background="#F8FAFC" BorderBrush="#E5E7EB" BorderThickness="1">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Caja" Property="Background" Value="#EFF6FF"/>
+                                <Setter TargetName="Caja" Property="BorderBrush" Value="#BFDBFE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--
+            Elegir norma para empezar. Es una **fila y no una tarjeta cuadrada** desde que
+            el título es la designación entera —«EN IEC 60598-1:2021 + A11:2022»—: en una
+            tarjeta de 118 px eso no cabe de ninguna manera, y ensancharlas dejaba dos por
+            fila y tres filas. En fila caben las cinco, una debajo de otra, y ocupan menos
+            que las dos filas de tarjetas de antes.
+        -->
+        <Style x:Key="FilaNorma" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="0,0,12,5"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Caja" CornerRadius="8" Padding="11,7"
+                                Background="White" BorderBrush="#DBEAFE" BorderThickness="1">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Caja" Property="Background" Value="#EFF6FF"/>
+                                <Setter TargetName="Caja" Property="BorderBrush" Value="#93C5FD"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="AccesoGestion" TargetType="Button">
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -103,7 +219,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Caja" CornerRadius="10" Padding="14,12"
+                        <Border x:Name="Caja" CornerRadius="10" Padding="12,10"
                                 Background="#F0FDFA" BorderBrush="#CCFBF1" BorderThickness="1">
                             <ContentPresenter/>
                         </Border>
@@ -129,14 +245,19 @@
                 desparejas —«IP» estrecha, «Módulos LED» ancha— sin más motivo que la
                 longitud del nombre; con cinco normas eso ya se notaba.
             -->
-            <Setter Property="Width" Value="134"/>
+            <!--
+                El ancho lo manda la ventana mínima, no el gusto: dos tarjetas más sus
+                márgenes tienen que caber en la columna izquierda cuando la ventana está
+                en 620. Cada píxel que se le quite aquí es un píxel menos de mínimo.
+            -->
+            <Setter Property="Width" Value="118"/>
             <Setter Property="Height" Value="96"/>
-            <Setter Property="Margin" Value="0,0,10,10"/>
+            <Setter Property="Margin" Value="0,0,8,8"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Caja" CornerRadius="10" Background="#F8FAFC"
-                                BorderBrush="#E5E7EB" BorderThickness="1" Padding="16,12">
+                                BorderBrush="#E5E7EB" BorderThickness="1" Padding="12,10">
                             <ContentPresenter VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -210,7 +331,11 @@
             </Setter>
         </Style>
 
-        <!-- La barra de un servicio sobre la línea de tiempo. Al pulsarla se planifica. -->
+        <!--
+            La tarjeta de una familia sobre la línea de tiempo. Al pulsarla se planifica.
+            Las esquinas las pone el modelo de vista: entre dos familias del mismo trabajo
+            van a escuadra, para que se lean como un tren y no como pastillas sueltas.
+        -->
         <Style x:Key="BarraPlan" TargetType="Button">
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Height" Value="30"/>
@@ -220,7 +345,8 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Caja" CornerRadius="7" Padding="8,0" ClipToBounds="True"
+                        <Border x:Name="Caja" CornerRadius="{Binding Esquinas}" Padding="8,0"
+                                ClipToBounds="True"
                                 Background="{TemplateBinding Background}">
                             <ContentPresenter VerticalAlignment="Center"/>
                         </Border>
@@ -401,6 +527,134 @@
             </Border>
         </DataTemplate>
 
+        <!--
+            Panel de planificación. Enseña lo que hay en el .lmnlab bajo «planificacion»:
+            fechas, muestras, estado, grupo e importe. Está aquí para no tener que irse a
+            gestión con el ensayo delante.
+
+            NO SALE EN EL INFORME. ExportadorDeInforme no conoce la planificación —cero
+            referencias— y esto no lo cambia: son fechas de gestión y dinero, no datos de
+            ensayo, y no pintan nada en un documento que se firma.
+        -->
+        <DataTemplate DataType="{x:Type vm:PlanificacionViewModel}">
+            <StackPanel>
+                <TextBlock Text="Planificación" FontSize="21" FontWeight="Bold"
+                           Foreground="#111827" Margin="0,0,0,4"/>
+                <TextBlock Text="Lo que dice gestión de este servicio. No se imprime en el informe."
+                           Foreground="#9CA3AF" FontSize="12" Margin="0,0,0,14" TextWrapping="Wrap"/>
+
+                <!-- Sin fichero no hay dónde leer ni dónde escribir -->
+                <Border Background="#F3F4F6" BorderBrush="#D1D5DB" BorderThickness="1" CornerRadius="4"
+                        Padding="12,9" Margin="0,0,0,14"
+                        Visibility="{Binding SinProyecto, Converter={StaticResource BoolAVisible}}">
+                    <TextBlock TextWrapping="Wrap" Foreground="#4B5563"
+                               Text="La toma de notas todavía no se ha guardado. En cuanto tenga fichero, aquí saldrá su planificación."/>
+                </Border>
+
+                <StackPanel Visibility="{Binding HayProyecto, Converter={StaticResource BoolAVisible}}">
+                    <!-- Lo que hay que saber sin buscarlo: retraso, muestras sin llegar, archivado -->
+                    <Border Background="#FEF3C7" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="4"
+                            Padding="12,9" Margin="0,0,0,14"
+                            Visibility="{Binding HayAviso, Converter={StaticResource BoolAVisible}}">
+                        <TextBlock Text="{Binding Aviso}" TextWrapping="Wrap" Foreground="#92400E"
+                                   FontWeight="SemiBold"/>
+                    </Border>
+
+                    <Border Background="#FEE2E2" BorderBrush="#DC2626" BorderThickness="1" CornerRadius="4"
+                            Padding="12,9" Margin="0,0,0,14"
+                            Visibility="{Binding HayMensaje, Converter={StaticResource BoolAVisible}}">
+                        <TextBlock Text="{Binding Mensaje}" TextWrapping="Wrap" Foreground="#991B1B"/>
+                    </Border>
+
+                    <Border Style="{StaticResource Tarjeta}">
+                        <StackPanel>
+                            <TextBlock Text="Fechas" FontWeight="Bold" FontSize="15"
+                                       Foreground="#1F2937" Margin="0,0,0,10"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="Inicio" Margin="0,0,0,8" Foreground="#374151"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Inicio}" Margin="0,0,0,8"
+                                           FontWeight="SemiBold" Foreground="#111827"/>
+
+                                <TextBlock Grid.Row="1" Text="Fin" Margin="0,0,0,8" Foreground="#374151"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Fin}" Margin="0,0,0,8"
+                                           FontWeight="SemiBold" Foreground="#111827"/>
+
+                                <TextBlock Grid.Row="2" Text="Recepción de muestras" Foreground="#374151"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RecepcionMuestras}"
+                                           FontWeight="SemiBold" Foreground="#111827"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Tarjeta}">
+                        <StackPanel>
+                            <TextBlock Text="Estado del servicio" FontWeight="Bold" FontSize="15"
+                                       Foreground="#1F2937" Margin="0,0,0,4"/>
+                            <!-- Lo único que se edita aquí. Se escribe en el fichero al
+                                 elegirlo, igual que desde el calendario. -->
+                            <TextBlock Text="Se guarda al elegirlo. Lo demás se cambia en «Planificar»."
+                                       Foreground="#9CA3AF" FontSize="11" Margin="0,0,0,10"
+                                       TextWrapping="Wrap"/>
+                            <ComboBox ItemsSource="{Binding Estados}" SelectedItem="{Binding EstadoElegido}"
+                                      Width="220" HorizontalAlignment="Left" Padding="6,5"/>
+
+                            <Grid Margin="0,14,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="Archivado" Margin="0,0,0,8" Foreground="#374151"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Archivado}" Margin="0,0,0,8"
+                                           FontWeight="SemiBold" Foreground="#111827"/>
+
+                                <TextBlock Grid.Row="1" Text="Importe de la oferta" Margin="0,0,0,8"
+                                           Foreground="#374151"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Importe}" Margin="0,0,0,8"
+                                           FontWeight="SemiBold" Foreground="#111827"/>
+
+                                <!-- El grupo solo si lo hay: la mayoría de servicios no van enlazados -->
+                                <TextBlock Grid.Row="2" Text="Trabajo (agrupación)" Foreground="#374151"
+                                           Visibility="{Binding HayGrupo, Converter={StaticResource BoolAVisible}}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Grupo}"
+                                           FontWeight="SemiBold" Foreground="#111827"
+                                           Visibility="{Binding HayGrupo, Converter={StaticResource BoolAVisible}}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <!-- Al calendario, buscando las once primeras del código: el mismo
+                             rótulo con el que el calendario dibuja cada barra. -->
+                        <Button Content="Ver en el calendario"
+                                Command="{Binding VerEnCalendario}"
+                                Padding="16,8" Cursor="Hand" Margin="0,0,10,0"
+                                Background="#0F766E" Foreground="White" BorderThickness="0"
+                                ToolTip="Abre gestión en el calendario buscando este servicio"/>
+
+                        <Button Content="Planificar" Command="{Binding Planificar}"
+                                Padding="16,8" Cursor="Hand"
+                                ToolTip="Cambiar fechas, importe y agrupación"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+
         <!-- Panel de cabecera del proyecto -->
         <DataTemplate DataType="{x:Type vm:ProyectoViewModel}">
             <StackPanel>
@@ -426,57 +680,78 @@
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition/><RowDefinition/><RowDefinition/>
-                                <RowDefinition/><RowDefinition/><RowDefinition/>
+                                <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
                             </Grid.RowDefinitions>
-                            <TextBlock Text="Código de servicio *" VerticalAlignment="Center" Margin="0,4"
+
+                            <!-- El que da nombre al fichero. Va el primero porque es el que
+                                 se teclea: el de servicio sale solo de sus nueve primeras. -->
+                            <TextBlock Text="Código de la toma de notas *" VerticalAlignment="Top" Margin="0,9,0,4"
+                                       TextWrapping="Wrap"
+                                       Foreground="{Binding FaltaCodigoTomaDeNotas, Converter={StaticResource FaltaAColor},
+                                                    ConverterParameter=#111827}"/>
+                            <StackPanel Grid.Column="1" Margin="0,4">
+                                <TextBox Width="240" HorizontalAlignment="Left"
+                                         Style="{StaticResource Obligatorio}"
+                                         Text="{Binding CodigoTomaDeNotas, UpdateSourceTrigger=LostFocus}"
+                                         BorderBrush="{Binding FaltaCodigoTomaDeNotas, Converter={StaticResource FaltaAColor}}"/>
+                                <TextBlock Text="Ejemplo: TECNO260201-00" FontSize="11" Foreground="#9CA3AF"
+                                           Margin="0,3,0,0"/>
+                            </StackPanel>
+
+                            <TextBlock Grid.Row="1" Text="Código de servicio *" VerticalAlignment="Top" Margin="0,9,0,4"
+                                       TextWrapping="Wrap"
                                        Foreground="{Binding FaltaCodigo, Converter={StaticResource FaltaAColor},
                                                     ConverterParameter=#111827}"/>
-                            <TextBox Grid.Column="1" Margin="0,4" Width="240" HorizontalAlignment="Left"
-                                     Style="{StaticResource Obligatorio}"
-                                     Text="{Binding CodigoServicio, UpdateSourceTrigger=LostFocus}"
-                                     BorderBrush="{Binding FaltaCodigo, Converter={StaticResource FaltaAColor}}"/>
+                            <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,4">
+                                <TextBox Width="240" HorizontalAlignment="Left"
+                                         Style="{StaticResource Obligatorio}"
+                                         Text="{Binding CodigoServicio, UpdateSourceTrigger=LostFocus}"
+                                         BorderBrush="{Binding FaltaCodigo, Converter={StaticResource FaltaAColor}}"/>
+                                <TextBlock Text="Ejemplo: TECNO2602" FontSize="11" Foreground="#9CA3AF"
+                                           Margin="0,3,0,0"/>
+                            </StackPanel>
 
-                            <TextBlock Grid.Row="1" Text="Técnico 1 *" VerticalAlignment="Center" Margin="0,4"
+                            <TextBlock Grid.Row="2" Text="Técnico 1 *" VerticalAlignment="Center" Margin="0,4"
                                        Foreground="{Binding FaltaTecnico1, Converter={StaticResource FaltaAColor},
                                                     ConverterParameter=#111827}"/>
                             <!-- Se elige de la lista del laboratorio; escribirlo a mano producía
                                  la misma persona con tres grafías. Empieza vacío a propósito. -->
-                            <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,4" Width="240"
+                            <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,4" Width="240"
                                       HorizontalAlignment="Left" BorderThickness="2"
                                       ItemsSource="{Binding Tecnicos}"
                                       SelectedItem="{Binding Tecnico1}"
                                       BorderBrush="{Binding FaltaTecnico1, Converter={StaticResource FaltaAColor}}"/>
 
-                            <TextBlock Grid.Row="2" Text="Técnico 2" VerticalAlignment="Center" Margin="0,4"/>
-                            <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,4" Width="240"
+                            <TextBlock Grid.Row="3" Text="Técnico 2" VerticalAlignment="Center" Margin="0,4"/>
+                            <ComboBox Grid.Row="3" Grid.Column="1" Margin="0,4" Width="240"
                                       HorizontalAlignment="Left"
                                       ItemsSource="{Binding Tecnicos}"
                                       SelectedItem="{Binding Tecnico2}"/>
 
-                            <TextBlock Grid.Row="3" Text="Nº de muestras *" VerticalAlignment="Center" Margin="0,4"
+                            <TextBlock Grid.Row="4" Text="Nº de muestras *" VerticalAlignment="Center" Margin="0,4"
                                        Foreground="{Binding FaltaMuestras, Converter={StaticResource FaltaAColor},
                                                     ConverterParameter=#111827}"/>
-                            <ComboBox Grid.Row="3" Grid.Column="1" Margin="0,4" Width="80" HorizontalAlignment="Left"
+                            <ComboBox Grid.Row="4" Grid.Column="1" Margin="0,4" Width="80" HorizontalAlignment="Left"
                                       BorderThickness="2"
                                       ItemsSource="{Binding OpcionesMuestras}"
                                       SelectedItem="{Binding NumeroMuestras}"
                                       BorderBrush="{Binding FaltaMuestras, Converter={StaticResource FaltaAColor}}"/>
 
                             <!-- Arranca vacía: hay que elegir, como el nº de muestras -->
-                            <TextBlock Grid.Row="4" Text="Clase *" VerticalAlignment="Center" Margin="0,4"
+                            <TextBlock Grid.Row="5" Text="Clase *" VerticalAlignment="Center" Margin="0,4"
                                        Visibility="{Binding MuestraClase, Converter={StaticResource BoolAVisible}}"
                                        Foreground="{Binding FaltaClase, Converter={StaticResource FaltaAColor},
                                                     ConverterParameter=#111827}"/>
-                            <ComboBox Grid.Row="4" Grid.Column="1" Margin="0,4" Width="80" HorizontalAlignment="Left"
+                            <ComboBox Grid.Row="5" Grid.Column="1" Margin="0,4" Width="80" HorizontalAlignment="Left"
                                       BorderThickness="2"
                                       Visibility="{Binding MuestraClase, Converter={StaticResource BoolAVisible}}"
                                       ItemsSource="{Binding Clases}" SelectedItem="{Binding Clase}"
                                       BorderBrush="{Binding FaltaClase, Converter={StaticResource FaltaAColor}}"/>
 
-                            <TextBlock Grid.Row="5" Text="Ta (ºC) *" VerticalAlignment="Center" Margin="0,4"
+                            <TextBlock Grid.Row="6" Text="Ta (ºC) *" VerticalAlignment="Center" Margin="0,4"
                                        Foreground="{Binding FaltaTa, Converter={StaticResource FaltaAColor},
                                                     ConverterParameter=#111827}"/>
-                            <TextBox Grid.Row="5" Grid.Column="1" Margin="0,4" Width="80" HorizontalAlignment="Left"
+                            <TextBox Grid.Row="6" Grid.Column="1" Margin="0,4" Width="80" HorizontalAlignment="Left"
                                      Style="{StaticResource Obligatorio}"
                                      Text="{Binding Ta, UpdateSourceTrigger=LostFocus}"
                                      BorderBrush="{Binding FaltaTa, Converter={StaticResource FaltaAColor}}"/>
@@ -624,6 +899,56 @@
                         </ItemsControl>
                     </StackPanel>
                 </Border>
+
+                <!-- Laboratorios de fuera. Lo normal es ninguno, así que la tarjeta está
+                     siempre pero vacía: se rellena solo cuando hay algo que contar. -->
+                <Border Style="{StaticResource Tarjeta}">
+                    <StackPanel>
+                        <TextBlock Text="Otros colaboradores" FontWeight="Bold" FontSize="15"
+                                   Foreground="#1F2937" Margin="0,0,0,4"/>
+                        <TextBlock TextWrapping="Wrap" Foreground="#6B7280" FontSize="12" Margin="0,0,0,10"
+                                   Text="Laboratorios de fuera que hayan hecho parte del ensayo. Opcional; se pueden añadir los que hagan falta."/>
+
+                        <ItemsControl ItemsSource="{Binding Colaboradores}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="220"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Margin="0,0,10,0">
+                                            <TextBlock Text="Laboratorio" FontSize="11" Foreground="#9CA3AF"
+                                                       Margin="0,0,0,3"/>
+                                            <TextBox Text="{Binding Laboratorio, UpdateSourceTrigger=LostFocus}"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                            <!-- Las dos cosas juntas y a propósito: para una auditoría,
+                                                 «fotobiología — no tenemos cámara» explica una
+                                                 subcontratación; «fotobiología» a secas, no. -->
+                                            <TextBlock Text="Ensayo y motivo" FontSize="11" Foreground="#9CA3AF"
+                                                       Margin="0,0,0,3"/>
+                                            <TextBox Text="{Binding EnsayoYMotivo, UpdateSourceTrigger=LostFocus}"
+                                                     TextWrapping="Wrap" AcceptsReturn="True"/>
+                                        </StackPanel>
+
+                                        <Button Grid.Column="2" Content="✕" Command="{Binding Quitar}"
+                                                Style="{StaticResource BotonIcono}"
+                                                Width="30" Height="30" VerticalAlignment="Bottom"
+                                                Cursor="Hand" Background="Transparent" BorderThickness="0"
+                                                Foreground="#6B7280" ToolTip="Quitar este colaborador"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Button Content="Añadir laboratorio externo" Command="{Binding AnadirColaborador}"
+                                Padding="14,7" Cursor="Hand" HorizontalAlignment="Left" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </DataTemplate>
 
@@ -701,7 +1026,7 @@
                                               VerticalContentAlignment="Center">
                                         <TextBlock TextWrapping="Wrap">
                                             <Run Text="{Binding Codigo, Mode=OneWay}" FontWeight="SemiBold"/>
-                                            <Run Text=" · "/>
+                                            <Run Text=" | "/>
                                             <Run Text="{Binding Descripcion, Mode=OneWay}" Foreground="#4B5563"/>
                                         </TextBlock>
                                     </CheckBox>
@@ -752,15 +1077,19 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Pliega el índice de secciones para dejar sitio al formulario -->
-                <Button Command="{Binding AlternarIndice}" Width="34" Height="34" Margin="0,0,14,0"
-                        VerticalAlignment="Center" Cursor="Hand" FontSize="15"
+                <Button Command="{Binding AlternarIndice}" Style="{StaticResource BotonIcono}"
+                        Width="34" Height="34" Margin="0,0,14,0"
+                        VerticalAlignment="Center" Cursor="Hand" FontSize="17"
                         Background="Transparent" Foreground="#374151" BorderBrush="#D1D5DB" BorderThickness="1"
                         Content="{Binding IconoIndice}" ToolTip="{Binding TituloIndice}"/>
 
-                <StackPanel Grid.Column="1">
-                    <TextBlock Text="{Binding Titulo}" FontSize="17" FontWeight="Bold" Foreground="#111827"/>
+                <!-- El título se recorta con puntos suspensivos, no crece: sin esto, con
+                     la ventana estrecha se metía por encima del contador de apartados. -->
+                <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                    <TextBlock Text="{Binding Titulo}" FontSize="17" FontWeight="Bold" Foreground="#111827"
+                               TextTrimming="CharacterEllipsis" ToolTip="{Binding Titulo}"/>
                     <TextBlock Text="{Binding Ubicacion}" Foreground="#9CA3AF" FontSize="11" Margin="0,2,0,0"
-                               TextTrimming="CharacterEllipsis"/>
+                               TextTrimming="CharacterEllipsis" ToolTip="{Binding Ubicacion}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                     <StackPanel Margin="0,0,24,0" VerticalAlignment="Center">
@@ -772,7 +1101,16 @@
                     <Button Content="Guardar" Command="{Binding Guardar}" Padding="18,7"
                             Background="#2563EB" Foreground="White" BorderThickness="0"
                             Cursor="Hand" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                    <Button Content="Exportar informe" Command="{Binding ExportarInforme}" Padding="18,7"
+
+                    <!-- Planificación, entre guardar y exportar. Con el verde de la gestión
+                         de proyectos, porque eso es lo que enseña: no es un apartado del
+                         ensayo y no debe parecerlo. -->
+                    <Button Content="Planificación" Command="{Binding VerPlanificacion}" Padding="18,7"
+                            Background="#0F766E" Foreground="White" BorderThickness="0"
+                            Cursor="Hand" VerticalAlignment="Center" Margin="0,0,8,0"
+                            ToolTip="Fechas, estado, muestras e importe de este servicio"/>
+
+                    <Button Content="Exportar" Command="{Binding ExportarInforme}" Padding="18,7"
                             Background="#111827" Foreground="White" BorderThickness="0"
                             Cursor="Hand" VerticalAlignment="Center"/>
                 </StackPanel>
@@ -786,8 +1124,14 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Índice en árbol: secciones colapsadas, apartados dentro -->
-            <Border Width="360" Background="White" BorderBrush="#E1E4E8" BorderThickness="0,0,1,0"
+            <!-- Índice en árbol: secciones colapsadas, apartados dentro.
+                 El ancho lo decide la ventana (AnchoDelIndice): con 360 fijos, en la
+                 ventana mínima se comía más de la mitad y el formulario se salía por la
+                 derecha. La columna sigue siendo Auto para que al plegarlo no reserve
+                 nada — una columna proporcional dejaría el hueco vacío. -->
+            <Border Background="White" BorderBrush="#E1E4E8" BorderThickness="0,0,1,0"
+                    Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Window},
+                            Converter={StaticResource AnchoIndice}}"
                     Visibility="{Binding IndiceVisible, Converter={StaticResource BoolAVisible}}">
                 <TreeView ItemsSource="{Binding Arbol}"
                           SelectedItemChanged="AlSeleccionarNodo"
@@ -812,6 +1156,23 @@
 
                     <TreeView.Resources>
                         <!--
+                            Realce de la fila seleccionada. El azul del sistema con texto blanco
+                            chocaba con la paleta del resto de la ventana y tapaba el punto de
+                            color de la fila. Cambiando estas cuatro brochas del tema se queda en
+                            un realce suave con el texto oscuro, y no hay que rehacer la plantilla
+                            de TreeViewItem —que trae el triángulo de desplegar y la sangría, y
+                            copiarla entera para cambiar un color sale caro—.
+                            La pareja «Inactive» es la que de verdad se ve casi siempre: en cuanto
+                            se escribe en el formulario, el foco deja de estar en el árbol.
+                        -->
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#DDE5F0"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#111827"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+                                         Color="#E9EEF5"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
+                                         Color="#111827"/>
+
+                        <!--
                             MaxWidth explícito en cada plantilla: la plantilla por defecto de
                             TreeViewItem coloca la cabecera en una columna de ancho Auto, así que
                             sin un límite el texto crece y se sale del panel en vez de partirse.
@@ -819,22 +1180,33 @@
                             márgenes sobre los 360 px de la columna.
                         -->
 
-                        <!-- Sección: cabecera desplegable con el resumen de sus apartados -->
+                        <!-- Sección: cabecera desplegable con la cuenta de sus apartados -->
                         <HierarchicalDataTemplate DataType="{x:Type vm:SeccionViewModel}"
                                                   ItemsSource="{Binding Apartados}">
-                            <Grid Margin="2,5" MaxWidth="315">
+                            <!-- El margen de arriba es el aire que separa una sección de la
+                                 anterior; una raya no vale, porque la cabecera solo ocupa lo que
+                                 mide su texto y saldrían rayas de largos distintos. -->
+                            <Grid Margin="2,10,2,4" MaxWidth="315" ToolTip="{Binding Resumen}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Ellipse Width="10" Height="10" Margin="0,4,8,0" VerticalAlignment="Top"
-                                         Fill="{Binding Estado, Converter={StaticResource EstadoAColor}}"/>
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock Text="{Binding Titulo}" TextWrapping="Wrap" FontWeight="Bold"
-                                               Foreground="#111827"/>
-                                    <TextBlock Text="{Binding Resumen}" Foreground="#9CA3AF" FontSize="11"
-                                               TextWrapping="Wrap"/>
-                                </StackPanel>
+
+                                <!-- La píldora sustituye al punto de color: dice lo mismo y además
+                                     cuánto queda. El MinWidth alinea los títulos entre secciones,
+                                     que si no bailan según la cuenta ocupe tres o cinco letras. -->
+                                <Border MinWidth="38" Padding="6,1,6,2" CornerRadius="8"
+                                        Margin="0,1,8,0" VerticalAlignment="Top"
+                                        Background="{Binding Estado, Converter={StaticResource EstadoAColor},
+                                                             ConverterParameter=Fondo}">
+                                    <TextBlock Text="{Binding Progreso}" FontSize="10"
+                                               HorizontalAlignment="Center"
+                                               Foreground="{Binding Estado, Converter={StaticResource EstadoAColor},
+                                                                    ConverterParameter=Texto}"/>
+                                </Border>
+
+                                <TextBlock Grid.Column="1" Text="{Binding Titulo}" TextWrapping="Wrap"
+                                           FontWeight="Bold" Foreground="#111827" VerticalAlignment="Top"/>
                             </Grid>
                         </HierarchicalDataTemplate>
 
@@ -848,9 +1220,36 @@
                                 <Ellipse Width="8" Height="8" Margin="0,5,8,0" VerticalAlignment="Top"
                                          Fill="{Binding Estado, Converter={StaticResource EstadoAColor}}"/>
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock Text="{Binding Encabezado}" TextWrapping="Wrap"/>
-                                    <TextBlock Text="{Binding EstadoTexto}" FontSize="10" TextWrapping="Wrap"
-                                               Foreground="{Binding Estado, Converter={StaticResource EstadoAColor}}"/>
+                                    <!-- Un apartado marcado N/A se apaga: sigue estando, para que
+                                         se vea que se decidió, pero deja de competir por la vista
+                                         con los que hay que rellenar. -->
+                                    <TextBlock Text="{Binding Encabezado}" TextWrapping="Wrap">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding NoAplica}" Value="True">
+                                                        <Setter Property="Foreground" Value="#9CA3AF"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+
+                                    <!-- Solo dice «No aplica»; el resto de estados los da el punto.
+                                         Vacío se pliega, para no dejar un renglón en blanco que
+                                         separaría las filas sin decir nada. -->
+                                    <TextBlock Text="{Binding EstadoTexto}" FontSize="10"
+                                               TextWrapping="Wrap" Foreground="#9CA3AF">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding EstadoTexto}" Value="">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
                                 </StackPanel>
                             </Grid>
                         </DataTemplate>
@@ -860,6 +1259,11 @@
                             <TextBlock Text="{Binding Encabezado}" FontWeight="Bold" Margin="20,6,2,6"
                                        MaxWidth="300" TextWrapping="Wrap" Foreground="#111827"/>
                         </DataTemplate>
+
+                        <!-- La planificación ya no cuelga del árbol: se llega por su botón de
+                             la barra de arriba. Aquí no queda plantilla porque aquí no hay
+                             nodo. -->
+
                     </TreeView.Resources>
                 </TreeView>
             </Border>
@@ -870,9 +1274,15 @@
             -->
             <ScrollViewer Grid.Column="1" Padding="24,20"
                           VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Auto"
-                          RequestBringIntoView="AlPedirLlevarALaVista">
-                <ContentControl Content="{Binding PanelActual}"/>
+                          HorizontalScrollBarVisibility="Auto">
+                <!--
+                    El manejador va AQUÍ DENTRO, no en el ScrollViewer: quien desplaza de
+                    verdad es el ScrollContentPresenter de su plantilla, que está por
+                    debajo. Marcando el evento en el ScrollViewer se llega tarde y la vista
+                    ya se ha movido de lado.
+                -->
+                <ContentControl Content="{Binding PanelActual}"
+                                RequestBringIntoView="AlPedirLlevarALaVista"/>
             </ScrollViewer>
         </Grid>
                         </Grid>
@@ -913,7 +1323,7 @@
                     </StackPanel>
                     <!-- Sin citar la norma: el programa lleva cuatro y las que se dejen
                          caer en la carpeta, así que nombrar una sola sobraba -->
-                    <TextBlock Text="Software de toma de notas primarias para ensayos y gestión de proyectos."
+                    <TextBlock Text="Software de toma de notas primarias para ensayos y gestión de proyectos"
                                Foreground="#6B7280" FontSize="12" Margin="0,6,0,26" TextWrapping="Wrap"/>
 
                     <!--
@@ -970,7 +1380,7 @@
                         <!--
                             ZONA 1 · la toma de notas, en azul.
                             No hay «proyecto» que crear: el registro del ensayo es el
-                            .lumproj y vive en la carpeta de tomas de notas de su servicio.
+                            .lmnlab y vive en la carpeta de tomas de notas de su servicio.
                             Un fichero de proyecto aparte sería un documento sin ensayo
                             detrás, y eso rompe la trazabilidad (DD‑89).
                         -->
@@ -982,72 +1392,118 @@
                                     <TextBlock Text="TOMA DE NOTAS" Style="{StaticResource RotuloZona}"
                                                Foreground="#2563EB"/>
                                 </StackPanel>
-                                <TextBlock Text="Empieza una toma de notas con la norma que toque, o abre una que ya tengas."
+                                <TextBlock Text="Abre una toma de notas"
                                            TextWrapping="Wrap"
                                            FontSize="12" Foreground="#6B7280" Margin="13,0,0,16"/>
 
                                 <!--
-                                    Se reacomodan solas: caben tres por fila y bajan a dos
-                                    al estrechar la ventana. Con WrapPanel y tarjetas de
-                                    tamaño fijo sale gratis — un UniformGrid habría que
-                                    decirle cuántas columnas, y su ItemsPanelTemplate no
-                                    llega a ver el ancho del contenedor.
+                                    Abrir y lo reciente, **a la misma altura**: son la misma
+                                    idea —volver a una toma de notas que ya existe— y en
+                                    vertical gastaban dos veces el alto para eso. Empezar una
+                                    nueva va debajo, cruzando las dos columnas.
+
+                                    Ancho fijo a la izquierda y el resto para las recientes:
+                                    el botón no necesita crecer y los nombres sí.
                                 -->
-                                <ItemsControl ItemsSource="{Binding Normas}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Empezar por la norma y el alta rápida hacen lo mismo, y
+                                         tenerlos juntos aquí era ofrecer dos caminos para una
+                                         sola cosa. El alta se queda en «Archivo» y en la barra
+                                         del tablero, que es donde está el responsable. -->
+                                    <Button Grid.Column="0" Width="150" VerticalAlignment="Top"
+                                            Style="{StaticResource AccesoTomaDeNotasPrincipal}"
+                                            Command="{Binding DataContext.Abrir, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            ToolTip="Abrir una toma de notas que ya existe (Ctrl+O)">
+                                        <TextBlock Text="Abrir existente" FontSize="14" FontWeight="Bold"
+                                                   Foreground="White" TextWrapping="Wrap"/>
+                                    </Button>
+
+                                    <StackPanel Grid.Column="1" Margin="14,0,0,0"
+                                                Visibility="{Binding DataContext.HayRecientes, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolAVisible}}">
+                                        <TextBlock Text="RECIENTES"
+                                                   Style="{StaticResource RotuloZona}" Foreground="#9CA3AF"
+                                                   Margin="0,0,0,6"/>
+
+                                        <ItemsControl ItemsSource="{Binding DataContext.UltimosAbiertos, RelativeSource={RelativeSource AncestorType=Window}}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Button Style="{StaticResource TarjetaNorma}"
-                                                    Command="{Binding DataContext.EmpezarConNorma,
-                                                              RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    CommandParameter="{Binding}">
-                                                <StackPanel>
-                                                    <!-- El número de norma, no el id: el id
-                                                         lleva la edición y no cabe -->
-                                                    <TextBlock Text="{Binding Rotulo}" FontSize="20" FontWeight="Bold"
-                                                               Foreground="#2563EB"/>
-                                                    <TextBlock Text="{Binding TituloConAnio}" TextWrapping="Wrap"
-                                                               FontSize="12.5" Foreground="#6B7280" Margin="0,3,0,0"/>
-                                                </StackPanel>
-                                            </Button>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-
-                                <Border Height="1" Background="#EEF0F3" Margin="0,10,12,16"/>
-
-                                <!-- Empezar por la norma y el alta rápida hacen lo mismo, y
-                                     tenerlos juntos aquí era ofrecer dos caminos para una
-                                     sola cosa. El alta se queda en «Archivo» y en la barra
-                                     del tablero, que es donde está el responsable. -->
-                                <Button Content="Abrir toma de notas…"
-                                        Command="{Binding DataContext.Abrir, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        Padding="20,10" Cursor="Hand" HorizontalAlignment="Left"/>
-
-                                <TextBlock Text="ÚLTIMAS TOMAS DE NOTAS"
-                                           Style="{StaticResource RotuloZona}" Foreground="#9CA3AF"
-                                           Margin="0,20,0,8"
-                                           Visibility="{Binding DataContext.HayRecientes, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolAVisible}}"/>
-
-                                <ItemsControl ItemsSource="{Binding DataContext.UltimosAbiertos, RelativeSource={RelativeSource AncestorType=Window}}"
-                                              Visibility="{Binding DataContext.HayRecientes, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolAVisible}}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <!-- La ruta puede ser larga: se recorta en vez de
-                                                 empujar el ancho de la portada -->
-                                            <Button HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                                    Margin="0,0,12,4" Padding="0" Cursor="Hand"
-                                                    Background="Transparent" BorderThickness="0" Foreground="#2563EB"
+                                            <Button Style="{StaticResource FilaReciente}"
                                                     ToolTip="{Binding Ruta}"
                                                     Command="{Binding DataContext.AbrirReciente,
                                                               RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding Ruta}">
-                                                <TextBlock Text="{Binding Etiqueta}" FontSize="12"
-                                                           TextTrimming="CharacterEllipsis"/>
+                                                <!--
+                                                    Solo el nombre, en una línea. La carpeta se
+                                                    quitó: son cinco filas y con dos líneas cada
+                                                    una el panel no cabía en una pantalla de 800.
+                                                    Sigue estando en el consejo emergente, que es
+                                                    donde se mira cuando hace falta desempatar dos
+                                                    servicios parecidos.
+
+                                                    Rejilla y no StackPanel: dentro de un StackPanel
+                                                    el ancho es infinito y el nombre no sabría dónde
+                                                    recortarse (la sexta trampa). Con la columna «*»
+                                                    sí termina en puntos suspensivos.
+                                                -->
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding Nombre}" FontSize="11.5"
+                                                               FontWeight="SemiBold" Foreground="#1D4ED8"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                </Grid>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Border Height="1" Background="#EEF0F3" Margin="0,14,12,14"/>
+
+                                <TextBlock Text="O crea una nueva con la norma que necesites"
+                                           TextWrapping="Wrap" FontSize="12.5" Foreground="#6B7280"
+                                           Margin="0,0,0,10"/>
+
+                                <!--
+                                    Una fila por norma instalada. Sale de CatalogoDeNormas,
+                                    así que dejar caer un plantilla-*.json añade la suya sin
+                                    tocar nada — incluido el orden, que lo da el título.
+                                -->
+                                <ItemsControl ItemsSource="{Binding Normas}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Style="{StaticResource FilaNorma}"
+                                                    Command="{Binding DataContext.EmpezarConNorma,
+                                                              RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    CommandParameter="{Binding}"
+                                                    ToolTip="{Binding Titulo}">
+                                                <!-- Rejilla y no StackPanel: dentro de un
+                                                     StackPanel el ancho es infinito y la
+                                                     designación no sabría dónde recortarse -->
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel>
+                                                        <!-- La designación entera, con sus
+                                                             enmiendas: es lo que distingue dos
+                                                             años de la misma norma -->
+                                                        <TextBlock Text="{Binding Designacion}" FontSize="13"
+                                                                   FontWeight="Bold" Foreground="#2563EB"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock Text="{Binding DescripcionConEdicion}"
+                                                                   FontSize="11.5" Foreground="#6B7280"
+                                                                   Margin="0,1,0,0"
+                                                                   TextTrimming="CharacterEllipsis"/>
+                                                    </StackPanel>
+                                                </Grid>
                                             </Button>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -1069,12 +1525,28 @@
                                     <TextBlock Text="GESTIÓN DE PROYECTOS" Style="{StaticResource RotuloZona}"
                                                Foreground="#0F766E"/>
                                 </StackPanel>
-                                <TextBlock Text="Mira cómo van todos los servicios sin abrirlos uno a uno."
+                                <TextBlock Text="Mira cómo van todos los servicios sin abrirlos uno a uno"
                                            TextWrapping="Wrap"
                                            FontSize="12" Foreground="#6B7280" Margin="13,0,0,16"/>
 
-                                <!-- Crear un proyecto es de la zona 1, no de esta: aquí se mira,
-                                     no se da de alta. Repetir el botón solo sería ruido. -->
+                                <!--
+                                    Dar de alta encabeza la zona (2026‑08‑06). Antes no
+                                    estaba aquí —se decía que esta zona es para mirar, no
+                                    para crear—, pero quien planifica entra por aquí, y
+                                    obligarle a buscarlo en el menú «Archivo» era mandarle a
+                                    la zona del que toma notas para hacer algo que es suyo.
+                                    Abre la misma ventana que ese menú.
+                                -->
+                                <Button Style="{StaticResource AccesoGestionPrincipal}"
+                                        Command="{Binding DataContext.NuevoProyecto, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        ToolTip="Da de alta la toma de notas para poder planificarla: con el código, el técnico y la norma ya se puede">
+                                    <!-- Sin subtexto: lo que explicaba está en el consejo
+                                         emergente. Este botón y el azul de la izquierda son
+                                         los dos que más se pulsan y no necesitan que se les
+                                         explique nada cada vez. -->
+                                    <TextBlock Text="Planificar nueva TdN" FontSize="14" FontWeight="Bold"
+                                               Foreground="White" TextWrapping="Wrap"/>
+                                </Button>
 
                                 <Button Style="{StaticResource AccesoGestion}"
                                         Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -1082,7 +1554,7 @@
                                     <StackPanel>
                                         <TextBlock Text="Tablero" FontSize="14" FontWeight="Bold"
                                                    Foreground="#0F766E"/>
-                                        <TextBlock Text="Qué falta por rellenar, servicio a servicio."
+                                        <TextBlock Text="Qué falta por rellenar, servicio a servicio"
                                                    TextWrapping="Wrap" FontSize="12" Foreground="#115E59"
                                                    Margin="0,2,0,0"/>
                                     </StackPanel>
@@ -1094,7 +1566,7 @@
                                     <StackPanel>
                                         <TextBlock Text="Calendario" FontSize="14" FontWeight="Bold"
                                                    Foreground="#0F766E"/>
-                                        <TextBlock Text="Cuándo toca cada uno, por semanas y por técnico."
+                                        <TextBlock Text="Línea temporal de planificación"
                                                    TextWrapping="Wrap" FontSize="12" Foreground="#115E59"
                                                    Margin="0,2,0,0"/>
                                     </StackPanel>
@@ -1106,7 +1578,22 @@
                                     <StackPanel>
                                         <TextBlock Text="Carga" FontSize="14" FontWeight="Bold"
                                                    Foreground="#0F766E"/>
-                                        <TextBlock Text="Cuánto tiene comprometido cada técnico cada mes."
+                                        <TextBlock Text="Carga de trabajo por técnico/mes"
+                                                   TextWrapping="Wrap" FontSize="12" Foreground="#115E59"
+                                                   Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <!-- La cuarta mira hacia atrás y no hacia lo que queda por
+                                     hacer, así que se dice que también enseña lo terminado:
+                                     es lo que la distingue de las otras tres. -->
+                                <Button Style="{StaticResource AccesoGestion}"
+                                        Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{x:Static vm:Vista.Bbdd}">
+                                    <StackPanel>
+                                        <TextBlock Text="BBDD" FontSize="14" FontWeight="Bold"
+                                                   Foreground="#0F766E"/>
+                                        <TextBlock Text="Buscar cualquier TdN"
                                                    TextWrapping="Wrap" FontSize="12" Foreground="#115E59"
                                                    Margin="0,2,0,0"/>
                                     </StackPanel>
@@ -1135,51 +1622,92 @@
 
                 <Border Background="White" BorderBrush="#E1E4E8" BorderThickness="0,0,0,1" Padding="20,12">
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                            <Button Content="Tablero" Command="{Binding VerTablero}" Margin="0,0,6,0"
+                        <!--
+                            WrapPanel y no StackPanel horizontal: un StackPanel no envuelve
+                            nunca, así que al estrechar la ventana lo que no cabía se
+                            recortaba en silencio —se perdían «Actualizar» y los tres
+                            filtros, que son lo que hace útil la vista—. Envolviendo, la
+                            barra pasa a dos o tres filas y no se pierde ningún mando.
+                        -->
+                        <WrapPanel Margin="0,0,0,4">
+                            <Button Content="Tablero" Command="{Binding VerTablero}" Margin="0,0,6,6"
                                     Style="{StaticResource Vista}"
                                     Tag="{Binding VistaTablero}"/>
-                            <Button Content="Calendario" Command="{Binding VerCalendario}" Margin="0,0,6,0"
+                            <Button Content="Calendario" Command="{Binding VerCalendario}" Margin="0,0,6,6"
                                     Style="{StaticResource Vista}"
                                     Tag="{Binding VistaCalendario}"/>
-                            <Button Content="Carga" Command="{Binding VerCarga}" Margin="0,0,18,0"
+                            <Button Content="Carga" Command="{Binding VerCarga}" Margin="0,0,6,6"
                                     Style="{StaticResource Vista}"
                                     Tag="{Binding VistaCarga}"
                                     ToolTip="Cuánto tiene comprometido cada técnico cada mes"/>
+                            <Button Content="BBDD" Command="{Binding VerBbdd}" Margin="0,0,18,6"
+                                    Style="{StaticResource Vista}"
+                                    Tag="{Binding VistaBbdd}"
+                                    ToolTip="Todas las tomas de notas, con buscador. Enseña también las terminadas y las archivadas"/>
 
-                            <Button Content="Nueva toma de notas…"
+                            <!-- Dar de alta es lo que más se pulsa: se queda con su color,
+                                 y en «+» porque el rótulo entero ocupaba media barra. El
+                                 consejo emergente dice lo que decía el rótulo. -->
+                            <Button Content="+" Style="{StaticResource BotonIcono}"
                                     Command="{Binding DataContext.NuevoProyecto, RelativeSource={RelativeSource AncestorType=Window}}"
-                                    Padding="14,6" Cursor="Hand" Margin="0,0,8,0"
+                                    Width="34" Height="30" FontSize="18" FontWeight="Bold"
+                                    Cursor="Hand" Margin="0,0,8,6"
                                     Background="#0F766E" Foreground="White" BorderThickness="0"
-                                    ToolTip="Solo hacen falta el nombre y el técnico responsable"/>
-                            <Button Content="Elegir carpeta…" Command="{Binding ElegirCarpeta}"
-                                    Padding="14,6" Cursor="Hand" Margin="0,0,8,0"/>
+                                    ToolTip="Nueva toma de notas — solo hacen falta el código, el técnico y la norma"/>
+
+                            <Button Content="Elegir carpeta" Command="{Binding ElegirCarpeta}"
+                                    Padding="14,6" Cursor="Hand" Margin="0,0,8,6"/>
                             <Button Content="Actualizar" Command="{Binding Refrescar}"
-                                    Padding="14,6" Cursor="Hand" Margin="0,0,16,0"/>
+                                    Padding="14,6" Cursor="Hand" Margin="0,0,8,6"/>
 
-                            <!-- Un solo filtro para las tres vistas: el responsable decide
-                                 una vez qué mira y todas hablan de lo mismo -->
-                            <TextBlock Text="Mostrar" VerticalAlignment="Center" FontSize="11"
-                                       Foreground="#6B7280" Margin="0,0,6,0"/>
-                            <ComboBox ItemsSource="{Binding Estados}" SelectedItem="{Binding Estado}"
-                                      MinWidth="140" VerticalAlignment="Center" Margin="0,0,14,0"
-                                      ToolTip="Los terminados y los archivados no se muestran salvo que los pidas"/>
+                            <!--
+                                Buscar y filtrar, juntos y en el mismo bloque para que al
+                                estrechar la ventana caigan a la vez a la fila siguiente:
+                                son la misma pregunta —qué estoy mirando— partida en dos.
 
-                            <TextBlock Text="Técnico" VerticalAlignment="Center" FontSize="11"
-                                       Foreground="#6B7280" Margin="0,0,6,0"/>
-                            <ComboBox ItemsSource="{Binding Tecnicos}" SelectedItem="{Binding Tecnico}"
-                                      MinWidth="130" VerticalAlignment="Center" Margin="0,0,14,0"/>
+                                Valen para las cuatro vistas, BBDD incluida. Antes el botón
+                                aparecía allí sin hacer nada y el listado tenía sus propios
+                                mandos: dos juegos de filtros para los mismos proyectos,
+                                que es la manera más fácil de que discrepen.
+                            -->
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Buscar" VerticalAlignment="Center" FontSize="11"
+                                           Foreground="#6B7280" Margin="0,0,6,6"/>
+                                <!-- Se filtra al teclear: lo leído ya está en memoria y
+                                     filtrarlo es instantáneo. -->
+                                <TextBox Text="{Binding Busqueda, UpdateSourceTrigger=PropertyChanged}"
+                                         MinWidth="180" VerticalAlignment="Center" Padding="6,4"
+                                         Margin="0,0,8,6"
+                                         ToolTip="Busca en el código, los técnicos, la norma, la acreditación y los colaboradores. Se suma a los filtros"/>
 
-                            <TextBlock Text="Norma" VerticalAlignment="Center" FontSize="11"
-                                       Foreground="#6B7280" Margin="0,0,6,0"/>
-                            <ComboBox ItemsSource="{Binding Normas}" SelectedItem="{Binding Norma}"
-                                      MinWidth="90" VerticalAlignment="Center"/>
-                        </StackPanel>
+                                <!--
+                                    Los tres filtros, dentro. El rótulo lleva la cuenta de los
+                                    que están apartando algo y el consejo emergente dice qué se
+                                    está viendo: escondidos y mudos, alguien no encontraría su
+                                    servicio y creería que se ha perdido.
+                                -->
+                                <Button Content="{Binding RotuloFiltros}" Click="AlAbrirFiltros"
+                                        ToolTip="{Binding DetalleFiltros}"
+                                        Padding="14,6" Cursor="Hand" Margin="0,0,0,6">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HayFiltros}" Value="True">
+                                                    <Setter Property="Background" Value="#CCFBF1"/>
+                                                    <Setter Property="BorderBrush" Value="#0F766E"/>
+                                                    <Setter Property="Foreground" Value="#115E59"/>
+                                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </StackPanel>
+                        </WrapPanel>
 
                         <!-- Ajustes propios de la línea de tiempo. Los filtros están arriba,
-                             porque valen para las tres vistas. -->
-                        <StackPanel Orientation="Horizontal"
-                                    Visibility="{Binding VistaCalendario, Converter={StaticResource BoolAVisible}}">
+                             porque valen para las tres vistas. Envuelve por lo mismo. -->
+                        <WrapPanel Visibility="{Binding VistaCalendario, Converter={StaticResource BoolAVisible}}">
                             <CheckBox Content="Agrupar por técnico"
                                       IsChecked="{Binding Calendario.AgruparPorTecnico}"
                                       VerticalAlignment="Center" Margin="0,0,14,0"/>
@@ -1190,23 +1718,26 @@
                                     Padding="0,3" Cursor="Hand" Margin="4,0,14,0"
                                     ToolTip="Semanas más anchas"/>
 
-                            <!-- Caminar por el calendario: así se llega a cualquier año sin
-                                 dibujarlos todos de golpe -->
-                            <Button Content="◀" Command="{Binding Calendario.VerAntes}" Width="26"
-                                    Padding="0,3" Cursor="Hand" ToolTip="Ver semanas anteriores"/>
-                            <Button Content="Hoy" Command="{Binding Calendario.VolverAHoy}"
-                                    Padding="10,3" Cursor="Hand" Margin="4,0"
-                                    ToolTip="Volver al periodo de trabajo"/>
-                            <Button Content="▶" Command="{Binding Calendario.VerDespues}" Width="26"
-                                    Padding="0,3" Cursor="Hand" ToolTip="Ver semanas posteriores"/>
+                            <!-- Aquí iban «◀ Hoy ▶» y el rótulo del periodo. Se fueron: por
+                                 la línea de tiempo se camina con la barra de desplazamiento,
+                                 que ahora está siempre a la vista, y los meses ya están
+                                 escritos en la propia cabecera del calendario. Los comandos
+                                 siguen existiendo en el modelo, sin botón que los llame. -->
+                        </WrapPanel>
 
-                            <TextBlock Text="{Binding Calendario.Periodo}" VerticalAlignment="Center"
-                                       FontSize="11" Foreground="#6B7280" Margin="12,0,0,0"/>
-                        </StackPanel>
+                        <!-- La ruta de la carpeta ya no se enseña: ocupaba una línea entera
+                             en las cuatro vistas para repetir algo que no cambia en todo el
+                             día. Sigue estando en «Configuración | Carpetas». -->
+                        <TextBlock Text="{Binding Mensaje}" Foreground="#6B7280" FontSize="12" Margin="0,6,0,0"/>
 
-                        <TextBlock Text="{Binding Carpeta}" Foreground="#9CA3AF" FontSize="11" Margin="0,8,0,0"
-                                   TextTrimming="CharacterEllipsis"/>
-                        <TextBlock Text="{Binding Mensaje}" Foreground="#6B7280" FontSize="12" Margin="0,2,0,0"/>
+                        <!--
+                            Lo que ha hecho el programa por su cuenta en ficheros que nadie
+                            había abierto: recolocar las familias de un trabajo. Va aparte
+                            del mensaje del escaneo, que lo borraría al terminar de leer.
+                        -->
+                        <TextBlock Text="{Binding Aviso}" Foreground="#B45309" FontSize="12"
+                                   FontWeight="SemiBold" Margin="0,4,0,0" TextWrapping="Wrap"
+                                   Visibility="{Binding HayAviso, Converter={StaticResource BoolAVisible}}"/>
 
                         <!-- Con una carpeta de clientes grande el escaneo tarda; que se vea
                              que está trabajando y no colgado -->
@@ -1216,13 +1747,38 @@
                     </StackPanel>
                 </Border>
 
-                <!-- ===================== TABLERO ===================== -->
-                <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto"
-                              VerticalScrollBarVisibility="Auto" Padding="16,14"
-                              Visibility="{Binding VistaTablero, Converter={StaticResource BoolAVisible}}">
-                    <ItemsControl ItemsSource="{Binding Proyectos}">
+                <!--
+                    ===================== TABLERO =====================
+
+                    Virtualizado (2026‑08‑06). Es la vista que más cuesta con diferencia:
+                    una columna por proyecto, y cada columna con una tarjeta por sección
+                    pendiente. Con 250 proyectos, crearlas todas tardaba **1,7 s cada vez
+                    que cambiaba un filtro** — y se pagaban igual mirando otra vista,
+                    porque plegar una vista no destruye lo que ya se creó.
+
+                    Ahora solo existen las columnas que se ven. La lista es la dueña de su
+                    propio desplazamiento —de ahí la plantilla—: dentro de un ScrollViewer
+                    de fuera se mediría con ancho infinito y no virtualizaría nada.
+                -->
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding Proyectos}"
+                              Visibility="{Binding VistaTablero, Converter={StaticResource BoolAVisible}}"
+                              VirtualizingPanel.IsVirtualizing="True"
+                              VirtualizingPanel.VirtualizationMode="Recycling"
+                              VirtualizingPanel.ScrollUnit="Pixel"
+                              ScrollViewer.CanContentScroll="True">
+                        <ItemsControl.Template>
+                            <ControlTemplate TargetType="ItemsControl">
+                                <ScrollViewer CanContentScroll="True" Padding="16,14"
+                                              HorizontalScrollBarVisibility="Auto"
+                                              VerticalScrollBarVisibility="Auto">
+                                    <ItemsPresenter/>
+                                </ScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
                         <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -1230,7 +1786,8 @@
                                 <Border Width="290" Margin="0,0,14,0" Background="#EEF0F3"
                                         CornerRadius="8" Padding="12" VerticalAlignment="Top">
                                     <StackPanel>
-                                        <TextBlock Text="{Binding CodigoServicio}" FontWeight="Bold"
+                                        <!-- Servicio y familia, sin la edición del documento -->
+                                        <TextBlock Text="{Binding Rotulo}" FontWeight="Bold"
                                                    FontSize="15" Foreground="#111827" TextWrapping="Wrap"/>
                                         <TextBlock Text="{Binding Tecnico}" Foreground="#6B7280" FontSize="11"/>
                                         <TextBlock Text="{Binding Avance}" Foreground="#374151" FontSize="12"
@@ -1262,8 +1819,7 @@
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                </ItemsControl>
 
                 <!-- ===================== CARGA =====================
                      Técnicos por meses, en porcentaje de ocupación. El tablero dice qué
@@ -1342,13 +1898,160 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
+                            <!--
+                                La explicación va dentro del ScrollViewer horizontal de la
+                                tabla, que ofrece ancho infinito: el texto se tendía hasta
+                                sus 620 y obligaba a desplazarse en horizontal para leerlo,
+                                aunque la tabla cupiera. Topándolo al ancho visible, envuelve
+                                y el desplazamiento se queda para lo que sí lo necesita.
+                            -->
                             <Border Background="#F8FAFC" BorderBrush="#E5E7EB" BorderThickness="1"
                                     CornerRadius="8" Padding="14,10" Margin="0,16,0,0"
-                                    HorizontalAlignment="Left">
+                                    HorizontalAlignment="Left"
+                                    MaxWidth="{Binding ViewportWidth,
+                                               RelativeSource={RelativeSource AncestorType=ScrollViewer}}">
                                 <TextBlock FontSize="11" Foreground="#4B5563" TextWrapping="Wrap" MaxWidth="620"
                                            Text="El trabajo de cada servicio sale de su oferta y se reparte entre los meses que abarca, en proporción a sus días entre semana. Se compara con lo que cabe en cada mes, que no es lo mismo en agosto que en marzo. Verde por debajo del 85 %, ámbar hasta el 100 %, rojo por encima."/>
                             </Border>
                         </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+                </Grid>
+
+                <!-- =================== BBDD ===================
+                     El listado de todo, para encontrar un servicio de hace meses. Solo
+                     lee: no es una base de datos aparte sino una lente sobre los mismos
+                     .lmnlab que escanea el tablero. Y enseña también lo terminado y lo
+                     archivado, porque es justo lo que se viene a buscar. -->
+                <!--
+                    Dos Grid y no uno: el de fuera decide si se ve y el de dentro cambia
+                    el DataContext. Juntos en el mismo elemento, el DataContext se aplica
+                    también a la atadura de Visibility —que pasaría a buscar «VistaBbdd»
+                    dentro de BbddViewModel, donde no está—, la atadura falla en silencio
+                    y la vista se queda visible encima de las otras tres.
+                -->
+                <Grid Grid.Row="1"
+                      Visibility="{Binding VistaBbdd, Converter={StaticResource BoolAVisible}}">
+                <Grid DataContext="{Binding Bbdd}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Aquí había una segunda barra de filtros —buscar, IP, IK y
+                         acreditación— propia del listado. Se fue al botón «Filtros», que
+                         ahora manda en las cuatro vistas; queda solo la cuenta. -->
+                    <Border Background="White" BorderBrush="#E1E4E8" BorderThickness="0,0,0,1"
+                            Padding="20,8">
+                        <TextBlock Text="{Binding Recuento}" VerticalAlignment="Center"
+                                   FontSize="11" Foreground="#9CA3AF"/>
+                    </Border>
+
+                    <!--
+                        Doce columnas no caben en una ventana estrecha, y aquí no se
+                        encogen: se desplaza en horizontal, que en una tabla es lo que
+                        se espera.
+
+                        El desplazamiento se reparte: **el horizontal lo lleva este de
+                        fuera** —así la cabecera de columnas viaja pegada a sus filas sin
+                        sincronizar nada— y **el vertical lo lleva la lista de dentro**,
+                        que es la única forma de que pueda virtualizar.
+
+                        `VerticalScrollBarVisibility="Disabled"` no es decoración: es lo que
+                        le da a la lista una altura finita. Con desplazamiento vertical aquí,
+                        la lista se mediría con altura infinita, tendría que crear las 250
+                        filas de golpe y no virtualizaría nada (la sexta trampa, en vertical).
+                    -->
+                    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Disabled" Padding="20,12">
+                        <Grid HorizontalAlignment="Left">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Text="No hay ninguna toma de notas que encaje con lo que buscas."
+                                       Foreground="#6B7280" Margin="0,8,0,0"
+                                       Visibility="{Binding NoHayNada, Converter={StaticResource BoolAVisible}}"/>
+
+                            <!-- La cabecera de columnas, con los mismos anchos que las filas -->
+                            <Border Grid.Row="1" BorderBrush="#D1D5DB" BorderThickness="0,0,0,2" Padding="0,0,0,6"
+                                    Visibility="{Binding HayAlgo, Converter={StaticResource BoolAVisible}}">
+                                <StackPanel Orientation="Horizontal" TextBlock.FontWeight="Bold"
+                                            TextBlock.FontSize="11" TextBlock.Foreground="#6B7280">
+                                    <TextBlock Text="CÓDIGO" Width="170"/>
+                                    <TextBlock Text="ACREDITACIÓN" Width="130"/>
+                                    <TextBlock Text="TÉCNICO 1" Width="150"/>
+                                    <TextBlock Text="TÉCNICO 2" Width="150"/>
+                                    <TextBlock Text="NORMA" Width="270"/>
+                                    <TextBlock Text="MUESTRAS" Width="70"/>
+                                    <TextBlock Text="IP" Width="70"/>
+                                    <TextBlock Text="IK" Width="70"/>
+                                    <TextBlock Text="ESTADO" Width="110"/>
+                                    <TextBlock Text="ENSAYADO" Width="180"/>
+                                    <TextBlock Text="LAB. EXTERNO" Width="200"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!--
+                                Virtualizada: solo existen las filas que se ven. Con 250
+                                tomas de notas, crearlas todas costaba 1,5 s cada vez que
+                                cambiaba un filtro (medido el 2026‑08‑06).
+
+                                Hacen falta las cuatro cosas a la vez: el panel
+                                virtualizador, que la lista tenga **su propio** ScrollViewer
+                                —de ahí la plantilla—, `CanContentScroll` para que cuente
+                                elementos y no píxeles, y `ScrollUnit=Pixel` para que aun así
+                                se desplace suave y no a saltos de fila.
+                            -->
+                            <ItemsControl Grid.Row="2" ItemsSource="{Binding Filas}"
+                                          VirtualizingPanel.IsVirtualizing="True"
+                                          VirtualizingPanel.VirtualizationMode="Recycling"
+                                          VirtualizingPanel.ScrollUnit="Pixel"
+                                          ScrollViewer.CanContentScroll="True"
+                                          Visibility="{Binding HayAlgo, Converter={StaticResource BoolAVisible}}">
+                                <ItemsControl.Template>
+                                    <ControlTemplate TargetType="ItemsControl">
+                                        <ScrollViewer CanContentScroll="True"
+                                                      HorizontalScrollBarVisibility="Disabled"
+                                                      VerticalScrollBarVisibility="Auto">
+                                            <ItemsPresenter/>
+                                        </ScrollViewer>
+                                    </ControlTemplate>
+                                </ItemsControl.Template>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#EEF0F3" BorderThickness="0,0,0,1" Padding="0,7">
+                                            <StackPanel Orientation="Horizontal">
+                                                <!-- Pulsar el código abre esa toma de notas en una pestaña -->
+                                                <Button Content="{Binding Codigo}" Width="170"
+                                                        HorizontalContentAlignment="Left" Padding="0"
+                                                        Background="Transparent" BorderThickness="0"
+                                                        Foreground="#2563EB" Cursor="Hand" FontWeight="SemiBold"
+                                                        ToolTip="{Binding Ruta}"
+                                                        Click="AlAbrirDeLaBbdd"/>
+                                                <TextBlock Text="{Binding Acreditacion}" Width="130" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Tecnico1}" Width="150" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Tecnico2}" Width="150" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Norma}" Width="270" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Muestras}" Width="70"/>
+                                                <TextBlock Text="{Binding Ip}" Width="70"/>
+                                                <TextBlock Text="{Binding Ik}" Width="70"/>
+                                                <TextBlock Text="{Binding Estado}" Width="110" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Ensayado}" Width="180" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Colaboradores}" Width="200" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
                     </ScrollViewer>
                 </Grid>
                 </Grid>
@@ -1367,11 +2070,17 @@
                          Se desplaza sola siguiendo el scroll horizontal de las barras. -->
                     <Grid Grid.Row="0" Background="#F8FAFC">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="230"/>
+                            <!-- El mismo ancho que abajo, y por el mismo motivo: si la
+                                 cabecera reserva un hueco que el cuerpo no gasta, las
+                                 semanas dejan de caer sobre sus barras. -->
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Border Grid.Column="0" BorderBrush="#E5E7EB" BorderThickness="0,0,1,1" Padding="12,8">
+                        <!-- Recortado: con la columna a cero, el rótulo se saldría por encima
+                             de las semanas, porque un Border no recorta a su hijo. -->
+                        <Border Grid.Column="0" Width="{Binding AnchoDeNombres}" ClipToBounds="True"
+                                BorderBrush="#E5E7EB" BorderThickness="0,0,1,1" Padding="12,8">
                             <TextBlock Text="TÉCNICO" FontSize="10" FontWeight="Bold" Foreground="#94A3B8"
                                        VerticalAlignment="Bottom"/>
                         </Border>
@@ -1431,56 +2140,104 @@
                         </ScrollViewer>
                     </Grid>
 
-                    <!-- Cuerpo: nombres fijos a la izquierda, barras desplazables a la derecha -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
-                                  HorizontalScrollBarVisibility="Disabled">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="230"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
+                    <!--
+                        Cuerpo: nombres fijos a la izquierda, barras desplazables a la derecha.
 
-                            <!-- Nombres. Recorre las mismas filas que las barras, con las
-                                 mismas alturas, y por eso van alineadas. -->
-                            <ItemsControl Grid.Column="0" ItemsSource="{Binding Filas}">
+                        Cada columna tiene su PROPIO desplazamiento vertical, atado al de la
+                        otra. Antes había uno solo envolviendo las dos, y entonces la barra
+                        horizontal quedaba al final del contenido: con veinte proyectos solo
+                        asomaba al bajar del todo. Ahora la horizontal es la de «Pista», que
+                        está pegada al borde de lo que se ve y no se va nunca.
+                    -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <!-- El ancho lo pone el modelo de vista: sin agrupar por técnico
+                                 esta columna no tiene nada que decir y se queda en cero. -->
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!--
+                            Cabeceras de técnico. Recorre las mismas filas que las barras, con
+                            las mismas alturas, y por eso van alineadas.
+
+                            Los carriles pasan por aquí sin escribir nada: una fila ya no es un
+                            trabajo, son todos los que caben en ella, así que no hay un nombre
+                            que poner. El código de cada uno va dentro de su propia barra.
+
+                            Debajo va un hueco del alto exacto de una barra horizontal, y
+                            solo cuando las tarjetas tienen la suya. Sin él, esta columna
+                            dispone de 17 px más de alto que la de tarjetas: las dos se
+                            desplazan a la vez, pero esta llega al final antes, se queda
+                            clavada y los nombres se separan de sus barras.
+
+                            El hueco va aquí y no se le quita a las tarjetas porque la
+                            columna de nombres NO puede llevar barra horizontal propia: en
+                            cuanto un ScrollViewer permite desplazamiento horizontal mide su
+                            contenido con ancho infinito, y entonces los nombres largos
+                            dejan de recortarse con puntos.
+                        -->
+                        <Grid Grid.Column="0" Width="{Binding AnchoDeNombres}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="1" BorderBrush="#E5E7EB" BorderThickness="0,0,1,0"
+                                    Height="{x:Static SystemParameters.HorizontalScrollBarHeight}"
+                                    Visibility="{Binding ComputedHorizontalScrollBarVisibility,
+                                                 ElementName=Pista}"/>
+
+                        <ScrollViewer VerticalScrollBarVisibility="Hidden"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      local:ScrollSincronizado.EnVerticalCon="{Binding ElementName=Pista}">
+                            <ItemsControl ItemsSource="{Binding Filas}">
                                 <ItemsControl.Resources>
-                                    <!-- Cabecera de técnico: quién es y qué carga lleva -->
+                                    <!-- Cabecera de técnico: quién es, cuántos lleva y el
+                                         triángulo de plegar. Todo en una línea. -->
                                     <DataTemplate DataType="{x:Type vm:GrupoDeTecnicoViewModel}">
-                                        <Border Height="38" Padding="12,0" Background="#F1F5F9"
+                                        <Border Height="30" Background="#F1F5F9"
                                                 BorderBrush="#E2E8F0" BorderThickness="0,0,1,1">
-                                            <StackPanel VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Tecnico}" FontWeight="Bold"
-                                                           Foreground="#1E3A8A" FontSize="13"
-                                                           TextTrimming="CharacterEllipsis"/>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Carga}" FontSize="10"
-                                                               Foreground="#64748B"/>
+                                            <Button Command="{Binding Alternar}" Cursor="Hand"
+                                                    Background="Transparent" BorderThickness="0"
+                                                    Padding="8,0" HorizontalContentAlignment="Left"
+                                                    ToolTip="Plegar o desplegar sus proyectos">
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Marca}" FontSize="10"
+                                                               Foreground="#64748B" Margin="0,0,5,0"
+                                                               VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding Tecnico}" FontWeight="Bold"
+                                                               Foreground="#1E3A8A" FontSize="12"
+                                                               VerticalAlignment="Center"
+                                                               TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding Proyectos}" FontSize="10"
+                                                               Foreground="#64748B" Margin="6,0,0,0"
+                                                               VerticalAlignment="Center"/>
                                                     <TextBlock Text="{Binding AvisoDeRetraso}" FontSize="10"
                                                                Foreground="#DC2626" Margin="6,0,0,0"
+                                                               VerticalAlignment="Center"
                                                                Visibility="{Binding HayRetrasados,
                                                                             Converter={StaticResource BoolAVisible}}"/>
                                                 </StackPanel>
-                                            </StackPanel>
+                                            </Button>
                                         </Border>
                                     </DataTemplate>
 
-                                    <!-- Un servicio del técnico: el código, pequeño y discreto,
-                                         porque ya va escrito dentro de su propia barra -->
-                                    <DataTemplate DataType="{x:Type vm:TarjetaPlanViewModel}">
-                                        <Border Height="46" Padding="22,0,12,0" BorderBrush="#EEF0F3"
-                                                BorderThickness="0,0,1,1">
-                                            <Button Content="{Binding Codigo}" Command="{Binding Abrir}"
-                                                    VerticalAlignment="Center" FontSize="11"
-                                                    Style="{StaticResource EnlaceProyecto}"
-                                                    Foreground="#374151"
-                                                    ToolTip="Abrir la toma de notas"/>
-                                        </Border>
+                                    <!-- Un carril del técnico. Va en blanco a propósito: lleva
+                                         varios trabajos y cada uno se llama por su barra. Lo
+                                         que hace aquí es reservar su alto —36, el mismo que
+                                         al otro lado— para que las filas no se descuadren. -->
+                                    <DataTemplate DataType="{x:Type vm:CarrilViewModel}">
+                                        <Border Height="36" BorderBrush="#EEF0F3"
+                                                BorderThickness="0,0,1,1"/>
                                     </DataTemplate>
                                 </ItemsControl.Resources>
                             </ItemsControl>
+                        </ScrollViewer>
+                        </Grid>
 
                             <ScrollViewer x:Name="Pista" Grid.Column="1" HorizontalScrollBarVisibility="Auto"
-                                          VerticalScrollBarVisibility="Disabled">
+                                          VerticalScrollBarVisibility="Auto">
                                 <Grid Width="{Binding Ancho}" HorizontalAlignment="Left">
                                     <!-- Rejilla de semanas, por detrás de todo -->
                                     <ItemsControl ItemsSource="{Binding Semanas}" VerticalAlignment="Stretch">
@@ -1498,47 +2255,121 @@
                                     <ItemsControl ItemsSource="{Binding Filas}">
                                         <ItemsControl.Resources>
                                             <!-- Las cabeceras de técnico no llevan barra, pero sí
-                                                 ocupan su fila para no descuadrar las columnas -->
+                                                 ocupan su fila para no descuadrar las columnas.
+                                                 Su alto tiene que ser el mismo que el de la
+                                                 columna de nombres, o las filas se desalinean. -->
                                             <DataTemplate DataType="{x:Type vm:GrupoDeTecnicoViewModel}">
-                                                <Border Height="38" Background="#F8FAFC"
+                                                <Border Height="30" Background="#F8FAFC"
                                                         BorderBrush="#E2E8F0" BorderThickness="0,0,0,1"/>
                                             </DataTemplate>
 
-                                            <DataTemplate DataType="{x:Type vm:TarjetaPlanViewModel}">
-                                                <Grid Height="46">
-                                                    <!-- Se arrastra entera desde el centro; los
-                                                         bordes cambian solo el inicio o el fin -->
-                                                    <Button Command="{Binding Planificar}"
-                                                            local:ArrastreDeBarra.Activo="True"
-                                                            Style="{StaticResource BarraPlan}"
-                                                            Background="{Binding Color}"
-                                                            Width="{Binding Ancho}"
-                                                            Margin="{Binding Izquierda,
-                                                                     Converter={StaticResource Desplazamiento}}"
-                                                            ToolTip="{Binding Detalle}">
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <!-- Caja de cartón: las muestras ya están en el laboratorio -->
-                                                            <Path Data="{StaticResource IconoCaja}"
-                                                                  Stroke="White" StrokeThickness="1.2"
-                                                                  StrokeLineJoin="Round" Margin="0,0,6,0"
+                                            <DataTemplate DataType="{x:Type vm:CarrilViewModel}">
+                                                <!--
+                                                    Un carril: todos los trabajos que caben en esta
+                                                    fila sin pisarse, cada uno en su fecha.
+
+                                                    El panel es una rejilla de una sola celda, de
+                                                    modo que los trabajos se superponen y quien los
+                                                    separa es su margen izquierdo. Con un StackPanel
+                                                    irían pegados uno detrás de otro y las fechas
+                                                    dejarían de decir nada.
+
+                                                    El «Carril» marca contra qué se mide el ratón:
+                                                    el panel de las tarjetas se desplaza con ellas
+                                                    y no sirve de referencia.
+                                                -->
+                                                <Grid Height="36" local:ArrastreDeBarra.Carril="True">
+                                                  <ItemsControl ItemsSource="{Binding Tarjetas}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate><Grid/></ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                      <DataTemplate>
+                                                        <!--
+                                                            Un trabajo son sus familias, una tarjeta
+                                                            cada una y pegadas unas a otras. Cogiendo
+                                                            cualquiera se mueven todas; los bordes de
+                                                            fuera estiran el trabajo. Una toma de
+                                                            notas suelta da una sola tarjeta, así que
+                                                            aquí no hay dos casos.
+                                                        -->
+                                                        <ItemsControl ItemsSource="{Binding Trozos}"
+                                                                  HorizontalAlignment="Left"
                                                                   VerticalAlignment="Center"
-                                                                  Visibility="{Binding MuestrasRecibidas,
-                                                                               Converter={StaticResource BoolAVisible}}"/>
-                                                            <TextBlock Text="{Binding Codigo}" Foreground="White"
-                                                                       FontSize="11" FontWeight="SemiBold"
-                                                                       TextTrimming="CharacterEllipsis"/>
-                                                            <!-- Varias familias enlazadas: la barra tiene que
-                                                                 decir que abarca más de una toma de notas -->
-                                                            <Border CornerRadius="7" Background="#33FFFFFF"
-                                                                    Padding="6,1" Margin="7,0,0,0"
-                                                                    VerticalAlignment="Center"
-                                                                    Visibility="{Binding EsGrupo,
-                                                                                 Converter={StaticResource BoolAVisible}}">
-                                                                <TextBlock Text="{Binding EtiquetaDeGrupo}"
-                                                                           Foreground="White" FontSize="10"/>
-                                                            </Border>
-                                                        </StackPanel>
-                                                    </Button>
+                                                                  Margin="{Binding Izquierda,
+                                                                           Converter={StaticResource Desplazamiento}}">
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Button Command="{Binding Planificar}"
+                                                                        local:ArrastreDeBarra.Activo="True"
+                                                                        Style="{StaticResource BarraPlan}"
+                                                                        Background="{Binding Color}"
+                                                                        Width="{Binding Ancho}"
+                                                                        ToolTip="{Binding Detalle}">
+                                                                    <!--
+                                                                        Abrir la toma de notas vivía
+                                                                        en el nombre de la izquierda,
+                                                                        que desapareció al compartir
+                                                                        fila. Va al botón derecho
+                                                                        para no estorbar al arrastre,
+                                                                        que es del izquierdo.
+                                                                    -->
+                                                                    <Button.ContextMenu>
+                                                                        <ContextMenu>
+                                                                            <MenuItem Header="Abrir la toma de notas"
+                                                                                      Command="{Binding Abrir}"/>
+                                                                            <MenuItem Header="Planificar"
+                                                                                      Command="{Binding Planificar}"/>
+                                                                        </ContextMenu>
+                                                                    </Button.ContextMenu>
+                                                                    <!--
+                                                                        Rejilla y no StackPanel: dentro de un
+                                                                        StackPanel horizontal el ancho es
+                                                                        infinito, así que el código se cortaba
+                                                                        en seco en vez de terminar en puntos
+                                                                        suspensivos. Con la columna «*» el
+                                                                        texto sí sabe lo que le queda.
+                                                                    -->
+                                                                    <Grid>
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="Auto"/>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                        </Grid.ColumnDefinitions>
+                                                                        <StackPanel Orientation="Horizontal"
+                                                                                    VerticalAlignment="Center">
+                                                                            <!-- Caja de cartón: las muestras ya están en el laboratorio -->
+                                                                            <Path Data="{StaticResource IconoCaja}"
+                                                                                  Stroke="White" StrokeThickness="1.2"
+                                                                                  StrokeLineJoin="Round" Margin="0,0,6,0"
+                                                                                  VerticalAlignment="Center"
+                                                                                  Visibility="{Binding MuestrasRecibidas,
+                                                                                               Converter={StaticResource BoolAVisible}}"/>
+
+                                                                            <!-- Candado: estas fechas no las mueve el arrastre -->
+                                                                            <Path Data="{StaticResource IconoCandado}"
+                                                                                  Stroke="White" StrokeThickness="1.2"
+                                                                                  StrokeLineJoin="Round" Margin="0,0,6,0"
+                                                                                  VerticalAlignment="Center"
+                                                                                  ToolTip="Fechas bloqueadas"
+                                                                                  Visibility="{Binding FechasBloqueadas,
+                                                                                               Converter={StaticResource BoolAVisible}}"/>
+                                                                        </StackPanel>
+                                                                        <TextBlock Grid.Column="1" Text="{Binding Codigo}"
+                                                                                   Foreground="White"
+                                                                                   FontSize="11" FontWeight="SemiBold"
+                                                                                   VerticalAlignment="Center"
+                                                                                   TextTrimming="CharacterEllipsis"/>
+                                                                    </Grid>
+                                                                </Button>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                      </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                  </ItemsControl>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.Resources>
@@ -1552,17 +2383,30 @@
                                             Visibility="{Binding HoyVisible, Converter={StaticResource BoolAVisible}}"/>
                                 </Grid>
                             </ScrollViewer>
-                        </Grid>
-                    </ScrollViewer>
+                    </Grid>
 
-                    <!-- Servicios sin fechas: se enseñan aparte para que no se pierdan -->
+                    <!-- Servicios sin fechas: se enseñan aparte para que no se pierdan.
+                         Plegable, porque con muchos se comía media pantalla; desplegado por
+                         defecto, porque lo que no está planificado es lo que hay que
+                         planificar. -->
                     <Border Grid.Row="2" Background="#F8FAFC" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0"
-                            Padding="14,10" Visibility="{Binding HaySinFechas,
+                            Padding="14,6,14,10" Visibility="{Binding HaySinFechas,
                                                         Converter={StaticResource BoolAVisible}}">
                         <StackPanel>
-                            <TextBlock Text="SIN FECHAS O FUERA DEL PERIODO" FontSize="10" FontWeight="Bold"
-                                       Foreground="#94A3B8" Margin="0,0,0,8"/>
-                            <ItemsControl ItemsSource="{Binding SinFechas}">
+                            <Button Command="{Binding AlternarSinFechas}" Cursor="Hand"
+                                    Background="Transparent" BorderThickness="0" Padding="0,4"
+                                    HorizontalAlignment="Left" HorizontalContentAlignment="Left"
+                                    ToolTip="Plegar o desplegar los que están sin planificar">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding MarcaSinFechas}" FontSize="10" FontWeight="Bold"
+                                               Foreground="#94A3B8" Margin="0,0,5,0"/>
+                                    <TextBlock Text="SIN FECHAS O FUERA DEL PERIODO" FontSize="10"
+                                               FontWeight="Bold" Foreground="#94A3B8"/>
+                                </StackPanel>
+                            </Button>
+                            <ItemsControl ItemsSource="{Binding SinFechas}" Margin="0,6,0,0"
+                                          Visibility="{Binding SinFechasDesplegado,
+                                                       Converter={StaticResource BoolAVisible}}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
@@ -1586,7 +2430,7 @@
                                                 </StackPanel>
                                                 <TextBlock Text="{Binding Tecnico}" FontSize="10"
                                                            Foreground="#9CA3AF"/>
-                                                <Button Content="Planificar…" Command="{Binding Planificar}"
+                                                <Button Content="Planificar" Command="{Binding Planificar}"
                                                         Padding="10,4" Margin="0,7,0,0" Cursor="Hand"
                                                         HorizontalAlignment="Left" FontSize="11"/>
                                             </StackPanel>
@@ -1612,11 +2456,11 @@
 
         <Menu Grid.Row="0" Background="#FFFFFF" BorderBrush="#E1E4E8" BorderThickness="0,0,0,1" Padding="6,3">
             <MenuItem Header="_Archivo">
-                <MenuItem Header="_Nueva toma de notas…" Command="{Binding NuevoProyecto}"
+                <MenuItem Header="_Nueva toma de notas" Command="{Binding NuevoProyecto}"
                           ToolTip="Darla de alta con nombre y técnico, para poder planificarla ya"/>
                 <Separator/>
                 <MenuItem Header="Nueva _pestaña" Command="{Binding NuevaPestana}" InputGestureText="Ctrl+T"/>
-                <MenuItem Header="_Abrir toma de notas…" Command="{Binding Abrir}" InputGestureText="Ctrl+O"/>
+                <MenuItem Header="_Abrir toma de notas" Command="{Binding Abrir}" InputGestureText="Ctrl+O"/>
                 <MenuItem Header="Tomas de notas _recientes" ItemsSource="{Binding Recientes}"
                           IsEnabled="{Binding HayRecientes}">
                     <MenuItem.ItemContainerStyle>
@@ -1632,9 +2476,9 @@
                 <Separator/>
                 <!-- Actúan sobre la pestaña de delante -->
                 <MenuItem Header="_Guardar" Command="{Binding ActivoDocumento.Guardar}" InputGestureText="Ctrl+S"/>
-                <MenuItem Header="Guardar _como…" Command="{Binding ActivoDocumento.GuardarComo}"/>
+                <MenuItem Header="Guardar _como" Command="{Binding ActivoDocumento.GuardarComo}"/>
                 <Separator/>
-                <MenuItem Header="_Exportar toma de notas (html)…"
+                <MenuItem Header="_Exportar toma de notas (html)"
                           Command="{Binding ActivoDocumento.ExportarInforme}" InputGestureText="Ctrl+P"/>
                 <Separator/>
                 <MenuItem Header="_Cerrar pestaña" Command="{Binding CerrarPestana}"
@@ -1647,8 +2491,43 @@
                 <MenuItem Header="_Inicio" Command="{Binding VerInicio}"
                           ToolTip="Volver a la portada sin cerrar lo que tengas abierto"/>
                 <Separator/>
-                <!-- El tablero es una pestaña más, y solo una -->
-                <MenuItem Header="_Gestión de proyectos" Command="{Binding IrAGestion}"/>
+                <!--
+                    El tablero es una pestaña más, y solo una.
+
+                    «Ir a gestión» respeta la vista en la que se estaba —volver desde el
+                    menú a media planificación no debe devolverte al tablero—; debajo, las
+                    cuatro por su nombre para quien ya sabe adónde va. La marca dice en
+                    cuál se está, que es la pregunta que se hace al abrir el menú.
+                -->
+                <MenuItem Header="_Gestión de proyectos">
+                    <MenuItem Header="_Ir a gestión" Command="{Binding IrAGestion}"
+                              ToolTip="Abre gestión en la vista en la que estabas"/>
+                    <Separator/>
+                    <MenuItem Header="_Tablero"
+                              Command="{Binding IrAVistaDeGestion}"
+                              CommandParameter="{x:Static vm:Vista.Tablero}"
+                              IsCheckable="True"
+                              IsChecked="{Binding Gestion.VistaTablero, Mode=OneWay}"
+                              ToolTip="Qué falta por rellenar, servicio a servicio"/>
+                    <MenuItem Header="_Calendario"
+                              Command="{Binding IrAVistaDeGestion}"
+                              CommandParameter="{x:Static vm:Vista.Calendario}"
+                              IsCheckable="True"
+                              IsChecked="{Binding Gestion.VistaCalendario, Mode=OneWay}"
+                              ToolTip="Cuándo toca cada uno, por semanas y por técnico"/>
+                    <MenuItem Header="Car_ga"
+                              Command="{Binding IrAVistaDeGestion}"
+                              CommandParameter="{x:Static vm:Vista.Carga}"
+                              IsCheckable="True"
+                              IsChecked="{Binding Gestion.VistaCarga, Mode=OneWay}"
+                              ToolTip="Cuánto tiene comprometido cada técnico cada mes"/>
+                    <MenuItem Header="_BBDD"
+                              Command="{Binding IrAVistaDeGestion}"
+                              CommandParameter="{x:Static vm:Vista.Bbdd}"
+                              IsCheckable="True"
+                              IsChecked="{Binding Gestion.VistaBbdd, Mode=OneWay}"
+                              ToolTip="Todas las tomas de notas, con buscador"/>
+                </MenuItem>
             </MenuItem>
 
             <!-- Listas del laboratorio, comunes a todas las tomas de notas -->
@@ -1656,21 +2535,21 @@
                 <!-- Lo primero: de esta carpeta sale todo lo demás -->
                 <!-- El nombre las dice las dos: son la carpeta donde se buscan los
                      proyectos y la compartida, y en una sola ventana no se adivinaba -->
-                <MenuItem Header="_Carpetas: proyectos y compartida…"
+                <MenuItem Header="_Carpetas: proyectos y compartida"
                           Command="{Binding ElegirCarpetaDelLaboratorio}"
                           ToolTip="Dónde se buscan los proyectos y dónde están las normas, los técnicos y la tarifa"/>
                 <Separator/>
-                <MenuItem Header="_Técnicos…" Command="{Binding EditarTecnicos}"/>
-                <MenuItem Header="_Capacidad y tarifa…" Command="{Binding EditarCapacidad}"/>
+                <MenuItem Header="_Técnicos" Command="{Binding EditarTecnicos}"/>
+                <MenuItem Header="_Capacidad y tarifa" Command="{Binding EditarCapacidad}"/>
                 <Separator/>
-                <MenuItem Header="_Normas instaladas…" Command="{Binding VerPlantillas}"/>
+                <MenuItem Header="_Normas instaladas" Command="{Binding VerPlantillas}"/>
             </MenuItem>
 
             <MenuItem Header="A_yuda">
-                <MenuItem Header="_Reportar un problema…" Command="{Binding ReportarProblema}"
+                <MenuItem Header="_Reportar un problema" Command="{Binding ReportarProblema}"
                           ToolTip="A quién avisar cuando algo falla, y con qué datos"/>
                 <Separator/>
-                <MenuItem Header="_Acerca de…" Command="{Binding VerAcercaDe}"/>
+                <MenuItem Header="_Acerca de" Command="{Binding VerAcercaDe}"/>
             </MenuItem>
         </Menu>
 
@@ -1756,7 +2635,8 @@
                 </ItemsControl>
 
                 <Button Content="+" Command="{Binding NuevaPestana}" Cursor="Hand"
-                        Width="30" Height="30" FontSize="16" FontWeight="Bold" Padding="0"
+                        Style="{StaticResource BotonIcono}"
+                        Width="30" Height="30" FontSize="16" FontWeight="Bold"
                         Background="Transparent" BorderThickness="0" Foreground="#374151"
                         ToolTip="Abrir otra toma de notas (Ctrl+T)"/>
             </WrapPanel>
@@ -1767,8 +2647,18 @@
 
 
 
-        <Border Grid.Row="2" Background="#111827" Padding="20,7">
-            <TextBlock Text="{Binding Mensaje}" Foreground="#D1D5DB"/>
-        </Border>
+        <!--
+            Aquí iba la franja oscura del pie de ventana. Se quitó el 2026‑08‑06 (DD‑133):
+            ocupaba sitio en todas las pantallas para no decir nada casi nunca.
+
+            Lo que se decía por ahí se repartió. Lo que **falla** va a una ventana
+            —`ServiciosDeVentana.Avisar`—, porque un «no se pudo guardar» tiene que
+            interrumpir; las **confirmaciones** se quitaron, porque ya se veían por otro
+            lado: la ruta está bajo el título, el punto de «sin guardar» desaparece solo al
+            guardar y el informe exportado se abre en el visor.
+
+            La fila 2 se deja declarada: si algún día vuelve a hacer falta algo fijo abajo
+            —una barra de progreso, por ejemplo— tiene sitio sin retocar la rejilla.
+        -->
     </Grid>
 </Window>

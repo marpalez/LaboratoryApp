@@ -75,11 +75,87 @@ public class ExploracionTests : IDisposable
         var escondida = Path.Combine(_clientes, ".papelera");
         Directory.CreateDirectory(escondida);
         new DirectoryInfo(escondida).Attributes |= FileAttributes.Hidden;
-        File.Copy(Crear("moonoff", "moono2304"), Path.Combine(escondida, "borrado.lumproj"));
+        File.Copy(Crear("moonoff", "moono2304"), Path.Combine(escondida, "borrado.lmnlab"));
 
         var resumenes = Explorar(new ExploradorDeProyectos(_repositorio, _cache));
 
         Assert.DoesNotContain(resumenes, r => r.Ruta.Contains(".papelera"));
+    }
+
+    /// <summary>
+    /// Los ficheros con la extensión anterior siguen apareciendo. El día que se cambió
+    /// <c>.lumproj</c> por <c>.lmnlab</c>, dejar de escanearlos habría hecho desaparecer
+    /// del tablero todo lo grabado hasta entonces — sin error y sin explicación.
+    /// </summary>
+    [Fact]
+    public void EncuentraTambienLosDeLaExtensionAnterior()
+    {
+        Crear("antares", "antar2504");
+
+        var vieja = Path.Combine(_clientes, "moonoff", "moono2304", "01", "tomadenotas");
+        Directory.CreateDirectory(vieja);
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "moono230401-00", CodigoServicio = "moono2304", NumeroMuestras = 1 };
+        datos.Establecer("proyecto", "tecnico1", "Javier Ibor");
+        _repositorio.Guardar(datos, Path.Combine(vieja, "moono2304" + RepositorioDeProyectos.ExtensionAnterior), "1.0.0");
+
+        var resumenes = Explorar(new ExploradorDeProyectos(_repositorio, _cache));
+
+        Assert.Equal(2, resumenes.Count);
+        Assert.Contains(resumenes, r => r.CodigoServicio == "moono2304");
+    }
+
+    /// <summary>
+    /// <b>Al añadir un campo al resumen, lo guardado deja de valer.</b> Sin esto, el
+    /// listado enseñaría huecos en blanco durante días —hasta que cada fichero se tocara
+    /// por su cuenta— y nada explicaría por qué unos proyectos traen el dato y otros no.
+    /// </summary>
+    [Fact]
+    public void AlCambiarLaFormaDelResumenLaCacheDejaDeValer()
+    {
+        var ruta = Crear("antares", "antar2504");
+        var cache = CacheDeResumenes.Cargar(_cache);
+        var fichero = new FileInfo(ruta);
+
+        cache.Anotar(fichero, "60598/1.0.0", AnalizadorDeProyectos.NoLegible(ruta, fichero.LastWriteTime, "x"));
+        cache.Guardar();
+
+        // Lo escrito con la forma de ahora se recupera…
+        Assert.NotNull(CacheDeResumenes.Cargar(_cache).Recuperar(fichero, "60598/1.0.0"));
+
+        // …y lo escrito sin marca de forma —como todo lo grabado antes— no.
+        var json = File.ReadAllText(_cache);
+        File.WriteAllText(_cache, json.Replace($"\"Version\":\"{CacheDeResumenes.Formato}\"", "\"Version\":\"\"")
+                                      .Replace($"\"version\": \"{CacheDeResumenes.Formato}\"", "\"version\": \"\""));
+
+        Assert.Null(CacheDeResumenes.Cargar(_cache).Recuperar(fichero, "60598/1.0.0"));
+    }
+
+    /// <summary>Los datos nuevos del listado suben al resumen sin releer el fichero.</summary>
+    [Fact]
+    public void ElResumenTraeAcreditacionGradosYColaboradores()
+    {
+        var carpeta = Path.Combine(_clientes, "antares", "antar2504", "01", "tomadenotas");
+        Directory.CreateDirectory(carpeta);
+
+        var datos = new DatosProyecto { CodigoServicio = "antar2504", NumeroMuestras = 2 };
+        datos.Establecer("proyecto", "tecnico1", "Javier Ibor");
+        datos.Establecer("proyecto", "tecnico2", "Daniel Martínez");
+        datos.Seleccion("acreditacion").Add("ENAC");
+        datos.Colaboradores.Add(new Colaborador { Laboratorio = "IMQ Italia", EnsayoYMotivo = "Fotobiología" });
+        datos.Establecer("proyecto", "ipPrimeraCifra", "IP6X", 1);
+        datos.Establecer("proyecto", "ipSegundaCifra", "IPX5", 1);
+        datos.Establecer("proyecto", "gradoIk", "IK08", 2);
+
+        var ruta = Path.Combine(carpeta, "antar2504" + RepositorioDeProyectos.Extension);
+        _repositorio.Guardar(datos, ruta, "1.0.0");
+
+        var resumen = Assert.Single(Explorar(new ExploradorDeProyectos(_repositorio, _cache)));
+
+        Assert.Equal("Daniel Martínez", resumen.Tecnico2);
+        Assert.Equal(["ENAC"], resumen.Acreditaciones);
+        Assert.Equal(["IMQ Italia"], resumen.Colaboradores);
+        Assert.Equal("IP65", resumen.GradoIp);
+        Assert.Equal("IK08", resumen.GradoIk);
     }
 
     [Fact]

@@ -16,16 +16,26 @@ public sealed class CatalogoDeTecnicos
 {
     public const string NombreDeFichero = "tecnicos.json";
 
-    /// <summary>Plantilla de partida, la del laboratorio a 2026‑08‑06.</summary>
-    public static IReadOnlyList<string> Iniciales =>
-    [
-        "Daniel Martínez",
-        "Daniel Pastor",
-        "Javier Ibor",
-        "Javier Salvador",
-        "Mario Madrigal",
-        "Raúl González"
-    ];
+    /// <summary>
+    /// Con qué lista arranca una instalación nueva: <b>sin ningún técnico</b>, solo el
+    /// cajón de los que están sin asignar.
+    /// <para>
+    /// Hasta el 2026‑08‑06 venían seis nombres cableados —los del laboratorio el día que
+    /// se escribió—, y eso está mal por dos motivos: <b>son personas concretas de un
+    /// laboratorio concreto</b> metidas en el programa, y quien instale en otro sitio se
+    /// encuentra una plantilla ajena que tiene que borrar a mano. La lista la hace el
+    /// laboratorio desde <c>Configuración</c>, que es de donde tiene que salir.
+    /// </para>
+    /// <para>
+    /// El único que viene es <see cref="CargaPorTecnico.SinTecnico"/>, y se usa <b>ese
+    /// mismo texto</b> y no uno parecido a propósito: es con el que el calendario, la carga
+    /// y los filtros agrupan lo que está sin repartir. Si aquí pusiera «Sin técnico» y
+    /// allí «(sin técnico)», un servicio elegido a mano y otro sin asignar saldrían en
+    /// <b>dos filas distintas queriendo decir lo mismo</b>. Los paréntesis siguen
+    /// haciendo su trabajo: nadie se llama así, luego no puede chocar con una persona.
+    /// </para>
+    /// </summary>
+    public static IReadOnlyList<string> Iniciales => [CargaPorTecnico.SinTecnico];
 
     private readonly List<string> _tecnicos;
 
@@ -37,8 +47,8 @@ public sealed class CatalogoDeTecnicos
 
     /// <summary>
     /// Lee el catálogo de una carpeta. Si no hay fichero todavía —instalación nueva—
-    /// devuelve la lista de partida; si el fichero está roto, también, porque quedarse
-    /// sin técnicos impediría abrir proyectos.
+    /// devuelve la lista de partida; si el fichero está roto, también, porque quedarse sin
+    /// <b>ninguna</b> opción dejaría el desplegable en blanco y el técnico 1 es obligatorio.
     /// </summary>
     public static CatalogoDeTecnicos Cargar(string carpeta)
     {

@@ -1,0 +1,44 @@
+{
+  "formato": "lmnlab/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-06T14:53:16.5448785+02:00",
+  "codigoTomaDeNotas": "FARAD261210-00",
+  "colaboradores": [],
+  "codigoServicio": "FARAD2612",
+  "numeroMuestras": 1,
+  "normas": [
+    "62262_2002_A1"
+  ],
+  "normaPrincipal": "62262_2002_A1",
+  "patronIdentificador": "EBP_CLIM{codigoServicio}",
+  "planificacion": {
+    "inicio": "2026-12-09T00:00:00",
+    "fin": "2026-12-14T00:00:00",
+    "estado": "planificado",
+    "archivado": false,
+    "importe": 1632,
+    "fechasBloqueadas": false
+  },
+  "selecciones": {},
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Javier Salvador"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico2",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Mario Madrigal"
+    }
+  ],
+  "na": [],
+  "checklists": []
+}

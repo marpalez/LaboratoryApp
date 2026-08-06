@@ -10,7 +10,16 @@ namespace LumNotas.Core.Gestion;
 /// </summary>
 public enum EstadoDeProyecto
 {
+    /// <summary>
+    /// Se lee «Por planificar». El nombre interno se queda como estaba: es lo que hay
+    /// escrito en los <c>.lmnlab</c> ya guardados, y cambiarlo dejaría a los proyectos
+    /// viejos sin estado que reconocer.
+    /// </summary>
     PorHacer,
+
+    /// <summary>Ya tiene fechas, pero todavía no se ha empezado a ensayar.</summary>
+    Planificado,
+
     EnCurso,
     PendienteCliente,
     Terminado
@@ -20,7 +29,7 @@ public enum EstadoDeProyecto
 /// Planificación de un servicio: cuándo empieza, cuándo termina, en qué estado está
 /// y si las muestras han llegado. Es lo que alimenta la línea de tiempo.
 /// <para>
-/// <b>Vive en el <c>.lumproj</c> pero no la gestiona la toma de notas.</b> Solo la
+/// <b>Vive en el <c>.lmnlab</c> pero no la gestiona la toma de notas.</b> Solo la
 /// escribe el calendario; al guardar un proyecto desde su pestaña, la planificación
 /// se conserva releyéndola del disco. Así, mover una fecha desde el calendario no lo
 /// pisa el técnico que tenía ese proyecto abierto desde hace media hora.
@@ -73,7 +82,37 @@ public sealed class Planificacion
     /// </summary>
     public string? Grupo { get; set; }
 
-    // Lo que sigue se calcula, no se guarda: sin [JsonIgnore] el .lumproj acababa con
+    /// <summary>
+    /// Cuándo se ensayó de verdad: la primera y la última fecha escritas en la toma de
+    /// notas. Las rellena el programa al dar el servicio por terminado, y son lo que
+    /// permite preguntarle a la BBDD «¿qué se hizo entre enero y marzo?».
+    /// <para>
+    /// <b>No sustituyen a <see cref="Inicio"/> y <see cref="Fin"/></b>: aquellas son las
+    /// previstas y se mueven por el calendario; estas son las que ocurrieron. Un servicio
+    /// planificado para marzo y ensayado en mayo tiene las cuatro, y las cuatro dicen algo
+    /// distinto.
+    /// </para>
+    /// </summary>
+    public DateTime? EnsayoDesde { get; set; }
+
+    public DateTime? EnsayoHasta { get; set; }
+
+    /// <summary>
+    /// Fechas bloqueadas: ni el diálogo ni el arrastre pueden moverlas.
+    /// <para>
+    /// Es para lo que está comprometido con el cliente. En el calendario se planifica
+    /// arrastrando, y un roce con el ratón mueve un trabajo sin que nadie se entere; con
+    /// esto puesto, ese roce no hace nada.
+    /// </para>
+    /// <para>
+    /// <b>Y también frena a la cadena de un grupo</b>, que mueve fechas por su cuenta al
+    /// recolocar las familias. Si no, la única forma de romper el bloqueo sería la que
+    /// nadie ve venir.
+    /// </para>
+    /// </summary>
+    public bool FechasBloqueadas { get; set; }
+
+    // Lo que sigue se calcula, no se guarda: sin [JsonIgnore] el .lmnlab acababa con
     // campos como «hayFechas» o «esVacia», que además mentirían al releerlos.
 
     [JsonIgnore]
@@ -83,7 +122,9 @@ public sealed class Planificacion
     [JsonIgnore]
     public bool EsVacia => Inicio is null && Fin is null && RecepcionMuestras is null
                            && Estado == EstadoDeProyecto.PorHacer && !Archivado && Importe is null
-                           && string.IsNullOrWhiteSpace(Grupo);
+                           && string.IsNullOrWhiteSpace(Grupo)
+                           && EnsayoDesde is null && EnsayoHasta is null
+                           && !FechasBloqueadas;
 
     /// <summary>Fin corregido: una fecha de fin anterior al inicio dibujaría al revés.</summary>
     [JsonIgnore]
@@ -107,12 +148,16 @@ public sealed class Planificacion
         RecepcionMuestras = RecepcionMuestras,
         Archivado = Archivado,
         Importe = Importe,
-        Grupo = Grupo
+        Grupo = Grupo,
+        EnsayoDesde = EnsayoDesde,
+        EnsayoHasta = EnsayoHasta,
+        FechasBloqueadas = FechasBloqueadas
     };
 
     public static string EtiquetaDe(EstadoDeProyecto estado) => estado switch
     {
-        EstadoDeProyecto.PorHacer => "Por hacer",
+        EstadoDeProyecto.PorHacer => "Por planificar",
+        EstadoDeProyecto.Planificado => "Planificado",
         EstadoDeProyecto.EnCurso => "En curso",
         EstadoDeProyecto.PendienteCliente => "Pendiente cliente",
         EstadoDeProyecto.Terminado => "Terminado",
@@ -123,15 +168,18 @@ public sealed class Planificacion
     public static string ColorDe(EstadoDeProyecto estado) => estado switch
     {
         EstadoDeProyecto.PorHacer => "#94A3B8",
+        EstadoDeProyecto.Planificado => "#7C3AED",
         EstadoDeProyecto.EnCurso => "#2563EB",
         EstadoDeProyecto.PendienteCliente => "#D97706",
         EstadoDeProyecto.Terminado => "#16A34A",
         _ => "#94A3B8"
     };
 
+    /// <summary>En el orden en que avanza un trabajo, que es el del desplegable.</summary>
     public static IReadOnlyList<EstadoDeProyecto> Estados =>
     [
         EstadoDeProyecto.PorHacer,
+        EstadoDeProyecto.Planificado,
         EstadoDeProyecto.EnCurso,
         EstadoDeProyecto.PendienteCliente,
         EstadoDeProyecto.Terminado
@@ -200,6 +248,21 @@ public sealed class EjeDeSemanas
 {
     /// <summary>Semanas de margen a cada lado, para que nada quede pegado al borde.</summary>
     private const int Margen = 2;
+
+    /// <summary>
+    /// Meses vacíos que se dibujan <b>siempre por detrás</b> del último trabajo.
+    /// <para>
+    /// Dos semanas de margen no bastaban: al arrastrar un trabajo hasta el borde no había
+    /// calendario debajo donde soltarlo, y había que parar a pedir sitio con «▶». Con medio
+    /// año por delante siempre hay a dónde ir, incluido el salto de año — que es donde más
+    /// se notaba, porque el año siguiente ni se dibujaba.
+    /// </para>
+    /// <para>
+    /// Solo por detrás: hacia atrás no se planifica, y estirar el eje por la izquierda solo
+    /// serviría para tener que desplazarse más para llegar a lo de hoy.
+    /// </para>
+    /// </summary>
+    private const int MesesDeCola = 6;
 
     private EjeDeSemanas(DateTime desde, int semanas, double anchoSemana, DateTime hoy)
     {
@@ -316,7 +379,7 @@ public sealed class EjeDeSemanas
         }
 
         var desde = primero.AddDays(-7 * Margen);
-        var hasta = ultimo.AddDays(7 * Margen);
+        var hasta = LunesDe(ultimo.AddMonths(MesesDeCola));
         var semanas = (int)Math.Round((hasta - desde).TotalDays / 7.0) + 1;
 
         // Con pocos proyectos el eje saldría muy corto y el calendario parecería vacío.

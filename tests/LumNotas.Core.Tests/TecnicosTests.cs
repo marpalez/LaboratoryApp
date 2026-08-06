@@ -41,14 +41,36 @@ public class TecnicosTests : IDisposable
 
     // ---- el catálogo -------------------------------------------------------
 
+    /// <summary>
+    /// <b>Una instalación nueva no trae ningún técnico</b> (2026‑08‑06). Antes venían seis
+    /// nombres cableados —los del laboratorio el día que se escribió el código—, y eso
+    /// metía personas concretas dentro del programa y obligaba a borrarlas a mano a
+    /// cualquiera que lo instalara en otro sitio.
+    /// <para>
+    /// Lo único que viene es el <b>cajón</b> de los que están sin asignar, y con el mismo
+    /// texto que usan el calendario, la carga y los filtros: si aquí pusiera «Sin técnico»
+    /// y allí «(sin técnico)» habría dos filas queriendo decir lo mismo.
+    /// </para>
+    /// </summary>
     [Fact]
-    public void LaListaDePartidaSonLosSeisTecnicosDelLaboratorio()
+    public void UnaInstalacionNuevaNoTraeNingunTecnico()
     {
         var catalogo = CatalogoDeTecnicos.DePartida();
 
-        Assert.Equal(6, catalogo.Tecnicos.Count);
+        Assert.Equal([CargaPorTecnico.SinTecnico], catalogo.Tecnicos);
+    }
+
+    /// <summary>Y el cajón no estorba: se le añaden personas encima con normalidad.</summary>
+    [Fact]
+    public void SobreLaListaVaciaSeAnadenLosDelLaboratorio()
+    {
+        var catalogo = CatalogoDeTecnicos.DePartida();
+
+        Assert.True(catalogo.Anadir("Raúl González"));
+        Assert.True(catalogo.Anadir("Daniel Martínez"));
+
+        Assert.Contains(CargaPorTecnico.SinTecnico, catalogo.Tecnicos);
         Assert.Contains("Daniel Martínez", catalogo.Tecnicos);
-        Assert.Contains("Raúl González", catalogo.Tecnicos);
 
         // Ordenada, que es como se busca un nombre en un desplegable.
         Assert.Equal(catalogo.Tecnicos.OrderBy(t => t, StringComparer.CurrentCultureIgnoreCase), catalogo.Tecnicos);
@@ -58,6 +80,7 @@ public class TecnicosTests : IDisposable
     public void LaListaSobreviveAlGuardadoYALaLectura()
     {
         var catalogo = CatalogoDeTecnicos.DePartida();
+        catalogo.Anadir("Javier Ibor");
         catalogo.Anadir("Ana Bellés");
         catalogo.Quitar("Javier Ibor");
         catalogo.Guardar(_carpeta);
@@ -85,6 +108,7 @@ public class TecnicosTests : IDisposable
     public void NoSeAdmitenNombresRepetidosNiVacios()
     {
         var catalogo = CatalogoDeTecnicos.DePartida();
+        catalogo.Anadir("Javier Ibor");
 
         Assert.False(catalogo.Anadir("  "));
         Assert.False(catalogo.Anadir("Javier Ibor"));
@@ -101,6 +125,7 @@ public class TecnicosTests : IDisposable
     public void UnNombreQueNoEstaEnLaListaSeSigueOfreciendo()
     {
         var catalogo = CatalogoDeTecnicos.DePartida();
+        catalogo.Anadir("Javier Ibor");
 
         var ofrecidos = catalogo.ConNombreSuelto("D. Martínez", null);
 
@@ -133,7 +158,7 @@ public class TecnicosTests : IDisposable
     [Fact]
     public void CorregirElNombreNoTocaNadaMas()
     {
-        var datos = new DatosProyecto { CodigoServicio = "111112026", NumeroMuestras = 3 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "11111202601-00", CodigoServicio = "111112026", NumeroMuestras = 3 };
         datos.Establecer("proyecto", "tecnico1", "Javer Ibor");
         datos.Establecer("6", "ambiente.fecha", new DateTime(2026, 7, 20));
         datos.Marcar("7", "sujecion", "tornillo");
@@ -164,6 +189,7 @@ public class TecnicosTests : IDisposable
         var ruta = Guardar("111112026", "Javier Ibor");
 
         var catalogo = CatalogoDeTecnicos.DePartida();
+        catalogo.Anadir("Javier Ibor");
         catalogo.Quitar("Javier Ibor");
         catalogo.Guardar(_carpeta);
 
@@ -201,7 +227,7 @@ public class TecnicosTests : IDisposable
     [Fact]
     public void EscribirElResponsableLoDejaDondeLaPlantillaLoDeclara()
     {
-        var datos = new DatosProyecto { CodigoServicio = "111112026" };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "11111202601-00", CodigoServicio = "111112026" };
         datos.Tecnico1 = "Javier Ibor";
 
         Assert.Equal("Javier Ibor", datos.Obtener(DatosProyecto.Cabecera, DatosProyecto.CampoTecnico1));
@@ -219,7 +245,7 @@ public class TecnicosTests : IDisposable
     [Fact]
     public void ElResponsableEsUnoAunqueElProyectoLleveVariasNormas()
     {
-        var datos = new DatosProyecto { CodigoServicio = "111112026", NumeroMuestras = 1 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "11111202601-00", CodigoServicio = "111112026", NumeroMuestras = 1 };
         datos.Tecnico1 = "Javier Ibor";
 
         var normas = Contexto.TodasLasPlantillas().ToList();
@@ -228,7 +254,7 @@ public class TecnicosTests : IDisposable
         // Se mire por donde se mire —cambiando cuál va primera— el responsable es el mismo.
         foreach (var orden in new[] { normas, Enumerable.Reverse(normas).ToList() })
             Assert.Equal("Javier Ibor",
-                AnalizadorDeProyectos.Analizar(orden, datos, "x.lumproj", DateTime.Now).Tecnico);
+                AnalizadorDeProyectos.Analizar(orden, datos, "x.lmnlab", DateTime.Now).Tecnico);
     }
 
     [Fact]
@@ -245,6 +271,8 @@ public class TecnicosTests : IDisposable
     public void CorregirEnLaListaNoAdmiteChocarConOtroTecnico()
     {
         var catalogo = CatalogoDeTecnicos.DePartida();
+        catalogo.Anadir("Javier Ibor");
+        catalogo.Anadir("Mario Madrigal");
 
         Assert.False(catalogo.Renombrar("Javier Ibor", "Mario Madrigal"));
         Assert.True(catalogo.Renombrar("Javier Ibor", "Javier Ibor Gil"));

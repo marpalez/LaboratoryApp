@@ -156,7 +156,7 @@ public class PlantillasCompartidasTests : IDisposable
             .Comparar(Contexto.CarpetaDePlantillas(), _proyectos).HayAlgo);
 
         // Llega una norma a este equipo y todavía no está publicada.
-        File.Delete(Path.Combine(CarpetaCompartida(), "plantilla-60529_2018_1.0.0.json"));
+        File.Delete(Path.Combine(CarpetaCompartida(), "plantilla-60529_1991_1.0.0.json"));
 
         var pendientes = PlantillasCompartidas.Comparar(Contexto.CarpetaDePlantillas(), _proyectos);
 
@@ -175,7 +175,7 @@ public class PlantillasCompartidasTests : IDisposable
         PlantillasCompartidas.Publicar(Contexto.CarpetaDePlantillas(), _proyectos);
 
         // Se rebaja la publicada, como si aquí se hubiera corregido la plantilla.
-        var publicada = Path.Combine(CarpetaCompartida(), "plantilla-60529_2018_1.0.0.json");
+        var publicada = Path.Combine(CarpetaCompartida(), "plantilla-60529_1991_1.0.0.json");
         File.WriteAllText(publicada,
             File.ReadAllText(publicada).Replace("\"version\": \"1.0.0\"", "\"version\": \"0.9.0\""));
 

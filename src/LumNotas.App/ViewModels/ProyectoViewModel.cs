@@ -146,7 +146,13 @@ public sealed class GradoDeMuestraViewModel(
 }
 
 /// <summary>Una casilla que marca o desmarca un valor dentro de un conjunto.</summary>
-public sealed class SeleccionViewModel(string etiqueta, ISet<string> conjunto, Action alCambiar) : ObservableObject
+/// <param name="marcar">
+/// Cómo se apunta o se quita del conjunto. Se puede sustituir porque hay campos donde una
+/// opción excluye a las demás —«Sin acreditar»— y entonces marcar una casilla también
+/// desmarca otras. Por defecto, añadir y quitar a secas.
+/// </param>
+public sealed class SeleccionViewModel(string etiqueta, ISet<string> conjunto, Action alCambiar,
+                                       Action<string, bool>? marcar = null) : ObservableObject
 {
     public string Etiqueta { get; } = etiqueta;
 
@@ -155,7 +161,10 @@ public sealed class SeleccionViewModel(string etiqueta, ISet<string> conjunto, A
         get => conjunto.Contains(Etiqueta);
         set
         {
-            if (value) conjunto.Add(Etiqueta); else conjunto.Remove(Etiqueta);
+            if (marcar is not null) marcar(Etiqueta, value);
+            else if (value) conjunto.Add(Etiqueta);
+            else conjunto.Remove(Etiqueta);
+
             Notificar();
             alCambiar();
         }
@@ -163,6 +172,44 @@ public sealed class SeleccionViewModel(string etiqueta, ISet<string> conjunto, A
 
     /// <summary>Relee el conjunto: hace falta cuando lo cambia algo que no es esta casilla.</summary>
     public void Refrescar() => Notificar(nameof(Marcada));
+}
+
+/// <summary>
+/// Una fila de «Otros colaboradores»: qué laboratorio de fuera y qué hizo.
+/// <para>
+/// Los dos campos son texto libre. El del laboratorio no sale de una lista cerrada porque
+/// los laboratorios cambian, y obligar a mantener un catálogo para poder escribir «IMQ
+/// Italia» sería poner una puerta donde no hace falta.
+/// </para>
+/// </summary>
+public sealed class ColaboradorViewModel : ObservableObject
+{
+    private readonly Action _alCambiar;
+
+    public ColaboradorViewModel(Colaborador colaborador,
+                                Action<ColaboradorViewModel> quitar,
+                                Action alCambiar)
+    {
+        Colaborador = colaborador;
+        _alCambiar = alCambiar;
+        Quitar = new Comando(() => quitar(this));
+    }
+
+    public Colaborador Colaborador { get; }
+
+    public string Laboratorio
+    {
+        get => Colaborador.Laboratorio;
+        set { Colaborador.Laboratorio = value ?? ""; Notificar(); _alCambiar(); }
+    }
+
+    public string EnsayoYMotivo
+    {
+        get => Colaborador.EnsayoYMotivo;
+        set { Colaborador.EnsayoYMotivo = value ?? ""; Notificar(); _alCambiar(); }
+    }
+
+    public Comando Quitar { get; }
 }
 
 /// <summary>
@@ -207,6 +254,10 @@ public sealed class ProyectoViewModel : ObservableObject
         CamposExtra = [.. plantilla.Proyecto.Campos
             .Where(c => !ConSitioPropio.Contains(c.Id) && !c.PorMuestra)
             .Select(c => new CampoExtraViewModel(c, datos, alCambiar, EsVerdadera))];
+
+        AnadirColaborador = new Comando(AnadirUnColaborador);
+        foreach (var colaborador in datos.Colaboradores)
+            Colaboradores.Add(new ColaboradorViewModel(colaborador, QuitarColaborador, alCambiar));
 
         RellenarTecnicos();
         ReconstruirMuestras();
@@ -261,15 +312,23 @@ public sealed class ProyectoViewModel : ObservableObject
         get
         {
             var faltan = RequisitosDelProyecto.Faltantes(_plantilla, _datos);
+            // «Completar» y no «rellenar»: desde que el código se exige entero, un campo
+            // puede estar escrito y aun así aparecer aquí.
             return faltan.Count == 0
                 ? ""
-                : "Para que aparezcan los apartados de ensayo falta por rellenar: " + string.Join(", ", faltan) + ".";
+                : "Para que aparezcan los apartados de ensayo falta por completar: " + string.Join(", ", faltan) + ".";
         }
     }
 
     public bool HayQueFalta => QueFalta.Length > 0;
 
     // Estado de cada dato obligatorio, para marcar en rojo lo que falta.
+
+    /// <summary>
+    /// Rojo mientras el código no esté <b>entero</b>, no solo mientras esté vacío: es la
+    /// misma exigencia que el alta (`CodigoDeServicio.EstaCompleto`).
+    /// </summary>
+    public bool FaltaCodigoTomaDeNotas => !CodigoDeServicio.EstaCompleto(CodigoTomaDeNotas);
     public bool FaltaCodigo => string.IsNullOrWhiteSpace(CodigoServicio)
                                || CodigoServicio == RequisitosDelProyecto.CodigoSinAsignar;
     public bool FaltaTecnico1 => string.IsNullOrWhiteSpace(Tecnico1);
@@ -331,6 +390,7 @@ public sealed class ProyectoViewModel : ObservableObject
     {
         Notificar(nameof(QueFalta));
         Notificar(nameof(HayQueFalta));
+        Notificar(nameof(FaltaCodigoTomaDeNotas));
         Notificar(nameof(FaltaCodigo));
         Notificar(nameof(FaltaTecnico1));
         Notificar(nameof(FaltaTa));
@@ -355,16 +415,70 @@ public sealed class ProyectoViewModel : ObservableObject
     /// <summary>Campos propios de la norma. En luminarias está vacía.</summary>
     public IReadOnlyList<CampoExtraViewModel> CamposExtra { get; }
 
+    // ---- laboratorios de fuera ----------------------------------------------
+
+    /// <summary>
+    /// Los colaboradores del servicio. Es una colección que <b>no se sustituye nunca</b>,
+    /// solo se añade y se quita: la lista está atada a la ventana y cambiarla entera
+    /// perdería el foco de la casilla que se estuviera escribiendo.
+    /// </summary>
+    public ObservableCollection<ColaboradorViewModel> Colaboradores { get; } = [];
+
+    public Comando AnadirColaborador { get; }
+
+    /// <summary>
+    /// Añade una fila en blanco para rellenar. No se pide confirmación ni se valida nada:
+    /// una fila vacía no llega al fichero —la descarta el repositorio al guardar—, así que
+    /// pulsar el botón por error no deja rastro.
+    /// </summary>
+    private void AnadirUnColaborador()
+    {
+        var colaborador = new Colaborador();
+        _datos.Colaboradores.Add(colaborador);
+        Colaboradores.Add(new ColaboradorViewModel(colaborador, QuitarColaborador, _alCambiar));
+        _alCambiar();
+    }
+
+    private void QuitarColaborador(ColaboradorViewModel fila)
+    {
+        _datos.Colaboradores.Remove(fila.Colaborador);
+        Colaboradores.Remove(fila);
+        _alCambiar();
+    }
+
     /// <summary>
     /// Ids que ya tienen su propio sitio en la ventana. Todo lo demás que declare la
     /// plantilla se pinta en <see cref="CamposExtra"/>.
     /// </summary>
     private static readonly HashSet<string> ConSitioPropio =
     [
-        "codigoServicio", "tecnico1", "tecnico2", "numeroMuestras",
+        "codigoTomaDeNotas", "codigoServicio", "tecnico1", "tecnico2", "numeroMuestras",
         "numeracionMuestras", "inicioNumeracion", "comentariosGenerales",
         "ta", "clase", "partes2"
     ];
+
+    /// <summary>
+    /// El que identifica esta toma de notas y da nombre al fichero. Al cambiarlo,
+    /// <b>arrastra el código de servicio</b> con sus nueve primeras, salvo que alguien lo
+    /// haya corregido a mano — quién decide eso es <see cref="CodigoDeServicio.Sugerir"/>,
+    /// en el núcleo y con tests.
+    /// </summary>
+    public string CodigoTomaDeNotas
+    {
+        get => _datos.CodigoTomaDeNotas;
+        set
+        {
+            var anterior = _datos.CodigoTomaDeNotas;
+            var nuevo = value ?? "";
+            if (nuevo == anterior) return;
+
+            _datos.CodigoTomaDeNotas = nuevo;
+            CodigoServicio = CodigoDeServicio.Sugerir(anterior, nuevo, _datos.CodigoServicio);
+
+            Notificar();
+            Notificar(nameof(FaltaCodigoTomaDeNotas));
+        }
+    }
 
     public string CodigoServicio
     {
@@ -373,6 +487,7 @@ public sealed class ProyectoViewModel : ObservableObject
         {
             _datos.CodigoServicio = value ?? "";
             Notificar();
+            Notificar(nameof(FaltaCodigo));
             // Los identificadores de muestra se componen con el código de servicio.
             foreach (var muestra in Muestras) muestra.Refrescar();
             _alCambiar();
@@ -544,11 +659,28 @@ public sealed class CampoExtraViewModel : ObservableObject
         _alCambiar = alCambiar;
         _esVerdadera = esVerdadera;
 
+        // Con una opción excluyente, marcar una casilla puede desmarcar otras, así que
+        // después hay que releerlas todas: la que se acaba de apagar no se entera sola.
         Marcas = EsMultiple
-            ? [.. campo.Opciones.Select(o => new SeleccionViewModel(o, datos.Seleccion(campo.Id), alCambiar))]
+            ? [.. campo.Opciones.Select(o => new SeleccionViewModel(
+                o, datos.Seleccion(campo.Id), alCambiar,
+                campo.OpcionExcluyente is null ? null : Marcar))]
             : [];
 
         AplicarValorPorDefecto();
+    }
+
+    /// <summary>
+    /// Marca o desmarca aplicando la exclusión que declare la plantilla, y repinta todas
+    /// las casillas del campo: al marcar «Sin acreditar» se apagan ENAC, ENEC y CB, y
+    /// ninguna de las tres se entera por su cuenta.
+    /// </summary>
+    private void Marcar(string opcion, bool marcada)
+    {
+        SeleccionExcluyente.Aplicar(
+            _datos.Seleccion(_campo.Id), opcion, marcada, _campo.OpcionExcluyente);
+
+        foreach (var marca in Marcas) marca.Refrescar();
     }
 
     /// <summary>

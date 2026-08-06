@@ -1,5 +1,7 @@
+using System.Reflection;
 using System.Text;
 using LumNotas.Core.Datos;
+using LumNotas.Core.Gestion;
 using LumNotas.Core.Motor;
 using LumNotas.Core.Plantilla;
 
@@ -21,6 +23,21 @@ namespace LumNotas.Report;
 public sealed class ExportadorDeInforme(PlantillaEnsayos plantilla, CatalogoDeEquipos? catalogo = null)
 {
     public const string Extension = ".html";
+
+    /// <summary>Cómo declara la plantilla la acreditación del servicio.</summary>
+    private const string CampoDeAcreditacion = "acreditacion";
+
+    /// <summary>
+    /// Con qué versión del programa se generó el documento. Se puede fijar desde fuera —lo
+    /// hacen los tests— y si no se lee del ejecutable, que es donde vive el número.
+    /// </summary>
+    public string VersionDelPrograma { get; init; } = DelEjecutable();
+
+    private static string DelEjecutable()
+        => Assembly.GetEntryAssembly()
+               ?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+           ?? Assembly.GetEntryAssembly()?.GetName().Version?.ToString()
+           ?? "desconocida";
 
     private readonly CatalogoDeEquipos _catalogo = catalogo ?? CatalogoDeEquipos.Vacio;
 
@@ -77,6 +94,31 @@ public sealed class ExportadorDeInforme(PlantillaEnsayos plantilla, CatalogoDeEq
     /// informe tiene que decir con cuál se tomaron las notas, no con cuál se imprime.
     /// Cuando no coinciden se dicen las dos, que es lo que necesita quien audite.
     /// </summary>
+    /// <summary>
+    /// Cada norma del proyecto con su designación completa y la versión de plantilla con
+    /// la que se midió, una por línea.
+    /// <para>
+    /// La principal declara la versión <b>con la que se registró</b>, que no siempre es la
+    /// instalada hoy; las añadidas, la suya. Con dos normas y una sola línea de versión no
+    /// había forma de saber cuál era de cuál.
+    /// </para>
+    /// </summary>
+    private string NormasConSuVersion(IReadOnlyList<NormaAdicional> normas, DatosProyecto datos)
+    {
+        var lineas = new List<string>();
+
+        for (var i = 0; i < normas.Count; i++)
+        {
+            var suya = normas[i].Plantilla;
+            // La primera es la principal: es de la que habla VersionDePlantillaGuardada.
+            var version = i == 0 ? VersionRegistrada(datos) : suya.Meta.Version;
+
+            lineas.Add($"{E(TituloDe(suya))} · plantilla {E(version)}");
+        }
+
+        return string.Join("<br>", lineas);
+    }
+
     private string VersionRegistrada(DatosProyecto datos)
     {
         var actual = plantilla.Meta.Version;
@@ -107,27 +149,38 @@ public sealed class ExportadorDeInforme(PlantillaEnsayos plantilla, CatalogoDeEq
         h.AppendLine("</header>");
 
         h.AppendLine("<table class=\"ficha\">");
+        // El de la toma de notas primero: es el que identifica este documento. El de
+        // servicio es el del trabajo entero, que puede tener más familias.
+        Ficha(h, "Código de la toma de notas", datos.CodigoTomaDeNotas);
         Ficha(h, "Código de servicio", datos.CodigoServicio);
-        Ficha(h, "Muestras",
-            datos.NumeroMuestras == 0
-                ? "—"
-                : string.Join(", ", datos.Muestras.Select(datos.IdentificadorDeMuestra)));
+        // Contra qué acreditación se ensayó. Sale aquí porque este documento no es un
+        // certificado: es la toma de notas puesta en limpio para que el director técnico
+        // la verifique antes de firmarla, y para eso necesita ver lo que marcó el técnico.
+        Ficha(h, "Acreditación", Lista(datos.Seleccion(CampoDeAcreditacion)));
+        // Si el ensayo salió de casa, tiene que constar en lo que se firma. Se dice
+        // siempre, también cuando no hubo ninguno: «—» es una respuesta, un hueco no.
+        // Va sin pasar por Ficha porque lleva marcas: cada laboratorio en su línea.
+        h.AppendLine($"<tr><th>Laboratorios externos</th><td>{Colaboradores(datos)}</td></tr>");
         Ficha(h, "Técnico 1", datos.Tecnico1 ?? "");
         Ficha(h, "Técnico 2", datos.Tecnico2 ?? "");
         Ficha(h, "Nº de muestras", datos.NumeroMuestras.ToString());
         Ficha(h, "Clase", datos.Clase.ToString());
         Ficha(h, "Ta", V(datos, "proyecto", "ta"));
-        // Hay normas que declaran el grado por muestra, así que se listan todos los que
-        // haya en el proyecto, vengan de donde vengan.
-        Ficha(h, "Grado IP objetivo",
-            Lista(datos.GradosDe("ipPrimeraCifra").Concat(datos.GradosDe("ipSegundaCifra")).Distinct()));
         Ficha(h, "Partes -2 aplicables", Lista(datos.Partes2));
-        if (normas.Count > 1)
-            Ficha(h, "Normas incluidas", string.Join(" · ", normas.Select(n => TituloDe(n.Plantilla))));
-        Ficha(h, "Versión de plantilla", VersionRegistrada(datos));
+
+        // Cada norma con su nombre completo y la versión de plantilla con la que se
+        // midió. Iban por separado —el nombre en la cabecerilla y una sola versión en la
+        // ficha—, y con dos normas no se sabía cuál de las dos versiones era de cuál.
+        h.AppendLine($"<tr><th>Normas y plantillas</th><td>{NormasConSuVersion(normas, datos)}</td></tr>");
+
+        // Con qué programa se generó. Para la validación de software de la ISO 17025 es
+        // parte del rastro: un documento no dice de dónde salió si no dice con qué.
+        Ficha(h, "Versión del programa", VersionDelPrograma);
         Ficha(h, "Documento generado el", DateTime.Now.ToString("dd/MM/yyyy HH:mm"));
         Ficha(h, "Estado", $"{avance.PorcentajePonderado:0}% ponderado · {avance.Contador} apartados completados");
         h.AppendLine("</table>");
+
+        TablaDeMuestras(h, datos);
 
         if (avance.ApartadosCompletados < avance.ApartadosAplicables)
             h.AppendLine("<p class=\"aviso\">ATENCIÓN: quedan apartados con datos pendientes. " +
@@ -136,6 +189,55 @@ public sealed class ExportadorDeInforme(PlantillaEnsayos plantilla, CatalogoDeEq
         h.AppendLine("<p class=\"sub\">Este documento es el registro primario del ensayo. " +
                      "Se firma en papel una vez impreso.</p>");
     }
+
+    /// <summary>
+    /// Una fila por muestra, con su identificador y sus grados.
+    /// <para>
+    /// <b>Antes iban todas juntas en una línea de la ficha</b> —«IP2X, IPX0»— y eso engaña
+    /// dos veces: mezcla las dos cifras de un mismo grado, y junta los de muestras
+    /// distintas. Un servicio puede traer una luminaria IP65 y otra IP20, y quien firma
+    /// necesita saber cuál es cuál.
+    /// </para>
+    /// </summary>
+    private static void TablaDeMuestras(StringBuilder h, DatosProyecto datos)
+    {
+        if (datos.NumeroMuestras == 0) return;
+
+        h.AppendLine("<h3>Muestras</h3>");
+        h.AppendLine("<table class=\"muestras\"><thead><tr>"
+                     + "<th>Nº</th><th>Identificador</th><th>Clase</th><th>Grado IP</th><th>Grado IK</th>"
+                     + "</tr></thead><tbody>");
+
+        foreach (var muestra in datos.Muestras)
+        {
+            h.AppendLine("<tr>"
+                + $"<td>{muestra:00}</td>"
+                + $"<td>{E(datos.IdentificadorDeMuestra(muestra))}</td>"
+                // La clase es del servicio, no de cada muestra: la plantilla la declara
+                // una sola vez. Se repite en cada fila porque se aplica a todas.
+                + $"<td>{E(datos.Clase.ToString())}</td>"
+                + $"<td>{O(GradosDelServicio.IpDeLaMuestra(datos, muestra))}</td>"
+                + $"<td>{O(GradosDelServicio.IkDeLaMuestra(datos, muestra))}</td>"
+                + "</tr>");
+        }
+
+        h.AppendLine("</tbody></table>");
+    }
+
+    /// <summary>Los laboratorios de fuera, con lo que hicieron y por qué.</summary>
+    private static string Colaboradores(DatosProyecto datos)
+    {
+        var conAlgo = datos.Colaboradores.Where(c => c.TieneAlgo).ToList();
+        if (conAlgo.Count == 0) return "—";
+
+        return string.Join("<br>", conAlgo.Select(c =>
+            string.IsNullOrWhiteSpace(c.EnsayoYMotivo)
+                ? E(c.Laboratorio.Trim())
+                : $"<b>{E(c.Laboratorio.Trim())}</b> — {E(c.EnsayoYMotivo.Trim())}"));
+    }
+
+    /// <summary>Un valor, o el guion cuando no lo hay. Un hueco no dice si falta o no aplica.</summary>
+    private static string O(string valor) => string.IsNullOrWhiteSpace(valor) ? "—" : E(valor);
 
     private void Apartado(StringBuilder h, MotorDeReglas motor, CatalogoDeEquipos catalogoDeLaNorma,
                           DatosProyecto datos, Seccion seccion, Bloque bloque)
@@ -349,6 +451,12 @@ public sealed class ExportadorDeInforme(PlantillaEnsayos plantilla, CatalogoDeEq
         tbody tr:nth-child(even) { background: #fcfcfd; }
         .ficha { margin-bottom: 20px; }
         .ficha th { background: #f3f4f6; width: 34%; }
+
+        /* La de muestras es estrecha: cinco columnas cortas estiradas al ancho de la
+           página quedarían separadas por un desierto. */
+        .muestras { width: auto; min-width: 60%; margin-bottom: 20px; }
+        .muestras th { background: #f3f4f6; }
+
         .datos .etq { width: 38%; }
 
         .aviso { background: #fef3c7; border: 1px solid #f59e0b; color: #92400e;

@@ -45,7 +45,9 @@ public partial class DialogoPlanificacion : Window
         Recepcion.SelectedDate = actual.RecepcionMuestras;
         Archivar.IsChecked = actual.Archivado;
         Grupo.Text = actual.Grupo ?? "";
+        Bloquear.IsChecked = actual.FechasBloqueadas;
 
+        ActualizarBloqueo();
         ActualizarZonaRecepcion();
         ActualizarSemanas();
         ActualizarTrabajo();
@@ -146,6 +148,21 @@ public partial class DialogoPlanificacion : Window
         ActualizarSemanas();
     }
 
+    private void AlBloquear(object sender, RoutedEventArgs e) => ActualizarBloqueo();
+
+    /// <summary>
+    /// Con el candado puesto, las casillas de fecha se apagan. <b>La casilla de bloquear
+    /// no</b>: si se apagara con ella misma, no habría forma de volver a abrirlo.
+    /// </summary>
+    private void ActualizarBloqueo()
+    {
+        var abierto = Bloquear.IsChecked != true;
+
+        Inicio.IsEnabled = abierto;
+        Fin.IsEnabled = abierto;
+        BotonQuitarFechas.IsEnabled = abierto;
+    }
+
     private static int Semanas(DateTime fecha) => System.Globalization.ISOWeek.GetWeekOfYear(fecha);
 
     private void AlGuardar(object sender, RoutedEventArgs e)
@@ -188,7 +205,8 @@ public partial class DialogoPlanificacion : Window
             Archivado = Archivar.IsChecked == true,
             Importe = importe,
             // Vacío es sin grupo, no un grupo llamado "".
-            Grupo = Grupo.Text.Trim() is { Length: > 0 } grupo ? grupo : null
+            Grupo = Grupo.Text.Trim() is { Length: > 0 } grupo ? grupo : null,
+            FechasBloqueadas = Bloquear.IsChecked == true
         };
 
         Close();

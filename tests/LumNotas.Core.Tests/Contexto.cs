@@ -69,7 +69,7 @@ public static class Contexto
 
     /// <summary>Proyecto mínimo válido: 1 muestra, clase I, sin nada relleno.</summary>
     public static DatosProyecto ProyectoVacio(int muestras = 1)
-        => new() { CodigoServicio = "123452026", NumeroMuestras = muestras, Clase = Clase.I };
+        => new() { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = muestras, Clase = Clase.I };
 
     public static MotorDeReglas Motor(DatosProyecto datos) => new(Plantilla, datos);
 }

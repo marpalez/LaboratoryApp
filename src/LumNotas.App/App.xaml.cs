@@ -34,7 +34,7 @@ public partial class App : Application
             PedirCarpetaLaPrimeraVez(modelo);
 
             // Si se ha arrancado con un fichero como argumento (doble clic sobre un
-            // .lumproj en la carpeta del servicio), se abre ese proyecto directamente.
+            // .lmnlab en la carpeta del servicio), se abre ese proyecto directamente.
             var fichero = e.Args.FirstOrDefault(a => File.Exists(a));
             if (fichero is not null) modelo.AbrirEnPestana(fichero);
         }

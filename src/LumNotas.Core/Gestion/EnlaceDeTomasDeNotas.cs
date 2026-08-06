@@ -16,6 +16,43 @@ public sealed record EntradaDeCalendario(
 
     public string? Grupo => Cabecera.Planificacion.Grupo;
 
+    /// <summary>
+    /// Las familias en el orden en que se dibujan, que lo dan <b>las fechas de inicio</b>
+    /// (DD‑123). Sigue siendo estable —la cadena las deja en fila y solo se mueven si
+    /// alguien las mueve queriendo—, y a igualdad de fecha desempata el código.
+    /// </summary>
+    public IReadOnlyList<ResumenDeProyecto> EnOrden => CadenaDelGrupo.EnOrden(Miembros);
+
+    /// <summary>
+    /// Cuándo empieza el trabajo entero: el inicio de la <b>primera</b> familia por código.
+    /// <para>
+    /// No es el más temprano de todas, y es a propósito: las familias se encadenan, así
+    /// que la segunda empieza donde acaba la primera aunque tenga otra fecha escrita. Si
+    /// la primera no lleva inicio, manda el de la primera que lo tenga.
+    /// </para>
+    /// </summary>
+    public DateTime? Inicio
+        => EnOrden.Select(m => m.Planificacion.Inicio).OfType<DateTime>().FirstOrDefault() is
+           { } valor && valor != default ? valor : null;
+
+    /// <summary>
+    /// Y cuándo acaba: <b>donde acaba la cadena</b> de sus familias, cada una durando lo
+    /// suyo. No es sin más la fecha más tardía que haya escrita: si la primera dura tres
+    /// semanas y la segunda va detrás, el trabajo acaba tres semanas después de la primera,
+    /// no cuando ponga la segunda —que es una fecha pensada sin saber dónde iba a caer.
+    /// <b>Por eso la barra de un grupo es más larga que la de su cabecera</b> en cuanto las
+    /// familias llevan fechas propias.
+    /// </summary>
+    public DateTime? Fin => TramosDelGrupo.FinDelTrabajo(EnOrden, Inicio, FinMasTardio);
+
+    /// <summary>Lo más tarde que acabe cualquiera. Es el suelo del fin del trabajo.</summary>
+    private DateTime? FinMasTardio
+        => Miembros.Select(m => m.Planificacion.FinEfectivo).OfType<DateTime>().DefaultIfEmpty().Max() is
+           { } valor && valor != default ? valor : null;
+
+    /// <summary>En qué se parte la barra. Una suelta da un solo tramo, el ancho entero.</summary>
+    public IReadOnlyList<TramoDelGrupo> Tramos => TramosDelGrupo.Calcular(this);
+
     /// <summary>El avance del trabajo entero, sumando lo de todas las enlazadas.</summary>
     public int SeccionesCompletadas => Miembros.Sum(m => m.SeccionesCompletadas);
 

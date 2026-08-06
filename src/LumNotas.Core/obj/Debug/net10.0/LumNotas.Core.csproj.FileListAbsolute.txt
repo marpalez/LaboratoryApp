@@ -1,0 +1,14 @@
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Core\bin\Debug\net10.0\LumNotas.Core.deps.json
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Core\bin\Debug\net10.0\LumNotas.Core.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Core\bin\Debug\net10.0\LumNotas.Core.pdb
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Core\obj\Debug\net10.0\LumNotas.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Core\obj\Debug\net10.0\LumNotas.Core.AssemblyInfoInputs.cache
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Core\obj\Debug\net10.0\LumNotas.Core.AssemblyInfo.cs
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Core\obj\Debug\net10.0\LumNotas.Core.csproj.CoreCompileInputs.cache
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Core\obj\Debug\net10.0\LumNotas.Core.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Core\obj\Debug\net10.0\refint\LumNotas.Core.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Core\obj\Debug\net10.0\LumNotas.Core.pdb
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Core\obj\Debug\net10.0\ref\LumNotas.Core.dll
+C:\Users\Invitado\AppData\Local\Temp\claude\C--Users-Invitado-Desktop-Archivos-windows-Desarrollo-de-aplicaciones-AplicacionTomaNotas\bc0e740c-2577-4b97-bb6f-7e2f89139c4b\scratchpad\build\LumNotas.Core.deps.json
+C:\Users\Invitado\AppData\Local\Temp\claude\C--Users-Invitado-Desktop-Archivos-windows-Desarrollo-de-aplicaciones-AplicacionTomaNotas\bc0e740c-2577-4b97-bb6f-7e2f89139c4b\scratchpad\build\LumNotas.Core.dll
+C:\Users\Invitado\AppData\Local\Temp\claude\C--Users-Invitado-Desktop-Archivos-windows-Desarrollo-de-aplicaciones-AplicacionTomaNotas\bc0e740c-2577-4b97-bb6f-7e2f89139c4b\scratchpad\build\LumNotas.Core.pdb

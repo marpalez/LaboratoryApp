@@ -1,0 +1,18 @@
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\bin\Debug\net10.0\LumNotas.Report.deps.json
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\bin\Debug\net10.0\LumNotas.Report.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\bin\Debug\net10.0\LumNotas.Report.pdb
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\bin\Debug\net10.0\LumNotas.Core.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\bin\Debug\net10.0\LumNotas.Core.pdb
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net10.0\LumNotas.Report.csproj.AssemblyReference.cache
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net10.0\LumNotas.Report.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net10.0\LumNotas.Report.AssemblyInfoInputs.cache
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net10.0\LumNotas.Report.AssemblyInfo.cs
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net10.0\LumNotas.Report.csproj.CoreCompileInputs.cache
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net10.0\LumNotas.58C892E1.Up2Date
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net10.0\LumNotas.Report.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net10.0\refint\LumNotas.Report.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net10.0\LumNotas.Report.pdb
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net10.0\ref\LumNotas.Report.dll
+C:\Users\Invitado\AppData\Local\Temp\claude\C--Users-Invitado-Desktop-Archivos-windows-Desarrollo-de-aplicaciones-AplicacionTomaNotas\bc0e740c-2577-4b97-bb6f-7e2f89139c4b\scratchpad\build\LumNotas.Report.deps.json
+C:\Users\Invitado\AppData\Local\Temp\claude\C--Users-Invitado-Desktop-Archivos-windows-Desarrollo-de-aplicaciones-AplicacionTomaNotas\bc0e740c-2577-4b97-bb6f-7e2f89139c4b\scratchpad\build\LumNotas.Report.dll
+C:\Users\Invitado\AppData\Local\Temp\claude\C--Users-Invitado-Desktop-Archivos-windows-Desarrollo-de-aplicaciones-AplicacionTomaNotas\bc0e740c-2577-4b97-bb6f-7e2f89139c4b\scratchpad\build\LumNotas.Report.pdb

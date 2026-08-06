@@ -20,21 +20,34 @@
             </StackPanel>
         </Border>
 
-        <TextBlock Text="Normas cargadas" Foreground="#374151" FontSize="12" Margin="0,0,0,4"/>
+        <TextBlock Text="Normas cargadas" Foreground="#374151" FontSize="12" FontWeight="SemiBold"
+                   Margin="0,0,0,6"/>
         <TextBlock x:Name="Normas" FontSize="12" Foreground="#4B5563" TextWrapping="Wrap"
-                   Margin="0,0,0,4"/>
+                   LineHeight="19" Margin="0,0,0,6"/>
         <TextBlock x:Name="OrigenNormas" FontSize="11" Foreground="#9CA3AF" TextWrapping="Wrap"
                    Margin="0,0,0,16"/>
 
         <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8"
                 Padding="14,10" Margin="0,0,0,16">
             <StackPanel>
-                <TextBlock Text="Publicar esta versión como la del laboratorio" FontWeight="SemiBold"
+                <TextBlock Text="Publicar la versión de programa existente en este PC como la oficial del laboratorio"
+                           FontWeight="SemiBold" TextWrapping="Wrap"
                            FontSize="12" Foreground="#374151"/>
+                <!--
+                    El texto dice lo que pasa HOY, no lo que pasará con el instalador
+                    automático: hoy solo se deja anotado el número y cada equipo se
+                    actualiza a mano. Prometer aquí que se instala solo dejaría a un
+                    técnico esperando una actualización que no llega.
+                    Cuando esté ClickOnce, esta última frase se cambia y ya está.
+                -->
                 <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="#6B7280" Margin="0,4,0,8"
-                           Text="Hazlo cuando instales una versión nueva. Los demás equipos verán un aviso al arrancar mientras sigan con una anterior."/>
+                           Text="Hazlo cuando instales una versión actualizada de LumenLab. El resto de equipos siguen con la suya y al arrancar verán un aviso de que hay una más nueva. De momento la instalación es manual en cada equipo; cuando esté el instalador automático se actualizarán y se reiniciarán solos."/>
+
+                <!-- La caja estaba sin rótulo y no se sabía qué escribir en ella. -->
+                <TextBlock Text="Qué cambia en esta versión (opcional)" FontSize="11"
+                           Foreground="#6B7280" Margin="0,0,0,3"/>
                 <TextBox x:Name="Notas" Padding="5,4" Margin="0,0,0,8"
-                         ToolTip="Qué cambia en esta versión (opcional)"/>
+                         ToolTip="Se les enseña a los demás junto al aviso de versión nueva"/>
                 <Button x:Name="BotonPublicar" Content="Publicar esta versión" Click="AlPublicar"
                         Padding="14,6" Cursor="Hand" HorizontalAlignment="Left"/>
             </StackPanel>

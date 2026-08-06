@@ -74,7 +74,7 @@ public sealed class BloqueViewModel : ObservableObject
 
     public string Encabezado => string.IsNullOrWhiteSpace(Codigo) || Codigo == Titulo
         ? Titulo
-        : $"{Codigo} · {Titulo}";
+        : $"{Codigo} | {Titulo}";
 
     public bool NoAplica
     {
@@ -128,7 +128,7 @@ public sealed class BloqueViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            FalloDeRegla ??= $"{Codigo} · regla {id}: {ex.Message}";
+            FalloDeRegla ??= $"{Codigo} | regla {id}: {ex.Message}";
             return siFalla;
         }
     }
@@ -138,13 +138,16 @@ public sealed class BloqueViewModel : ObservableObject
 
     public bool HayFalloDeRegla => FalloDeRegla is not null;
 
-    public string EstadoTexto => Estado switch
-    {
-        EstadoApartado.NoAplica => "No aplica",
-        EstadoApartado.Completo => "Completo",
-        EstadoApartado.FaltanDatos => "Faltan datos",
-        _ => ""
-    };
+    /// <summary>
+    /// Renglón bajo el nombre del apartado en el índice. Solo se escribe cuando dice
+    /// algo que el punto de color no dice ya: que el ensayo no toca en esta luminaria.
+    /// <para>
+    /// «Faltan datos» y «Completo» se quitaron porque repetían el punto en todas las
+    /// filas a la vez —doce «Faltan datos» seguidos nada más abrir— y lo que se lee doce
+    /// veces iguales se deja de leer. Cuando está vacío, el renglón ni se dibuja.
+    /// </para>
+    /// </summary>
+    public string EstadoTexto => Estado == EstadoApartado.NoAplica ? "No aplica" : "";
 
     /// <summary>Avisos activos del apartado, con el texto que veía el técnico en el Excel.</summary>
     public IReadOnlyList<string> Avisos =>

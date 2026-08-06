@@ -6,6 +6,7 @@
     "anioDePublicacion": "2002",
     "titulo": "Grados IK — EN 62262:2002 + A1:2021",
     "tituloCorto": "IK",
+    "designacion": "EN 62262:2002 + A1:2021",
     "normasCompatibles": ["60529_2018"],
     "version": "1.0.0",
     "generadoEl": "2026-07-31",
@@ -20,7 +21,8 @@
 
   "proyecto": {
     "campos": [
-      { "id": "codigoServicio", "etiqueta": "Código de servicio", "tipo": "texto", "formato": "NNNNNAAAA", "obligatorio": true, "origenExcel": "RESUMEN PROYECTO IP-IK!D3" },
+      { "id": "codigoTomaDeNotas", "etiqueta": "Código de la toma de notas", "tipo": "texto", "obligatorio": true, "nota": "Ejemplo: TECNO260201-00" },
+      { "id": "codigoServicio", "etiqueta": "Código de servicio", "tipo": "texto", "formato": "NNNNNAAAA", "obligatorio": true, "nota": "Ejemplo: TECNO2602", "origenExcel": "RESUMEN PROYECTO IP-IK!D3" },
       { "id": "tecnico1", "etiqueta": "Técnico 1", "tipo": "texto", "obligatorio": true, "origenExcel": "RESUMEN PROYECTO IP-IK!C5" },
       { "id": "tecnico2", "etiqueta": "Técnico 2", "tipo": "texto", "origenExcel": "RESUMEN PROYECTO IP-IK!C6" },
       { "id": "numeroMuestras", "etiqueta": "Nº de muestras", "tipo": "entero", "min": 1, "max": 30, "obligatorio": true, "origenExcel": "RESUMEN PROYECTO IP-IK!D8" },

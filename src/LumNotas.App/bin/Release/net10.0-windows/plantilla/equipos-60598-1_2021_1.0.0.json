@@ -1,0 +1,2293 @@
+{
+    "meta":  {
+                 "id":  "equipos-60598",
+                 "version":  "1.0.0",
+                 "generadoEl":  "2026-07-29",
+                 "origen":  "TomaDeNotasExcel.xlsx v2.1 — hoja \"BBDD Equipos 60598\"",
+                 "criterio":  "Importación literal (DD-10). No se depura el catálogo: se conservan los marcadores AMPLIACIÓN, PREVISIÓN, EQ-SAFE-3xx y RESERVADO COPPER-BS que aparecen en las hojas de selección.",
+                 "numeracion":  "Edición 2024 (D-02)"
+             },
+    "notasDeUso":  [
+                       "En caso de utilizar equipos adicionales debe indicarse en el apartado \"otros\".",
+                       "Las casillas coloreadas (excepto amarillo) indican equipos alternativos: solo se marcan los que procedan.",
+                       "Los equipos de casilla en blanco se asumen utilizados por ser equipos por defecto. Si alguno no se ha utilizado debe eliminarse, tacharse o indicarse \"NO\".",
+                       "Las celdas en amarillo corresponden a novedades o avisos, resaltadas para llamar la atención del técnico."
+                   ],
+    "grupos":  [
+                   {
+                       "id":  "sec06.marcado",
+                       "seccion":  "6",
+                       "titulo":  "6.5. Verificación del marcado",
+                       "origenExcel":  "BBDD Equipos 60598!C6:D9",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "RC-SAFE-015",
+                                           "codigos":  [
+                                                           "RC-SAFE-015"
+                                                       ],
+                                           "descripcion":  "Hexano",
+                                           "origenExcel":  "BBDD Equipos 60598!C6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!C7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!C8"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec07.04.portalamparas",
+                       "seccion":  "7.4",
+                       "titulo":  "7.4.4. Colocación fácil y correcta de los portalámparas",
+                       "origenExcel":  "BBDD Equipos 60598!G6:H12",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-213",
+                                           "codigos":  [
+                                                           "EQ-SAFE-213"
+                                                       ],
+                                           "descripcion":  "Dinamómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!G6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-216",
+                                           "codigos":  [
+                                                           "EQ-SAFE-216"
+                                                       ],
+                                           "descripcion":  "Llave dinamométrica",
+                                           "origenExcel":  "BBDD Equipos 60598!G7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!G8"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-207",
+                                           "codigos":  [
+                                                           "EQ-SAFE-207"
+                                                       ],
+                                           "descripcion":  "Micrómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!G9"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!G10"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!G11"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec07.06.bloques-conexion",
+                       "seccion":  "7.6",
+                       "titulo":  "7.6. Bloques de conexión",
+                       "origenExcel":  "BBDD Equipos 60598!G16:H19",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!G16"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-207",
+                                           "codigos":  [
+                                                           "EQ-SAFE-207"
+                                                       ],
+                                           "descripcion":  "Micrómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!G17"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!G18"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec07.07.2.bornes-red",
+                       "seccion":  "7.7.2",
+                       "titulo":  "7.7.2. Bornes y conexiones a la red de alimentación",
+                       "origenExcel":  "BBDD Equipos 60598!G23:H26",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!G23"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-207",
+                                           "codigos":  [
+                                                           "EQ-SAFE-207"
+                                                       ],
+                                           "descripcion":  "Micrómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!G24"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!G25"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec07.09.revestimientos",
+                       "seccion":  "7.9",
+                       "titulo":  "7.9. Revestimientos y manguitos aislantes",
+                       "origenExcel":  "BBDD Equipos 60598!G30:H42",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-305",
+                                           "codigos":  [
+                                                           "EQ-SAFE-305"
+                                                       ],
+                                           "descripcion":  "Estufa / horno",
+                                           "origenExcel":  "BBDD Equipos 60598!G30"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-304",
+                                           "codigos":  [
+                                                           "EQ-SAFE-304"
+                                                       ],
+                                           "descripcion":  "Estufa / Horno AUTOSTRONG",
+                                           "origenExcel":  "BBDD Equipos 60598!G31"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-301",
+                                           "codigos":  [
+                                                           "EQ-SAFE-301"
+                                                       ],
+                                           "descripcion":  "Recinto de temperaturas",
+                                           "origenExcel":  "BBDD Equipos 60598!G32"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-330",
+                                           "codigos":  [
+                                                           "EQ-SAFE-330"
+                                                       ],
+                                           "descripcion":  "Cámara climática",
+                                           "origenExcel":  "BBDD Equipos 60598!G33"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!G34"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-403",
+                                           "codigos":  [
+                                                           "EQ-SAFE-403"
+                                                       ],
+                                           "descripcion":  "Rigidez dieléctrica",
+                                           "origenExcel":  "BBDD Equipos 60598!G35"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-402",
+                                           "codigos":  [
+                                                           "EQ-SAFE-402"
+                                                       ],
+                                           "descripcion":  "Rigidez dieléctrica + Resist aisl + Tierra",
+                                           "origenExcel":  "BBDD Equipos 60598!G36"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-402",
+                                           "codigos":  [
+                                                           "EQ-SAFE-402"
+                                                       ],
+                                           "descripcion":  "Rigidez dieléctrica + Resist aisl + Tierra",
+                                           "origenExcel":  "BBDD Equipos 60598!G37"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-402",
+                                           "codigos":  [
+                                                           "EQ-SAFE-402"
+                                                       ],
+                                           "descripcion":  "Rigidez dieléctrica + Resist aisl + Tierra",
+                                           "origenExcel":  "BBDD Equipos 60598!G38"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-402",
+                                           "codigos":  [
+                                                           "EQ-SAFE-402"
+                                                       ],
+                                           "descripcion":  "Rigidez dieléctrica + Resist aisl + Tierra",
+                                           "origenExcel":  "BBDD Equipos 60598!G39"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!G40"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!G41"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec07.10.doble-aislamiento",
+                       "seccion":  "7.10",
+                       "titulo":  "7.10. Aislamiento doble o reforzado",
+                       "origenExcel":  "BBDD Equipos 60598!G46:H49",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-601",
+                                           "codigos":  [
+                                                           "EQ-SAFE-601"
+                                                       ],
+                                           "descripcion":  "Indicador de contacto eléctr.",
+                                           "origenExcel":  "BBDD Equipos 60598!G46"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-113",
+                                           "codigos":  [
+                                                           "EQ-SAFE-113"
+                                                       ],
+                                           "descripcion":  "Punzón cónico",
+                                           "origenExcel":  "BBDD Equipos 60598!G47"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!G48"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec07.12.tornillos",
+                       "seccion":  "7.12",
+                       "titulo":  "7.12. Tornillos y conexiones mecánicas y prensaestopas",
+                       "origenExcel":  "BBDD Equipos 60598!G53:H62",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-213",
+                                           "codigos":  [
+                                                           "EQ-SAFE-213"
+                                                       ],
+                                           "descripcion":  "Dinamómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!G53"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-216",
+                                           "codigos":  [
+                                                           "EQ-SAFE-216"
+                                                       ],
+                                           "descripcion":  "Llave dinamométrica",
+                                           "origenExcel":  "BBDD Equipos 60598!G54"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!G55"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-207",
+                                           "codigos":  [
+                                                           "EQ-SAFE-207"
+                                                       ],
+                                           "descripcion":  "Micrómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!G56"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!G57"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-214",
+                                           "codigos":  [
+                                                           "EQ-SAFE-214"
+                                                       ],
+                                           "descripcion":  "Atornillador dinamométrico 60cNm",
+                                           "origenExcel":  "BBDD Equipos 60598!G58"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-215",
+                                           "codigos":  [
+                                                           "EQ-SAFE-215"
+                                                       ],
+                                           "descripcion":  "Atornillador dinamométrico 260cNm",
+                                           "origenExcel":  "BBDD Equipos 60598!G59"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!G60"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-212",
+                                           "codigos":  [
+                                                           "EQ-SAFE-212"
+                                                       ],
+                                           "descripcion":  "Flexómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!G61"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec07.13.impacto",
+                       "seccion":  "7.13",
+                       "titulo":  "7.13. Ensayo de golpe martillo impacto",
+                       "origenExcel":  "BBDD Equipos 60598!G66:H70",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-122",
+                                           "codigos":  [
+                                                           "EQ-SAFE-122"
+                                                       ],
+                                           "descripcion":  "Dedo rígido de prueba rígido",
+                                           "origenExcel":  "BBDD Equipos 60598!G66"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-101",
+                                           "codigos":  [
+                                                           "EQ-SAFE-101"
+                                                       ],
+                                           "descripcion":  "Martillo resorte",
+                                           "origenExcel":  "BBDD Equipos 60598!G67"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-601",
+                                           "codigos":  [
+                                                           "EQ-SAFE-601"
+                                                       ],
+                                           "descripcion":  "Indicador de contacto eléctrico",
+                                           "origenExcel":  "BBDD Equipos 60598!G68"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!G69"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec07.14.suspensiones",
+                       "seccion":  "7.14",
+                       "titulo":  "7.14. Suspensiones, fijaciones y dispositivos de regulación",
+                       "origenExcel":  "BBDD Equipos 60598!G73:H77",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-201",
+                                           "codigos":  [
+                                                           "EQ-SAFE-201"
+                                                       ],
+                                           "descripcion":  "Balanza + plataforma",
+                                           "origenExcel":  "BBDD Equipos 60598!G73"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-213",
+                                           "codigos":  [
+                                                           "EQ-SAFE-213"
+                                                       ],
+                                           "descripcion":  "Dinamómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!G74"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-221",
+                                           "codigos":  [
+                                                           "EQ-SAFE-221"
+                                                       ],
+                                           "descripcion":  "Dinamómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!G75"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!G76"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec07.18.corrosion",
+                       "seccion":  "7.18",
+                       "titulo":  "7.18. Resistencia a la corrosión",
+                       "origenExcel":  "BBDD Equipos 60598!G81:H86",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-305",
+                                           "codigos":  [
+                                                           "EQ-SAFE-305"
+                                                       ],
+                                           "descripcion":  "Estufa",
+                                           "origenExcel":  "BBDD Equipos 60598!G81"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-330",
+                                           "codigos":  [
+                                                           "EQ-SAFE-330"
+                                                       ],
+                                           "descripcion":  "Cámara climática",
+                                           "origenExcel":  "BBDD Equipos 60598!G82"
+                                       },
+                                       {
+                                           "codigoLiteral":  "RC-SAFE-001",
+                                           "codigos":  [
+                                                           "RC-SAFE-001"
+                                                       ],
+                                           "descripcion":  "Cloruro de amonio",
+                                           "origenExcel":  "BBDD Equipos 60598!G83"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!G84"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!G85"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec07.24.2.luz-azul",
+                       "seccion":  "7.24.2",
+                       "titulo":  "7.24.2. Riesgo retiniano de luz azul ",
+                       "origenExcel":  "BBDD Equipos 60598!G90:H92",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-415",
+                                           "codigos":  [
+                                                           "EQ-SAFE-415"
+                                                       ],
+                                           "descripcion":  "Espectrofotómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!G90"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-212",
+                                           "codigos":  [
+                                                           "EQ-SAFE-212"
+                                                       ],
+                                           "descripcion":  "Flexómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!G91"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec07.28.control-termico",
+                       "seccion":  "7.28",
+                       "titulo":  "7.28. Fijación de los dispositivos de control sensibles a la temperatura",
+                       "origenExcel":  "BBDD Equipos 60598!G96:H98",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-330",
+                                           "codigos":  [
+                                                           "EQ-SAFE-330"
+                                                       ],
+                                           "descripcion":  "Cámara climática",
+                                           "origenExcel":  "BBDD Equipos 60598!G96"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-212",
+                                           "codigos":  [
+                                                           "EQ-SAFE-212"
+                                                       ],
+                                           "descripcion":  "Flexómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!G97"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec07.35.aspas-ventilador",
+                       "seccion":  "7.35",
+                       "titulo":  "7.35 Protección contra las aspas de un ventilador",
+                       "origenExcel":  "BBDD Equipos 60598!G103:H104",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-127",
+                                           "codigos":  [
+                                                           "EQ-SAFE-127"
+                                                       ],
+                                           "descripcion":  "Dedo niños hasta 36 meses",
+                                           "origenExcel":  "BBDD Equipos 60598!G103"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec13.02.lf-da",
+                       "seccion":  "13.2",
+                       "titulo":  "13.2. Líneas de fuga y distancias en el aire",
+                       "origenExcel":  "BBDD Equipos 60598!K6:L15",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-207",
+                                           "codigos":  [
+                                                           "EQ-SAFE-207"
+                                                       ],
+                                           "descripcion":  "Micrómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!K6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!K7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-212",
+                                           "codigos":  [
+                                                           "EQ-SAFE-212"
+                                                       ],
+                                           "descripcion":  "Flexómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!K8"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-605",
+                                           "codigos":  [
+                                                           "EQ-SAFE-605"
+                                                       ],
+                                           "descripcion":  "Lámina cinta 0,1-2,00mm",
+                                           "origenExcel":  "BBDD Equipos 60598!K9"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-167",
+                                           "codigos":  [
+                                                           "EQ-SAFE-167"
+                                                       ],
+                                           "descripcion":  "Juego de galgas",
+                                           "origenExcel":  "BBDD Equipos 60598!K10"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-409; EQ-SAFE-121",
+                                           "codigos":  [
+                                                           "EQ-SAFE-409",
+                                                           "EQ-SAFE-121"
+                                                       ],
+                                           "descripcion":  "Osciloscopio",
+                                           "origenExcel":  "BBDD Equipos 60598!K11"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-440",
+                                           "codigos":  [
+                                                           "EQ-SAFE-440"
+                                                       ],
+                                           "descripcion":  "Vatímetro GW-INSTEK",
+                                           "origenExcel":  "BBDD Equipos 60598!K12"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-417",
+                                           "codigos":  [
+                                                           "EQ-SAFE-417"
+                                                       ],
+                                           "descripcion":  "Multímetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!K13"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!K14"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec09.tierra",
+                       "seccion":  "9",
+                       "titulo":  "9. Continuidad circuito tierra",
+                       "origenExcel":  "BBDD Equipos 60598!O6:P9",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-442",
+                                           "codigos":  [
+                                                           "EQ-SAFE-442"
+                                                       ],
+                                           "descripcion":  "Medidor de continuidad de tierra (ELABO)",
+                                           "origenExcel":  "BBDD Equipos 60598!O6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-403",
+                                           "codigos":  [
+                                                           "EQ-SAFE-403"
+                                                       ],
+                                           "descripcion":  "Medidor de continuidad de tierra (GW INSTEK.)",
+                                           "origenExcel":  "BBDD Equipos 60598!O7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!O8"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec08.02.cableado",
+                       "seccion":  "8.2",
+                       "titulo":  "8.2 Conexiones a la red y otros cableados externos",
+                       "origenExcel":  "BBDD Equipos 60598!S6:T10",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-213",
+                                           "codigos":  [
+                                                           "EQ-SAFE-213"
+                                                       ],
+                                           "descripcion":  "Dinamómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!S6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-235\r\nEQ-SAFE-236",
+                                           "codigos":  [
+                                                           "EQ-SAFE-235",
+                                                           "EQ-SAFE-236"
+                                                       ],
+                                           "descripcion":  "Llave dinamométrica hasta 4 N.m\r\nLlave dinamométrica entre 4 N.m y 40N.m",
+                                           "origenExcel":  "BBDD Equipos 60598!S7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!S8"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-606",
+                                           "codigos":  [
+                                                           "EQ-SAFE-606"
+                                                       ],
+                                           "descripcion":  "Zumbador Fig. 34 IEC 60598-1:2020",
+                                           "origenExcel":  "BBDD Equipos 60598!S9"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec10.choque-electrico",
+                       "seccion":  "10",
+                       "titulo":  "8. Protección contra choque eléctrico",
+                       "origenExcel":  "BBDD Equipos 60598!W6:X16",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-122",
+                                           "codigos":  [
+                                                           "EQ-SAFE-122"
+                                                       ],
+                                           "descripcion":  "Dedo de prueba normalizado",
+                                           "origenExcel":  "BBDD Equipos 60598!W6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-107",
+                                           "codigos":  [
+                                                           "EQ-SAFE-107"
+                                                       ],
+                                           "descripcion":  "Sonda 50mm diámetro",
+                                           "origenExcel":  "BBDD Equipos 60598!W7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-437",
+                                           "codigos":  [
+                                                           "EQ-SAFE-437"
+                                                       ],
+                                           "descripcion":  "Multimetro UNI-T",
+                                           "origenExcel":  "BBDD Equipos 60598!W8"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-428",
+                                           "codigos":  [
+                                                           "EQ-SAFE-428"
+                                                       ],
+                                           "descripcion":  "Multímetro Fluke",
+                                           "origenExcel":  "BBDD Equipos 60598!W9"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-430",
+                                           "codigos":  [
+                                                           "EQ-SAFE-430"
+                                                       ],
+                                           "descripcion":  "Multímetro/Pinza UNI-T",
+                                           "origenExcel":  "BBDD Equipos 60598!W10"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-409; EQ-SAFE-121",
+                                           "codigos":  [
+                                                           "EQ-SAFE-409",
+                                                           "EQ-SAFE-121"
+                                                       ],
+                                           "descripcion":  "Osciloscopio FLUKE",
+                                           "origenExcel":  "BBDD Equipos 60598!W11"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-106",
+                                           "codigos":  [
+                                                           "EQ-SAFE-106"
+                                                       ],
+                                           "descripcion":  "Dedo de prueba articulado",
+                                           "origenExcel":  "BBDD Equipos 60598!W12"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-213",
+                                           "codigos":  [
+                                                           "EQ-SAFE-213"
+                                                       ],
+                                           "descripcion":  "Dinamómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!W13"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-221",
+                                           "codigos":  [
+                                                           "EQ-SAFE-221"
+                                                       ],
+                                           "descripcion":  "Dinamómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!W14"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!W15"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec14.endurancia-calentamientos",
+                       "seccion":  "14",
+                       "titulo":  "14. Endurancia / Calentamientos / Humedad",
+                       "origenExcel":  "BBDD Equipos 60598!AA6:AB16",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-301",
+                                           "codigos":  [
+                                                           "EQ-SAFE-301"
+                                                       ],
+                                           "descripcion":  "Cámara panelable",
+                                           "origenExcel":  "BBDD Equipos 60598!AA6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-302",
+                                           "codigos":  [
+                                                           "EQ-SAFE-302"
+                                                       ],
+                                           "descripcion":  "Cámara panelable",
+                                           "origenExcel":  "BBDD Equipos 60598!AA7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-328",
+                                           "codigos":  [
+                                                           "EQ-SAFE-328"
+                                                       ],
+                                           "descripcion":  "Estufa endurancias DYCOMETAL",
+                                           "origenExcel":  "BBDD Equipos 60598!AA8"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-303",
+                                           "codigos":  [
+                                                           "EQ-SAFE-303"
+                                                       ],
+                                           "descripcion":  "Cámara climática (3)",
+                                           "origenExcel":  "BBDD Equipos 60598!AA9"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-327",
+                                           "codigos":  [
+                                                           "EQ-SAFE-327"
+                                                       ],
+                                           "descripcion":  "Medidor temperatura 40 canales",
+                                           "origenExcel":  "BBDD Equipos 60598!AA10"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-328",
+                                           "codigos":  [
+                                                           "EQ-SAFE-328"
+                                                       ],
+                                           "descripcion":  "Medidor temperatura 32 canales",
+                                           "origenExcel":  "BBDD Equipos 60598!AA11"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-323",
+                                           "codigos":  [
+                                                           "EQ-SAFE-323"
+                                                       ],
+                                           "descripcion":  "Registrador 20+20 canales Graphtec",
+                                           "origenExcel":  "BBDD Equipos 60598!AA12"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-324",
+                                           "codigos":  [
+                                                           "EQ-SAFE-324"
+                                                       ],
+                                           "descripcion":  "Registrador 20+20 canales Graphtec",
+                                           "origenExcel":  "BBDD Equipos 60598!AA13"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-001",
+                                           "codigos":  [
+                                                           "EQ-SAFE-001"
+                                                       ],
+                                           "descripcion":  "Estabilizador de tensión",
+                                           "origenExcel":  "BBDD Equipos 60598!AA14"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-011",
+                                           "codigos":  [
+                                                           "EQ-SAFE-011"
+                                                       ],
+                                           "descripcion":  "Medidor de resistencias de bobinado",
+                                           "origenExcel":  "BBDD Equipos 60598!AA15"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec11.ip-humedad",
+                       "seccion":  "11",
+                       "titulo":  "11. Ensayos de IP y humedad",
+                       "origenExcel":  "BBDD Equipos 60598!AE6:AF29",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-174 + EQ-SAFE-210",
+                                           "codigos":  [
+                                                           "EQ-SAFE-174",
+                                                           "EQ-SAFE-210"
+                                                       ],
+                                           "descripcion":  "Arco de lluvia + Caudalímetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AE6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-105",
+                                           "codigos":  [
+                                                           "EQ-SAFE-105"
+                                                       ],
+                                           "descripcion":  "Boquillas",
+                                           "origenExcel":  "BBDD Equipos 60598!AE7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-111",
+                                           "codigos":  [
+                                                           "EQ-SAFE-111"
+                                                       ],
+                                           "descripcion":  "Cabeza de regadera (si R necesario \u003e 120cm)",
+                                           "origenExcel":  "BBDD Equipos 60598!AE8"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-608",
+                                           "codigos":  [
+                                                           "EQ-SAFE-608"
+                                                       ],
+                                           "descripcion":  "Depósitos de inmersión",
+                                           "origenExcel":  "BBDD Equipos 60598!AE9"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-615",
+                                           "codigos":  [
+                                                           "EQ-SAFE-615"
+                                                       ],
+                                           "descripcion":  "Caja de goteo",
+                                           "origenExcel":  "BBDD Equipos 60598!AE10"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-232",
+                                           "codigos":  [
+                                                           "EQ-SAFE-232"
+                                                       ],
+                                           "descripcion":  "Boquillas de Tobera + Pulverizador +  Bomba de presión",
+                                           "origenExcel":  "BBDD Equipos 60598!AE11"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-211",
+                                           "codigos":  [
+                                                           "EQ-SAFE-211"
+                                                       ],
+                                           "descripcion":  "Caudalímetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AE12"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-106",
+                                           "codigos":  [
+                                                           "EQ-SAFE-106"
+                                                       ],
+                                           "descripcion":  "Dedo de prueba articulado",
+                                           "origenExcel":  "BBDD Equipos 60598!AE13"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!AE14"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-107\r\nEQ-SAFE-112",
+                                           "codigos":  [
+                                                           "EQ-SAFE-107",
+                                                           "EQ-SAFE-112"
+                                                       ],
+                                           "descripcion":  "Varilla 50mm diámetro\r\nEsfera 50mm diámetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AE15"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-108",
+                                           "codigos":  [
+                                                           "EQ-SAFE-108"
+                                                       ],
+                                           "descripcion":  "Varilla 2,5mm diámetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AE16"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-110",
+                                           "codigos":  [
+                                                           "EQ-SAFE-110"
+                                                       ],
+                                           "descripcion":  "Esfera 12,5mm diámetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AE17"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-109",
+                                           "codigos":  [
+                                                           "EQ-SAFE-109"
+                                                       ],
+                                           "descripcion":  "Varilla 1 mm diámetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AE18"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-309; EQ-SAFE-310",
+                                           "codigos":  [
+                                                           "EQ-SAFE-309",
+                                                           "EQ-SAFE-310"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AE19"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-212",
+                                           "codigos":  [
+                                                           "EQ-SAFE-212"
+                                                       ],
+                                           "descripcion":  "Flexómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AE20"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-330",
+                                           "codigos":  [
+                                                           "EQ-SAFE-330"
+                                                       ],
+                                           "descripcion":  "Cámara climática",
+                                           "origenExcel":  "BBDD Equipos 60598!AE21"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-403",
+                                           "codigos":  [
+                                                           "EQ-SAFE-403"
+                                                       ],
+                                           "descripcion":  "Rigidez dieléctrica",
+                                           "origenExcel":  "BBDD Equipos 60598!AE22"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-402",
+                                           "codigos":  [
+                                                           "EQ-SAFE-402"
+                                                       ],
+                                           "descripcion":  "Rigidez dieléctrica",
+                                           "origenExcel":  "BBDD Equipos 60598!AE23"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-403",
+                                           "codigos":  [
+                                                           "EQ-SAFE-403"
+                                                       ],
+                                           "descripcion":  "Rigidez dieléctrica (GW INSTEK)",
+                                           "origenExcel":  "BBDD Equipos 60598!AE24"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-403",
+                                           "codigos":  [
+                                                           "EQ-SAFE-403"
+                                                       ],
+                                           "descripcion":  "Medidor resistencia de aislamiento",
+                                           "origenExcel":  "BBDD Equipos 60598!AE25"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-403",
+                                           "codigos":  [
+                                                           "EQ-SAFE-403"
+                                                       ],
+                                           "descripcion":  "Medidor resistencia de aislamiento",
+                                           "origenExcel":  "BBDD Equipos 60598!AE26"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!AE27"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-326",
+                                           "codigos":  [
+                                                           "EQ-SAFE-326"
+                                                       ],
+                                           "descripcion":  "Cámara de polvo",
+                                           "origenExcel":  "BBDD Equipos 60598!AE28"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec12.02.1.resistencia-aislamiento",
+                       "seccion":  "12.2.1",
+                       "titulo":  "12.2.1. Resistencia de aislamiento",
+                       "origenExcel":  "BBDD Equipos 60598!AI6:AJ9",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-403",
+                                           "codigos":  [
+                                                           "EQ-SAFE-403"
+                                                       ],
+                                           "descripcion":  "Medidor resistencia de aislamiento (GW INSTEK)",
+                                           "origenExcel":  "BBDD Equipos 60598!AI6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-403",
+                                           "codigos":  [
+                                                           "EQ-SAFE-403"
+                                                       ],
+                                           "descripcion":  "Medidor resistencia de aislamiento (GW INSTEK)",
+                                           "origenExcel":  "BBDD Equipos 60598!AI7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; \r\nEQ-SAFE-312; \r\nEQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AI8"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec12.02.2.rigidez",
+                       "seccion":  "12.2.2",
+                       "titulo":  "12.2.2. Rigidez dieléctrica",
+                       "origenExcel":  "BBDD Equipos 60598!AI13:AJ17",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-402",
+                                           "codigos":  [
+                                                           "EQ-SAFE-402"
+                                                       ],
+                                           "descripcion":  "Rigidez dieléctrica (GW INSTEK GPT 15002)",
+                                           "origenExcel":  "BBDD Equipos 60598!AI13"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-403",
+                                           "codigos":  [
+                                                           "EQ-SAFE-403"
+                                                       ],
+                                           "descripcion":  "Rigidez dieléctrica (GW INSTEK GPT 15004)",
+                                           "origenExcel":  "BBDD Equipos 60598!AI14"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-403",
+                                           "codigos":  [
+                                                           "EQ-SAFE-403"
+                                                       ],
+                                           "descripcion":  "Rigidez dieléctrica (GW INSTEK)",
+                                           "origenExcel":  "BBDD Equipos 60598!AI15"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; \r\nEQ-SAFE-312; \r\nEQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AI16"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec12.03.corrientes-fuga",
+                       "seccion":  "12.3",
+                       "titulo":  "12.3. Corrientes de fuga",
+                       "origenExcel":  "BBDD Equipos 60598!AI21:AJ24",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-441",
+                                           "codigos":  [
+                                                           "EQ-SAFE-441"
+                                                       ],
+                                           "descripcion":  "Corrientes de fuga AINUO",
+                                           "origenExcel":  "BBDD Equipos 60598!AI21"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-404",
+                                           "codigos":  [
+                                                           "EQ-SAFE-404"
+                                                       ],
+                                           "descripcion":  "Corrientes de fuga GW INSTEK - GLC-1000",
+                                           "origenExcel":  "BBDD Equipos 60598!AI22"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; \r\nEQ-SAFE-312; \r\nEQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AI23"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec15.02.bola",
+                       "seccion":  "15.2",
+                       "titulo":  "15.2. Resistencia al calor",
+                       "origenExcel":  "BBDD Equipos 60598!AM6:AN16",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-305",
+                                           "codigos":  [
+                                                           "EQ-SAFE-305"
+                                                       ],
+                                           "descripcion":  "Estufa",
+                                           "origenExcel":  "BBDD Equipos 60598!AM6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-328",
+                                           "codigos":  [
+                                                           "EQ-SAFE-328"
+                                                       ],
+                                           "descripcion":  "Registrador",
+                                           "origenExcel":  "BBDD Equipos 60598!AM7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-323",
+                                           "codigos":  [
+                                                           "EQ-SAFE-323"
+                                                       ],
+                                           "descripcion":  "Registrador 20 canales Graphtec",
+                                           "origenExcel":  "BBDD Equipos 60598!AM8"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-324",
+                                           "codigos":  [
+                                                           "EQ-SAFE-324"
+                                                       ],
+                                           "descripcion":  "Registrador 20 canales Graphtec (Maletín)",
+                                           "origenExcel":  "BBDD Equipos 60598!AM9"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-318",
+                                           "codigos":  [
+                                                           "EQ-SAFE-318"
+                                                       ],
+                                           "descripcion":  "Comprobador termopares 2 canales",
+                                           "origenExcel":  "BBDD Equipos 60598!AM10"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-104",
+                                           "codigos":  [
+                                                           "EQ-SAFE-104"
+                                                       ],
+                                           "descripcion":  "Presión con bola",
+                                           "origenExcel":  "BBDD Equipos 60598!AM11"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-604",
+                                           "codigos":  [
+                                                           "EQ-SAFE-604"
+                                                       ],
+                                           "descripcion":  "Microscopio",
+                                           "origenExcel":  "BBDD Equipos 60598!AM12"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-121",
+                                           "codigos":  [
+                                                           "EQ-SAFE-121"
+                                                       ],
+                                           "descripcion":  "Regla graduada",
+                                           "origenExcel":  "BBDD Equipos 60598!AM13"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AM14"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AM15"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec15.03.1.llama-aguja",
+                       "seccion":  "15.3.1",
+                       "titulo":  "15.3.1 Resistencia a la llama y a la inflamación",
+                       "origenExcel":  "BBDD Equipos 60598!AM20:AN25",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-307",
+                                           "codigos":  [
+                                                           "EQ-SAFE-307"
+                                                       ],
+                                           "descripcion":  "Llama de aguja",
+                                           "origenExcel":  "BBDD Equipos 60598!AM20"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-308",
+                                           "codigos":  [
+                                                           "EQ-SAFE-308"
+                                                       ],
+                                           "descripcion":  "Mechero Bunsen",
+                                           "origenExcel":  "BBDD Equipos 60598!AM21"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AM22"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AM23"
+                                       },
+                                       {
+                                           "codigoLiteral":  "RC-SAFE-013",
+                                           "codigos":  [
+                                                           "RC-SAFE-013"
+                                                       ],
+                                           "descripcion":  "Gas propano",
+                                           "origenExcel":  "BBDD Equipos 60598!AM24"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec15.03.2.hilo-incandescente",
+                       "seccion":  "15.3.2",
+                       "titulo":  "15.3.2 Hilo inandescente",
+                       "origenExcel":  "BBDD Equipos 60598!AM29:AN32",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-306",
+                                           "codigos":  [
+                                                           "EQ-SAFE-306"
+                                                       ],
+                                           "descripcion":  "Equipo de hilo incandescente",
+                                           "origenExcel":  "BBDD Equipos 60598!AM29"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AM30"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AM31"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec15.04.caminos-conductores",
+                       "seccion":  "15.4",
+                       "titulo":  "15.4 Frormación de caminos conductores",
+                       "origenExcel":  "BBDD Equipos 60598!AM37:AN44",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-444",
+                                           "codigos":  [
+                                                           "EQ-SAFE-444"
+                                                       ],
+                                           "descripcion":  "Banco de pruebas eléctricas",
+                                           "origenExcel":  "BBDD Equipos 60598!AM37"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AM38"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-167",
+                                           "codigos":  [
+                                                           "EQ-SAFE-167"
+                                                       ],
+                                           "descripcion":  "Juego de Galgas",
+                                           "origenExcel":  "BBDD Equipos 60598!AM39"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!AM40"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-405",
+                                           "codigos":  [
+                                                           "EQ-SAFE-405"
+                                                       ],
+                                           "descripcion":  "Conductímetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AM41"
+                                       },
+                                       {
+                                           "codigoLiteral":  "RC-SAFE-07; RC-SAFE-09; RC-SAFE-10",
+                                           "codigos":  [
+                                                           "RC-SAFE-07",
+                                                           "RC-SAFE-09",
+                                                           "RC-SAFE-10"
+                                                       ],
+                                           "descripcion":  "Soluciones conductividad",
+                                           "origenExcel":  "BBDD Equipos 60598!AM42"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AM43"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec16.bornes-tornillo",
+                       "seccion":  "16",
+                       "titulo":  "Sección 16 - Bornes de tornillo",
+                       "origenExcel":  "BBDD Equipos 60598!AQ5:AR17",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-428",
+                                           "codigos":  [
+                                                           "EQ-SAFE-428"
+                                                       ],
+                                           "descripcion":  "Multímetro Fluke",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ5"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-430",
+                                           "codigos":  [
+                                                           "EQ-SAFE-430"
+                                                       ],
+                                           "descripcion":  "Multímetro/Pinza UNI-T",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-425",
+                                           "codigos":  [
+                                                           "EQ-SAFE-425"
+                                                       ],
+                                           "descripcion":  "Multímetro laboratorio TEKTRONIX",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ8"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-207",
+                                           "codigos":  [
+                                                           "EQ-SAFE-207"
+                                                       ],
+                                           "descripcion":  "Micrómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ9"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-167",
+                                           "codigos":  [
+                                                           "EQ-SAFE-167"
+                                                       ],
+                                           "descripcion":  "Juego de galgas",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ10"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-214",
+                                           "codigos":  [
+                                                           "EQ-SAFE-214"
+                                                       ],
+                                           "descripcion":  "Atornillador dinamométrico 60cNm",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ11"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-215",
+                                           "codigos":  [
+                                                           "EQ-SAFE-215"
+                                                       ],
+                                           "descripcion":  "Atornillador dinamométrico 260cNm",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ12"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-213",
+                                           "codigos":  [
+                                                           "EQ-SAFE-213"
+                                                       ],
+                                           "descripcion":  "Dinamómetro 500N",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ13"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-221",
+                                           "codigos":  [
+                                                           "EQ-SAFE-221"
+                                                       ],
+                                           "descripcion":  "Dinamómetro 10N",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ14"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ15"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ16"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "sec17.bornes-sin-tornillo",
+                       "seccion":  "17",
+                       "titulo":  "Sección 17 - Bornes sin tornillo y conexiones eléctricas",
+                       "origenExcel":  "BBDD Equipos 60598!AQ23:AR34",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-428",
+                                           "codigos":  [
+                                                           "EQ-SAFE-428"
+                                                       ],
+                                           "descripcion":  "Multímetro Fluke",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ23"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-430",
+                                           "codigos":  [
+                                                           "EQ-SAFE-430"
+                                                       ],
+                                           "descripcion":  "Multímetro/Pinza UNI-T",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ24"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-417",
+                                           "codigos":  [
+                                                           "EQ-SAFE-417"
+                                                       ],
+                                           "descripcion":  "Multímetro laboratorio",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ25"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ26"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-207",
+                                           "codigos":  [
+                                                           "EQ-SAFE-207"
+                                                       ],
+                                           "descripcion":  "Micrómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ27"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-167",
+                                           "codigos":  [
+                                                           "EQ-SAFE-167"
+                                                       ],
+                                           "descripcion":  "Juego de galgas",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ28"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-330",
+                                           "codigos":  [
+                                                           "EQ-SAFE-330"
+                                                       ],
+                                           "descripcion":  "Cámara climática",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ29"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-213",
+                                           "codigos":  [
+                                                           "EQ-SAFE-213"
+                                                       ],
+                                           "descripcion":  "Dinamómetro 500N",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ30"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-221",
+                                           "codigos":  [
+                                                           "EQ-SAFE-221"
+                                                       ],
+                                           "descripcion":  "Dinamómetro 10N",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ31"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ32"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AQ33"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "anexoA.partes-activas",
+                       "seccion":  "Anexo A",
+                       "titulo":  "Anexo A (Partes activas)",
+                       "origenExcel":  "BBDD Equipos 60598!AU6:AV14",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-417",
+                                           "codigos":  [
+                                                           "EQ-SAFE-417"
+                                                       ],
+                                           "descripcion":  "Multimetro UNI-T",
+                                           "origenExcel":  "BBDD Equipos 60598!AU6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-428",
+                                           "codigos":  [
+                                                           "EQ-SAFE-428"
+                                                       ],
+                                           "descripcion":  "Multímetro Fluke",
+                                           "origenExcel":  "BBDD Equipos 60598!AU7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-430",
+                                           "codigos":  [
+                                                           "EQ-SAFE-430"
+                                                       ],
+                                           "descripcion":  "Multímetro/Pinza UNI-T",
+                                           "origenExcel":  "BBDD Equipos 60598!AU8"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-441",
+                                           "codigos":  [
+                                                           "EQ-SAFE-441"
+                                                       ],
+                                           "descripcion":  "Corrientes de fuga (contacto). AINUO",
+                                           "origenExcel":  "BBDD Equipos 60598!AU9"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-404",
+                                           "codigos":  [
+                                                           "EQ-SAFE-404"
+                                                       ],
+                                           "descripcion":  "Corrientes de fuga lum. GW INSTEK GLC-1000",
+                                           "origenExcel":  "BBDD Equipos 60598!AU10"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-409; EQ-SAFE-121",
+                                           "codigos":  [
+                                                           "EQ-SAFE-409",
+                                                           "EQ-SAFE-121"
+                                                       ],
+                                           "descripcion":  "Osciloscopio",
+                                           "origenExcel":  "BBDD Equipos 60598!AU11"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-608",
+                                           "codigos":  [
+                                                           "EQ-SAFE-608"
+                                                       ],
+                                           "descripcion":  "Resistencia para partes activas",
+                                           "origenExcel":  "BBDD Equipos 60598!AU12"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AU13"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "p2-3.3.6.3.1.carga-estatica",
+                       "seccion":  "-2-3 / 3.6.3.1",
+                       "titulo":  "3.6.3.1. Ensayo de carga estática",
+                       "origenExcel":  "BBDD Equipos 60598!AY7:AZ9",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-201",
+                                           "codigos":  [
+                                                           "EQ-SAFE-201"
+                                                       ],
+                                           "descripcion":  "Balanza",
+                                           "origenExcel":  "BBDD Equipos 60598!AY7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AY8"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "p2-3.3.6.5.rotura-cristal",
+                       "seccion":  "-2-3 / 3.6.5",
+                       "titulo":  "3.6.5. Rotura cubiertas cristal",
+                       "origenExcel":  "BBDD Equipos 60598!AY13:AZ15",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-173",
+                                           "codigos":  [
+                                                           "EQ-SAFE-173"
+                                                       ],
+                                           "descripcion":  "Punzón",
+                                           "origenExcel":  "BBDD Equipos 60598!AY13"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AY14"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "p2-3.3.6.5.2.cristal-resistente",
+                       "seccion":  "-2-3 / 3.6.5.2 y 3.6.8",
+                       "titulo":  "3.6.5.2. Cristal gran resistencia\r\n3.6.8. Puerta de acceso",
+                       "origenExcel":  "BBDD Equipos 60598!AY18:AZ23",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-212",
+                                           "codigos":  [
+                                                           "EQ-SAFE-212"
+                                                       ],
+                                           "descripcion":  "Flexómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY19"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!AY20"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY21"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-102",
+                                           "codigos":  [
+                                                           "EQ-SAFE-102"
+                                                       ],
+                                           "descripcion":  "Péndulo de golpeo (IK08)",
+                                           "origenExcel":  "BBDD Equipos 60598!AY22"
+                                       }
+                                   ],
+                       "notas":  [
+                                     "EN 62262:2002 + A1:2021 / IEC TR 62696:2011"
+                                 ]
+                   },
+                   {
+                       "id":  "p2-4.4.7.3.estabilidad",
+                       "seccion":  "-2-4 / 4.7.3",
+                       "titulo":  "Estabilidad (plano inclinado 6º y 15º)",
+                       "origenExcel":  "BBDD Equipos 60598!AY28:AZ30",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-217",
+                                           "codigos":  [
+                                                           "EQ-SAFE-217"
+                                                       ],
+                                           "descripcion":  "Inclinómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY28"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AY29"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "p2-5.5.6.5.carga-estatica",
+                       "seccion":  "-2-5 / 5.6.5",
+                       "titulo":  "5.6.5. Ensayo de carga estática",
+                       "origenExcel":  "BBDD Equipos 60598!AY36:AZ38",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-201",
+                                           "codigos":  [
+                                                           "EQ-SAFE-201"
+                                                       ],
+                                           "descripcion":  "Balanza",
+                                           "origenExcel":  "BBDD Equipos 60598!AY36"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AY37"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "p2-5.5.6.8.1.rotura-cristal",
+                       "seccion":  "-2-5 / 5.6.8.1",
+                       "titulo":  "5.6.8.1. Rotura cubiertas cristal",
+                       "origenExcel":  "BBDD Equipos 60598!AY42:AZ44",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-173",
+                                           "codigos":  [
+                                                           "EQ-SAFE-173"
+                                                       ],
+                                           "descripcion":  "Punzón",
+                                           "origenExcel":  "BBDD Equipos 60598!AY42"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AY43"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "p2-5.5.6.8.2.cristal-resistente",
+                       "seccion":  "-2-5 / 5.6.8.2",
+                       "titulo":  "5.6.8.2. Cristal gran resistencia",
+                       "origenExcel":  "BBDD Equipos 60598!AY47:AZ52",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-212",
+                                           "codigos":  [
+                                                           "EQ-SAFE-212"
+                                                       ],
+                                           "descripcion":  "Flexómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY48"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!AY49"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY50"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-102",
+                                           "codigos":  [
+                                                           "EQ-SAFE-102"
+                                                       ],
+                                           "descripcion":  "Péndulo de golpeo (IK08)",
+                                           "origenExcel":  "BBDD Equipos 60598!AY51"
+                                       }
+                                   ],
+                       "notas":  [
+                                     "EN 62262:2002 + A1:2021 / IEC TR 62696:2011"
+                                 ]
+                   },
+                   {
+                       "id":  "p2-10.10.6.2.estabilidad",
+                       "seccion":  "-2-10 / 10.6.2",
+                       "titulo":  "10.6.2 Estabilidad",
+                       "origenExcel":  "BBDD Equipos 60598!AY58:AZ60",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-217",
+                                           "codigos":  [
+                                                           "EQ-SAFE-217"
+                                                       ],
+                                           "descripcion":  "Inclinómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY58"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY59"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "p2-10.10.6.3.impacto-caida",
+                       "seccion":  "-2-10 / 10.6.3",
+                       "titulo":  "10.6.3 Resistencia al impacto y caida",
+                       "origenExcel":  "BBDD Equipos 60598!AY65:AZ68",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-101",
+                                           "codigos":  [
+                                                           "EQ-SAFE-101"
+                                                       ],
+                                           "descripcion":  "Martillo resorte",
+                                           "origenExcel":  "BBDD Equipos 60598!AY65"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EA-SAFE-605",
+                                           "codigos":  [
+                                                           "EA-SAFE-605"
+                                                       ],
+                                           "descripcion":  "Lámina acero",
+                                           "origenExcel":  "BBDD Equipos 60598!AY66"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY67"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "p2-13.13.6.1.carga-estatica",
+                       "seccion":  "-2-13 / 13.6.1",
+                       "titulo":  "13.6.1. Ensayo de carga estática",
+                       "origenExcel":  "BBDD Equipos 60598!AY74:AZ76",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EA-SAFE-620\r\nEQ-SAFE-209",
+                                           "codigos":  [
+                                                           "EA-SAFE-620",
+                                                           "EQ-SAFE-209"
+                                                       ],
+                                           "descripcion":  "Punzón acero y goma\r\nPrensa hidráulica",
+                                           "origenExcel":  "BBDD Equipos 60598!AY74"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY75"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "p2-18.18.7.2.impacto",
+                       "seccion":  "-2-18 / 18.7.2",
+                       "titulo":  "18.7.2. Impacto mecánico",
+                       "origenExcel":  "BBDD Equipos 60598!AY81:AZ84",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-101",
+                                           "codigos":  [
+                                                           "EQ-SAFE-101"
+                                                       ],
+                                           "descripcion":  "Martillo resorte",
+                                           "origenExcel":  "BBDD Equipos 60598!AY81"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetros",
+                                           "origenExcel":  "BBDD Equipos 60598!AY82"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY83"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "p2-18.18.7.3.corrosion",
+                       "seccion":  "-2-18 / 18.7.3",
+                       "titulo":  "18.7.3 Corrosión",
+                       "origenExcel":  "BBDD Equipos 60598!AY88:AZ91",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "RC-SAFE-004\r\nRC-SAFE-006",
+                                           "codigos":  [
+                                                           "RC-SAFE-004",
+                                                           "RC-SAFE-006"
+                                                       ],
+                                           "descripcion":  "Reactivos Solución A",
+                                           "origenExcel":  "BBDD Equipos 60598!AY88"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY89"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-318",
+                                           "codigos":  [
+                                                           "EQ-SAFE-318"
+                                                       ],
+                                           "descripcion":  "Comprobador termopares 2 canales",
+                                           "origenExcel":  "BBDD Equipos 60598!AY90"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "p2-22.22.17.3-22.19",
+                       "seccion":  "-2-22 / 22.17.3 y 22.19",
+                       "titulo":  "22.17.3 Mantenimiento flujo\r\n22.19 Funcionamiento alta temperatura",
+                       "origenExcel":  "BBDD Equipos 60598!AY95:AZ100",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-330",
+                                           "codigos":  [
+                                                           "EQ-SAFE-330"
+                                                       ],
+                                           "descripcion":  "Cámara climática",
+                                           "origenExcel":  "BBDD Equipos 60598!AY95"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-415",
+                                           "codigos":  [
+                                                           "EQ-SAFE-415"
+                                                       ],
+                                           "descripcion":  "Espectrofotómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY96"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-407",
+                                           "codigos":  [
+                                                           "EQ-SAFE-407"
+                                                       ],
+                                           "descripcion":  "Cronómetro digital",
+                                           "origenExcel":  "BBDD Equipos 60598!AY97"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY98"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-212",
+                                           "codigos":  [
+                                                           "EQ-SAFE-212"
+                                                       ],
+                                           "descripcion":  "Flexómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!AY99"
+                                       }
+                                   ]
+                   },
+                   {
+                       "id":  "ik.62262",
+                       "seccion":  "IK",
+                       "titulo":  "EN 62262:2002 + A1:2021 / IEC TR 62696:2011",
+                       "origenExcel":  "BBDD Equipos 60598!BC6:BD12",
+                       "permiteOtros":  true,
+                       "equipos":  [
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-212",
+                                           "codigos":  [
+                                                           "EQ-SAFE-212"
+                                                       ],
+                                           "descripcion":  "Flexómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!BC6"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-206",
+                                           "codigos":  [
+                                                           "EQ-SAFE-206"
+                                                       ],
+                                           "descripcion":  "Pie de rey",
+                                           "origenExcel":  "BBDD Equipos 60598!BC7"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-311; EQ-SAFE-312; EQ-SAFE-313",
+                                           "codigos":  [
+                                                           "EQ-SAFE-311",
+                                                           "EQ-SAFE-312",
+                                                           "EQ-SAFE-313"
+                                                       ],
+                                           "descripcion":  "Termohigrómetro",
+                                           "origenExcel":  "BBDD Equipos 60598!BC8"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-102",
+                                           "codigos":  [
+                                                           "EQ-SAFE-102"
+                                                       ],
+                                           "descripcion":  "Péndulo de golpeo (con su correspondiente pesa)",
+                                           "origenExcel":  "BBDD Equipos 60598!BC9"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-103",
+                                           "codigos":  [
+                                                           "EQ-SAFE-103"
+                                                       ],
+                                           "descripcion":  "Equipo de IK para caida vertical",
+                                           "origenExcel":  "BBDD Equipos 60598!BC10"
+                                       },
+                                       {
+                                           "codigoLiteral":  "EQ-SAFE-101",
+                                           "codigos":  [
+                                                           "EQ-SAFE-101"
+                                                       ],
+                                           "descripcion":  "Martillo Resorte",
+                                           "origenExcel":  "BBDD Equipos 60598!BC11"
+                                       }
+                                   ],
+                       "fueraDeAlcance":  true
+                   }
+               ]
+}

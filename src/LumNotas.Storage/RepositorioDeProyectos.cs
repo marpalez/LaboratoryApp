@@ -21,7 +21,34 @@ public sealed class RepositorioDeProyectos
     /// Extensión propia para que el proyecto se vea como un documento del laboratorio
     /// y no como un fichero técnico. Por dentro es JSON, igual que un .xlsx es un zip.
     /// </summary>
-    public const string Extension = ".lumproj";
+    public const string Extension = ".lmnlab";
+
+    /// <summary>
+    /// Cómo se llamaban antes de <c>.lmnlab</c>. Se siguen abriendo y escaneando, y al
+    /// guardar <b>se quedan donde están y como están</b>: renombrarlos solos movería el
+    /// registro de un ensayo sin que nadie lo haya pedido, y el técnico dejaría de
+    /// encontrarlo donde lo dejó. Lo nuevo nace ya con <see cref="Extension"/>.
+    /// <para>
+    /// Es transitorio: cuando en el laboratorio no quede ninguno, esta constante y
+    /// <see cref="Patrones"/> se borran y todo vuelve a ir por <see cref="Extension"/>.
+    /// </para>
+    /// </summary>
+    public const string ExtensionAnterior = ".lumproj";
+
+    /// <summary>
+    /// Lo que hay que buscar al recorrer una carpeta. Va aquí y no repetido en cada
+    /// sitio que escanea: dejarse uno significa que unos proyectos aparecen en el
+    /// tablero y otros no, sin que nada lo explique.
+    /// </summary>
+    public static readonly string[] Patrones = ["*" + Extension, "*" + ExtensionAnterior];
+
+    /// <summary>Si esa ruta es una toma de notas, con la extensión de ahora o la anterior.</summary>
+    public static bool EsTomaDeNotas(string ruta)
+    {
+        var ext = Path.GetExtension(ruta);
+        return ext.Equals(Extension, StringComparison.OrdinalIgnoreCase)
+            || ext.Equals(ExtensionAnterior, StringComparison.OrdinalIgnoreCase);
+    }
 
     private static readonly JsonSerializerOptions Opciones = new()
     {
@@ -45,8 +72,12 @@ public sealed class RepositorioDeProyectos
             Planificacion = SoloSiTieneAlgo(LeerPlanificacion(ruta)),
             VersionPlantilla = versionPlantilla,
             GuardadoEl = DateTime.Now,
+            CodigoTomaDeNotas = datos.CodigoTomaDeNotas,
             CodigoServicio = datos.CodigoServicio,
             NumeroMuestras = datos.NumeroMuestras,
+            // Las filas en blanco no se guardan: pulsar «Añadir» y arrepentirse no deja
+            // un colaborador vacío en el registro del ensayo.
+            Colaboradores = SoloLosQueTienenAlgo(datos.Colaboradores),
             Normas = [.. datos.Normas],
             NormaPrincipal = datos.NormaPrincipal,
             PatronIdentificador = datos.PatronIdentificador,
@@ -83,8 +114,13 @@ public sealed class RepositorioDeProyectos
 
         var datos = new DatosProyecto
         {
+            // Los guardados antes de que existiera no lo traen y se quedan en blanco: se
+            // marcará como pendiente en la cabecera. Deducirlo del nombre del fichero
+            // sería inventar el código de un ensayo ya hecho.
+            CodigoTomaDeNotas = documento.CodigoTomaDeNotas ?? "",
             CodigoServicio = documento.CodigoServicio,
             NumeroMuestras = documento.NumeroMuestras,
+            Colaboradores = [.. documento.Colaboradores ?? []],
             // Los proyectos guardados antes de que se apuntara no la traen: se quedan en
             // null y el tablero la deduce, como hacía siempre.
             NormaPrincipal = documento.NormaPrincipal,
@@ -171,7 +207,8 @@ public sealed class RepositorioDeProyectos
 
         var cambiados = 0;
 
-        foreach (var ruta in Directory.EnumerateFiles(carpeta, "*" + Extension, SearchOption.AllDirectories))
+        foreach (var ruta in Patrones.SelectMany(
+                     p => Directory.EnumerateFiles(carpeta, p, SearchOption.AllDirectories)))
         {
             try
             {
@@ -267,11 +304,26 @@ public sealed class RepositorioDeProyectos
         _ => texto
     };
 
+    /// <summary>
+    /// Los colaboradores con algo escrito. Una fila recién añadida y vacía no llega al
+    /// fichero: el técnico pulsa «Añadir laboratorio externo», se lo piensa y se va.
+    /// </summary>
+    private static List<Colaborador> SoloLosQueTienenAlgo(IEnumerable<Colaborador> colaboradores)
+        => [.. colaboradores.Where(c => c.TieneAlgo)];
+
     private sealed class DocumentoProyecto
     {
-        public string Formato { get; init; } = "lumproj/1";
+        // Marca de formato para quien abra el fichero con el Bloc de notas. No la lee
+        // nadie: los ficheros con la marca anterior («lumproj/1») se siguen leyendo igual.
+        public string Formato { get; init; } = "lmnlab/1";
         public string VersionPlantilla { get; init; } = "";
         public DateTime GuardadoEl { get; init; }
+        /// <summary>Admite nulo: los ficheros anteriores a este campo no lo traen.</summary>
+        public string? CodigoTomaDeNotas { get; init; }
+
+        /// <summary>Laboratorios de fuera. Nulo en los ficheros anteriores a este campo.</summary>
+        public List<Colaborador>? Colaboradores { get; init; }
+
         public string CodigoServicio { get; init; } = "";
         public int NumeroMuestras { get; init; } = 1;
 

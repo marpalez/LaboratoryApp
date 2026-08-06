@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using LumNotas.App.ViewModels;
 using LumNotas.Storage;
 using Microsoft.Win32;
@@ -10,7 +11,17 @@ namespace LumNotas.App;
 
 public partial class MainWindow : Window
 {
-    private const string Filtro = "Proyecto de toma de notas (*.lumproj)|*.lumproj|Todos los ficheros (*.*)|*.*";
+    // Al abrir se enseñan también los de la extensión anterior —si no, un fichero que
+    // está ahí no aparece en el diálogo y parece perdido—; al guardar no, porque no se
+    // escribe ninguno nuevo con la vieja.
+    private const string FiltroAbrir =
+        "Toma de notas (*" + RepositorioDeProyectos.Extension + ";*" + RepositorioDeProyectos.ExtensionAnterior + ")"
+        + "|*" + RepositorioDeProyectos.Extension + ";*" + RepositorioDeProyectos.ExtensionAnterior
+        + "|Todos los ficheros (*.*)|*.*";
+
+    private const string FiltroGuardar =
+        "Toma de notas (*" + RepositorioDeProyectos.Extension + ")|*" + RepositorioDeProyectos.Extension
+        + "|Todos los ficheros (*.*)|*.*";
 
     public MainWindow(VentanaPrincipalViewModel modelo)
     {
@@ -20,7 +31,7 @@ public partial class MainWindow : Window
         // Los diálogos son de WPF, así que se los da la ventana al modelo.
         modelo.Servicios.PedirFicheroParaAbrir = () =>
         {
-            var dialogo = new OpenFileDialog { Filter = Filtro, Title = "Abrir proyecto" };
+            var dialogo = new OpenFileDialog { Filter = FiltroAbrir, Title = "Abrir toma de notas" };
             return dialogo.ShowDialog(this) == true ? dialogo.FileName : null;
         };
 
@@ -28,8 +39,8 @@ public partial class MainWindow : Window
         {
             var dialogo = new SaveFileDialog
             {
-                Filter = Filtro,
-                Title = "Guardar proyecto",
+                Filter = FiltroGuardar,
+                Title = "Guardar la toma de notas",
                 FileName = sugerido,
                 DefaultExt = RepositorioDeProyectos.Extension
             };
@@ -40,7 +51,7 @@ public partial class MainWindow : Window
         {
             var dialogo = new SaveFileDialog
             {
-                Filter = "Informe de toma de notas (*.html)|*.html",
+                Filter = "Toma de notas en HTML (*.html)|*.html",
                 Title = "Exportar la toma de notas",
                 FileName = sugerido,
                 DefaultExt = LumNotas.Report.ExportadorDeInforme.Extension
@@ -62,6 +73,12 @@ public partial class MainWindow : Window
         };
 
         modelo.Servicios.ConfirmarDescartarCambios = () => DialogoCambiosSinGuardar.Preguntar(this);
+        modelo.Servicios.PreguntarSiSeCierra = motivo => DialogoCerrarProyecto.Preguntar(this, motivo);
+
+        // El mismo diálogo que abre el tablero: la planificación se edita en un solo sitio,
+        // se entre por donde se entre.
+        modelo.Servicios.PedirPlanificacion = (titulo, actual)
+            => DialogoPlanificacion.Preguntar(this, titulo, actual);
         modelo.Servicios.EditarTecnicos = () => DialogoTecnicos.Editar(this);
         modelo.Servicios.EditarCapacidad = () => DialogoCapacidad.Editar(this);
         modelo.Servicios.VerPlantillas = () => DialogoPlantillas.Mostrar(this);
@@ -83,6 +100,13 @@ public partial class MainWindow : Window
 
             return respuesta;
         };
+
+        // Lo que no ha salido bien. Interrumpe a propósito: sustituye a la franja del pie
+        // de ventana, que se quitó (DD‑133), y por aquí pasan los cuatro únicos avisos de
+        // que algo ha fallado. Uno que se pueda pasar por alto no serviría.
+        modelo.Servicios.Avisar = texto => MessageBox.Show(
+            this, texto, VentanaPrincipalViewModel.NombreDelPrograma,
+            MessageBoxButton.OK, MessageBoxImage.Warning);
 
         // La carpeta se aplica a través del tablero, que es quien la guarda y avisa al
         // resto de la ventana de que hay que releerlo todo.
@@ -119,6 +143,30 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
+    /// Pulsar el código de una fila del listado abre esa toma de notas en una pestaña.
+    /// La ruta viaja en la propia fila, así que no hace falta buscarla otra vez.
+    /// </summary>
+    private void AlAbrirDeLaBbdd(object remitente, RoutedEventArgs args)
+    {
+        if (remitente is FrameworkElement origen
+            && origen.DataContext is FilaDeBbdd fila
+            && DataContext is VentanaPrincipalViewModel modelo)
+            modelo.AbrirEnPestana(fila.Ruta);
+    }
+
+    /// <summary>
+    /// Abre los filtros de gestión. Va en el código de la ventana y no como comando del
+    /// modelo porque abrir una ventana es cosa de la interfaz; el diálogo trabaja contra
+    /// el mismo <see cref="GestionViewModel"/> del botón, así que lo que se elija ahí
+    /// filtra las tres vistas en el acto.
+    /// </summary>
+    private void AlAbrirFiltros(object remitente, RoutedEventArgs args)
+    {
+        if (remitente is FrameworkElement origen && origen.DataContext is GestionViewModel gestion)
+            DialogoFiltros.Mostrar(this, gestion);
+    }
+
+    /// <summary>
     /// Al pinchar una sección se despliega o se pliega; al pinchar un apartado se muestra
     /// su formulario. Se hace aquí porque <c>TreeView.SelectedItem</c> es de solo lectura.
     /// </summary>
@@ -135,36 +183,65 @@ public partial class MainWindow : Window
                     nodo.IsExpanded = !nodo.IsExpanded;
                 break;
 
-            case BloqueViewModel or ProyectoViewModel:
+            case BloqueViewModel or ProyectoViewModel or PlanificacionViewModel:
                 documento.PanelActual = e.NewValue;
                 break;
         }
     }
 
-    private bool _corrigiendoVista;
-
     /// <summary>
     /// Al enfocar un control, WPF pide llevarlo a la vista y el panel se desplaza también
     /// en horizontal. En la tabla de muestras eso significaba que pulsar una casilla movía
-    /// la vista a otra columna. Aquí se rehace la petición con un rectángulo sin ancho:
-    /// el panel sigue subiendo o bajando para enseñar el control —que es lo que hace falta
-    /// al tabular entre campos— pero deja de moverse de lado.
+    /// la vista a otra columna; en la cabecera, que marcar una norma añadida daba un salto
+    /// de lado —su casilla ocupa todo el ancho del contenido, así que enseñarla entera
+    /// obliga a recorrerlo—.
+    /// <para>
+    /// Se cancela la petición y <b>el desplazamiento vertical se hace a mano</b>. Antes se
+    /// rehacía la petición con un rectángulo sin ancho, y eso quitaba media enfermedad pero
+    /// no la otra mitad: ese rectángulo pide <b>el punto x=0 del control</b>, así que si el
+    /// panel estaba desplazado a la derecha volvía de un salto a la izquierda. Tocando solo
+    /// <see cref="ScrollViewer.VerticalOffset"/> no hay manera de que se mueva de lado.
+    /// </para>
+    /// <para>
+    /// El vertical sí hace falta: es lo que enseña el campo al que se llega tabulando.
+    /// </para>
     /// </summary>
     private void AlPedirLlevarALaVista(object sender, RequestBringIntoViewEventArgs e)
     {
-        // La llamada de abajo vuelve a levantar el evento: sin esto sería infinito.
-        if (_corrigiendoVista || e.TargetObject is not FrameworkElement destino) return;
+        if (e.TargetObject is not FrameworkElement destino) return;
 
+        // Se atiende desde dentro del ScrollViewer, no desde él: el que desplaza es el
+        // ScrollContentPresenter de su plantilla, que queda por debajo en el árbol. Puesto
+        // en el ScrollViewer, el evento ya venía atendido y la vista movida.
         e.Handled = true;
-        _corrigiendoVista = true;
-        try
-        {
-            destino.BringIntoView(new Rect(0, 0, 0, destino.ActualHeight));
-        }
-        finally
-        {
-            _corrigiendoVista = false;
-        }
+
+        if (sender is not DependencyObject nodo ||
+            PanelQueLoContiene(nodo) is not { } panel ||
+            !destino.IsDescendantOf(panel) || destino.ActualHeight <= 0) return;
+
+        var caja = destino.TransformToAncestor(panel)
+                          .TransformBounds(new Rect(0, 0, destino.ActualWidth, destino.ActualHeight));
+
+        // Las coordenadas van contra el ScrollViewer entero, así que lo que se ve empieza
+        // después de su relleno de arriba.
+        var arriba = panel.Padding.Top;
+        var abajo = arriba + panel.ViewportHeight;
+
+        // Se corrige lo justo para que asome, y solo hacia arriba o hacia abajo. Si el
+        // control es más alto que lo que se ve, manda su borde de arriba.
+        if (caja.Top < arriba)
+            panel.ScrollToVerticalOffset(panel.VerticalOffset + (caja.Top - arriba));
+        else if (caja.Bottom > abajo)
+            panel.ScrollToVerticalOffset(panel.VerticalOffset + (caja.Bottom - abajo));
+    }
+
+    private static ScrollViewer? PanelQueLoContiene(DependencyObject nodo)
+    {
+        for (var actual = VisualTreeHelper.GetParent(nodo); actual is not null;
+             actual = VisualTreeHelper.GetParent(actual))
+            if (actual is ScrollViewer panel) return panel;
+
+        return null;
     }
 
 }

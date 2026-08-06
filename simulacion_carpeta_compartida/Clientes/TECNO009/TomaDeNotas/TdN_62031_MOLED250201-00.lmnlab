@@ -1,0 +1,206 @@
+{
+  "formato": "lmnlab/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-06T14:53:13.3445426+02:00",
+  "codigoTomaDeNotas": "MOLED250201-00",
+  "colaboradores": [],
+  "codigoServicio": "MOLED2502",
+  "numeroMuestras": 2,
+  "normas": [
+    "62031_2020_A11"
+  ],
+  "normaPrincipal": "62031_2020_A11",
+  "patronIdentificador": "EBP_SAFE{codigoServicio}",
+  "planificacion": {
+    "inicio": "2025-02-13T00:00:00",
+    "fin": "2025-03-03T00:00:00",
+    "estado": "terminado",
+    "archivado": true,
+    "importe": 855,
+    "ensayoDesde": "2025-02-13T00:00:00",
+    "ensayoHasta": "2025-03-03T00:00:00",
+    "fechasBloqueadas": false
+  },
+  "selecciones": {
+    "acreditacion": [
+      "ENAC"
+    ]
+  },
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Javier Ibor"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico2",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Javier Salvador"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ta",
+      "muestra": 0,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tc",
+      "muestra": 0,
+      "tipo": "numero",
+      "valor": "85"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "clasificacionModulo",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "A incorporar"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "uout",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "valorTc",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tension1[0].tension",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tension1[0].corriente",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tension1[0].potencia",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tension1[0].factorPotencia",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tamano[0].alto",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "5"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tamano[0].ancho",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "5"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tamano[0].profundo",
+      "muestra": 1,
+      "tipo": "numero",
+      "valor": "5"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "ambiente.fecha",
+      "muestra": 0,
+      "tipo": "instante",
+      "valor": "2026-10-10T00:00:00.0000000"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "uout",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "valorTc",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tension1[0].tension",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tension1[0].corriente",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tension1[0].potencia",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tension1[0].factorPotencia",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tamano[0].alto",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "5"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tamano[0].ancho",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "5"
+    },
+    {
+      "ambito": "62031.generales",
+      "campo": "tamano[0].profundo",
+      "muestra": 2,
+      "tipo": "numero",
+      "valor": "5"
+    }
+  ],
+  "na": [],
+  "checklists": [
+    "62031.generales/aptoPara/montajeSuperficie"
+  ]
+}

@@ -22,7 +22,7 @@ public class PersistenciaTests : IDisposable
 
     private static DatosProyecto ProyectoDeEjemplo()
     {
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 3, Clase = Clase.II };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 3, Clase = Clase.II };
         datos.IpSegundaCifra.Add("IPX4");
         datos.IpPrimeraCifra.Add("IP6X");
         datos.Partes2.Add("-2-3");
@@ -81,6 +81,7 @@ public class PersistenciaTests : IDisposable
 
         var leido = _repositorio.Cargar(Ruta);
 
+        Assert.Equal("12345202601-00", leido.CodigoTomaDeNotas);
         Assert.Equal("123452026", leido.CodigoServicio);
         Assert.Equal(3, leido.NumeroMuestras);
         Assert.Equal(Clase.II, leido.Clase);
@@ -94,6 +95,59 @@ public class PersistenciaTests : IDisposable
         Assert.Equal(new DateTime(2026, 7, 20, 23, 40, 0), leido.Instante("15.2.1", "ensayoInicio", 1));
         Assert.True(leido.Na("11.3/na"));
         Assert.True(leido.Marcada("15.2.1", "origenMuestra", "corteEbp"));
+    }
+
+    /// <summary>
+    /// Los laboratorios de fuera van y vuelven con el proyecto. <b>Las filas vacías no se
+    /// guardan</b>: pulsar «Añadir laboratorio externo» y arrepentirse no puede dejar un
+    /// colaborador en blanco en el registro de un ensayo.
+    /// </summary>
+    [Fact]
+    public void LosColaboradoresSeGuardanYLosVaciosNo()
+    {
+        var original = ProyectoDeEjemplo();
+        original.Colaboradores.Add(new Colaborador
+        {
+            Laboratorio = "IMQ Italia",
+            EnsayoYMotivo = "Fotobiología — no tenemos cámara"
+        });
+        original.Colaboradores.Add(new Colaborador());   // el que se añadió y no se rellenó
+
+        _repositorio.Guardar(original, Ruta, "1.0.0-mvp");
+        var leido = _repositorio.Cargar(Ruta);
+
+        var unico = Assert.Single(leido.Colaboradores);
+        Assert.Equal("IMQ Italia", unico.Laboratorio);
+        Assert.Equal("Fotobiología — no tenemos cámara", unico.EnsayoYMotivo);
+    }
+
+    /// <summary>Lo normal es no tener ninguno, y eso no puede dar problemas al leer.</summary>
+    [Fact]
+    public void UnProyectoSinColaboradoresSeAbreIgual()
+    {
+        _repositorio.Guardar(ProyectoDeEjemplo(), Ruta, "1.0.0-mvp");
+
+        Assert.Empty(_repositorio.Cargar(Ruta).Colaboradores);
+    }
+
+    /// <summary>
+    /// Los ficheros grabados antes de existir el código de la toma de notas se abren
+    /// igual y lo dejan en blanco. Deducirlo del nombre del fichero sería inventar el
+    /// código de un ensayo ya hecho; se marca como pendiente y lo pone una persona.
+    /// </summary>
+    [Fact]
+    public void UnProyectoSinCodigoDeTomaDeNotasSeAbreIgual()
+    {
+        _repositorio.Guardar(ProyectoDeEjemplo(), Ruta, "1.0.0-mvp");
+
+        var json = File.ReadAllText(Ruta);
+        File.WriteAllText(Ruta, json.Replace("\"codigoTomaDeNotas\": \"12345202601-00\",", ""));
+
+        var leido = _repositorio.Cargar(Ruta);
+
+        Assert.Equal("", leido.CodigoTomaDeNotas);
+        Assert.Equal("123452026", leido.CodigoServicio);
+        Assert.Equal(3, leido.NumeroMuestras);
     }
 
     [Fact]

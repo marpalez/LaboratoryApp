@@ -33,7 +33,7 @@
                            TextWrapping="Wrap"/>
             </StackPanel>
         </Border>
-        <Button Content="Elegir carpeta de proyectos…" Click="AlElegirProyectos" Padding="14,7"
+        <Button Content="Elegir carpeta de proyectos" Click="AlElegirProyectos" Padding="14,7"
                 Cursor="Hand" HorizontalAlignment="Left" Margin="0,0,0,20"/>
 
         <!-- ===== 2. Configuración compartida ===== -->
@@ -51,7 +51,7 @@
             </StackPanel>
         </Border>
         <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
-            <Button Content="Elegir carpeta compartida…" Click="AlElegirCompartida" Padding="14,7"
+            <Button Content="Elegir carpeta compartida" Click="AlElegirCompartida" Padding="14,7"
                     Cursor="Hand"/>
             <Button x:Name="BotonUsarProyectos" Content="Usar la de proyectos" Click="AlUsarProyectos"
                     Padding="14,7" Margin="8,0,0,0" Cursor="Hand"

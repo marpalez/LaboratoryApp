@@ -67,7 +67,7 @@ public class PlanificacionTests : IDisposable
 
     /// <summary>
     /// En el fichero solo se guarda lo que se decide, no lo que se deduce. Sin esto el
-    /// <c>.lumproj</c> acababa con campos como «hayFechas» o «esVacia», que además
+    /// <c>.lmnlab</c> acababa con campos como «hayFechas» o «esVacia», que además
     /// mentirían en cuanto alguien editara las fechas a mano.
     /// </summary>
     [Fact]
@@ -268,6 +268,44 @@ public class PlanificacionTests : IDisposable
         var eje = EjeDeSemanas.Para([], new DateTime(2026, 8, 15), 46);
 
         Assert.True(eje.Semanas >= 12, $"El eje solo tiene {eje.Semanas} semanas.");
+    }
+
+    /// <summary>
+    /// <b>Siempre se dibuja medio año por detrás del último trabajo.</b> Con dos semanas de
+    /// margen, arrastrar un trabajo hasta el borde lo dejaba sin calendario debajo donde
+    /// soltarlo y había que parar a pedir sitio con «▶».
+    /// </summary>
+    [Fact]
+    public void ElEjeLlegaSiempreMedioAnoMasAllaDelUltimoTrabajo()
+    {
+        var fin = new DateTime(2027, 8, 1);
+        var eje = EjeDeSemanas.Para([(new DateTime(2027, 7, 1), fin)], new DateTime(2026, 8, 15), 46);
+
+        Assert.True(eje.Hasta >= new DateTime(2028, 1, 1),
+                    $"El eje solo llega hasta {eje.Hasta:dd/MM/yyyy}.");
+    }
+
+    /// <summary>
+    /// Y el salto de año se dibuja solo: era donde más se notaba, porque el año siguiente
+    /// ni aparecía en la cabecera.
+    /// </summary>
+    [Fact]
+    public void ElEjeCruzaElAnoSinPedirSitio()
+    {
+        var eje = EjeDeSemanas.Para([(new DateTime(2026, 11, 2), new DateTime(2026, 11, 30))],
+                                    new DateTime(2026, 11, 10), 46);
+
+        Assert.Contains(eje.Meses, m => m.Nombre.Contains("2027"));
+    }
+
+    /// <summary>Sin nada planificado, el sitio para planificar tiene que estar ya puesto.</summary>
+    [Fact]
+    public void UnEjeVacioTambienLlegaMedioAnoMasAlla()
+    {
+        var hoy = new DateTime(2026, 8, 15);
+        var eje = EjeDeSemanas.Para([], hoy, 46);
+
+        Assert.True(eje.Hasta >= hoy.AddMonths(6), $"El eje solo llega hasta {eje.Hasta:dd/MM/yyyy}.");
     }
 
     [Fact]
@@ -640,18 +678,17 @@ public class PlanificacionTests : IDisposable
         => new() { Estado = estado, Archivado = archivado };
 
     /// <summary>
-    /// Lo que pidió el responsable: ver solo lo que se está desarrollando. Terminar un
-    /// servicio lo saca de la vista <b>sin que nadie tenga que acordarse de archivarlo</b>,
-    /// porque marcar el estado ya forma parte del trabajo.
+    /// <b>Lo único que esconde es archivar</b> (2026‑08‑05). Antes «En desarrollo» dejaba
+    /// fuera lo terminado, y eso escondía trabajo que sigue vivo: un servicio terminado la
+    /// semana pasada se sigue mirando —hay que facturarlo, el cliente pregunta—.
     /// </summary>
     [Fact]
-    public void EnDesarrolloDejaFueraLoTerminadoYLoArchivado()
+    public void EnDesarrolloSoloDejaFueraLoArchivado()
     {
-        Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.PorHacer), FiltroDeEstado.EnDesarrollo));
-        Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso), FiltroDeEstado.EnDesarrollo));
-        Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.PendienteCliente), FiltroDeEstado.EnDesarrollo));
+        foreach (var estado in Planificacion.Estados)
+            Assert.True(FiltroDeEstado.Pasa(Con(estado), FiltroDeEstado.EnDesarrollo),
+                        $"{Planificacion.EtiquetaDe(estado)} debería entrar");
 
-        Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.Terminado), FiltroDeEstado.EnDesarrollo));
         Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso, archivado: true), FiltroDeEstado.EnDesarrollo));
     }
 
@@ -664,24 +701,38 @@ public class PlanificacionTests : IDisposable
         foreach (var vacio in new string?[] { null, "" })
         {
             Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso), vacio));
-            Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.Terminado), vacio));
+            Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.Terminado), vacio));
+            Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso, archivado: true), vacio));
         }
     }
 
     /// <summary>
-    /// Ninguna opción general trae lo terminado ni lo archivado: son las tres vistas las
-    /// que hablan de trabajo vivo, y en la carga mensual un servicio cerrado sumaría días
-    /// que ya nadie va a hacer.
+    /// Archivar es el único gesto que retira algo de las vistas generales. Es deliberado y
+    /// quiere decir «quítamelo de en medio»; terminar, no.
     /// </summary>
     [Fact]
-    public void NingunFiltroGeneralTraeLoTerminadoNiLoArchivado()
+    public void NingunFiltroGeneralTraeLoArchivado()
     {
         foreach (var general in new string?[] { null, "", FiltroDeEstado.EnDesarrollo, FiltroDeEstado.Todos })
         {
-            Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.Terminado), general));
             Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso, archivado: true), general));
+            Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.Terminado), general));
             Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso), general));
         }
+    }
+
+    /// <summary>
+    /// Los estados y sus rótulos. <b>«Por hacer» se lee «Por planificar»</b>, y el nombre
+    /// interno se queda como estaba: es lo que llevan escrito los ficheros ya guardados.
+    /// </summary>
+    [Fact]
+    public void LosEstadosVanEnElOrdenEnQueAvanzaUnTrabajo()
+    {
+        Assert.Equal(
+            ["Por planificar", "Planificado", "En curso", "Pendiente cliente", "Terminado"],
+            Planificacion.Estados.Select(Planificacion.EtiquetaDe));
+
+        Assert.Equal("Por planificar", Planificacion.EtiquetaDe(EstadoDeProyecto.PorHacer));
     }
 
     /// <summary>
@@ -716,8 +767,16 @@ public class PlanificacionTests : IDisposable
         Assert.Equal("(sin técnico)", CargaPorTecnico.SinTecnico);
 
         // Y lleva paréntesis a propósito: nadie se llama así, de modo que no puede
-        // chocar con un técnico de verdad de la lista del laboratorio.
-        Assert.DoesNotContain(CatalogoDeTecnicos.DePartida().Tecnicos, t => t == CargaPorTecnico.SinTecnico);
+        // chocar con una persona de la lista del laboratorio.
+        //
+        // **Sí está en el catálogo, y desde el 2026‑08‑06 es lo único que trae** (DD‑132):
+        // una instalación nueva no viene con técnicos. Antes este test comprobaba lo
+        // contrario —que el rótulo NO estuviera— para que el cajón y las personas no se
+        // mezclaran; ahora el cajón es una opción elegible, y por eso importa todavía más
+        // que sea **este mismo texto** y no uno parecido: con «Sin técnico» en la lista y
+        // «(sin técnico)» en las vistas, lo elegido a mano y lo que está sin asignar
+        // saldrían en dos filas distintas queriendo decir lo mismo.
+        Assert.Equal([CargaPorTecnico.SinTecnico], CatalogoDeTecnicos.DePartida().Tecnicos);
     }
 
     /// <summary>Quien busca «En curso» no quiere lo que se apartó de en medio.</summary>
@@ -739,12 +798,12 @@ public class PlanificacionTests : IDisposable
     [Fact]
     public void ElFiltroNoMiraElAvanceSinoLoQueDijoLaPersona()
     {
-        var esperandoAlCliente = Con(EstadoDeProyecto.PendienteCliente);
+        // Pedir «En curso» trae ese estado y solo ese, lo diga el avance o no.
+        Assert.True(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso), "En curso"));
+        Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.PendienteCliente), "En curso"));
 
-        Assert.True(FiltroDeEstado.Pasa(esperandoAlCliente, FiltroDeEstado.EnDesarrollo));
-
-        // Y al revés: marcado como terminado aunque le falten secciones, se oculta.
-        Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.Terminado), FiltroDeEstado.EnDesarrollo));
+        // Y un archivado no sale ni pidiendo su propio estado.
+        Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso, archivado: true), "En curso"));
     }
 
     // ---- carga de un técnico -----------------------------------------------
@@ -805,9 +864,9 @@ public class PlanificacionTests : IDisposable
     public void LaCargaSeCuentaEnDiasSiEsCortaYEnSemanasSiEsLarga()
     {
         Assert.Equal("1 proyecto", Ocupacion.Resumir(1, 0));
-        Assert.Equal("1 proyecto · 3 días", Ocupacion.Resumir(1, 3));
-        Assert.Equal("2 proyectos · 1 semana", Ocupacion.Resumir(2, 7));
-        Assert.Equal("3 proyectos · 4 semanas", Ocupacion.Resumir(3, 22));
+        Assert.Equal("1 proyecto | 3 días", Ocupacion.Resumir(1, 3));
+        Assert.Equal("2 proyectos | 1 semana", Ocupacion.Resumir(2, 7));
+        Assert.Equal("3 proyectos | 4 semanas", Ocupacion.Resumir(3, 22));
     }
 
     [Fact]

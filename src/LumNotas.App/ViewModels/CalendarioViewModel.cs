@@ -1,8 +1,17 @@
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Windows;
 using LumNotas.Core.Gestion;
 
 namespace LumNotas.App.ViewModels;
+
+/// <summary>
+/// Guarda todo lo que ha cambiado <b>un mismo gesto</b>. Arrastrar un trabajo enlazado mueve
+/// varias familias a la vez, y entregarlas de una en una haría que la cadena del grupo se
+/// recolocara contra datos a medio guardar (DD‑123).
+/// </summary>
+public delegate void CambiosDePlanificacion(
+    IReadOnlyList<(ResumenDeProyecto Proyecto, Planificacion Plan)> cambios);
 
 /// <summary>
 /// Línea de tiempo de los servicios: una tarjeta por toma de notas, colocada sobre un
@@ -23,7 +32,7 @@ public sealed class CalendarioViewModel : ObservableObject
     private IReadOnlyList<ResumenDeProyecto> _proyectos = [];
     private readonly Action<ResumenDeProyecto> _planificar;
     private readonly Action<string> _abrir;
-    private readonly Action<ResumenDeProyecto, Planificacion> _guardar;
+    private readonly CambiosDePlanificacion _guardar;
 
     /// <summary>Semanas vacías que se añaden cada vez que se pide ver más allá.</summary>
     private const int Paso = 8;
@@ -35,7 +44,7 @@ public sealed class CalendarioViewModel : ObservableObject
     private EjeDeSemanas _eje = EjeDeSemanas.Para([], DateTime.Today, Anchos[1]);
 
     public CalendarioViewModel(Action<ResumenDeProyecto> planificar, Action<string> abrir,
-                               Action<ResumenDeProyecto, Planificacion> guardar)
+                               CambiosDePlanificacion guardar)
     {
         _planificar = planificar;
         _abrir = abrir;
@@ -52,20 +61,24 @@ public sealed class CalendarioViewModel : ObservableObject
                                  () => _extraAntes > 0 || _extraDespues > 0);
     }
 
-    public ObservableCollection<TarjetaPlanViewModel> Tarjetas { get; } = [];
+    public ColeccionEnBloque<TarjetaPlanViewModel> Tarjetas { get; } = [];
 
     /// <summary>
-    /// Lo que se dibuja, fila a fila: cabeceras de técnico y barras de servicio. Las dos
+    /// Lo que se dibuja, fila a fila: cabeceras de técnico y carriles de barras. Las dos
     /// columnas del calendario —nombres y barras— recorren esta misma lista, y por eso
     /// van alineadas.
+    /// <para>
+    /// Una fila ya <b>no es un trabajo</b>, sino un carril donde caben todos los que no se
+    /// pisan entre sí. Ver <see cref="CarrilViewModel"/>.
+    /// </para>
     /// </summary>
-    public ObservableCollection<object> Filas { get; } = [];
+    public ColeccionEnBloque<object> Filas { get; } = [];
 
     /// <summary>
     /// Servicios todavía sin fechas. Van en una lista aparte en vez de no dibujarse:
     /// un proyecto invisible es un proyecto que se olvida.
     /// </summary>
-    public ObservableCollection<TarjetaPlanViewModel> SinFechas { get; } = [];
+    public ColeccionEnBloque<TarjetaPlanViewModel> SinFechas { get; } = [];
 
     public Comando Acercar { get; }
     public Comando Alejar { get; }
@@ -99,8 +112,22 @@ public sealed class CalendarioViewModel : ObservableObject
     public bool AgruparPorTecnico
     {
         get => _agrupar;
-        set { if (Establecer(ref _agrupar, value)) Recalcular(rehacerEje: false); }
+        set
+        {
+            if (!Establecer(ref _agrupar, value)) return;
+
+            Notificar(nameof(AnchoDeNombres));
+            Recalcular(rehacerEje: false);
+        }
     }
+
+    /// <summary>
+    /// Lo que ocupa la columna de la izquierda. <b>Sin agrupar por técnico no hay nada que
+    /// escribir en ella</b>: desde que las filas son carriles compartidos, lo único que
+    /// lleva son las cabeceras, y el código de cada trabajo va dentro de su propia barra.
+    /// Dejarla vacía serían 230 píxeles de calendario tirados.
+    /// </summary>
+    public double AnchoDeNombres => AgruparPorTecnico ? 230 : 0;
 
     public int Zoom
     {
@@ -145,11 +172,14 @@ public sealed class CalendarioViewModel : ObservableObject
         // que es la que lleva las fechas.
         var visibles = EnlaceDeTomasDeNotas.Agrupar(_proyectos);
 
-        var conFechas = visibles.Where(e => e.Cabecera.Planificacion.HayFechas).ToList();
+        // Las fechas que encuadran el eje son las del **trabajo entero**, no las de su
+        // cabecera. Con las de la cabecera, un trabajo de cuatro familias estiraba el
+        // calendario solo lo que ocupaba la primera: al arrastrarlo hasta el borde no se
+        // dibujaba el año siguiente y no había dónde soltarlo.
+        var conFechas = visibles.Where(e => e.Inicio is not null && e.Fin is not null).ToList();
 
         var necesario = EjeDeSemanas.Para(
-            conFechas.Select(e => (e.Cabecera.Planificacion.Inicio!.Value,
-                                   e.Cabecera.Planificacion.FinEfectivo!.Value)),
+            conFechas.Select(e => (e.Inicio!.Value, e.Fin!.Value)),
             hoy, Anchos[_zoom], extraAntes: _extraAntes, extraDespues: _extraDespues);
 
         // Al refrescar los datos, si el eje que ya había sigue valiendo, se conserva: al
@@ -160,21 +190,17 @@ public sealed class CalendarioViewModel : ObservableObject
         // Un proyecto con una fecha disparatada queda fuera del eje. No se pierde: baja a
         // la banda de abajo, que es justo donde se ve que hay que corregirlo.
         bool Dibujable(EntradaDeCalendario e)
-            => e.Cabecera.Planificacion.HayFechas
-               && _eje.Contiene(e.Cabecera.Planificacion.Inicio!.Value,
-                                e.Cabecera.Planificacion.FinEfectivo!.Value);
+            => e.Inicio is { } inicio && e.Fin is { } fin && _eje.Contiene(inicio, fin);
 
-        Tarjetas.Clear();
-        foreach (var entrada in conFechas.Where(Dibujable)
-                                         .OrderBy(e => e.Cabecera.Planificacion.Inicio))
-            Tarjetas.Add(new TarjetaPlanViewModel(entrada, _eje, hoy, _planificar, _abrir, _guardar));
+        Tarjetas.Reemplazar(conFechas.Where(Dibujable)
+                                     .OrderBy(e => e.Inicio)
+                                     .Select(e => new TarjetaPlanViewModel(e, _eje, hoy, _planificar, _abrir, _guardar)));
 
         RehacerFilas();
 
-        SinFechas.Clear();
-        foreach (var entrada in visibles.Where(e => !Dibujable(e))
-                                        .OrderBy(e => e.Cabecera.CodigoServicio))
-            SinFechas.Add(new TarjetaPlanViewModel(entrada, _eje, hoy, _planificar, _abrir, _guardar));
+        SinFechas.Reemplazar(visibles.Where(e => !Dibujable(e))
+                                     .OrderBy(e => e.Cabecera.CodigoServicio)
+                                     .Select(e => new TarjetaPlanViewModel(e, _eje, hoy, _planificar, _abrir, _guardar)));
 
         Notificar(nameof(Semanas));
         Notificar(nameof(Meses));
@@ -189,17 +215,19 @@ public sealed class CalendarioViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Ordena las barras en filas. Agrupadas, cada técnico abre con una cabecera que
-    /// dice cuántos servicios lleva y cuánto tiempo le ocupan; debajo van los suyos, del
-    /// más próximo al más lejano.
+    /// Ordena las barras en filas. Agrupadas, cada técnico abre con una cabecera que dice
+    /// cuántos servicios lleva; debajo van sus carriles.
+    /// <para>
+    /// <b>Los carriles son por técnico</b>, no del calendario entero: si se repartieran
+    /// todos juntos, dos técnicos que trabajan las mismas semanas compartirían fila y la
+    /// cabecera dejaría de decir de quién es lo que hay debajo.
+    /// </para>
     /// </summary>
     private void RehacerFilas()
     {
-        Filas.Clear();
-
         if (!AgruparPorTecnico)
         {
-            foreach (var tarjeta in Tarjetas) Filas.Add(tarjeta);
+            Filas.Reemplazar(Repartir(Tarjetas));
             return;
         }
 
@@ -210,13 +238,69 @@ public sealed class CalendarioViewModel : ObservableObject
             .OrderBy(g => g.Key == SinTecnico)
             .ThenBy(g => g.Key, StringComparer.CurrentCultureIgnoreCase);
 
+        // Se arma la lista entera y se entrega de una vez: plegar un técnico rehace todas
+        // las filas, y con veinte técnicos eso eran cientos de avisos por un solo clic.
+        var filas = new List<object>();
+
         foreach (var grupo in grupos)
         {
             var suyos = grupo.OrderBy(t => t.Inicio).ToList();
-            Filas.Add(new GrupoDeTecnicoViewModel(grupo.Key, suyos));
-            foreach (var tarjeta in suyos) Filas.Add(tarjeta);
+            var desplegado = !_plegados.Contains(grupo.Key);
+
+            filas.Add(new GrupoDeTecnicoViewModel(grupo.Key, suyos, desplegado, AlPlegarUnTecnico));
+            if (desplegado) filas.AddRange(Repartir(suyos));
         }
+
+        Filas.Reemplazar(filas);
     }
+
+    /// <summary>
+    /// Coloca unas tarjetas en carriles. El reparto está en el núcleo —<see
+    /// cref="CarrilesDelCalendario"/>—, que es donde se puede probar; aquí solo se le dice
+    /// de dónde a dónde ocupa cada trabajo.
+    /// <para>
+    /// Se miran las fechas que se están <b>enseñando</b>, no las guardadas, y nunca son
+    /// nulas: a esta lista solo llega lo que se puede dibujar sobre el eje.
+    /// </para>
+    /// </summary>
+    private static IEnumerable<CarrilViewModel> Repartir(IEnumerable<TarjetaPlanViewModel> tarjetas)
+        => CarrilesDelCalendario
+            .Repartir(tarjetas, t => (t.Inicio!.Value, t.Fin!.Value))
+            .Select(carril => new CarrilViewModel(carril));
+
+    /// <summary>
+    /// Técnicos plegados. Se recuerda por nombre y no por objeto: las cabeceras se rehacen
+    /// en cada escaneo, y con referencias se volvería a desplegar todo cada dos minutos.
+    /// </summary>
+    private readonly HashSet<string> _plegados = new(StringComparer.CurrentCultureIgnoreCase);
+
+    private void AlPlegarUnTecnico(GrupoDeTecnicoViewModel grupo)
+    {
+        if (grupo.Desplegado) _plegados.Remove(grupo.Tecnico);
+        else _plegados.Add(grupo.Tecnico);
+
+        RehacerFilas();
+    }
+
+    private bool _sinFechasDesplegado = true;
+
+    /// <summary>
+    /// Si se ve la lista de servicios sin fechas. Empieza desplegada —lo que no está
+    /// planificado es justo lo que hay que planificar— pero se puede cerrar para recuperar
+    /// la mitad de la pantalla cuando hay muchos.
+    /// </summary>
+    public bool SinFechasDesplegado
+    {
+        get => _sinFechasDesplegado;
+        set { if (Establecer(ref _sinFechasDesplegado, value)) Notificar(nameof(MarcaSinFechas)); }
+    }
+
+    public string MarcaSinFechas => SinFechasDesplegado ? "▾" : "▸";
+
+    public Comando AlternarSinFechas => _alternarSinFechas ??=
+        new Comando(() => SinFechasDesplegado = !SinFechasDesplegado);
+
+    private Comando? _alternarSinFechas;
 
     /// <summary>
     /// Etiqueta de los servicios que aún no tienen responsable asignado. Es la misma que
@@ -228,32 +312,221 @@ public sealed class CalendarioViewModel : ObservableObject
 }
 
 /// <summary>
-/// Cabecera de un técnico en la línea de tiempo: quién es y qué carga lleva.
+/// Una fila de la línea de tiempo con <b>todos los trabajos que caben en ella</b> sin
+/// pisarse.
+/// <para>
+/// Es lo que sustituye a «una fila por trabajo». Un técnico con veinte proyectos seguidos
+/// gastaba veinte renglones para dibujar veinte barras que nunca coinciden; ahora esos
+/// veinte van en uno solo y <b>bajar una fila significa que dos trabajos se solapan</b>.
+/// </para>
+/// <para>
+/// La lista no se toca después de construirla: rehacer los carriles a mitad de un arrastre
+/// destruiría la tarjeta que tiene cogida el ratón. Se recolocan al soltar, cuando el
+/// calendario se vuelve a dibujar entero.
+/// </para>
 /// </summary>
-public sealed class GrupoDeTecnicoViewModel
+public sealed class CarrilViewModel(IReadOnlyList<TarjetaPlanViewModel> tarjetas)
 {
-    public GrupoDeTecnicoViewModel(string tecnico, IReadOnlyList<TarjetaPlanViewModel> servicios)
+    public IReadOnlyList<TarjetaPlanViewModel> Tarjetas { get; } = tarjetas;
+}
+
+/// <summary>
+/// Cabecera de un técnico en la línea de tiempo: quién es, cuántos lleva y si se puede
+/// plegar.
+/// <para>
+/// <b>Plegable porque con veinte proyectos no cabe nada.</b> Un responsable mira de uno
+/// en uno; los demás solo estorban. Lo plegado se recuerda mientras dure la sesión, así
+/// que refrescar el escaneo no vuelve a desplegar lo que se acababa de cerrar.
+/// </para>
+/// </summary>
+public sealed class GrupoDeTecnicoViewModel : ObservableObject
+{
+    private readonly Action<GrupoDeTecnicoViewModel> _alPlegar;
+    private bool _desplegado;
+
+    public GrupoDeTecnicoViewModel(string tecnico, IReadOnlyList<TarjetaPlanViewModel> servicios,
+                                   bool desplegado, Action<GrupoDeTecnicoViewModel> alPlegar)
     {
         Tecnico = tecnico;
+        _desplegado = desplegado;
+        _alPlegar = alPlegar;
 
-        var dias = Ocupacion.Dias(servicios
-            .Where(s => s.Inicio is not null && s.Fin is not null)
-            .Select(s => (s.Inicio!.Value, s.Fin!.Value)));
-
-        Carga = Ocupacion.Resumir(servicios.Count, dias);
+        // El número de proyectos va pegado al nombre, en la misma línea. Las semanas que
+        // ocupaba se quitaron: gastaban un renglón por técnico —y con veinte proyectos eso
+        // son veinte renglones— para un dato que no se mira, porque el tiempo ya se ve
+        // dibujado a la derecha.
+        Proyectos = servicios.Count == 1 ? "1 proyecto" : $"{servicios.Count} proyectos";
         Retrasados = servicios.Count(s => s.Retrasado);
+
+        Alternar = new Comando(() => Desplegado = !Desplegado);
     }
 
     public string Tecnico { get; }
 
-    /// <summary>«3 proyectos · 5 semanas», contando una sola vez lo que se solapa.</summary>
-    public string Carga { get; }
+    /// <summary>«3 proyectos». Va a continuación del nombre, no debajo.</summary>
+    public string Proyectos { get; }
 
     public int Retrasados { get; }
 
     public bool HayRetrasados => Retrasados > 0;
 
     public string AvisoDeRetraso => Retrasados == 1 ? "1 fuera de plazo" : $"{Retrasados} fuera de plazo";
+
+    /// <summary>Si se ven sus proyectos. Al cambiarlo, el calendario rehace las filas.</summary>
+    public bool Desplegado
+    {
+        get => _desplegado;
+        set
+        {
+            if (!Establecer(ref _desplegado, value)) return;
+            Notificar(nameof(Marca));
+            _alPlegar(this);
+        }
+    }
+
+    /// <summary>El triángulo de plegar, que es lo que dice si hay algo escondido.</summary>
+    public string Marca => Desplegado ? "▾" : "▸";
+
+    public Comando Alternar { get; }
+}
+
+/// <summary>
+/// Una tarjeta de la barra: la que le toca a <b>una familia</b> del trabajo.
+/// <para>
+/// Antes esto era decoración pintada encima de una barra única, y por eso el trabajo
+/// entero salía del color de su cabecera y se abría siempre la misma toma de notas. Ahora
+/// cada familia es una tarjeta de verdad —su color, su consejo emergente y su
+/// planificación—, pegadas unas a otras porque el trabajo es uno solo.
+/// </para>
+/// <para>
+/// <b>Estas tarjetas no se rehacen</b> mientras se arrastra el trabajo: solo se les
+/// recalcula el tramo. Si se sustituyeran, WPF destruiría el elemento que tiene cogido el
+/// ratón y el arrastre se cancelaría solo a mitad del gesto.
+/// </para>
+/// </summary>
+public sealed class TrozoDeBarraViewModel : ObservableObject
+{
+    private readonly EntradaDeCalendario _entrada;
+    private readonly DateTime _hoy;
+    private TramoDelGrupo _tramo;
+    private double _ancho;
+
+    public TrozoDeBarraViewModel(TarjetaPlanViewModel tarjeta, EntradaDeCalendario entrada,
+                                 TramoDelGrupo tramo, double anchoDeLaBarra, DateTime hoy,
+                                 bool esPrimera, bool esUltima,
+                                 Action<ResumenDeProyecto> planificar, Action<string> abrir)
+    {
+        Tarjeta = tarjeta;
+        _entrada = entrada;
+        _tramo = tramo;
+        _hoy = hoy;
+        _ancho = AnchoDe(tramo, anchoDeLaBarra);
+        EsPrimera = esPrimera;
+        EsUltima = esUltima;
+
+        Planificar = new Comando(() => planificar(Miembro));
+        Abrir = new Comando(() => abrir(Miembro.Ruta));
+    }
+
+    /// <summary>
+    /// El trabajo al que pertenece. El arrastre se lo pide a la tarjeta que se coge, porque
+    /// mover una familia mueve el trabajo entero.
+    /// </summary>
+    public TarjetaPlanViewModel Tarjeta { get; }
+
+    public ResumenDeProyecto Miembro => _tramo.Miembro;
+
+    /// <summary>Si es la de más a la izquierda, cuyo borde exterior fija el inicio del trabajo.</summary>
+    public bool EsPrimera { get; }
+
+    /// <summary>Y la de más a la derecha, cuyo borde exterior fija el fin.</summary>
+    public bool EsUltima { get; }
+
+    /// <summary>Lo que ocupa en píxeles, que es lo que necesita la plantilla.</summary>
+    public double Ancho
+    {
+        get => _ancho;
+        private set => Establecer(ref _ancho, value);
+    }
+
+    /// <summary>
+    /// Redondeadas solo por fuera: entre dos familias las esquinas van a escuadra para que
+    /// se lean como un tren y no como una fila de pastillas sueltas.
+    /// </summary>
+    public CornerRadius Esquinas => new(EsPrimera ? 7 : 0, EsUltima ? 7 : 0,
+                                        EsUltima ? 7 : 0, EsPrimera ? 7 : 0);
+
+    public string Codigo => Miembro.Rotulo;
+
+    public bool MuestrasRecibidas => Miembro.Planificacion.MuestrasRecibidas;
+
+    /// <summary>
+    /// Fechas blindadas. Lo dibuja un candado y lo respeta el arrastre: coger esta tarjeta
+    /// no mueve nada.
+    /// </summary>
+    public bool FechasBloqueadas => Miembro.Planificacion.FechasBloqueadas;
+
+    /// <summary>
+    /// Fuera de plazo. Se mira contra el fin que <b>se está dibujando</b>, no contra el
+    /// guardado, para que la tarjeta cambie de color mientras se arrastra.
+    /// </summary>
+    public bool Retrasado => Miembro.Planificacion.Estado != EstadoDeProyecto.Terminado
+                             && _tramo.Hasta.Date < _hoy.Date;
+
+    /// <summary>
+    /// El de <b>su</b> estado, no el del trabajo. Con una barra única, un trabajo con la
+    /// primera familia terminada y la segunda en curso salía todo de un color.
+    /// </summary>
+    public string Color => Retrasado ? "#DC2626" : Planificacion.ColorDe(Miembro.Planificacion.Estado);
+
+    public string Detalle => string.Join("\n",
+        new[]
+        {
+            // Con varias enlazadas hay que decir de qué trabajo es esta tarjeta.
+            !_entrada.EsGrupo ? null
+                : $"Grupo «{_entrada.Grupo}» | {_entrada.Miembros.Count} tomas de notas",
+            Codigo + (Miembro.Normas.Count == 0 ? "" : "  |  " + string.Join(" + ", Miembro.Normas)),
+            string.IsNullOrWhiteSpace(Miembro.Tecnico) ? null : "Técnico: " + Miembro.Tecnico,
+            "Estado: " + Planificacion.EtiquetaDe(Miembro.Planificacion.Estado)
+                       + (Retrasado ? "  |  fuera de plazo" : ""),
+            $"Fechas: {_tramo.Desde:dd/MM} → {_tramo.Hasta:dd/MM}",
+            // Sin fechas propias el tramo es un reparto, no un dato: hay que decirlo o la
+            // tarjeta parecería planificada cuando nadie la ha planificado.
+            Miembro.Planificacion.HayFechas ? null : "Sin fechas propias: se reparte el tramo del trabajo",
+            Miembro.Planificacion.RecepcionMuestras is { } fecha
+                ? $"Muestras recibidas el {fecha:dd/MM/yyyy}"
+                : "Muestras pendientes de recibir",
+            "Avance: " + Miembro.Avance,
+            Path.GetDirectoryName(Miembro.Ruta) ?? ""
+        }.Where(l => l is not null));
+
+    /// <summary>Abre la planificación <b>de esta familia</b>, no la de la cabecera.</summary>
+    public Comando Planificar { get; }
+
+    /// <summary>
+    /// Abre <b>esta</b> toma de notas. Cuelga del menú contextual de la barra desde que las
+    /// filas son carriles compartidos: la columna de la izquierda ya no puede llevar un
+    /// nombre por trabajo, y con ella se iba la única forma de abrirlo desde la línea de
+    /// tiempo. Ahora abre además la familia que se pulsa, no la cabecera del grupo.
+    /// </summary>
+    public Comando Abrir { get; }
+
+    /// <summary>
+    /// Vuelve a colocarse con el tramo nuevo. Se llama en cada latido del arrastre, así que
+    /// se cambia el objeto por dentro en vez de crear otro.
+    /// </summary>
+    public void Redibujar(TramoDelGrupo tramo, double anchoDeLaBarra)
+    {
+        _tramo = tramo;
+        Ancho = AnchoDe(tramo, anchoDeLaBarra);
+
+        Notificar(nameof(Retrasado));
+        Notificar(nameof(Color));
+        Notificar(nameof(Detalle));
+    }
+
+    private static double AnchoDe(TramoDelGrupo tramo, double anchoDeLaBarra)
+        => Math.Max(0, anchoDeLaBarra * tramo.Fraccion);
 }
 
 /// <summary>Una toma de notas dibujada sobre la línea de tiempo.</summary>
@@ -261,23 +534,34 @@ public sealed class TarjetaPlanViewModel : ObservableObject
 {
     private readonly ResumenDeProyecto _proyecto;
     private readonly DateTime _hoy;
-    private readonly Action<ResumenDeProyecto, Planificacion> _guardar;
+    private readonly CambiosDePlanificacion _guardar;
     private readonly BarraDePlanificacion _barra;
 
     /// <param name="entrada">
-    /// La toma de notas que se dibuja y, si está enlazada, las que van con ella. Se
-    /// arrastra y se planifica <b>la cabecera</b>, que es la que lleva las fechas; el
-    /// avance que se enseña es el del trabajo entero.
+    /// La toma de notas que se dibuja y, si está enlazada, las que van con ella. El trabajo
+    /// se arrastra entero; cada familia se planifica por su cuenta desde su propia tarjeta.
     /// </param>
     public TarjetaPlanViewModel(EntradaDeCalendario entrada, EjeDeSemanas eje, DateTime hoy,
                                 Action<ResumenDeProyecto> planificar, Action<string> abrir,
-                                Action<ResumenDeProyecto, Planificacion> guardar)
+                                CambiosDePlanificacion guardar)
     {
         _entrada = entrada;
         _proyecto = entrada.Cabecera;
         _hoy = hoy;
         _guardar = guardar;
-        _barra = new BarraDePlanificacion(_proyecto.Planificacion, eje);
+
+        // La barra abarca el trabajo entero —de la primera familia a la última—, no solo
+        // las fechas de la cabecera. Se le da al gesto una planificación con ese tramo; al
+        // soltar, RepartoDelArrastre decide a qué familias hay que escribírselo.
+        var delGrupo = _proyecto.Planificacion.Copia();
+        delGrupo.Inicio = entrada.Inicio;
+        delGrupo.Fin = entrada.Fin;
+        _barra = new BarraDePlanificacion(delGrupo, eje);
+
+        var tramos = entrada.Tramos;
+        Trozos = [.. tramos.Select((t, i) => new TrozoDeBarraViewModel(
+            this, entrada, t, _barra.Ancho, hoy,
+            esPrimera: i == 0, esUltima: i == tramos.Count - 1, planificar, abrir))];
 
         Planificar = new Comando(() => planificar(_proyecto));
         Abrir = new Comando(() => abrir(_proyecto.Ruta));
@@ -289,7 +573,17 @@ public sealed class TarjetaPlanViewModel : ObservableObject
     // El gesto lo lleva BarraDePlanificacion, en el núcleo. Aquí solo se avisa a la
     // vista de que hay que repintar.
 
-    public bool SePuedeArrastrar => _barra.SePuedeArrastrar;
+    /// <summary>
+    /// Si el trabajo se puede mover con el ratón.
+    /// <para>
+    /// <b>Basta con que una familia tenga las fechas bloqueadas</b> para que no se pueda
+    /// arrastrar ninguna: coger cualquier tarjeta mueve el trabajo entero, así que
+    /// permitirlo movería también la bloqueada. Para desbloquearla se entra por su
+    /// diálogo, que es donde se puso el candado.
+    /// </para>
+    /// </summary>
+    public bool SePuedeArrastrar
+        => _barra.SePuedeArrastrar && !_entrada.Miembros.Any(m => m.Planificacion.FechasBloqueadas);
 
     public void EmpezarArrastre(ModoArrastre modo) => _barra.Empezar(modo);
 
@@ -302,10 +596,16 @@ public sealed class TarjetaPlanViewModel : ObservableObject
     /// <summary>
     /// Suelta la barra. Si las fechas no han cambiado no se guarda nada: arrastrar y
     /// volver al sitio no debe tocar el fichero.
+    /// <para>
+    /// Se entrega <b>el gesto entero de una vez</b>, no familia a familia: quien guarda
+    /// tiene que poder recolocar la cadena contra los datos ya completos y no a medias.
+    /// </para>
     /// </summary>
     public void SoltarArrastre()
     {
-        if (_barra.HayCambio) _guardar(_proyecto, _barra.Resultado());
+        if (!_barra.HayCambio) return;
+
+        _guardar(RepartoDelArrastre.Aplicar(_entrada, _barra.Inicio, _barra.Fin));
     }
 
     public void CancelarArrastre()
@@ -318,34 +618,56 @@ public sealed class TarjetaPlanViewModel : ObservableObject
     {
         Notificar(nameof(Izquierda));
         Notificar(nameof(Ancho));
-        Notificar(nameof(Fechas));
-        Notificar(nameof(Detalle));
         Notificar(nameof(Retrasado));
-        Notificar(nameof(Color));
+
+        // Las tarjetas se recalculan, no se rehacen: la que tiene cogido el ratón tiene que
+        // seguir existiendo hasta que se suelte.
+        var tramos = TramosDelGrupo.Calcular(_entrada.EnOrden, _barra.Inicio, _barra.Fin);
+
+        for (var i = 0; i < Trozos.Count && i < tramos.Count; i++)
+            Trozos[i].Redibujar(tramos[i], Ancho);
     }
 
     public string Ruta => _proyecto.Ruta;
 
-    /// <summary>El código del servicio, o el nombre del fichero si aún no lo tiene.</summary>
-    public string Codigo => string.IsNullOrWhiteSpace(_proyecto.CodigoServicio)
-        ? _proyecto.Nombre
-        : _proyecto.CodigoServicio;
+    /// <summary>
+    /// Cómo se encabeza la barra: el mismo rótulo que en el tablero, para que un servicio
+    /// se llame igual en las dos vistas.
+    /// </summary>
+    public string Codigo => _proyecto.Rotulo;
+
+    /// <summary>
+    /// Cómo se encabeza la <b>fila</b> del calendario. Con varias familias enlazadas es el
+    /// nombre del grupo —tal como se tecleó— seguido de <c>(agrupación)</c>: la fila ya no
+    /// es una toma de notas, son todas, y poner el código de una sola —la cabecera— hacía
+    /// pensar que las demás no estaban ahí. Cada familia lleva el suyo escrito en su propia
+    /// tarjeta.
+    /// <para>
+    /// La coletilla hace falta porque el nombre del grupo lo pone una persona y puede
+    /// parecerse a cualquier cosa: sin ella, una fila que dice «ANTAR2504» no se distingue
+    /// de una toma de notas suelta que se llamara así.
+    /// </para>
+    /// </summary>
+    public string Titulo => _entrada.EsGrupo && !string.IsNullOrWhiteSpace(_entrada.Grupo)
+        ? $"{_entrada.Grupo!.Trim()} {MarcaDeGrupo}"
+        : Codigo;
+
+    /// <summary>Lo que distingue una fila de varias familias de una toma de notas suelta.</summary>
+    public const string MarcaDeGrupo = "(agrupación)";
 
     public string Tecnico => _proyecto.Tecnico;
-    public string Normas => string.Join(" + ", _proyecto.Normas);
 
-    /// <summary>El avance del trabajo entero: si hay varias enlazadas, la suma.</summary>
-    public string Avance => _entrada.Avance;
-
-    public string Carpeta => Path.GetDirectoryName(_proyecto.Ruta) ?? "";
-
-    /// <summary>Cuántas tomas de notas van en esta barra. Una, si no está enlazada.</summary>
-    public int Enlazadas => _entrada.Miembros.Count;
-
-    public bool EsGrupo => _entrada.EsGrupo;
-
-    /// <summary>Rótulo del grupo para la barra: «ANTAR2504 · 4 tomas de notas».</summary>
-    public string EtiquetaDeGrupo => _entrada.EsGrupo ? $"{Enlazadas} tomas de notas" : "";
+    /// <summary>
+    /// Las tarjetas del trabajo, <b>una por familia</b> y pegadas unas a otras. Una toma de
+    /// notas suelta da una sola que ocupa la línea entera, así que la plantilla no distingue
+    /// casos.
+    /// <para>
+    /// La lista se construye una vez y <b>no se sustituye nunca</b>: rehacerla a mitad de un
+    /// arrastre destruiría la tarjeta que tiene cogido el ratón, WPF daría el gesto por
+    /// perdido y el trabajo volvería solo a su sitio.
+    /// </para>
+    /// </summary>
+    public IReadOnlyList<TrozoDeBarraViewModel> Trozos { get; }
 
     /// <summary>Se llama <c>Plan</c> y no <c>Planificacion</c> para no tapar al tipo.</summary>
     public Planificacion Plan => _proyecto.Planificacion;
@@ -356,14 +678,10 @@ public sealed class TarjetaPlanViewModel : ObservableObject
 
     public bool Archivado => Plan.Archivado;
 
-    public string EstadoTexto => Planificacion.EtiquetaDe(Plan.Estado);
-
-    /// <summary>Rojo si se ha pasado de plazo; si no, el color de su estado.</summary>
-    public string Color => Retrasado ? "#DC2626" : Planificacion.ColorDe(Plan.Estado);
-
     /// <summary>
-    /// Fuera de plazo. Se calcula sobre la fecha que se esté enseñando, no sobre la
-    /// guardada, para que la barra cambie de color mientras se arrastra.
+    /// Fuera de plazo. Es del <b>trabajo entero</b> —lo usa la cabecera del técnico para
+    /// contar cuántos van tarde—; el color de cada tarjeta lo decide su propia familia.
+    /// Se calcula sobre la fecha que se esté enseñando, no sobre la guardada.
     /// </summary>
     public bool Retrasado => Plan.Estado != EstadoDeProyecto.Terminado
                              && _barra.Fin is { } fin && fin.Date < _hoy.Date;
@@ -371,35 +689,13 @@ public sealed class TarjetaPlanViewModel : ObservableObject
     public double Izquierda => _barra.Izquierda;
     public double Ancho => _barra.Ancho;
 
-    public string Fechas => _barra.Inicio is { } inicio && _barra.Fin is { } fin
-        ? $"{inicio:dd/MM} → {fin:dd/MM}  (S{System.Globalization.ISOWeek.GetWeekOfYear(inicio):00}" +
-          $"–S{System.Globalization.ISOWeek.GetWeekOfYear(fin):00})"
-        : "sin fechas";
-
-    public string Muestras => Plan.RecepcionMuestras is { } fecha
-        ? $"Muestras recibidas el {fecha:dd/MM/yyyy}"
-        : "Muestras pendientes de recibir";
-
     public bool MuestrasRecibidas => Plan.MuestrasRecibidas;
 
-    public string Detalle => string.Join("\n",
-        new[]
-        {
-            Codigo + (string.IsNullOrWhiteSpace(Normas) ? "" : "  |  " + Normas),
-            // Con varias enlazadas hay que decir cuáles, o la barra miente sobre qué abarca.
-            !EsGrupo ? null
-                : $"Grupo «{_entrada.Grupo}» · {Enlazadas} tomas de notas:\n  "
-                  + string.Join("\n  ", _entrada.Miembros.Select(m =>
-                      (string.IsNullOrWhiteSpace(m.CodigoServicio) ? m.Nombre : m.CodigoServicio)
-                      + "  " + m.Avance)),
-            string.IsNullOrWhiteSpace(Tecnico) ? null : "Técnico: " + Tecnico,
-            "Estado: " + EstadoTexto + (Retrasado ? "  ·  fuera de plazo" : ""),
-            "Fechas: " + Fechas,
-            Muestras,
-            "Avance: " + Avance,
-            Carpeta
-        }.Where(l => l is not null));
-
+    /// <summary>
+    /// Planifica la cabecera. Solo lo usa la banda de los que están sin fechas, donde no
+    /// hay tarjetas por familia que pulsar; sobre la línea de tiempo se planifica cada una
+    /// desde la suya.
+    /// </summary>
     public Comando Planificar { get; }
     public Comando Abrir { get; }
 }

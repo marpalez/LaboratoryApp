@@ -217,15 +217,34 @@ public sealed class MotorDeReglas(PlantillaEnsayos plantilla, DatosProyecto dato
     private int Recuento(Regla r, Entrada e)
         => ValoresSegunAmbito(r, e).Count(v => TieneDato(v, r.CuentaCeros));
 
+    /// <summary>
+    /// Si están los datos que pide la regla.
+    /// <para>
+    /// <c>umbralPorMuestra</c> se comprueba <b>muestra a muestra</b>, y no sumando: la
+    /// regla dice «alto, ancho y profundo <i>de cada muestra</i>», así que una muestra
+    /// medida de sobra no puede tapar a otra sin medir. Sumando, un servicio de dos
+    /// muestras con las cuatro medidas de la primera y dos de la segunda llegaba a seis
+    /// —el total pedido— y el apartado se daba por terminado con media muestra sin medir.
+    /// </para>
+    /// <para>
+    /// <c>umbral</c>, en cambio, sí es un total: ese no habla de muestras.
+    /// </para>
+    /// </summary>
     private bool RecuentoDatos(Regla r, Entrada e)
     {
         if (r.SoloSi is not null && Evaluar(r.SoloSi) is not true) return true;
 
-        var introducidos = Recuento(r, e);
-        var umbral = r.Umbral
-            ?? (r.UmbralPorMuestra is { } porMuestra ? porMuestra * Datos.NumeroMuestras : 1);
+        if (r.UmbralPorMuestra is { } porMuestra)
+            return Datos.Muestras.All(m => RecuentoDe(r, e, m) >= porMuestra);
 
-        return introducidos >= umbral;
+        return Recuento(r, e) >= (r.Umbral ?? 1);
+    }
+
+    private int RecuentoDe(Regla r, Entrada e, int muestra)
+    {
+        var ruta = Resolver(e.Ambito, r.Campo!);
+        return Datos.ValoresDe(ruta.Ambito, ruta.Campo, muestra)
+                    .Count(v => TieneDato(v, r.CuentaCeros));
     }
 
     private IEnumerable<object?> ValoresSegunAmbito(Regla r, Entrada e)

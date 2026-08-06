@@ -58,7 +58,7 @@ public sealed class ExploradorDeProyectos(RepositorioDeProyectos repositorio, st
     {
         if (!Directory.Exists(carpeta)) return [];
 
-        avance?.Report(new AvanceDeExploracion(0, 0, "Buscando proyectos…"));
+        avance?.Report(new AvanceDeExploracion(0, 0, "Buscando proyectos"));
 
         var ficheros = Buscar(carpeta, incluirSubcarpetas, cancelar);
         if (ficheros.Count == 0) return [];
@@ -95,7 +95,7 @@ public sealed class ExploradorDeProyectos(RepositorioDeProyectos repositorio, st
                 var vistos = Interlocked.Increment(ref leidos);
                 if (vistos % 10 == 0 || vistos == ficheros.Count)
                     avance?.Report(new AvanceDeExploracion(vistos, ficheros.Count,
-                        $"Leyendo proyectos… {vistos} de {ficheros.Count}"));
+                        $"Leyendo proyectos {vistos} de {ficheros.Count}"));
             });
 
         _cache.ConservarSolo(ficheros.Select(f => f.FullName));
@@ -169,12 +169,14 @@ public sealed class ExploradorDeProyectos(RepositorioDeProyectos repositorio, st
 
         var encontrados = new List<FileInfo>();
 
-        foreach (var fichero in new DirectoryInfo(carpeta)
-                     .EnumerateFiles("*" + RepositorioDeProyectos.Extension, opciones))
-        {
-            cancelar.ThrowIfCancellationRequested();
-            encontrados.Add(fichero);
-        }
+        var raiz = new DirectoryInfo(carpeta);
+
+        foreach (var patron in RepositorioDeProyectos.Patrones)
+            foreach (var fichero in raiz.EnumerateFiles(patron, opciones))
+            {
+                cancelar.ThrowIfCancellationRequested();
+                encontrados.Add(fichero);
+            }
 
         return encontrados;
     }

@@ -13,3 +13,6 @@ C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\Aplicacion
 C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net8.0\refint\LumNotas.Report.dll
 C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net8.0\LumNotas.Report.pdb
 C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\src\LumNotas.Report\obj\Debug\net8.0\ref\LumNotas.Report.dll
+C:\Users\Invitado\AppData\Local\Temp\claude\C--Users-Invitado-Desktop-Archivos-windows-Desarrollo-de-aplicaciones-AplicacionTomaNotas\bc0e740c-2577-4b97-bb6f-7e2f89139c4b\scratchpad\comprobar-app\salida\LumNotas.Report.deps.json
+C:\Users\Invitado\AppData\Local\Temp\claude\C--Users-Invitado-Desktop-Archivos-windows-Desarrollo-de-aplicaciones-AplicacionTomaNotas\bc0e740c-2577-4b97-bb6f-7e2f89139c4b\scratchpad\comprobar-app\salida\LumNotas.Report.dll
+C:\Users\Invitado\AppData\Local\Temp\claude\C--Users-Invitado-Desktop-Archivos-windows-Desarrollo-de-aplicaciones-AplicacionTomaNotas\bc0e740c-2577-4b97-bb6f-7e2f89139c4b\scratchpad\comprobar-app\salida\LumNotas.Report.pdb

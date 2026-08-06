@@ -25,10 +25,13 @@ public class InformeTests : IDisposable
 
     private static DatosProyecto ProyectoRelleno()
     {
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 3, Clase = Clase.I };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 3, Clase = Clase.I };
         datos.IpSegundaCifra.Add("IPX3");
         datos.IpPrimeraCifra.Add("IP5X");
         datos.Partes2.Add("-2-3");
+
+        datos.Seleccion("acreditacion").Add("ENAC");
+        datos.Seleccion("acreditacion").Add("CB");
 
         datos.Establecer("proyecto", "tecnico1", "A. Pérez");
         datos.Establecer("proyecto", "ta", 25.0);
@@ -61,6 +64,115 @@ public class InformeTests : IDisposable
         var contenido = File.ReadAllText(ruta);
         Assert.StartsWith("<!DOCTYPE html>", contenido);
         Assert.Contains("</html>", contenido);
+    }
+
+    /// <summary>
+    /// <b>La acreditación sale en la exportación.</b> Este documento no es un certificado:
+    /// es la toma de notas puesta en limpio para que el director técnico la verifique
+    /// antes de firmarla, y para eso tiene que ver contra qué acreditación se ensayó.
+    /// Salen todas las marcadas, que pueden ser varias.
+    /// </summary>
+    [Fact]
+    public void LaExportacionDiceLaAcreditacion()
+    {
+        var html = Html(ProyectoRelleno());
+
+        Assert.Contains("Acreditación", html);
+        Assert.Contains("ENAC", html);
+        Assert.Contains("CB", html);
+    }
+
+    /// <summary>Sin marcar nada no se inventa una acreditación: se deja el guion.</summary>
+    [Fact]
+    public void SinAcreditacionNoSeInventaNinguna()
+    {
+        var datos = ProyectoRelleno();
+        datos.Seleccion("acreditacion").Clear();
+
+        var html = Html(datos);
+
+        Assert.Contains("Acreditación", html);
+        Assert.DoesNotContain("ENAC", html);
+    }
+
+    /// <summary>
+    /// <b>Una fila por muestra, con sus grados.</b> Antes iban todas juntas en una línea
+    /// —«IP2X, IPX0»—, que engaña dos veces: mezcla las dos cifras de un mismo grado y
+    /// junta los de muestras distintas. Un servicio puede traer una IP65 y otra IP20, y
+    /// quien firma necesita saber cuál es cuál.
+    /// </summary>
+    [Fact]
+    public void HayUnaTablaConUnaFilaPorMuestra()
+    {
+        var datos = ProyectoRelleno();
+        datos.Establecer("proyecto", "ipPrimeraCifra", "IP6X", 1);
+        datos.Establecer("proyecto", "ipSegundaCifra", "IPX5", 1);
+        datos.Establecer("proyecto", "gradoIk", "IK08", 1);
+        datos.Establecer("proyecto", "ipPrimeraCifra", "IP2X", 2);
+        datos.Establecer("proyecto", "ipSegundaCifra", "IPX0", 2);
+
+        var html = Html(datos);
+
+        Assert.Contains("<h3>Muestras</h3>", html);
+        Assert.Contains("EBP_SAFE12345202601", html);
+        Assert.Contains("IP65", html);   // la primera
+        Assert.Contains("IP20", html);   // la segunda, distinta
+        Assert.Contains("IK08", html);
+    }
+
+    /// <summary>
+    /// Que el ensayo saliera de casa consta en lo que se firma, con qué se subcontrató y
+    /// por qué. Es lo primero que pregunta una auditoría sobre subcontratación.
+    /// </summary>
+    [Fact]
+    public void LaExportacionDiceLosLaboratoriosExternos()
+    {
+        var datos = ProyectoRelleno();
+        datos.Colaboradores.Add(new Colaborador
+        {
+            Laboratorio = "IMQ Italia",
+            EnsayoYMotivo = "Fotobiología — no tenemos cámara"
+        });
+
+        var html = Html(datos);
+
+        Assert.Contains("Laboratorios externos", html);
+        Assert.Contains("IMQ Italia", html);
+        Assert.Contains("no tenemos cámara", html);
+    }
+
+    /// <summary>
+    /// Sin ninguno se dice que no hay, con un guion. Un hueco en blanco no distingue
+    /// «no se subcontrató nada» de «nadie lo rellenó».
+    /// </summary>
+    [Fact]
+    public void SinLaboratoriosExternosSeDiceQueNoHay()
+    {
+        var html = Html(ProyectoRelleno());
+
+        Assert.Contains("Laboratorios externos", html);
+        Assert.DoesNotContain("IMQ", html);
+    }
+
+    /// <summary>
+    /// <b>Con qué se generó el documento.</b> La versión de plantilla dice contra qué
+    /// reglas se midió; la del programa, con qué software se produjo. Las dos son parte
+    /// del rastro que pide la ISO 17025 sobre validación de software, y sin la segunda el
+    /// documento no dice de dónde salió.
+    /// </summary>
+    [Fact]
+    public void LaExportacionDiceLaVersionDelProgramaYLaDeLaPlantilla()
+    {
+        var html = new ExportadorDeInforme(Contexto.Plantilla) { VersionDelPrograma = "9.9.9" }
+            .GenerarHtml(ProyectoRelleno());
+
+        Assert.Contains("Versión del programa", html);
+        Assert.Contains("9.9.9", html);
+
+        // Y la norma con su nombre completo al lado de su versión de plantilla.
+        Assert.Contains("Normas y plantillas", html);
+        Assert.Contains(Contexto.Plantilla.Meta.Titulo!, html);
+        Assert.Contains("· plantilla " + Contexto.Plantilla.Meta.Version, html);
     }
 
     [Fact]
@@ -151,7 +263,7 @@ public class InformeTests : IDisposable
     public void UnProyectoVacioTambienSeExportaYAvisaDeLoQueFalta()
     {
         // Imprimir a mitad de ensayo es habitual: no puede fallar por faltar datos.
-        var html = Html(new DatosProyecto { CodigoServicio = "000002026", NumeroMuestras = 1 });
+        var html = Html(new DatosProyecto { CodigoTomaDeNotas = "00000202601-00", CodigoServicio = "000002026", NumeroMuestras = 1 });
 
         Assert.Contains("quedan apartados con datos pendientes", html);
         Assert.Contains("FALTAN DATOS EN ESTE APARTADO", html);

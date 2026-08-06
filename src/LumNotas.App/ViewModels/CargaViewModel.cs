@@ -14,8 +14,8 @@ public sealed class CargaViewModel : ObservableObject
     private IReadOnlyList<ResumenDeProyecto> _proyectos = [];
     private string _mensaje = "";
 
-    public ObservableCollection<string> Meses { get; } = [];
-    public ObservableCollection<FilaDeCargaViewModel> Filas { get; } = [];
+    public ColeccionEnBloque<string> Meses { get; } = [];
+    public ColeccionEnBloque<FilaDeCargaViewModel> Filas { get; } = [];
 
     public bool HayDatos => Filas.Count > 0;
 
@@ -36,6 +36,9 @@ public sealed class CargaViewModel : ObservableObject
     {
         var capacidad = ServicioDeCapacidad.Capacidad;
 
+        // Las agrupadas entran como cualquier otra, cada familia con su importe: un trabajo
+        // de cuatro familias son cuatro ensayos que ocupan cuatro veces, y dejarlas fuera
+        // hacía que la tabla dijera que el técnico está más libre de lo que está.
         var servicios = _proyectos
             .Where(p => p.Planificacion.HayFechas)
             .Select(p => new ServicioPlanificado(
@@ -45,18 +48,15 @@ public sealed class CargaViewModel : ObservableObject
 
         var (meses, filas) = CargaPorTecnico.Calcular(servicios, capacidad);
 
-        Meses.Clear();
-        foreach (var (ano, mes) in meses) Meses.Add(Rotulo(ano, mes));
-
-        Filas.Clear();
-        foreach (var fila in filas) Filas.Add(new FilaDeCargaViewModel(fila));
+        Meses.Reemplazar(meses.Select(m => Rotulo(m.Ano, m.Mes)));
+        Filas.Reemplazar(filas.Select(f => new FilaDeCargaViewModel(f)));
 
         var sinImporte = filas.Sum(f => f.SinImporte);
         Mensaje = servicios.Count == 0
             ? "No hay servicios con fechas que repartir."
             : $"Importe ÷ {capacidad.EurosPorHora:0.##} × {capacidad.Factor:0.###} = horas"
-              + $"  ·  {capacidad.HorasPorDia:0.##} h por jornada"
-              + (sinImporte == 0 ? "" : $"  ·  {sinImporte} servicio{(sinImporte == 1 ? "" : "s")} sin importe");
+              + $"  |  {capacidad.HorasPorDia:0.##} h por jornada"
+              + (sinImporte == 0 ? "" : $"  |  {sinImporte} servicio{(sinImporte == 1 ? "" : "s")} sin importe");
 
         Notificar(nameof(HayDatos));
     }

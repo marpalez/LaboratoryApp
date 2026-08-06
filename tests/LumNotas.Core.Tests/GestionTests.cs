@@ -41,7 +41,7 @@ public class GestionTests : IDisposable
     public void UnProyectoVacio_TieneTodasLasSeccionesPendientes()
     {
         var resumen = AnalizadorDeProyectos.Analizar(
-            Contexto.Plantilla, Proyecto("111112026"), "x.lumproj", DateTime.Now);
+            Contexto.Plantilla, Proyecto("111112026"), "x.lmnlab", DateTime.Now);
 
         Assert.Null(resumen.Error);
         Assert.NotEmpty(resumen.SeccionesPendientes);

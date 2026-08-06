@@ -1,0 +1,46 @@
+{
+  "formato": "lmnlab/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-06T14:53:14.8814761+02:00",
+  "codigoTomaDeNotas": "EDISO260105-00",
+  "colaboradores": [],
+  "codigoServicio": "EDISO2601",
+  "numeroMuestras": 1,
+  "normas": [
+    "62262_2002_A1"
+  ],
+  "normaPrincipal": "62262_2002_A1",
+  "patronIdentificador": "EBP_CLIM{codigoServicio}",
+  "planificacion": {
+    "inicio": "2026-01-11T00:00:00",
+    "fin": "2026-01-14T00:00:00",
+    "estado": "terminado",
+    "archivado": true,
+    "importe": 1944,
+    "ensayoDesde": "2026-01-11T00:00:00",
+    "ensayoHasta": "2026-01-14T00:00:00",
+    "fechasBloqueadas": false
+  },
+  "selecciones": {},
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Javier Salvador"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico2",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Mario Madrigal"
+    }
+  ],
+  "na": [],
+  "checklists": []
+}

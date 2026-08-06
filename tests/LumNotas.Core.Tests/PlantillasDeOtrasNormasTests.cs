@@ -218,7 +218,7 @@ public class PlantillasDeOtrasNormasTests
     public void TodasLasReglasSeEvaluanSinExcepcionSobreUnProyectoVacio(string fichero)
     {
         var plantilla = Cargar(fichero);
-        var motor = new MotorDeReglas(plantilla, new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 2 });
+        var motor = new MotorDeReglas(plantilla, new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 2 });
         var fallos = new List<string>();
 
         foreach (var regla in ReglasDe(plantilla))
@@ -300,7 +300,8 @@ public class PlantillasDeOtrasNormasTests
     public void ElIkUsaElPrefijoDeMuestraDelLaboratorioParaEseServicio()
     {
         var ik = Contexto.Norma("62262");
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 1 };
+        datos.Seleccion("acreditacion").Add("ENAC");
 
         ik.AplicarA(datos);
 
@@ -312,7 +313,8 @@ public class PlantillasDeOtrasNormasTests
     public void ElMetodoDeGolpeoSoloSeExigeDeIk07EnAdelante()
     {
         var ik = Contexto.Norma("62262");
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 1 };
+        datos.Seleccion("acreditacion").Add("ENAC");
 
         datos.Establecer("proyecto", "gradoIk", "IK05", 1);
         Assert.False(new MotorDeReglas(ik, datos).EsVerdadera("R-62262-ik-metodoElegible"));
@@ -332,7 +334,9 @@ public class PlantillasDeOtrasNormasTests
         var led = Contexto.Norma("62031");
         var ik = Contexto.Norma("62262");
 
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 2 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 2 };
+
+        datos.Seleccion("acreditacion").Add("ENAC");
 
         var soloLuminarias = new Report.ExportadorDeInforme(lum).GenerarHtml(datos);
         var conLasTres = new Report.ExportadorDeInforme(lum)
@@ -349,9 +353,33 @@ public class PlantillasDeOtrasNormasTests
         Assert.Contains("Riesgo por luz azul", conLasTres);
         Assert.Contains("Resistencia a los impactos mecánicos externos", conLasTres);
 
-        // Y la portada dice qué normas lleva el documento.
-        Assert.Contains("Normas incluidas", conLasTres);
-        Assert.DoesNotContain("Normas incluidas", soloLuminarias);
+        // Y la portada dice qué normas lleva el documento, cada una con la versión de
+        // plantilla con la que se midió: con dos normas y una sola línea de versión no
+        // había forma de saber cuál era de cuál.
+        Assert.Contains("Normas y plantillas", conLasTres);
+        Assert.Contains("Normas y plantillas", soloLuminarias);
+
+        Assert.Contains(led.Meta.Titulo!, conLasTres);
+        Assert.Contains(ik.Meta.Titulo!, conLasTres);
+        Assert.DoesNotContain(led.Meta.Titulo!, soloLuminarias);
+
+        // Tres normas, tres versiones declaradas.
+        Assert.Equal(3, Ocurrencias(conLasTres, "· plantilla "));
+        Assert.Equal(1, Ocurrencias(soloLuminarias, "· plantilla "));
+    }
+
+    private static int Ocurrencias(string texto, string trozo)
+    {
+        var cuantas = 0;
+        var desde = 0;
+
+        while ((desde = texto.IndexOf(trozo, desde, StringComparison.Ordinal)) >= 0)
+        {
+            cuantas++;
+            desde += trozo.Length;
+        }
+
+        return cuantas;
     }
 
     /// <summary>
@@ -389,7 +417,7 @@ public class PlantillasDeOtrasNormasTests
     {
         string[] conSitioPropio =
         [
-            "codigoServicio", "tecnico1", "tecnico2", "numeroMuestras",
+            "codigoTomaDeNotas", "codigoServicio", "tecnico1", "tecnico2", "numeroMuestras",
             "numeracionMuestras", "inicioNumeracion", "comentariosGenerales",
             "ta", "clase", "partes2", "ipPrimeraCifra", "ipSegundaCifra", "sinGradoIp"
         ];
@@ -401,9 +429,13 @@ public class PlantillasDeOtrasNormasTests
             .Except(conSitioPropio)
             .ToList();
 
-        // Los únicos que sí llevan tarjeta propia son los de inmersión, que además solo
-        // aparecen con objetivo IPX7 o IPX8. El laboratorio los pidió igual que en la 60529.
-        Assert.Equal(["profundidadInmersion", "tiempoInmersion", "temperaturaInmersion"], extra);
+        // Los que sí llevan tarjeta propia: la acreditación —casillas, una por cada— y los
+        // de inmersión, que además solo aparecen con objetivo IPX7 o IPX8. Todos ellos los
+        // pinta CamposExtra sin XAML escrito a mano, que es lo que hace que añadirlos no
+        // toque la pantalla que el laboratorio da por buena.
+        Assert.Equal(
+            ["acreditacion", "profundidadInmersion", "tiempoInmersion", "temperaturaInmersion"],
+            extra);
     }
 
     [Fact]
@@ -447,7 +479,9 @@ public class PlantillasDeOtrasNormasTests
         Assert.Equal("Partes -2 aplicables",
             Contexto.Plantilla.Proyecto.Campos.Single(c => c.Id == "partes2").Etiqueta);
 
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 1 };
+
+        datos.Seleccion("acreditacion").Add("ENAC");
         datos.Establecer("proyecto", "tecnico1", "D. Martínez");
         datos.Establecer("proyecto", "gradoIk", "IK08", 1);
 
@@ -466,7 +500,9 @@ public class PlantillasDeOtrasNormasTests
     {
         var ik = Contexto.Norma("62262");
 
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 2 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 2 };
+
+        datos.Seleccion("acreditacion").Add("ENAC");
         datos.Establecer("proyecto", "tecnico1", "D. Martínez");
         datos.Partes2.Add("OTRO");
 
@@ -524,7 +560,8 @@ public class PlantillasDeOtrasNormasTests
     public void LaCabeceraDelIkSePuedeCompletar()
     {
         var ik = Contexto.Norma("62262");
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 2 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 2 };
+        datos.Seleccion("acreditacion").Add("ENAC");
 
         datos.Establecer("proyecto", "tecnico1", "D. Martínez");
         datos.Establecer("proyecto", "gradoIk", "IK08", 1);
@@ -538,7 +575,8 @@ public class PlantillasDeOtrasNormasTests
     public void LaCabeceraDeLosModulosLedSePuedeCompletar()
     {
         var led = Contexto.Norma("62031");
-        var datos = new DatosProyecto { CodigoServicio = "202612345", NumeroMuestras = 2 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "20261234501-00", CodigoServicio = "202612345", NumeroMuestras = 2 };
+        datos.Seleccion("acreditacion").Add("ENAC");
 
         datos.Establecer("proyecto", "tecnico1", "D. Martínez");
         datos.Establecer("proyecto", "tc", 65d);
@@ -579,7 +617,9 @@ public class PlantillasDeOtrasNormasTests
         Assert.Equal(["IP1X", "IP2X", "IP3X", "IP4X", "IP5X", "IP6X"], primera.Opciones);
         Assert.Equal(10, segunda.Opciones.Count);
 
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 2 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 2 };
+
+        datos.Seleccion("acreditacion").Add("ENAC");
         datos.Establecer("proyecto", "tecnico1", "D. Martínez");
 
         // Solo la primera muestra rellena: sigue faltando la segunda.
@@ -602,7 +642,8 @@ public class PlantillasDeOtrasNormasTests
     public void LasReglasVenElGradoIpDeclaradoPorMuestra()
     {
         var ip = Contexto.Norma("60529");
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 2 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 2 };
+        datos.Seleccion("acreditacion").Add("ENAC");
 
         var motorVacio = new MotorDeReglas(ip, datos);
         Assert.False(motorVacio.EsVerdadera("R-60529-hayPrimeraCifra"));
@@ -632,7 +673,9 @@ public class PlantillasDeOtrasNormasTests
 
         Assert.Equal(25d, ip.Proyecto.Campos.Single(c => c.Id == "temperaturaInmersion").NumeroPorDefecto);
 
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 2 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 2 };
+
+        datos.Seleccion("acreditacion").Add("ENAC");
         Assert.False(new MotorDeReglas(ip, datos).EsVerdadera("R-60529-inmersion"));
 
         datos.Establecer("proyecto", "ipSegundaCifra", "IPX5", 1);
@@ -652,7 +695,9 @@ public class PlantillasDeOtrasNormasTests
     {
         var ip = Contexto.Norma("60529");
 
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 1 };
+
+        datos.Seleccion("acreditacion").Add("ENAC");
         datos.Establecer("proyecto", "tecnico1", "D. Martínez");
         datos.Establecer("proyecto", "ipPrimeraCifra", "IP2X", 1);
         datos.Establecer("proyecto", "ipSegundaCifra", "IPX4", 1);
@@ -687,6 +732,7 @@ public class PlantillasDeOtrasNormasTests
         Assert.True(lum.Proyecto.Campos.Single(c => c.Id == "luminariaOrdinaria").PorMuestra);
 
         var datos = Contexto.ProyectoVacio(muestras: 2);
+        datos.Seleccion("acreditacion").Add("ENAC");
         datos.Establecer("proyecto", "tecnico1", "D. Martínez");
         datos.Establecer("proyecto", "ta", 25d);
         datos.Partes2.Add("-2-1");
@@ -764,7 +810,9 @@ public class PlantillasDeOtrasNormasTests
         Assert.Null(campo.PorDefecto);
         Assert.Equal(["I", "II", "III"], campo.Opciones);
 
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 1 };
+
+        datos.Seleccion("acreditacion").Add("ENAC");
         Assert.Contains(RequisitosDelProyecto.Faltantes(Contexto.Plantilla, datos), f => f == "Clase");
 
         datos.Establecer("proyecto", "clase", "II");
@@ -830,7 +878,9 @@ public class PlantillasDeOtrasNormasTests
             if (plantilla.Proyecto.Campos.FirstOrDefault(c => c.Id == "profundidadInmersion")?.VisibleSi
                 is not { } regla) continue;
 
-            var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 2 };
+            var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 2 };
+
+            datos.Seleccion("acreditacion").Add("ENAC");
             if (new MotorDeReglas(plantilla, datos).EsVerdadera(regla))
                 fallos.Add($"{norma}: pide inmersión sin que ninguna muestra la lleve");
 
@@ -851,7 +901,8 @@ public class PlantillasDeOtrasNormasTests
     {
         var ik = Contexto.Norma("62262");
         var ip = Contexto.Norma("60529");
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 1 };
+        datos.Seleccion("acreditacion").Add("ENAC");
 
         ik.AplicarA(datos);
         ip.AplicarA(datos, principal: false);
@@ -881,7 +932,8 @@ public class PlantillasDeOtrasNormasTests
         var led = Contexto.Norma("62031");
 
         // Nace como módulos LED, con el IP añadido detrás.
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 1 };
+        datos.Seleccion("acreditacion").Add("ENAC");
         led.AplicarA(datos);
         ip.AplicarA(datos, principal: false);
 
@@ -891,7 +943,7 @@ public class PlantillasDeOtrasNormasTests
         // plantillas en el orden que se le pasen.
         foreach (var orden in new[] { new[] { ip, led }, [led, ip] })
         {
-            var resumen = AnalizadorDeProyectos.Analizar(orden, datos, "x.lumproj", DateTime.Now);
+            var resumen = AnalizadorDeProyectos.Analizar(orden, datos, "x.lmnlab", DateTime.Now);
             Assert.Contains(resumen.SeccionesPendientes, s => s.Titulo == ip.Meta.Titulo);
         }
     }
@@ -906,7 +958,9 @@ public class PlantillasDeOtrasNormasTests
         var luminarias = Contexto.Plantilla;
         var led = Contexto.Norma("62031");
 
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 1 };
+
+        datos.Seleccion("acreditacion").Add("ENAC");
         led.AplicarA(datos);
         luminarias.AplicarA(datos, principal: false);
 
@@ -915,7 +969,7 @@ public class PlantillasDeOtrasNormasTests
         Assert.Equal(led.Meta.Id, datos.NormaPrincipal);
 
         // No se cae ni detalla la que ya no está: manda luminarias, como siempre.
-        var resumen = AnalizadorDeProyectos.Analizar([luminarias], datos, "x.lumproj", DateTime.Now);
+        var resumen = AnalizadorDeProyectos.Analizar([luminarias], datos, "x.lmnlab", DateTime.Now);
         Assert.Null(resumen.Error);
         Assert.NotEmpty(resumen.SeccionesPendientes);
     }
@@ -952,7 +1006,8 @@ public class PlantillasDeOtrasNormasTests
     {
         var lum = Contexto.Plantilla;
         var ik = Contexto.Norma("62262");
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 1 };
+        datos.Seleccion("acreditacion").Add("ENAC");
 
         var soloLum = new IndicadorDeAvance(new MotorDeReglas(lum, datos)).Calcular();
         var soloIk = new IndicadorDeAvance(new MotorDeReglas(ik, datos)).Calcular();
@@ -972,7 +1027,8 @@ public class PlantillasDeOtrasNormasTests
     {
         var ip = Contexto.Norma("60529");
         var ik = Contexto.Norma("62262");
-        var datos = new DatosProyecto { CodigoServicio = "123452026", NumeroMuestras = 1 };
+        var datos = new DatosProyecto { CodigoTomaDeNotas = "12345202601-00", CodigoServicio = "123452026", NumeroMuestras = 1 };
+        datos.Seleccion("acreditacion").Add("ENAC");
 
         var faltanIp = RequisitosDelProyecto.Faltantes(ip, datos);
         var faltanIk = RequisitosDelProyecto.Faltantes(ik, datos);

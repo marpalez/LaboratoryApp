@@ -2,8 +2,8 @@
 
 **Origen:** `TomaDeNotasExcel.xlsx`, plantilla v2.1
 **Extraído el:** 2026-07-29 (última modificación del libro: 2026-07-29)
-**Versión del documento:** 3.38 — documento de traspaso al día
-**Actualizado:** 2026‑08‑02
+**Versión del documento:** 3.75 — documento de traspaso al día
+**Actualizado:** 2026‑08‑06
 **Propósito:** nació como documento de revisión previo a programar —cada regla extraída del Excel debía ser **confirmada, corregida o eliminada** por el laboratorio— y hoy es además el **documento de traspaso** de la aplicación: qué hace, por qué se decidió así y qué queda pendiente. Lo que sigue sin confirmar va marcado con ⏳.
 
 ## Alcance del borrador
@@ -37,7 +37,7 @@ Las partes excluidas se conservan en este documento marcadas como 🚫 **fuera d
 | 2026‑07‑29 | D‑20 | Se acepta: «OTRO» sigue fuera de la comprobación de normas |
 | 2026‑07‑29 | D‑18 | **Resuelto:** se mantienen los pesos y se añade un contador de apartados completados |
 | 2026‑07‑29 | D‑11 | **Resuelto:** la aplicación no firma. Se firma el PDF impreso, fuera del programa |
-| 2026‑07‑29 | DD‑01 | **Stack: .NET 8 + WPF** |
+| 2026‑07‑29 | DD‑01 | **Stack: .NET 10 + WPF** (nació en .NET 8; ver DD‑107) |
 | 2026‑07‑29 | DD‑10 | El catálogo de equipos se importa tal cual está |
 | 2026‑07‑30 | DD‑20 | **El informe se genera en HTML**, no con librería de PDF. Word lo abre como documento y el navegador lo imprime a PDF con Ctrl+P. Cero dependencias externas |
 | 2026‑07‑30 | DD‑21 | **Máximo de muestras: 30.** El Excel admitía 8; ampliación pedida por el laboratorio |
@@ -55,7 +55,35 @@ Las partes excluidas se conservan en este documento marcadas como 🚫 **fuera d
 | 2026‑08‑01 | DD‑33 | **El identificador de muestra sale de la plantilla.** En IK 62262 el laboratorio usa `EBP_CLIM…` en lugar de `EBP_SAFE…` |
 | 2026‑08‑01 | DD‑34 | **Los catálogos de equipos se importan por separado**, uno por norma |
 | 2026‑08‑01 | DD‑35 | **Qué es obligatorio en la cabecera lo decide la plantilla**, no el código: se leen los campos con `obligatorio: true` |
-| 2026‑08‑03 | DD‑102 | **Un solo estilo de botón para toda la aplicación**, con esquinas redondeadas, declarado en `App.xaml` — no en la ventana, porque los diálogos son ventanas aparte y no lo verían. Rehacer la plantilla obliga a dibujar a mano los cuatro estados; encima y pulsado se resuelven **con opacidad y no con un color fijo**, para que funcionen igual sobre el gris de por defecto y sobre los botones que traen el suyo. Los de tamaño fijo —el `+` de pestañas, el zoom del calendario— llevan `Padding="0"`: con el relleno del estilo, el contenido no cabía |
+| 2026‑08‑06 | DD‑134 | **La plantilla declara la edición de la norma** (`meta.edicion`), y la portada la enseña: «Luminarias \| Ed. 9». Va en un campo **aparte del año de publicación** y no se deduce de él: son dos cosas distintas y el programa ya las confundió una vez (DD‑101). Es opcional — sin ella se enseña solo el nombre, porque un «Ed.» sin número parece un dato a medio escribir. Al darlas, el laboratorio corrigió dos cosas más: la **60598‑1 de 2021 es la 9.ª y la de 2024 la 10.ª** —la ficha de DD‑101 decía lo contrario— y la **designación de la 60529 estaba mal**: no es `EN 60529:2018` sino `EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02 + AC:2016-12 + corrigendum May 1993`. Eso obligó a **renombrar su identidad** a `60529_1991`, porque hay un test que exige que la designación lleve dentro el año que identifica a la norma —lo único que separa dos plantillas de la misma— y con la designación nueva dejaba de cumplirse. Con el renombrado hubo que mover también el catálogo de equipos —se llama como su plantilla— y actualizar el `normasCompatibles` de las otras dos que la citaban; **lo cazaron los tests, no la vista**. Se llegó a poner `60529_2018` en `idsAnteriores` para no dejar huérfano lo ya guardado (DD‑95), y **el laboratorio pidió quitarlo**: se está en desarrollo, no hay ensayos que conservar, y una norma mal designada no debe poder abrirse ni por compatibilidad. Se borraron las 36 tomas de notas de prueba que la citaban, sus dos ficheros de las tres carpetas donde estaban publicados, y el reconocimiento del id viejo. **De la 60529 errónea no queda nada** |
+| 2026‑08‑06 | DD‑133 | **Se quita la franja oscura del pie de ventana.** Ocupaba sitio en todas las pantallas para no decir nada casi nunca, y una franja que casi siempre está vacía es justo la que nadie mira el día que importa. Lo que se decía por ahí se repartió en dos: **lo que falla va a una ventana** —no se pudo abrir, guardar o exportar, qué falta para poder guardar, y que la toma de notas se registró con otra versión de la norma—, porque un «no se pudo guardar» tiene que interrumpir; y **las confirmaciones se borraron** —«Guardado en…», «Abierto…», «Exportado a…», «Ya estaba abierto en otra pestaña»—, porque ya se veían por otro lado: la ruta está bajo el título, el punto de «sin guardar» desaparece solo al guardar, el informe se abre en el visor y la pestaña salta sola. Se listaron los diez mensajes antes de tocar nada: **borrar la franja sin más habría dejado cuatro fallos en silencio**, incluido el aviso de que no se puede guardar, que es de esta misma mañana (DD‑130). Los modelos de vista no llaman a `MessageBox`: piden `ServiciosDeVentana.Avisar`, igual que ya piden abrir un fichero |
+| 2026‑08‑06 | DD‑132 | **Una instalación nueva no trae ningún técnico.** Hasta hoy el programa venía con **seis nombres cableados** —los del laboratorio el día que se escribió el código— y eso está mal por dos motivos: mete personas concretas de un laboratorio concreto dentro del ejecutable, y quien lo instale en otro sitio se encuentra una plantilla ajena que tiene que borrar a mano. La lista la hace cada laboratorio desde `Configuración`, que es de donde tiene que salir. **Lo único que viene es el cajón de los que están sin asignar**, y con el mismo texto que ya usaban el calendario, la carga y los filtros —`(sin técnico)`, con sus paréntesis— y no uno parecido: si el catálogo dijera «Sin técnico» y las vistas «(sin técnico)», un servicio al que alguien le elige el cajón a mano y otro que sencillamente no tiene técnico saldrían en **dos filas distintas queriendo decir lo mismo**. Los paréntesis siguen haciendo su trabajo —nadie se llama así, luego no puede chocar con una persona—, pero **deja de ser cierto que el rótulo no esté en el catálogo**: el test que lo exigía se dio la vuelta, con el motivo escrito dentro. **A quien ya tenga su `tecnicos.json` no le cambia nada**: solo afecta a las instalaciones sin fichero, o con el fichero roto |
+| 2026‑08‑06 | DD‑131 | **El tablero y la BBDD se dibujan virtualizados**: solo existen las columnas y las filas que se ven. Con 250 proyectos, cambiar un filtro tardaba **1,7 s** en volver a pintarse, y **se pagaba igual mirando otra vista** —plegar una vista no destruye lo que ya se creó, así que el tablero se rehacía entero por detrás—. Ahora son **141 ms**: doce veces menos. Hicieron falta cuatro cosas a la vez: el panel virtualizador, que la lista sea dueña de **su propio** `ScrollViewer` —dentro de uno de fuera se mide con tamaño infinito y no virtualiza nada, que es la sexta trampa aplicada al alto—, `CanContentScroll` para que cuente elementos, y `ScrollUnit=Pixel` para que aun así se desplace suave. **El calendario se dejó como estaba a propósito**: sus barras van colocadas por margen y no en fila, virtualizarlas obligaría a rehacer el arrastre, la sincronización de las dos columnas y la barra horizontal — lo más delicado de la aplicación — para ganar los ~0,9 s que quedan. Medido antes y después con un banco de 250 proyectos en `Clientes/TECNOnnn/TomaDeNotas/`; ver «Qué se midió y qué no» |
+| 2026‑08‑06 | DD‑130 | **El código de la toma de notas se exige entero por los tres caminos**: al dar de alta, para guardar y para empezar a ensayar. Antes la regla dependía de por dónde hubiera entrado la toma de notas — lo creado con «Nueva toma de notas» llevaba sus 14 caracteres y lo abierto de un fichero podía llevar nueve. La longitud se mudó a `CodigoDeServicio`, que ya guardaba las otras dos —nueve del servicio y once de la familia—, y las tres se recortan **del mismo código**: uno corto las deja a todas mal. **Se propuso dejar guardar** con el código a medias, para no dejar atrapados a los proyectos anteriores a la regla, y **el laboratorio lo rechazó el mismo día**: con esa excepción puesta, esos proyectos se quedaban a medias para siempre, porque nada obligaba nunca a completarlos. Así que hay que arreglarlo antes de poder escribir; el aviso dice qué falta y la vista salta a la cabecera. **No se pierde trabajo por el camino**: si al cerrar se elige «Guardar» y el guardado se rechaza, `ConfirmarSiHayCambios` ve que los cambios siguen ahí y **cancela el cierre** en vez de tirarlos. Tampoco afecta a la cadena del grupo (DD‑123), que escribe solo la planificación por otro camino. Con ello los dos avisos pasan de «falta por rellenar» y «no se puede guardar sin» a **«completar»**: desde ahora un campo puede estar escrito y aun así salir en la lista |
+| 2026‑08‑06 | DD‑129 | **Una fila del calendario deja de ser un trabajo y pasa a ser un carril**: caben todos los que no se pisen. Antes, un técnico con veinte proyectos daba veinte renglones aunque fueran uno detrás de otro y no coincidieran nunca, y el calendario se leía **bajando** cuando lo que se quiere leer es el tiempo, que va en horizontal. Se recorren por fecha de inicio y **cada uno cae en el primer carril donde quepa**, el más alto disponible; con eso salen tantas filas como trabajos coincidan **el día más cargado**, que es el mínimo, sin probar combinaciones. **Compartir un solo día ya es pisarse**: dos barras pegadas sin hueco se leerían como una sola barra larga. Los carriles son **por técnico**, o dos técnicos que trabajan las mismas semanas compartirían fila y la cabecera dejaría de decir de quién es lo que hay debajo. **Se recolocan al soltar, nunca durante el arrastre** — rehacerlos a media faena destruiría la tarjeta que tiene cogida el ratón. Arrastra dos consecuencias: la columna de la izquierda **se queda sin nombres** —una fila son varios trabajos, y sin agrupar por técnico se encoge a cero, que si no serían 230 px tirados— y **abrir la toma de notas se pasa al botón derecho**, que es donde no estorba al arrastre; abre además la familia que se pulsa y no la cabecera del grupo. El reparto vive en `CarrilesDelCalendario`, en el núcleo, para poder probarlo sin ratón |
+| 2026‑08‑05 | DD‑128 | **«Cualquier estado» es lo que hace buscable la BBDD.** Desde que los filtros son un solo juego para las cuatro vistas, sin esta opción no había forma de ver a la vez lo terminado y lo archivado: encontrar un servicio de hace tres años obligaba a probar estados de uno en uno hasta acertar. **No se pone por defecto y sigue sin ser lo normal** —con lo terminado y lo archivado dentro, la carga mensual sale inflada por trabajo que ya no existe—, así que se pide a sabiendas. No confundirla con «Todos», que es el **nombre antiguo de «En desarrollo»**: ya no se ofrece, pero se sigue reconociendo con ese significado para que quien lo tenga guardado no se encuentre el tablero en blanco |
+| 2026‑08‑05 | DD‑123 | **Las fechas de un trabajo enlazado se escriben, no solo se dibujan.** Hasta ahora la cadena se calculaba al pintar y cada fichero conservaba las suyas, así que **el diálogo de planificación decía una cosa y la línea de tiempo otra**: dos verdades. Ahora, al guardar cualquier toma de notas de un grupo, `CadenaDelGrupo` pone el trabajo en fila y **escribe** el resultado. Reglas: la primera conserva su fecha de inicio; cada una de las siguientes empieza **al día siguiente** del fin de la anterior —no el mismo día, que contaba la frontera dos veces— y **conserva su duración**; sin fecha de fin se le da una semana; sin ninguna fecha, empieza mañana. **El orden lo dan las fechas de inicio y nada más**: para adelantar una familia se le pone una fecha anterior, y con la misma fecha gana la que se acaba de tocar. No hay número de orden guardado ni botones de «adelantar/atrasar» — sería un segundo dato diciendo lo mismo, y en cuanto se desincronizara habría dos verdades otra vez. **Solo se toca la planificación** (DD‑53): las fechas que rellena el técnico en cada ensayo viven en otro sitio del fichero y la exportación no mira la planificación. Como se escribe en ficheros que nadie ha abierto, **se avisa**: un aviso aparte —el del escaneo lo pisaría— nombra las que se han movido |
+| 2026‑08‑05 | DD‑122 | **El calendario dibuja siempre medio año por detrás del último trabajo.** Antes dejaba dos semanas de margen, y arrastrar un trabajo hasta el borde lo dejaba sin calendario debajo donde soltarlo: había que parar, pedir sitio con «▶» y volver. Donde peor se veía era en el **salto de año**, porque el año siguiente ni se dibujaba. Solo por detrás: hacia atrás no se planifica, y estirar por la izquierda solo obligaría a desplazarse más para llegar a lo de hoy. **«▶» sigue estando** para ir más lejos de esos seis meses. De paso se arregló que **el eje se encuadraba con las fechas de la cabecera y no con las del trabajo entero**: un grupo de cuatro familias estiraba el calendario solo lo que ocupaba la primera, así que al arrastrarlo al límite no se dibujaba nada más — que es justo el fallo que dio la cara |
+| 2026‑08‑05 | DD‑121 | **Cada familia dura lo suyo.** Lo que manda es su **duración** —lo que va de su inicio a su fin—, no la fecha en que acaba. Antes se razonaba con **fechas de corte**, y en cuanto la fecha de una familia no servía de corte —caía por detrás de donde iba el reparto, o justo en el final del trabajo— sus fechas se tiraban y esa familia se repartía el hueco **a partes iguales** con las de al lado. Lo notó el laboratorio: dos familias planificadas de cinco y de quince días salían **del mismo tamaño**. Pasaba siempre que la primera abarcaba todo el trabajo, que es justo como se planifica al anexar una segunda a un servicio ya metido en el calendario. Del inicio propio de una familia se sigue ignorando **dónde la pone** (DD‑118) pero **ya no cuánto dice que dura**. En consecuencia, **el trabajo acaba donde acaba la cadena** y no en la fecha más tardía que haya escrita: la anexada se planificó sin saber dónde iba a caer. Y **la que no dice cuánto dura, dura como las demás** —la media de las que sí— en vez de partir la barra por la mitad y quitarle el plazo a la que sí estaba planificada |
+| 2026‑08‑05 | DD‑120 | **La última familia de un trabajo llega siempre hasta donde acaba el trabajo**, aunque tenga escrita una fecha de fin anterior. No hay nada detrás a lo que dejarle sitio, y es lo que se guarda al estirar ese borde: si cortara por su fecha, al arrastrar quedaría un hueco al final. De paso se arregló un fallo del reparto que venía de DD‑118: cuando una familia tenía una fecha que **no servía de corte** —caía donde ya iba el reparto o fuera del trabajo— y detrás venía otra que sí, la segunda se quedaba **sin sitio**. Ahora las dos se reparten el hueco hasta la fecha buena. Se dieron cuenta los tests, no la vista |
+| 2026‑08‑05 | DD‑119 | **Un trabajo enlazado se dibuja como un tren de tarjetas de verdad, una por familia**, en vez de una barra única con los trozos pintados encima. Los trozos eran decoración —no recogían el ratón— y por eso el trabajo entero salía del color de su cabecera y pulsarlo abría siempre la misma toma de notas. Ahora **cada familia tiene su color de estado, su consejo emergente y su planificación**. Van **pegadas, sin hueco** —un hueco mentiría sobre las fechas— y solo se redondean las esquinas **de fuera**, para que se lean como un tren y no como pastillas sueltas. **Cogiendo cualquiera se mueve el trabajo entero**, que es lo que pidió el laboratorio. La lista de tarjetas **se recalcula, nunca se sustituye**: rehacerla a mitad de un arrastre destruiría el elemento que tiene cogido el ratón. La fila pasa a rotularse con el **nombre del grupo**, porque ya no es una toma de notas sino todas |
+| 2026‑08‑04 | DD‑118 | **La barra de un trabajo enlazado se parte en un trozo por familia**, con una línea de puntos entre ellos y el código de cada una dentro. Se **encadenan**: cada familia empieza donde acabó la anterior, aunque tenga otra fecha de inicio escrita — lo que interesa ver es la secuencia. El orden lo da el **código**, que es estable, y no las fechas. Las que no traen fecha propia **se reparten a partes iguales** lo que quede hasta la siguiente que sí la tenga, para que ninguna desaparezca; si no la trae ninguna, trozos iguales. **La barra pasa a abarcar de la primera familia a la última** —antes solo las fechas de la cabecera—, y por eso **arrastrarla mueve a todas** y estirar un borde solo toca la del extremo (`RepartoDelArrastre`). Las divisiones **no se arrastran todavía**: eso va aparte |
+| 2026‑08‑04 | DD‑117 | **El alta se parte en «Información obligatoria» y «Información opcional»**, y la segunda —que es la planificación entera: técnico 2, fechas, estado, importe, recepción de muestras y grupo— **va plegada por defecto**. Desplegada de serie convertiría en formulario lo que existe para hacerse en cuatro segundos (DD‑83, DD‑85); plegada, quien quiera planificar en el momento la abre y quien no, no la ve. **La carpeta empieza vacía** —para que se vea que hay que elegirla—, aunque el examinador siga abriéndose en la carpeta de proyectos. **No se ofrece archivar**: nace archivado lo que nadie va a mirar. Al crear se escribe el `.lmnlab` y, si se puso algo, su planificación en un segundo paso — que es lo único que la escribe (DD‑53) |
+| 2026‑08‑04 | DD‑116 | **El tablero y el calendario encabezan cada servicio con las once primeras del código de la toma de notas** —`TECNO260201`: servicio y número de familia, **sin la edición del documento**—. El de servicio a secas no valía, porque las cuatro familias de un trabajo se llamaban igual y no se distinguían; el código completo tampoco, porque el `-00` se corrige por una errata del técnico y no dice nada de qué hay que ensayar. Sale de `ResumenDeProyecto.Rotulo`, en un solo sitio, para que las dos vistas y el diálogo de planificación no puedan llamarlo de tres formas distintas |
+| 2026‑08‑04 | DD‑115 | **No se guarda un `.lmnlab` sin código de la toma de notas y sin técnico 1.** Sin ellos el fichero **no se puede ni nombrar ni atribuir**: el código es lo que le da nombre y lo que lo distingue de las otras familias del trabajo, y el técnico 1 es de quién es. Son los **mismos dos que ya exigía el alta rápida**, a propósito: lo que nace por un camino y lo que nace por el otro tiene que ser igual de identificable. **Exige mucho menos que empezar a ensayar** —sin clase, sin Ta y sin acreditación se sigue guardando—, porque un servicio a medias es el estado normal durante semanas. Al intentarlo, el aviso dice qué falta y **la vista salta a la cabecera**, donde los dos están en rojo |
+| 2026‑08‑04 | DD‑114 | **`Ver \| Gestión de proyectos` pasa a ser un submenú** con las cuatro vistas. Se conserva arriba **«Ir a gestión»**, que respeta la vista en la que se estaba —volver desde el menú a media planificación no debe devolverte al tablero—, y debajo van las cuatro por su nombre para quien ya sabe adónde va. Cada una **se marca cuando es la vista activa**: al abrir el menú, la primera pregunta es dónde estoy |
+| 2026‑08‑04 | DD‑113 | **La exportación declara con qué se hizo**: cada norma con su designación completa **al lado de su versión de plantilla** —iban por separado, y con dos normas no se sabía cuál de las dos versiones era de cuál—, más la **versión del programa**. La de plantilla dice contra qué reglas se midió; la del programa, con qué software se produjo el documento. Las dos son el rastro que pide la ISO 17025 sobre validación de software. **Quién exportó no se apunta**: lo revisa y firma el director técnico, así que quién pulsó el botón no aporta nada |
+| 2026‑08‑04 | DD‑112 | **La exportación HTML lleva una tabla de muestras**, una fila por muestra con su identificador, clase, grado IP y grado IK. Antes iban todas juntas en una línea de la ficha —«IP2X, IPX0»—, que engaña dos veces: mezcla las dos cifras de un mismo grado y junta los de muestras distintas. Un servicio puede traer una IP65 y otra IP20, y quien firma necesita saber cuál es cuál. La ficha gana además **«Laboratorios externos»**, que se dice siempre —con «—» si no hubo ninguno—, porque un hueco en blanco no distingue «no se subcontrató» de «nadie lo rellenó» |
+| 2026‑08‑04 | DD‑111 | **La acreditación es obligatoria y admite varias**: «Sin acreditar», ENAC, ENEC y CB. **«Sin acreditar» es excluyente** —marcarla borra las demás y marcar cualquier otra la quita—, porque si no se podría guardar un servicio declarado a la vez como acreditado y sin acreditar. Quién excluye a quién lo declara la plantilla (`opcionExcluyente`), no el código. **Sale en la exportación HTML**: ese documento no es un certificado sino la toma de notas puesta en limpio para que el director técnico la verifique antes de firmarla, así que tiene que ver contra qué acreditación se ensayó |
+| 2026‑08‑04 | DD‑110 | **Los laboratorios de fuera van en la toma de notas**, en «Otros colaboradores»: tantas filas como haga falta, cada una con el laboratorio y **el ensayo y el motivo juntos**, porque «fotobiología — no tenemos cámara» explica una subcontratación y «fotobiología» a secas no. Texto libre y no una lista cerrada: los laboratorios cambian, y mantener un catálogo para poder escribir «IMQ Italia» sería una puerta de más. Es **opcional**, y las filas en blanco no llegan al fichero. Va por toma de notas y no por apartado; el día que el informe tenga que declarar subcontratación habrá que bajarlo al apartado |
+| 2026‑08‑04 | DD‑109 | **Cuarta vista: BBDD**, el listado de todas las tomas de notas con buscador. **Solo lee**: no es una base de datos aparte sino una lente sobre los mismos `.lmnlab` que ya escanea el tablero — un fichero índice sería una segunda verdad que se desincroniza, y eso se descartó dos veces (DD‑27, DD‑89). **Ignora el filtro compartido y enseña todo**, terminados y archivados incluidos: arranca en «En desarrollo» y lo que se busca aquí casi siempre está terminado, así que con él nacería escondiendo justo lo que se viene a buscar. Filtros propios: texto —que busca **en todas las columnas**, porque quien recuerda un proyecto no sabe por cuál lo recuerda—, IP, IK y acreditación |
+| 2026‑08‑04 | DD‑108 | **La barra de gestión se queda en una fila**: «Nueva toma de notas…» pasa a un **«+»** con su color de siempre, y los tres filtros se meten en un botón **«Filtros»** que abre un diálogo. Con esto la barra cabe entera a 620 px sin envolver. **El botón lleva la cuenta de los filtros que están apartando trabajo** —«Filtros (2)»— y se pinta de verde: escondidos y mudos, quien no encontrase su servicio en el tablero pensaría que se ha perdido, cuando lo que hay es un técnico elegido la semana pasada. «En desarrollo» no cuenta como filtro activo, porque es lo puesto al abrir y el aviso quedaría encendido siempre |
+| 2026‑08‑04 | DD‑107 | **Se salta de .NET 8 a .NET 10**, antes de repartir el programa. **El soporte de .NET 8 termina el 10 de noviembre de 2026**, y estandarizar seis ordenadores en agosto sobre una versión a la que le quedan tres meses de parches obligaría a repetir la ronda enseguida. .NET 10 es LTS y llega a 2028. El salto costó **cinco líneas** —el `TargetFramework` de cada proyecto— porque el programa **no tiene ni una dependencia externa**: solo los tests traen paquetes. Verificado con los 368 tests de entonces y con la aplicación abierta: portada, calendario y toma de notas iguales. De paso se decide **publicar dependiente del framework** e instalar el *.NET Desktop Runtime* en cada equipo: es gratis (MIT), sin licencias por puesto, y deja las actualizaciones en unos MB en vez de 130 |
+| 2026‑08‑04 | DD‑106 | **La ventana mínima baja de 740 a 620**, para que quepa en media pantalla y se pueda trabajar con el programa al lado de otra cosa. Se gana estrechando las tarjetas de norma (134→118) y los rellenos de la portada, pero **lo que de verdad lo permitía era arreglar dos recortes silenciosos**: la barra de gestión era un `StackPanel` horizontal —que no envuelve nunca, así que perdía «Actualizar» y los tres filtros—, y el título de la toma de notas se metía por encima del contador. La barra es ahora un `WrapPanel` y el título se recorta con puntos suspensivos. El índice de secciones deja de llevar 360 fijos y se lleva un 30 % del ancho, con tope en 360: **por encima de 1200 px de ventana el comportamiento es idéntico al de antes** |
+| 2026‑08‑04 | DD‑105 | **La pestaña dice el código de la toma de notas y el título dice la norma con su año.** La lengüeta pasa de `TECNO2602 \| Luminarias` a `TECNO260201-00` —con las cuatro familias de un trabajo abiertas, las cuatro ponían lo mismo y no se distinguían—, y el título pasa de `Toma de notas \| TECNO2602 \| fichero.lmnlab` a `EN IEC 60598-1:2024 + A11:2024 \| TECNO260201-00`. **En el título la norma va entera y no como «Luminarias»**: hay dos años de la 60598 instalados a la vez y anotar contra el que no era no se vería hasta emitir. Sin código, «Sin código» en la pestaña y «sin código» en el título |
+| 2026‑08‑04 | DD‑104 | **La cabecera pide un «Código de la toma de notas», obligatorio y el primero de todos**, del estilo `TECNO260201-00`. Es **lo que identifica esta toma de notas y no el servicio**: un trabajo con cuatro familias de luminarias tiene cuatro, y las cuatro comparten el de servicio. De él salen dos cosas: el **código de servicio**, que son sus **nueve primeras** y se rellena solo aunque se puede corregir a mano, y el **nombre del fichero**, `TdN_60598_TECNO260201-00.lmnlab`. Con esto **desaparece el `xx-00`** que el programa pegaba y el técnico tenía que sustituir renombrando: el número de familia y la edición se teclean una vez, en la cabecera |
+| 2026‑08‑04 | DD‑103 | **La extensión pasa de `.lumproj` a `.lmnlab`**, para que el fichero lleve el nombre del programa —LumenLab— y no el del objeto que había dentro cuando se eligió. **Los `.lumproj` se siguen abriendo y escaneando**, y al guardarlos **se quedan donde están y como están**: renombrarlos solos movería el registro de un ensayo sin que nadie lo pida. Lo nuevo nace ya con `.lmnlab`. Es transitorio; cuando no quede ninguno se borran `ExtensionAnterior` y `Patrones` |
+| 2026‑08‑03 | DD‑102 | **Un solo estilo de botón para toda la aplicación**, con esquinas redondeadas, declarado en `App.xaml` — no en la ventana, porque los diálogos son ventanas aparte y no lo verían. Rehacer la plantilla obliga a dibujar a mano los cuatro estados; encima y pulsado se resuelven **con opacidad y no con un color fijo**, para que funcionen igual sobre el gris de por defecto y sobre los botones que traen el suyo. Los de tamaño fijo que solo llevan un símbolo van con el estilo **`BotonIcono`**, que quita el relleno: con los 14 px a cada lado del estilo general, a un botón de 30‑34 px le quedan cuatro para el símbolo, y **WPF no avisa — lo encoge y lo recorta**. Picó dos veces (el `+` de pestañas y el de plegar el índice) antes de que la excepción tuviera nombre en vez de repetirse a mano |
 | 2026‑08‑03 | DD‑101 | **Lo que distingue una norma de otra es el AÑO DE PUBLICACIÓN, no la «edición».** Son dos cosas distintas —la 60598‑1 va por su novena edición y se publicó en 2024— y durante un tiempo este documento y el código llamaron «edición» al año. Corregido en las cinco plantillas (`anioDePublicacion`, **el año y solo el año**), en el código, en los tests y aquí. La designación completa con sus enmiendas vive en `titulo`, que es lo que se lee y lo que sale en el informe |
 | 2026‑08‑03 | DD‑100 | **La portada tiene un recuadro de avisos, y no existe si no hay nada que hacer.** Ocho condiciones sin solaparse: carpeta de proyectos sin elegir o inalcanzable; carpeta compartida sin elegir, inalcanzable o sin normas publicadas; normas locales sin publicar o más nuevas que las publicadas; y ficheros ilegibles en el último escaneo. **Casi todas fallaban en silencio** — sin carpeta de proyectos, las tres vistas de gestión salen vacías y eso es indistinguible de no tener trabajo. Rojo si algo no funciona, ámbar si solo está descuadrado, y cada línea trae el botón que lo arregla. **Nada en verde**: un recuadro que casi siempre está deja de leerse |
 | 2026‑08‑03 | DD‑99 | **`Configuración | Normas instaladas…` avisa de lo que este equipo tiene y el laboratorio no.** Desde que se publica la primera tanda, el programa lee de la carpeta compartida y **deja de mirar la local**: dejar caer una norma nueva no producía ninguna señal — el fichero estaba, no aparecía y nada lo explicaba. Ahora se comparan las dos carpetas y se dice qué falta por publicar, en ámbar y junto al botón que lo resuelve |
@@ -66,14 +94,14 @@ Las partes excluidas se conservan en este documento marcadas como 🚫 **fuera d
 | 2026‑08‑02 | DD‑94 | **La versión de plantilla con la que se registró un ensayo se lee y se enseña.** Se guardaba desde el principio y no se leía nunca. El **informe declara la del registro**, no la instalada al imprimir —decir la de hoy es atribuirle al ensayo una plantilla que no se usó—, y al abrir un proyecto grabado con otra versión se avisa, sin bloquear |
 | 2026‑08‑02 | DD‑93 | **La norma pasa a ser obligatoria en el alta**, y el alta sale de la portada. Sin norma no hay apartados que rellenar y el nombre del fichero la lleva dentro, así que dejarla para después obligaba a renombrarlo. En la portada, elegir norma y dar de alta eran dos caminos para lo mismo: el alta se queda en `Archivo` y en la barra del tablero. **Lo que falta se ve en rojo** en el rótulo del campo, y vuelve al gris al rellenarse — como las casillas obligatorias de la toma de notas |
 | 2026‑08‑02 | DD‑92 | **«(sin técnico)» es una opción del filtro de técnico**, no un técnico del catálogo. Aparece sola cuando hay servicios sin responsable y enseña justo esos, que es lo que hay que repartir. Mismo rótulo que usan el calendario y la carga, escrito en un solo sitio. **Crear un técnico llamado «Sin técnico» sería peor**: saldría como persona en todas las tomas de notas y la carga le sumaría días como si tuviera capacidad |
-| 2026‑08‑02 | DD‑91 | **El fichero se llama `TdN_<norma>_<código>xx-00.lumproj`**, p. ej. `TdN_60598_LEDC42502xx-00.lumproj`. El **`xx` es un hueco** para el número de toma de notas —un servicio puede llevar varias familias— y el **`00` es la revisión del documento**, que sube al corregir algo ya emitido. **Los pone el técnico renombrando**, no el programa: numerar y reeditar son decisiones del laboratorio, y un programa que las tomara solo acabaría renumerando un registro ya firmado |
+| 2026‑08‑02 | DD‑91 | **El fichero se llama `TdN_<norma>_<código>xx-00.lmnlab`**, p. ej. `TdN_60598_LEDC42502xx-00.lmnlab`. El **`xx` es un hueco** para el número de toma de notas —un servicio puede llevar varias familias— y el **`00` es la revisión del documento**, que sube al corregir algo ya emitido. **Los pone el técnico renombrando**, no el programa: numerar y reeditar son decisiones del laboratorio, y un programa que las tomara solo acabaría renumerando un registro ya firmado |
 | 2026‑08‑02 | DD‑90 | **Las tomas de notas de un mismo trabajo se enlazan con un campo «Grupo»**, y el calendario las enseña en una sola barra. Resuelve DD‑88: el jefe planifica un trabajo y el técnico sigue viendo las cuatro familias en el tablero. **Manda la cabecera** —la que lleva las fechas—, y el importe va solo en ella; la barra enseña la suma, así que repetirlo deja de ser invisible. El enlace vive dentro de cada fichero, no en un índice aparte |
-| 2026‑08‑02 | DD‑89 | **No hay objeto «proyecto», y no lo habrá.** El registro del ensayo es el `.lumproj` y tiene que estar en la carpeta de tomas de notas de su servicio; un fichero de proyecto aparte sería un documento sin ensayo detrás y **rompería la trazabilidad**. Revierte DD‑83: la portada vuelve a dos zonas y el alta rápida crea una toma de notas, no un proyecto. Lo que agrupa varias tomas de notas de un mismo trabajo se resolverá **enlazándolas** desde el calendario, no creando un fichero por encima |
+| 2026‑08‑02 | DD‑89 | **No hay objeto «proyecto», y no lo habrá.** El registro del ensayo es el `.lmnlab` y tiene que estar en la carpeta de tomas de notas de su servicio; un fichero de proyecto aparte sería un documento sin ensayo detrás y **rompería la trazabilidad**. Revierte DD‑83: la portada vuelve a dos zonas y el alta rápida crea una toma de notas, no un proyecto. Lo que agrupa varias tomas de notas de un mismo trabajo se resolverá **enlazándolas** desde el calendario, no creando un fichero por encima |
 | 2026‑08‑02 | DD‑88 | **Un proyecto puede llevar varias familias de luminarias, cada una con su toma de notas.** Es el motivo por el que en su día se decidió no tener objeto «proyecto». Se planifica **el trabajo entero**, y se resuelve enlazando las tomas de notas (DD‑90), no agrupándolas en un fichero |
 | 2026‑08‑02 | DD‑87 | ↩️ **Deshecha el mismo día por DD‑89.** **La portada tiene tres zonas: Proyectos, Gestión, y la toma de notas suelta en gris y abajo.** Elegir norma era la puerta de entrada del programa; desde que los proyectos se dan de alta, empezar por ahí es casi siempre crear un servicio que ya existía. No se quita —hay ensayos que no llegan a ser proyecto— pero deja de competir con «Proyectos» |
 | 2026‑08‑02 | DD‑86 | **Al guardar un proyecto nuevo se avisa si ese servicio ya existe** en la carpeta, con la opción de abrir el que hay. Nace de separar el alta de la toma de notas: un técnico puede empezar sin saber que su proyecto ya estaba creado. Los códigos se comparan sin mayúsculas, espacios ni guiones. **Se puede crear otro a sabiendas** —un reensayo repite código— porque quien decide es la persona. Es una red, no la solución: lo que evita el error es la pantalla de inicio |
-| 2026‑08‑02 | DD‑85 | **Para dar de alta un proyecto solo son obligatorios el nombre y el técnico 1.** Precisa DD‑83: no es que el formulario deba ser corto, es que **nada más puede bloquear** — norma y técnico 2 se pueden dejar en blanco. Lo que la norma exige para ensayar (`RequisitosDelProyecto`) no tiene voz en el alta. `Archivo \| Nuevo proyecto…`, también en la portada y en la barra del tablero; crea el `.lumproj` y va al calendario **sin abrir la toma de notas** |
-| 2026‑08‑02 | DD‑84 | **Qué norma es la principal la apunta el proyecto**, y se guarda en el `.lumproj`. Antes se deducía del patrón de muestras —que es la consecuencia de haberla elegido, no la elección—, y dos normas del mismo patrón lo dejaban en manos del orden alfabético. De paso se cierra un fallo latente: abrir un servicio de dos normas podía cargarlo por la añadida y **guardar renombraba todas las muestras** |
+| 2026‑08‑02 | DD‑85 | **Para dar de alta un proyecto solo son obligatorios el nombre y el técnico 1.** Precisa DD‑83: no es que el formulario deba ser corto, es que **nada más puede bloquear** — norma y técnico 2 se pueden dejar en blanco. Lo que la norma exige para ensayar (`RequisitosDelProyecto`) no tiene voz en el alta. `Archivo \| Nuevo proyecto…`, también en la portada y en la barra del tablero; crea el `.lmnlab` y va al calendario **sin abrir la toma de notas** |
+| 2026‑08‑02 | DD‑84 | **Qué norma es la principal la apunta el proyecto**, y se guarda en el `.lmnlab`. Antes se deducía del patrón de muestras —que es la consecuencia de haberla elegido, no la elección—, y dos normas del mismo patrón lo dejaban en manos del orden alfabético. De paso se cierra un fallo latente: abrir un servicio de dos normas podía cargarlo por la añadida y **guardar renombraba todas las muestras** |
 | 2026‑08‑02 | DD‑83 | **El proyecto pasa a ser el centro y la toma de notas una parte suya.** Un proyecto tiene fechas, muestras, importe y certificaciones que no son de ninguna norma. **Con una restricción por encima de todo: crear un proyecto son cuatro cosas y Aceptar**, y nada de su cabecera puede ser obligatorio — el PM planifica antes de que exista un solo dato de ensayo. Se hace en tres pasos; el 1 (la identidad se lee de un solo sitio, sin tocar el formato) ya está |
 | 2026‑08‑02 | DD‑82 | **`Ayuda \| Reportar un problema…`**: el correo de quien mantiene el programa, con los datos que hacen falta para reproducir un fallo y acceso al registro de errores. **No envía nada por su cuenta** —eso obligaría a llevar una contraseña de servidor en el ejecutable, lo mismo que se descartó en DD‑67—; abre el programa de correo del equipo, que es quien tiene las credenciales |
 | 2026‑08‑02 | DD‑81 | **El programa se llama «LumenLab»**, escrito en `<Product>` del `.csproj` y en ningún otro sitio: portada, barra de título y «Acerca de» lo leen del ejecutable. Se titulaba por lo que hacía al principio, y ya hace dos cosas. La **versión** se ve en la portada, que es lo primero que se pregunta ante un fallo. **En la portada no hay ajustes**: las carpetas se cambian en *Configuración* |
@@ -104,7 +132,7 @@ Las partes excluidas se conservan en este documento marcadas como 🚫 **fuera d
 | 2026‑08‑06 | DD‑56 | **El arrastre se ajusta a días, no a semanas.** Se planifica por semanas, pero un servicio empieza el día que empieza; el número de semana se enseña como ayuda, no como rejilla obligatoria |
 | 2026‑08‑06 | DD‑55 | **El calendario mide en semanas ISO**, no en días ni en meses: es la unidad con la que planifica el laboratorio («entra en la S32»). La aritmética vive en `EjeDeSemanas`, dentro del núcleo, para poder probarla |
 | 2026‑08‑06 | DD‑54 | **Una tarjeta por toma de notas.** Un servicio con 60598‑1 + ‑2‑3 + IK + 62031 es **una sola tarjeta**: todo cuelga de la toma de notas principal |
-| 2026‑08‑06 | DD‑53 | **La planificación vive en el `.lumproj` pero no la gestiona la toma de notas.** Solo la escribe el calendario; al guardar desde una pestaña se conserva releyéndola del disco. Sin esto, el técnico que tuviera el proyecto abierto pisaría al guardar las fechas que otro acababa de mover |
+| 2026‑08‑06 | DD‑53 | **La planificación vive en el `.lmnlab` pero no la gestiona la toma de notas.** Solo la escribe el calendario; al guardar desde una pestaña se conserva releyéndola del disco. Sin esto, el técnico que tuviera el proyecto abierto pisaría al guardar las fechas que otro acababa de mover |
 | 2026‑08‑06 | DD‑52 | **Archivar, no ocultar.** Quitar una tarjeta del calendario se guarda en el fichero, no en los ajustes de cada usuario: si cada técnico ocultara lo suyo, el calendario dejaría de ser una foto común. Es reversible y **no borra nada** |
 | 2026‑08‑06 | DD‑51 | **Estados: por hacer, en curso, pendiente cliente, terminado.** Es un dato manual y **distinto del avance** que calcula el motor: un proyecto puede estar relleno del todo y seguir «pendiente cliente» |
 | 2026‑08‑06 | DD‑50 | **«Muestras recibidas» se guarda como fecha, no como sí/no.** Con la fecha se ve «llegaron hace tres semanas y sigue sin empezar»; con un booleano, no |
@@ -731,7 +759,7 @@ Excluido igualmente. Inventario de lo que existe hoy:
 
 - Casillas de clasificación del módulo en `Datos!Q6`, `R6`, `S6`, `T6`: *built‑in sin cubierta*, *built‑in con cubierta*, *independiente*, *integrado*. **Las cuatro están rotas** (`=#REF!`), es decir, ya no hay casilla que las alimente.
 - `Datos!BQ4 = OR(Q6,S6,T6)` → la norma 62031 aplica si el módulo es built‑in, independiente o integrado (obsérvese que `R6`, *built‑in con cubierta*, queda fuera del OR).
-- Designaciones: IEC 62031:2018 / EN 62031:2020 + A11:2021.
+- Designaciones: IEC 62031:2018 / EN IEC 62031:2020 + A11:2021.
 - `Datos!BN14` compone el texto «62031 + IK» para la cabecera del proyecto.
 
 **Consecuencia para el borrador:** `Datos!O6` (¿hay alguna parte ‑2 marcada?) deja de estar roto en cuanto se elimina `S6` de su expresión, y con él se arregla el aviso «FALTA POR MARCAR NORMAS A APLICAR» de `RESUMEN!D25`.
@@ -785,9 +813,23 @@ Catálogo de designaciones vigentes en la plantilla, con su año (dato maestro q
 🚫 Fuera de alcance del borrador, se conservan para más adelante:
 
 ```
-62031       IEC 62031:2018                            EN 62031:2020 + A11:2021
+62031       IEC 62031:2018                            EN IEC 62031:2020 + A11:2021
 IK          IEC 62262:2002+AMD1:2021 + IEC TR 62696:2011   EN 62262:2002 + A1:2021 + IEC TR 62696:2011
 ```
+
+### Qué designación enseña el programa
+
+Cada plantilla declara la suya en `meta.designacion`, y es **lo que encabeza la toma de notas abierta** (DD‑105). Las cinco instaladas, **confirmadas por el laboratorio el 2026‑08‑04**:
+
+| Plantilla | `meta.designacion` | `meta.edicion` |
+|---|---|---|
+| `60598-1_2024` | `EN IEC 60598-1:2024 + A11:2024` | 10 |
+| `60598-1_2021` | `EN IEC 60598-1:2021 + A11:2022` | 9 |
+| `62031_2020_A11` | `EN IEC 62031:2020 + A11:2021` | 2 |
+| `60529_1991` | `EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02 + AC:2016-12 + corrigendum May 1993` | 2.2 |
+| `62262_2002_A1` | `EN 62262:2002 + A1:2021` | 1.1 |
+
+Es la designación a secas: **sin el nombre comercial** («Luminarias — ») y **sin la coletilla** («y partes ‑2»), que sí van en `titulo` porque ahí describen, mientras que aquí lo que hace falta es identificar contra qué se ensaya. `RotulosTests` comprueba que **todas llevan su año dentro**: es lo único que separa dos plantillas de la misma norma, y es el error que este rótulo existe para evitar.
 
 ---
 
@@ -1007,7 +1049,7 @@ Se recogen porque explican por qué la plantilla y el motor tienen las piezas qu
 | **DD‑18** | Política de retención y copias: **fuera de alcance por ahora**; se delega en el versionado de OneDrive |
 | **DD‑19** | **Los registros son modificables.** El documento firmado es el PDF, que se gestiona fuera |
 
-| **DD‑01** | **.NET 8 + WPF.** C# es el lenguaje que el desarrollador ya domina (vía Unity); XAML con *data binding* encaja con un formulario de cientos de campos; distribución como ejecutable único en Windows |
+| **DD‑01** | **.NET 10 + WPF.** C# es el lenguaje que el desarrollador ya domina (vía Unity); XAML con *data binding* encaja con un formulario de cientos de campos; distribución como ejecutable único en Windows |
 | **DD‑10** | El catálogo de equipos se **importa tal cual está** desde `BBDD Equipos 60598`, incluidos los marcadores `AMPLIACIÓN`, `PREVISIÓN`, `EQ-SAFE-3xx` y `RESERVADO COPPER-BS` (coherente con D‑16) |
 
 *No quedan decisiones de desarrollo abiertas.*
@@ -1025,9 +1067,9 @@ LumNotas.App           interfaz WPF (MVVM)
 
 | Elemento | Elección |
 |---|---|
-| Plataforma | .NET 8, Windows |
+| Plataforma | .NET 10, Windows |
 | Interfaz | WPF + MVVM **a mano**, sin librería externa: `ObservableObject`, `Comando` y `ComandoCon<T>` en `Base.cs` son cien líneas y evitan una dependencia más |
-| Fichero de proyecto | JSON (`System.Text.Json`), escritura atómica, en OneDrive. Extensión `.lumproj` |
+| Fichero de proyecto | JSON (`System.Text.Json`), escritura atómica, en OneDrive. Extensión `.lmnlab` |
 | Definición de plantilla | JSON versionado, leído de la carpeta compartida del laboratorio |
 | Informe | HTML generado a mano, **sin dependencias**. Se descartó MigraDoc/PDFsharp: añadía una librería externa y daba problemas de resolución de fuentes (DD‑20) |
 | Contraseñas | **No hay** (DD‑67). Se estudiaron y se descartaron; si algún día hace falta control de acceso, son permisos de carpeta |
@@ -1038,7 +1080,9 @@ LumNotas.App           interfaz WPF (MVVM)
 
 **OneDrive condiciona el formato de almacenamiento.** No se puede usar SQLite sobre una carpeta sincronizada: el bloqueo de fichero y la sincronización parcial provocan corrupción y copias en conflicto. Formato adoptado en su lugar:
 
-- **Un fichero JSON por toma de notas**, con extensión `.lumproj` y el nombre que fija el laboratorio (DD‑91), escrito de forma atómica en cada guardado (escritura a temporal + reemplazo).
+- **Un fichero JSON por toma de notas**, con extensión `.lmnlab` y el nombre que fija el laboratorio (DD‑91), escrito de forma atómica en cada guardado (escritura a temporal + reemplazo). La extensión es propia para que el fichero se vea como un documento del laboratorio y no como algo técnico; por dentro es JSON, igual que un `.xlsx` es un zip.
+
+> **Se llamó `.lumproj` hasta el 2026‑08‑04** (DD‑103). Los que existan **se siguen abriendo, escaneando y contando**, y guardarlos no los renombra: mover el registro de un ensayo sin que nadie lo pida es peor que convivir con dos extensiones una temporada. Todo pasa por `RepositorioDeProyectos`: `Extension` es la de ahora, `ExtensionAnterior` la vieja y **`Patrones` es lo que hay que usar al recorrer una carpeta** — hay cuatro sitios que escanean, y dejarse uno significa que unos proyectos salen en el tablero y otros no, sin que nada lo explique. El día que no quede ninguno, se borran las dos últimas.
 - Ventajas sobre OneDrive: reemplazo de fichero completo —que OneDrive sincroniza sin problema—, historial de versiones gratuito, recuperación manual si algo falla, y contenido legible sin la aplicación.
 - **Manda el último en guardar**, y la planificación la escribe un solo camino releyendo el fichero (DD‑50), de modo que mover una fecha en el calendario no pisa lo que esté anotando el técnico ni al revés. Sigue conviniendo un aviso al abrir si OneDrive marca el fichero como no sincronizado.
 
@@ -1061,12 +1105,18 @@ LumNotas.App           interfaz WPF (MVVM)
 | `plantilla/equipos-60598-1_2024_1.0.0.json` | Catálogo de equipos completo: **43 grupos, 224 entradas, 89 códigos distintos**. Importación literal desde `BBDD Equipos 60598` (DD‑10), con las notas de uso del laboratorio y la trazabilidad de cada celda de origen |
 | `plantilla/plantilla-60598-1_2024_1.0.0.json` | **La norma entera como datos**: 16 secciones y 45 apartados, con campos, checklists, subbloques, grupos repetibles, reglas P1‑P8 y los nueve cálculos. ~140 KB |
 | `src/LumNotas.Core` | Motor de reglas: modelo de plantilla, catálogo de equipos, almacén de datos, evaluador de los tipos de regla, predicados y cálculos con nombre, requisitos del proyecto, indicador de avance, estado de apartado y resumen para el tablero. En `Gestion/` vive además todo lo que no es ensayo: eje de semanas ISO, gesto de arrastre, ocupación, lista de técnicos, capacidad mensual, carga por técnico, filtros, **alta de una toma de notas** (`AltaDeProyecto`), **nombre del fichero** (`NombreDeTomaDeNotas`), **aviso de servicios repetidos** (`ProyectosRepetidos`) y **enlace de las familias de un trabajo** (`EnlaceDeTomasDeNotas`) — todo **fuera de la interfaz para poder probarlo** |
-| `src/LumNotas.Storage` | Un fichero `.lumproj` por proyecto (JSON), con **escritura atómica** (temporal + reemplazo) para que OneDrive lo sincronice sin corromperlo. Más la lista de recientes, los ajustes y el explorador de carpetas |
+| `src/LumNotas.Storage` | Un fichero `.lmnlab` por proyecto (JSON), con **escritura atómica** (temporal + reemplazo) para que OneDrive lo sincronice sin corromperlo. Más la lista de recientes, los ajustes y el explorador de carpetas |
 | `src/LumNotas.Report` | Exportador del informe a HTML con estilos de impresión A4. **Sin dependencias externas** |
-| `src/LumNotas.App` | Interfaz WPF. `VentanaPrincipalViewModel` es la ventana con su barra de pestañas; `DocumentoViewModel` es **un proyecto abierto** (árbol con semáforo y formulario generado desde la plantilla); `GestionViewModel` es la pestaña de gestión, con sus tres vistas (`CalendarioViewModel`, `CargaViewModel`). Las plantillas grandes viven en `Window.Resources` y se eligen por tipo |
+| `src/LumNotas.App` | Interfaz WPF. `VentanaPrincipalViewModel` es la ventana con su barra de pestañas; `DocumentoViewModel` es **un proyecto abierto** (árbol con semáforo y formulario generado desde la plantilla); `GestionViewModel` es la pestaña de gestión, con sus **cuatro** vistas (`CalendarioViewModel`, `CargaViewModel`, `BbddViewModel` y el tablero, que va en el propio `GestionViewModel`). Las plantillas grandes viven en `Window.Resources` y se eligen por tipo |
 | Ficheros compartidos | Junto a los proyectos, en la carpeta de OneDrive: `tecnicos.json` (la lista del laboratorio) y `capacidad.json` (tarifa y días por mes). Se editan desde `Configuración` y valen para todos |
 | `plantilla/plantilla-<id>_<version>.json` | Una por norma y año, p. ej. `plantilla-60598-1_2024_1.0.0.json`, con su catálogo `equipos-60598-1_2024_1.0.0.json` al lado |
-| `tests/LumNotas.Core.Tests` | **344 tests, verificados en verde el 2026‑08‑02.** Cubren los ocho patrones, los nueve cálculos, los defectos corregidos, la integridad de la plantilla, el ciclo de guardado, varios proyectos simultáneos, el informe, el tablero y la planificación (semanas ISO, cambio de año, el gesto de arrastre completo, que años lejanos y erratas de año no rompan el eje, y que planificar y anotar no se pisen), y la lista de técnicos (que quitar no toque los proyectos y corregir sí), y la ocupación por técnico (que lo solapado no cuente dos veces), y la carga mensual (tarifa, capacidad, reparto entre meses y que no se pierda trabajo), y el escaneo de la matrioska de clientes (que encuentre lo hondo, que la caché caduque bien, que una rama rota no lo tumbe y que una norma añadida ocupe una sola línea con la cuenta de toda ella) |
+| `tests/LumNotas.Core.Tests` | **562 tests, verificados en verde el 2026‑08‑06.** Cubren los ocho patrones, los nueve cálculos, los defectos corregidos, la integridad de la plantilla, el ciclo de guardado, varios proyectos simultáneos, el informe, el tablero y la planificación (semanas ISO, cambio de año, el gesto de arrastre completo, que años lejanos y erratas de año no rompan el eje, y que planificar y anotar no se pisen), y la lista de técnicos (que quitar no toque los proyectos y corregir sí), y la ocupación por técnico (que lo solapado no cuente dos veces), y la carga mensual (tarifa, capacidad, reparto entre meses y que no se pierda trabajo), y el escaneo de la matrioska de clientes (que encuentre lo hondo, que la caché caduque bien, que una rama rota no lo tumbe y que una norma añadida ocupe una sola línea con la cuenta de toda ella), y **qué proyecto se ve** (`FiltrosDeGestion`, que decide por las cuatro vistas a la vez), y **cuándo se ensayó** (que solo cuenten las fechas de verdad y que el periodo case por solapamiento), y **los carriles del calendario** (`CarrilesDelCalendario`: que lo que no se pisa quepa en una fila, que tocarse un día no baste para compartirla, que se suba al hueco libre de arriba y que no se gasten más filas de las que hacen falta), y **el código entero** (que las tres longitudes encajen, que los tres caminos exijan lo mismo, y que un código a medias no llegue al disco) |
+
+### Cómo se escriben los rótulos
+
+**Sin puntos suspensivos.** Ni en botones, ni en menús, ni en textos de la interfaz: «Planificar», no «Planificar…»; «Elegir carpeta», no «Elegir carpeta…». Es una decisión del laboratorio (2026‑08‑05) y vale para lo que se añada a partir de ahora.
+
+Se dejaron a propósito los de los **comentarios del código** donde significan «etcétera» o un rango —`M1…Mn`, `tornillos, uniones…`, `EBP_SAFE…`—: ahí no son un rótulo, son notación.
 
 Los ficheros de plantilla conservan `origenExcel` en cada elemento para poder auditarlos contra el libro original. Ese campo no se usa en ejecución.
 
@@ -1095,12 +1145,62 @@ Solo **seis reglas** necesitan código a medida (`Predicados.cs`); el resto es c
 | `InformeTests` | Que el HTML se genera con la portada, los apartados y los formatos en `es-ES` |
 | `GestionTests` | El tablero: que el avance cuenta secciones y no apartados, que al completar un apartado baja la sección, que las secciones que no aplican no salen, que el escaneo encuentra los proyectos de las subcarpetas y que **un fichero corrupto no tumba el tablero** |
 | `AltaDeProyectoTests` | Que dar de alta exige **solo el nombre, el técnico y la norma**, y que lo que la norma pide para ensayar **no bloquea el alta** |
-| `NombreDeFicheroTests` | Que el nombre del fichero es el que fija el laboratorio, con las cuatro normas y con el código escrito de cualquier manera |
+| `NombreDeFicheroTests` | Que el nombre del fichero es el que fija el laboratorio, con todas las normas instaladas y con el código escrito de cualquier manera |
 | `ProyectosRepetidosTests` | Que un servicio que ya existe se reconoce aunque el código se teclee con otras mayúsculas o espacios, y que un fichero ilegible no provoca un aviso falso |
 | VersionDePlantillaTests | Que la versión con la que se registró vuelve al abrir, que guardar la actualiza y que **el informe declara la del registro** y no la instalada |
 | `CargaTests` | La cuenta del laboratorio en horas, que cuadre con los 80 €/h, el reparto entre meses y que un `capacidad.json` anterior al cambio no deje la carga a cero |
 | `EnlaceTests` | El enlace de las familias de un trabajo: quién hace de cabecera, que el avance y el importe son los del grupo entero y que el enlace sobrevive a que el técnico guarde |
 | `PlantillasDeOtrasNormasTests` | Integridad de **todas** las normas instaladas, no solo la de luminarias: ids únicos, referencias entre reglas, `visibleSi` y `reglaDeCierre`, predicados registrados, grupos de equipos existentes, evaluación sin excepciones, que ningún id de bloque se repita entre normas, qué normas se pueden combinar, el grado por muestra y que cada norma exija su propia cabecera. **Los que vigilan la unificación recorren la carpeta**, no una lista escrita a mano, así que una norma nueva queda cubierta por existir |
+| `CodigoDeServicioTests` | Que el de servicio son las nueve primeras del de la toma de notas, que **lo escrito a mano no se pisa**, y que el rótulo del tablero y el calendario son las once primeras — servicio y familia, sin la edición |
+| `AcreditacionTests` | Que se admiten varias a la vez, que **«Sin acreditar» no admite compañía** en los dos sentidos, y que las cinco normas la exigen |
+| `GradosDelServicioTests` | El IP y el IK mayores de un servicio con la regla del laboratorio: manda la segunda cifra, la primera desempata, la «X» cuenta como 0 y «No IK» no es un grado bajo sino no haberlo |
+| `BusquedaDeProyectosTests` | El buscador del listado: que busca en todas las columnas, que los filtros se suman y que los desplegables solo ofrecen valores que existen |
+| `CadenaDelGrupoTests` | Cómo se pone en fila un trabajo enlazado (DD‑123): que la que empieza antes encabeza y no se mueve, que cada una arranca **al día siguiente** conservando su duración, los valores por defecto —una semana sin fin, mañana sin nada—, que una fecha anterior **adelanta** y que con la misma fecha gana la que se acaba de tocar. Y lo que evita escribir por escribir: una cadena ya colocada no se reescribe, solo se toca lo que de verdad se mueve, y recolocar dos veces da lo mismo. Cierra con el puente entre las dos piezas: **lo que se escribe es exactamente lo que se dibuja** |
+| `TramosDelGrupoTests` | En qué se parte la barra de un trabajo enlazado: que las familias se encadenan, que el orden lo dan las fechas de inicio (DD‑123), que las que no traen fecha no desaparecen y que los trozos suman la barra entera. Que **cada una dura lo suyo** (DD‑121): dos planificadas de cinco y quince días salen de cinco y de quince, la anexada no copia el tamaño de la primera, el trabajo acaba donde acaba la cadena y **mover no deforma nada**. Y lo que hace falta para arrastrar el tren (DD‑119, DD‑120): que estirar un extremo **solo agranda la tarjeta de ese extremo**, que las fracciones **siempre suman uno**, y que **siempre hay un tramo por familia y en su orden**, que es lo que permite recalcular las tarjetas en el sitio en vez de rehacerlas |
+| `RepartoDelArrastreTests` | Qué se escribe al soltar esa barra: que mover el trabajo desplaza a todas manteniendo las distancias, que estirar un borde toca solo la del extremo y que **una toma de notas suelta se comporta exactamente como antes** |
+| `RequisitosParaGuardarTests` | Que guardar exige código y técnico 1 y **nada más**, y que son los mismos dos que pide el alta |
+| `RotulosTests` | Cómo se identifica una toma de notas abierta: que cada familia tiene su propia pestaña y que el título lleva la norma **con su año**, que es lo que evita anotar contra la edición equivocada |
+| `ResumenDeFiltrosTests` | Que el botón «Filtros» delata cuántos están apartando trabajo, y que «En desarrollo» no cuenta como filtro activo pero sí se nombra |
+
+### Las nueve trampas de WPF
+
+Cada una costó un rato y todas comparten el mismo carácter: **WPF no avisa**. No falla, no lanza nada, no escribe en ningún sitio — simplemente hace otra cosa. Van explicadas donde mordieron; esto es el índice, porque a estas alturas están repartidas por medio documento.
+
+| # | Qué pasa | Dónde mordió |
+|---|---|---|
+| 1 | `ReleaseMouseCapture()` levanta `LostMouseCapture` **en el acto**, no al final del método | Arrastre de barras: se cancelaba solo justo antes de guardar |
+| 2 | Un elemento que pide más ancho del que le dan **se recorta**, sin decir nada | Cabecera del calendario: en blanco al encoger la ventana |
+| 3 | Un evento de la interfaz que revienta **tumba la aplicación entera** | Elegir un técnico cerraba el programa de golpe |
+| 4 | Perder la captura del ratón **da el `Click` por cancelado** | Pulsar una barra dejó de abrir su diálogo al añadir el arrastre |
+| 5 | Dentro de un `ItemsPanelTemplate` **no resuelven las ataduras** | Portada: no se le podía decir al panel cuántas columnas |
+| 6 | Un `StackPanel` horizontal **no envuelve jamás**; lo que no cabe no se dibuja | Barra de gestión: desaparecían botones y filtros al estrechar |
+| 7 | `DataContext` y `Visibility` en el mismo elemento **se estorban** | La BBDD se dibujaba encima de las otras tres vistas |
+| 8 | Lo que se arrastra **no se puede recrear** mientras dura el gesto | Tren de tarjetas: el arrastre se cancelaba a mitad |
+| 9 | `RequestBringIntoView` atendido en el `ScrollViewer` **llega tarde** | La cabecera saltaba de lado al marcar una norma |
+
+Dos corolarios de la sexta, que valen por sí solos: dentro de un `ScrollViewer` horizontal **el ancho disponible es infinito**, así que `HorizontalAlignment="Stretch"` no estira y `MaxWidth` no acota; y por lo mismo `TextTrimming` **no pone puntos suspensivos** dentro de un `StackPanel` horizontal — el texto se corta a mitad de letra.
+
+Y un tercero, que salió al virtualizar (DD‑131): **una lista dentro de un `ScrollViewer` de fuera se mide con tamaño infinito, así que no puede virtualizar nunca**. Da igual poner `IsVirtualizing="True"`: si algo por encima le da alto infinito, la lista concluye que se ve entera y crea sus 250 filas. Para virtualizar, la lista tiene que ser **dueña de su propio desplazamiento**.
+
+### Qué se midió y qué no
+
+**Ninguna de las mejoras de rendimiento se hizo por intuición** (2026‑08‑06). Hay un banco de pruebas —fuera de la solución— que genera 250 proyectos en `Clientes/TECNOnnn/TomaDeNotas/` y cronometra el escaneo; y la propia ventana se midió con un cronómetro a `DispatcherPriority.ContextIdle`, que es lo único que corre **después** de maquetar y pintar.
+
+Los proyectos de prueba **se clonan de los reales** y se les cambia código, técnico y fechas: con ficheros vacíos el motor no trabaja y el escaneo sale más rápido de lo que es. El banco tiene dos modos: `generar`, que hace una carpeta desde cero, y `escenario`, que **solo añade** —200 archivados y 50 vivos repartidos entre los técnicos del laboratorio— y por eso se puede apuntar a una carpeta que ya tenga cosas. Ninguno de los dos borra nada que no haya puesto él: la primera versión hacía un `Directory.Delete` a secas, y apuntarla a la carpeta de proyectos de verdad —que es exactamente lo que uno quiere hacer para probar sobre OneDrive— se habría llevado el trabajo del laboratorio por delante.
+
+Sirvió sobre todo para **descartar tres cosas que parecían el problema y no lo eran**:
+
+| Sospecha | Medida | Veredicto |
+|---|---|---|
+| El escaneo de la carpeta | 0,6 s en frío, **74 ms** en caliente | No es el problema |
+| El recálculo del núcleo (filtrar, calendario, carga) | **7 ms** entre los tres | No es el problema |
+| `EntradaDeCalendario` recalculando `Inicio`/`Fin`/`Tramos` ~8 veces por proyecto | **6,5 ms** | Se **descartó** cachearlo: habría tocado el arrastre para no ganar nada |
+| Rellenar las colecciones de una en una | Reemplazarlas en bloque salió **igual** | Se dejó hecho por higiene, no por velocidad |
+| Crear los controles de las 250 columnas del tablero | **1,7 s** | **Era esto** |
+
+Dos avisos para quien vuelva a medir. El primero: **el escaneo va en segundo plano**, así que cronometrar «pulsar Actualizar» no mide nada — la ventana queda libre en el acto y el trabajo llega después. El segundo: **un cliente de accesibilidad hace que WPF construya objetos que un usuario normal no paga**, así que una medida tomada con un script de UIA puede estar midiendo el propio medidor; aquí se comprobó repitiéndola sin tocar accesibilidad, y el número aguantó.
+
+Lo que **no** se tocó, a sabiendas: el volcado de la caché de resúmenes (189 ms de los 294 que cuesta reescanear tras mover una barra) y el doble recorrido del árbol de carpetas (69 → 38 ms). Los dos son arreglables y los dos tocan el guardado o la detección de proyectos; con la ventana ya respondiendo en 141 ms, no compensan el riesgo.
 
 ### La interfaz
 
@@ -1110,7 +1210,11 @@ La pantalla **se genera a partir de la plantilla**, no está escrita a mano: añ
 - **Formulario** a la derecha, con una columna por muestra en vez de las ocho columnas fusionadas del Excel. Los grupos repetidos (tornillos, uniones, prensaestopas) se generan a partir de `grupoRepetido`.
 - **Avisos** con los mismos textos que veía el técnico en el Excel, en su apartado y no en una celda perdida.
 - **Lo que no aplica no se puede rellenar.** Al marcar «Este apartado no aplica (N/A)», o una exención de subapartado como «La luminaria NO tiene tornillos», los campos, equipos y comentarios de debajo se desactivan. Antes seguían siendo editables y se podían guardar proyectos que decían a la vez que un apartado no aplica y traían sus datos de ensayo. Las casillas que toman la decisión quedan activas, para poder volver atrás.
-- **El panel no se desplaza de lado al pulsar una casilla.** WPF, al enfocar un control, pide llevarlo a la vista y el `ScrollViewer` se movía también en horizontal: con la tabla de muestras, marcar una casilla saltaba a otra columna. `MainWindow` rehace la petición con un rectángulo sin ancho, así que sigue subiendo o bajando al tabular entre campos pero deja de moverse de lado.
+- **El panel no se desplaza de lado al pulsar una casilla.** WPF, al enfocar un control, pide llevarlo a la vista y el `ScrollViewer` se movía también en horizontal: con la tabla de muestras, marcar una casilla saltaba a otra columna; en la cabecera, marcar una norma añadida daba un salto de lado, porque su casilla ocupa **todo el ancho del contenido** y enseñarla entera obliga a recorrerlo. Se **cancela la petición y se hace a mano solo el desplazamiento vertical**, que es lo que hace falta al tabular entre campos.
+
+> **Novena trampa de WPF: atender `RequestBringIntoView` en el `ScrollViewer` llega tarde.** Quien desplaza no es él, sino el **`ScrollContentPresenter` de su plantilla**, que está **por debajo** en el árbol visual. El evento burbujea de abajo arriba, así que cuando llega al `ScrollViewer` el presentador ya lo ha atendido y la vista ya se ha movido: marcarlo como atendido allí no deshace nada. El manejador va **dentro**, en el `ContentControl` que cuelga del `ScrollViewer` — ahí el evento pasa antes que por el presentador y sí se le puede cortar el paso.
+>
+> Con esto cayeron dos intentos previos. El primero rehacía la petición con un **rectángulo sin ancho**: quitaba media enfermedad, pero ese rectángulo pide **el punto x=0 del control**, así que con el panel desplazado a la derecha volvía de un salto a la izquierda. El segundo cancelaba el evento y desplazaba a mano solo en vertical —lo correcto— pero **desde el `ScrollViewer`**, o sea tarde. Medido con automatización: al enfocar la casilla de la 62031, el desplazamiento horizontal pasaba de 0 % a 2,47 % (unos 17 DIP). Con el manejador dentro se queda en 0 %, y desde un panel ya desplazado al 45 % sigue clavado en 45 % mientras el vertical hace su trabajo.
 - **Contador de apartados** en la cabecera. El porcentaje ponderado y la barra de progreso se retiraron (DD‑25) por no aportar nada; el cálculo sigue en `IndicadorDeAvance`.
 - **El índice se pliega** con el botón ◀ / ▶ de la cabecera. Con 30 muestras, esos 360 px son la diferencia entre ver tres columnas o siete.
 - **Una barra de pestañas y una sola**: los proyectos y el tablero al mismo nivel, con el `+` detrás de la última. La pestaña de delante va en negrita y con fondo más claro.
@@ -1123,11 +1227,11 @@ El técnico suele llevar dos o tres servicios en marcha —mientras una muestra 
 
 - El botón **`+`** o *Archivo · Nueva pestaña* (Ctrl+T) abre una pestaña vacía, que enseña la portada.
 - *Archivo · Abrir otro proyecto…* (Ctrl+O) abre en la pestaña de delante si está sin estrenar, y si no en una nueva.
-- **Abrir un fichero ya abierto salta a su pestaña** en vez de duplicarlo: dos pestañas sobre el mismo `.lumproj` se pisarían los guardados.
+- **Abrir un fichero ya abierto salta a su pestaña** en vez de duplicarlo: dos pestañas sobre el mismo `.lmnlab` se pisarían los guardados.
 - Cerrar una pestaña con cambios avisa. Cerrar la última deja una vacía, no una ventana en blanco.
 - **Al cerrar la aplicación se pregunta por cada pestaña con cambios**, no solo por la de delante.
 - Ctrl+S y Ctrl+P actúan sobre la pestaña activa.
-- **El tablero de gestión es una pestaña más**, y solo una: se abre desde la portada —por cualquiera de sus tres vistas— o desde *Ver · Gestión de proyectos*, y volver a pedirlo salta a la que ya está. No hay pestañas de dos niveles.
+- **El tablero de gestión es una pestaña más**, y solo una: se abre desde la portada —por cualquiera de sus cuatro vistas— o desde *Ver · Gestión de proyectos*, y volver a pedirlo salta a la que ya está. No hay pestañas de dos niveles.
 
 Eso obligó a partir en dos lo que era una sola clase: `DocumentoViewModel` es **un proyecto abierto** —datos, motor, cabecera, árbol, ruta y cambios sin guardar— y `VentanaPrincipalViewModel` es la ventana que sostiene la colección de documentos, el tablero y los menús. **El núcleo no se tocó**: `DatosProyecto`, el motor y las plantillas ya recibían todo por parámetro y no guardaban estado global, que es justo lo que hizo viable el cambio.
 
@@ -1143,13 +1247,20 @@ Debajo, **«Software de toma de notas primarias para ensayos y gestión de proye
 
 | Toma de notas (izquierda) | Gestión (derecha) |
 |---|---|
-| **Una tarjeta por norma instalada** — sale de `CatalogoDeNormas`, así que dejar caer un `plantilla-*.json` añade la suya sin tocar nada | **Tablero** · qué falta por rellenar |
-| **Abrir…** | **Calendario** · cuándo toca cada uno |
-| Los **tres últimos abiertos** | **Carga** · cuánto tiene comprometido cada técnico |
+| **Abrir existente**, en azul | **Planificar nueva TdN**, en verde |
+| Los **cinco últimos abiertos**, bajo «RECIENTES» | **Tablero** · qué falta por rellenar |
+| «O crea una nueva con la norma que necesites» y **una tarjeta por norma instalada** — sale de `CatalogoDeNormas`, así que dejar caer un `plantilla-*.json` añade la suya sin tocar nada | **Calendario** · cuándo toca cada uno |
+| | **Carga** y **BBDD** |
 
-En la portada se enseñan **tres** recientes, no todos: ahí son un atajo para volver a lo de ayer, y una lista larga empuja hacia abajo lo que de verdad se usa. `Archivo | Proyectos recientes` los sigue teniendo todos, que para eso hay que ir a buscarlo.
+**El orden lo puso el laboratorio** (2026‑08‑06): primero abrir, luego lo reciente, y las normas al final. Antes las tarjetas encabezaban el panel. El día a día es volver a una toma de notas empezada; estrenar norma es lo que menos ocurre, así que estaba lo raro arriba y lo frecuente abajo.
 
-> **Hubo una zona «Proyectos» y duró un día.** El 2026‑08‑02 la portada se partió en tres —Proyectos, Gestión y «toma de notas sin proyecto asignado»— dando por hecho que existiría un objeto proyecto por encima de las tomas de notas. El laboratorio lo paró: **el registro del ensayo es el `.lumproj`**, y un fichero de proyecto flotando fuera de la carpeta de tomas de notas sería un documento sin ensayo detrás (DD‑89). Sin ese objeto, «con proyecto» y «sin proyecto» dejan de distinguir nada y la tercera zona sobra. Queda escrito para que a nadie se le ocurra volver a partirla sin leer DD‑89.
+Cada mitad tiene **un solo botón lleno de color** y es el que más se pulsa: azul a la izquierda, verde a la derecha, mismo tamaño y mismo redondeo.
+
+En la portada se enseñan **cinco** recientes, no todos, y **solo el nombre**: la carpeta se quitó de la fila —con dos líneas por fila, cinco filas no cabían en una pantalla de 800— y se quedó en el consejo emergente, que es donde se mira para desempatar dos servicios parecidos. `Archivo | Proyectos recientes` los sigue teniendo todos, que para eso hay que ir a buscarlo.
+
+**Las tarjetas de norma salen ordenadas por su título**, con luminarias primero por ser la de uso más frecuente; el resto queda «Grados IK», «Grados IP», «Módulos LED». No hay ninguna lista de orden escrita en el código **a propósito**: una lista fija habría que tocarla cada vez que entre una norma nueva, y lo que se quiere es que dejar caer un JSON baste. Si algún día el laboratorio quiere otro orden, el sitio es un campo en la propia plantilla, no el C#.
+
+> **Hubo una zona «Proyectos» y duró un día.** El 2026‑08‑02 la portada se partió en tres —Proyectos, Gestión y «toma de notas sin proyecto asignado»— dando por hecho que existiría un objeto proyecto por encima de las tomas de notas. El laboratorio lo paró: **el registro del ensayo es el `.lmnlab`**, y un fichero de proyecto flotando fuera de la carpeta de tomas de notas sería un documento sin ensayo detrás (DD‑89). Sin ese objeto, «con proyecto» y «sin proyecto» dejan de distinguir nada y la tercera zona sobra. Queda escrito para que a nadie se le ocurra volver a partirla sin leer DD‑89.
 
 **El alta rápida no está en la portada** (DD‑93). Estuvo, junto a las tarjetas de norma, y era ofrecer dos caminos para lo mismo: elegir norma y dar de alta acaban las dos en una toma de notas. Se queda en `Archivo | Nueva toma de notas…` y en la barra del tablero, que es donde está el responsable cuando se le ocurre.
 
@@ -1161,9 +1272,29 @@ Las dos columnas son `1.35*` y `*`, **en proporción y sin ancho fijo ni mínimo
 
 **Las tarjetas de norma son todas del mismo tamaño y se recolocan solas** (DD‑102): tres por fila cuando cabe y dos al estrechar la ventana. Es un `WrapPanel` con tarjetas de tamaño fijo, no un `UniformGrid` — a este hay que decirle cuántas columnas, y **desde un `ItemsPanelTemplate` no se llega al ancho del contenedor** (quinta trampa, abajo). Antes se ajustaban al texto y quedaban desparejas: «IP» estrecha y «Módulos LED» ancha, sin más motivo que la longitud del nombre.
 
-Los tres botones de gestión **encogen dejando que su texto pase a dos líneas** en vez de recortarse, que es lo que permite ganar el sitio de la tercera columna. Verificado en la ventana más pequeña que se admite, 740 px: cinco tarjetas iguales en dos filas y los rótulos de gestión partidos, sin nada recortado.
+Los tres botones de gestión **encogen dejando que su texto pase a dos líneas** en vez de recortarse, que es lo que permite ganar el sitio de la tercera columna. Verificado en la ventana más pequeña que se admite, **620 px** (DD‑106): cinco tarjetas iguales en dos filas y los rótulos de gestión partidos, sin nada recortado.
 
 En cuanto se elige norma o se abre un fichero, esa misma pestaña pasa a ser la toma de notas. Para volver, **`Ver | Inicio`**: salta a una pestaña vacía si la hay y abre una si no queda ninguna — no cierra nada ni deja pestañas iguales acumuladas.
+
+### Qué hace falta para guardar
+
+**Dos cosas, y solo dos: el código de la toma de notas —entero, 14 caracteres— y el técnico 1** (DD‑115, DD‑130). Sin ellos el fichero no se puede ni nombrar ni atribuir.
+
+Conviene no confundir tres listas que se parecen y no son la misma:
+
+| Lista | Qué decide | Dónde vive |
+|---|---|---|
+| **Para dar de alta** | Crear el `.lmnlab` desde el responsable | `AltaDeProyecto` — código entero, técnico 1 y norma |
+| **Para guardar** | Escribir el fichero en disco | `RequisitosParaGuardar` — código entero y técnico 1 |
+| **Para ensayar** | Que aparezcan los apartados de ensayo | `RequisitosDelProyecto` — lo que exija cada norma |
+
+Sobre el **código** las tres dicen lo mismo (DD‑130): entero o nada. Lo que las separa son los demás datos —clase, Ta, acreditación, partes ‑2—, que solo hacen falta para ensayar.
+
+**La tercera es mucho más larga, y guardar no la mira.** Un servicio sin clase, sin Ta y sin acreditación tiene que poder guardarse: así está durante semanas, y bloquear ahí obligaría al técnico a inventarse datos para no perder lo anotado.
+
+Al intentar guardar sin lo mínimo, **la vista salta a la cabecera**: decir que falta algo sin enseñar dónde obliga a buscarlo, y ahí los dos campos ya están en rojo.
+
+> **Un fichero anterior a DD‑104 no traía código de toma de notas**, así que al abrirlo y guardarlo pedirá que se ponga. Es lo buscado: ese código es lo que lo distingue de las otras familias del servicio.
 
 ### Cambios sin guardar
 
@@ -1175,13 +1306,16 @@ Todo lo que abandona el proyecto abierto pasa por el mismo aviso: proyecto nuevo
 
 ### El tablero de gestión de proyectos
 
-Pestaña propia, pensada para el responsable y no para el técnico. Tiene **tres vistas de la misma carpeta**, que responden a sus tres preguntas:
+Pestaña propia, pensada para el responsable y no para el técnico. Tiene **cuatro vistas de la misma carpeta**, que responden a cuatro preguntas distintas:
 
-| Vista | Pregunta |
-|---|---|
-| **Tablero** | ¿Qué falta por rellenar? |
-| **Calendario** | ¿Cuándo toca cada servicio? |
-| **Carga** | ¿Cabe? |
+| Vista | Pregunta | Filtro |
+|---|---|---|
+| **Tablero** | ¿Qué falta por rellenar? | El compartido |
+| **Calendario** | ¿Cuándo toca cada servicio? | El compartido |
+| **Carga** | ¿Cabe? | El compartido |
+| **BBDD** | ¿Dónde está aquel proyecto de hace meses? | **El suyo propio** |
+
+**La BBDD queda fuera del filtro compartido a propósito** (DD‑109): las tres primeras miran lo que hay en marcha y arrancan en «En desarrollo»; la cuarta mira hacia atrás, y lo que se busca en ella casi siempre está terminado.
 
 El tablero es lo primero que se construyó: **columnas = proyectos, tarjetas = secciones pendientes** (a lo Trello).
 
@@ -1218,7 +1352,7 @@ Es el **mismo rótulo** con el que el calendario agrupa las filas y la carga nom
 
 > **No hace falta —ni conviene— crear un técnico llamado «Sin técnico»** en `Configuración | Técnicos`. Saldría como una persona en el desplegable de Técnico 1 de todas las tomas de notas y, en cuanto se asignara, la carga lo trataría como alguien con capacidad y sumaría días a su nombre. El hueco vacío ya se agrupa solo.
 
-Cómo encuentra los proyectos: se le indica **la carpeta de proyectos** y la escanea buscando `*.lumproj`, incluidas todas sus subcarpetas. Sin índice ni base de datos — con varios técnicos sincronizando, un índice se desincroniza y miente; el fichero es la única verdad (DD‑27).
+Cómo encuentra los proyectos: se le indica **la carpeta de proyectos** y la escanea buscando `*.lmnlab`, incluidas todas sus subcarpetas. Sin índice ni base de datos — con varios técnicos sincronizando, un índice se desincroniza y miente; el fichero es la única verdad (DD‑27).
 
 | Pieza | Qué hace |
 |---|---|
@@ -1252,7 +1386,7 @@ Un proyecto que no apunte sus normas —los guardados antes de que se registrara
 
 #### Escanear una matrioska de carpetas
 
-Los proyectos del laboratorio cuelgan de la carpeta de clientes, cada uno en su rama y con años de historia detrás. El tablero **lee entero cada `.lumproj`** que encuentra —el estado sale de aplicarle las reglas—, así que sobre un árbol grande eso se nota. Cuatro medidas, por orden de lo que aportan:
+Los proyectos del laboratorio cuelgan de la carpeta de clientes, cada uno en su rama y con años de historia detrás. El tablero **lee entero cada `.lmnlab`** que encuentra —el estado sale de aplicarle las reglas—, así que sobre un árbol grande eso se nota. Cuatro medidas, por orden de lo que aportan:
 
 | | |
 |---|---|
@@ -1273,14 +1407,14 @@ Va en el perfil del usuario y no en la carpeta compartida: es una caché de este
 
 | Ajuste | Qué guarda |
 |---|---|
-| **Carpeta de proyectos** | los `*.lumproj` |
+| **Carpeta de proyectos** | los `*.lmnlab` |
 | **Carpeta compartida** | `plantilla/` (las normas), `tecnicos.json`, `capacidad.json`, `version.json` |
 
 Los proyectos **no están todos juntos**: cuelgan de la carpeta de clientes, cada uno en su rama.
 
 ```
-clientes/antares/antar2504/01/tomadenotas/antar2504.lumproj
-clientes/moonoff/moono2304/01/tomadenotas/moono2304.lumproj
+clientes/antares/antar2504/01/tomadenotas/antar2504.lmnlab
+clientes/moonoff/moono2304/01/tomadenotas/moono2304.lmnlab
 ```
 
 Basta con apuntar a `clientes`: se busca en ella **y en todas sus subcarpetas**, así que la profundidad y la forma de cada rama dan igual.
@@ -1321,14 +1455,16 @@ El `id` de una plantilla lleva **norma, parte y año de publicación** (DD‑95)
 
 | | |
 |---|---|
-| `id` | `60598-1_2024` · `62031_2020_A11` · `60529_2018` · `62262_2002_A1` — **por la designación EN**, que es contra la que ensaya el laboratorio |
+| `id` | `60598-1_2024` | `62031_2020_A11` | `60529_1991` | `62262_2002_A1` — **por la designación EN**, que es contra la que ensaya el laboratorio |
 | `idsAnteriores` | `["60598"]` — con lo que se conoció antes |
 | `codigoDeFichero` | `60598` — lo corto, que es lo que va en el nombre del fichero |
 | `anioDePublicacion` | `2024` — **el año y solo el año**, para poder enseñarlo sin descomponer el id |
-| `titulo` | La designación completa, con sus enmiendas: «Módulos LED — EN 62031:2020 + A11:2021». **Sale en el informe**, así que es lo que dice contra qué norma se ensayó |
+| `titulo` | La designación completa, con sus enmiendas: «Módulos LED — EN IEC 62031:2020 + A11:2021». **Sale en el informe**, así que es lo que dice contra qué norma se ensayó |
 | `version` | `1.0.0` — **nuestra**, y va aparte |
 
-> **Año de publicación, no «edición»** (DD‑101). Una norma tiene las dos cosas y no son lo mismo: la 60598‑1 va por su novena edición, y lo que el laboratorio usa para distinguir una de otra —y lo que lleva el id— es **el año**. Durante un tiempo este documento y el código llamaron «edición» al año; está corregido.
+> **Año de publicación, no «edición»** (DD‑101). Una norma tiene las dos cosas y no son lo mismo: la 60598‑1 de 2021 es la **novena** edición y la de 2024 la **décima**, y lo que el laboratorio usa para distinguir una de otra —y lo que lleva el id— es **el año**. Durante un tiempo este documento y el código llamaron «edición» al año; está corregido. Desde el 2026‑08‑06 la edición **también se guarda**, en `meta.edicion`, pero solo para enseñarla (DD‑134).
+>
+> Esta ficha decía que la novena edición era la de 2024. **Era falso**, y lo corrigió el laboratorio al dar las cinco ediciones (2026‑08‑06). Queda escrito porque el error estuvo tres días en el documento que se usa para traspasar el proyecto.
 
 **El año está en la identidad porque un ensayo hecho contra la norma de un año tiene que seguir midiéndose contra esa.** Cuando el id era solo `60598`, publicar la norma nueva sustituía el fichero y **remedía en silencio** todos los ensayos anteriores.
 
@@ -1360,7 +1496,7 @@ Se planteó la duda de si además cambiaba algún límite, método o ensayo —l
 
 ### Con qué versión de la plantilla se registró cada ensayo
 
-Cada `.lumproj` guarda la versión de la plantilla con la que se escribió. **Se guardaba desde el principio y no se leía nunca**: estaba en el fichero para quien lo abriera con un editor. Ahora vuelve al proyecto al abrirlo (DD‑94), y con eso:
+Cada `.lmnlab` guarda la versión de la plantilla con la que se escribió. **Se guardaba desde el principio y no se leía nunca**: estaba en el fichero para quien lo abriera con un editor. Ahora vuelve al proyecto al abrirlo (DD‑94), y con eso:
 
 - **El informe declara la versión con la que se registró**, no la instalada el día que se imprime. Si no coinciden, dice las dos: `1.0.0 (registrado) · 1.1.0 (instalada al generar este informe)`. Antes declaraba siempre la de hoy, que es atribuirle al ensayo una plantilla que no se usó.
 - **Al abrir un proyecto grabado con otra versión se avisa.** No bloquea: evita que el técnico vea cambiar el avance de un día para otro y lo tome por un fallo suyo cuando fue una corrección de la plantilla.
@@ -1382,7 +1518,13 @@ El mismo problema, un piso más arriba: con la aplicación copiada en varios ord
 - Quien instala una versión nueva la **publica** desde ahí. Se escribe un `version.json` en la carpeta compartida.
 - Los equipos que sigan con una anterior ven **una banda ámbar al arrancar**. Se puede quitar hasta el siguiente arranque.
 
+**«Publicar» no reparte nada.** Es la duda que le surge a cualquiera al leer el botón, así que conviene dejarlo claro: no copia el programa, no instala y no actualiza a nadie. Lo único que hace es **anotar un número en la carpeta compartida** —«la versión buena es la 1.2.0, publicada tal día por tal persona»—, y los demás equipos comparan ese número con el suyo al arrancar. Instalar sigue siendo cosa aparte; esto solo evita que nadie se quede atrás sin enterarse. Junto al número se puede dejar una nota de qué cambia, que es lo que los demás leen en el aviso.
+
+**Las normas se listan con su designación, una por línea** (DD‑105). Iban con el nombre corto y todas seguidas, y con los dos años de la 60598 instalados se leía «Luminarias v1.0.0 · Luminarias v1.0.0»: la ventana que existe para saber qué hay instalado era justo la que no lo decía. `RotulosTests` comprueba que **no haya dos iguales en la lista**.
+
 **Es un aviso, no un candado.** Dejar sin trabajar a un laboratorio porque un fichero de OneDrive dice otra cosa sería peor que el problema que resuelve. Y ante cualquier duda —un número de versión que no se entiende— no avisa: es preferible callar que avisar en falso todos los días.
+
+> **«Publicar» no actualiza a nadie, y el botón invita a creer que sí.** Lo único que hace es escribir un número en la carpeta compartida; los demás equipos lo leen al arrancar y enseñan el aviso, pero **siguen ejecutando su copia vieja hasta que alguien instale la nueva en cada máquina**. Es un detector de desactualización, no un repartidor. Lo que sí actualizará solo es **ClickOnce**, que está pendiente; cuando esté, esto se queda como red de seguridad para quien nunca cierra el programa —y por la trazabilidad de quién publicó qué y cuándo, que para la ISO 17025 no sobra.
 
 > **Para que esto sirva hay que subir `<Version>` en `LumNotas.App.csproj` en cada entrega.** Si no se sube, los demás equipos no se enteran de nada. Está comentado en el propio fichero.
 
@@ -1400,6 +1542,8 @@ La dirección está **escrita en el código**, no en la carpeta compartida: si d
 ### El proyecto y sus tomas de notas
 
 Todo empezó por la toma de notas, y por eso la toma de notas está en el centro. **Ya no le corresponde.** Un proyecto tiene fechas, llegada de muestras, estado, importe y —en cuanto se pidan— ENAC, ENEC, CB o EMC; nada de eso es de una norma, y la toma de notas ha pasado a ser *una parte* del proyecto, no al revés. Con dos normas en el mismo servicio ya se ven las costuras: hay dos cabeceras y un solo cliente.
+
+> **Cómo acabó.** El objeto proyecto se descartó (DD‑89) y esos datos viven en la toma de notas: la acreditación desde DD‑111 y los laboratorios de fuera desde DD‑110. Que sean del servicio y no de la norma sigue siendo cierto; lo que se decidió es que **el sitio donde constan es el `.lmnlab`**, porque es el único fichero que existe.
 
 **Adónde va**: un proyecto con cabecera propia —cliente, código, técnicos, certificaciones— y **N tomas de notas colgando**, cada una con lo suyo de ensayo. En pantalla no sería una vista nueva: el árbol que ya existe gana un nivel (`Proyecto → norma → sección → apartado`) y desaparece el prefijo con el que hoy se distinguen las secciones de cada norma.
 
@@ -1420,7 +1564,7 @@ Quién decide qué bloquea es `AltaDeProyecto`, en el núcleo y con tests; el di
 | 3 | **Diálogo «Nuevo proyecto»**: dar de alta sin pasar por la toma de notas | **hecho** el 2026‑08‑02 |
 | 4 | El árbol gana un nivel: cabecera propia del proyecto y una rama por norma | pendiente |
 
-Del **paso 3**: `Archivo | Nuevo proyecto…`, y también desde la mitad de gestión de la portada y desde la barra del tablero — que son los tres sitios donde está el responsable cuando se le ocurre. Se rellenan nombre y técnico, se elige carpeta y el `.lumproj` queda en disco con su tarjeta ya en el calendario, **sin abrir su toma de notas**: quien da de alta un proyecto lo hace para planificarlo.
+Del **paso 3**: `Archivo | Nuevo proyecto…`, y también desde la mitad de gestión de la portada y desde la barra del tablero — que son los tres sitios donde está el responsable cuando se le ocurre. Se rellenan nombre y técnico, se elige carpeta y el `.lmnlab` queda en disco con su tarjeta ya en el calendario, **sin abrir su toma de notas**: quien da de alta un proyecto lo hace para planificarlo.
 
 Antes, lo mismo eran cuatro pasos: elegir norma en la portada, escribir en la cabecera de la toma de notas, «Guardar como» y buscar carpeta. Se comprueba además que no se pise un proyecto que ya exista con ese nombre en esa carpeta — dos servicios del mismo cliente llamados igual es un descuido frecuente, y ahí se perdería el trabajo del otro.
 
@@ -1436,15 +1580,21 @@ Proyecto        cliente, código, técnicos, fechas, importe, ENAC/EMC
    └ Norma      60598, y las que se le añadan
 ```
 
-**Lo que hay hoy** —un `.lumproj` por toma de notas— ya sirve para esto: cuatro familias son cuatro ficheros. Y tiene una virtud que no conviene perder: **cuatro técnicos pueden trabajar a la vez en cuatro familias del mismo proyecto**, porque son cuatro ficheros distintos. Meter las cuatro en uno reabriría el problema de los dos escritores que ya se resolvió con la planificación.
+**Lo que hay hoy** —un `.lmnlab` por toma de notas— ya sirve para esto: cuatro familias son cuatro ficheros. Y tiene una virtud que no conviene perder: **cuatro técnicos pueden trabajar a la vez en cuatro familias del mismo proyecto**, porque son cuatro ficheros distintos. Meter las cuatro en uno reabriría el problema de los dos escritores que ya se resolvió con la planificación.
 
 **Se resuelve enlazándolas** (DD‑90), no creando un fichero por encima. En el diálogo de planificación hay un campo **«Grupo»**: se escribe el mismo nombre en las tomas de notas del mismo trabajo y el calendario las enseña **en una sola barra**.
 
 | | |
 |---|---|
-| **Dónde vive el enlace** | Dentro de cada `.lumproj`, con su planificación. Sin fichero de grupo, sin índice — y **viaja con el fichero** si se mueve de carpeta |
-| **Quién manda** | La **cabecera**: la que lleva las fechas. Es la que se dibuja, la que se arrastra y donde va el importe |
-| **Qué enseña la barra** | El avance **del trabajo entero**, sumando las cuatro. Un servicio no está hecho porque lo esté la primera familia |
+| **Dónde vive el enlace** | Dentro de cada `.lmnlab`, con su planificación. Sin fichero de grupo, sin índice — y **viaja con el fichero** si se mueve de carpeta |
+| **Qué enseña la barra** | Una **tarjeta por familia**, pegadas unas a otras, cada una con su código, **su color y su consejo emergente** (DD‑119). El avance y el importe son los **del trabajo entero**: un servicio no está hecho porque lo esté la primera familia |
+| **Cuánto abarca** | De la **primera** familia hasta donde acaba la **cadena** (DD‑121). No hasta la fecha más tardía que haya escrita: una familia anexada se planificó sin saber dónde iba a caer |
+| **Cómo se pone en fila** | Al guardar cualquiera de ellas, `CadenaDelGrupo` **escribe** las fechas (DD‑123): la primera conserva su inicio y cada una de las siguientes empieza **al día siguiente** del fin de la anterior, conservando su duración. Sin fin, una semana; sin ninguna fecha, mañana |
+| **Quién va delante** | Lo dicen **las fechas de inicio**. Para adelantar una familia se le pone una fecha anterior; con la misma fecha gana la que se acaba de tocar. Sin número de orden guardado y sin botones |
+| **Cómo se dibuja** | Lo que pone en el fichero, tal cual: las tarjetas se tocan porque una acaba el día antes de que empiece la siguiente. Cuando las fechas todavía no están encadenadas —datos viejos, o la vista previa de un arrastre—, `TramosDelGrupo` las coloca respetando lo que dura cada una (DD‑121) |
+| **Pulsar** | Abre la planificación de **esa** familia, no la de la cabecera |
+| **Cómo se rotula la fila** | Con el **nombre del grupo tal como se tecleó**, seguido de **«(agrupación)»** — `ANTAR2504 (agrupación)`. No con el código de la cabecera: la fila ya no es una toma de notas, son todas, y cada una lleva el suyo escrito dentro. La coletilla hace falta porque el nombre del grupo lo pone una persona y puede parecerse a cualquier cosa: sin ella no se distingue de una toma de notas suelta que se llamara igual |
+| **Arrastrar** | Cogiendo **cualquiera** de las tarjetas se mueve el trabajo entero, manteniendo las distancias; los **bordes de fuera** —izquierdo de la primera, derecho de la última— estiran y tocan solo esa familia. Los bordes **de dentro** todavía no mueven la frontera: se comportan como el centro |
 | **El tablero** | No cambia: una columna por familia, que es la unidad de trabajo del técnico |
 
 El nombre del grupo se compara **sin mayúsculas, espacios ni guiones**, igual que los códigos de servicio: se teclea a mano en cada una de las cuatro y una mayúscula no puede desenlazarlas.
@@ -1458,20 +1608,78 @@ El nombre del grupo se compara **sin mayúsculas, espacios ni guiones**, igual q
 El nombre lo fija el laboratorio (DD‑91) y se lee de un vistazo en el explorador, sin abrir nada:
 
 ```
-TdN_60598_LEDC42502xx-00.lumproj
-└─┬─┘ └─┬─┘ └───┬───┘└┬┘ └┬┘
-  │     │       │     │   └── revisión del documento
-  │     │       │     └────── nº de toma de notas
-  │     │       └──────────── código de servicio
-  │     └──────────────────── la norma principal
-  └────────────────────────── es una toma de notas
+TdN_60598_TECNO260201-00.lmnlab
+└─┬─┘ └─┬─┘ └──────┬──────┘
+  │     │          └──────── código de la toma de notas
+  │     └─────────────────── la norma principal
+  └───────────────────────── es una toma de notas
 ```
 
-**El `xx` y el `00` los pone el técnico**, renombrando el fichero. El `xx` es un hueco a la vista: un servicio puede llevar varias familias y cada una lleva su número. El `00` es la revisión del documento, y sube a `01` cuando hay que corregir algo ya emitido.
+**El código entra tal cual** (DD‑104): es el que se teclea en la cabecera, y ya lleva dentro el número de familia y la edición.
 
-**El programa no los gestiona, y es a propósito**: numerar familias y decidir que algo se reedita son decisiones del laboratorio. Un programa que las tomara solo acabaría renumerando un registro ya firmado.
+```
+TECNO260201-00
+└───┬───┘└┬┘└┬┘
+    │     │  └── edición del documento
+    │     └───── nº de familia dentro del servicio
+    └─────────── código de servicio (las 9 primeras)
+```
 
-Lo componen los dos caminos que crean fichero —el alta rápida y el «Guardar como» de la toma de notas— desde el mismo sitio, para que no puedan divergir. Sin norma elegida queda `TdN_LEDC42502xx-00`; el `TdN_` no se pierde nunca, porque es lo que dice qué es el fichero.
+**Las dos últimas parejas las decide el laboratorio, no el programa**: numerar familias y decidir que algo se reedita son decisiones suyas, y un programa que las tomara solo acabaría renumerando un registro ya firmado. Lo que sí hace el programa es **dejar de estorbar**: antes pegaba un `xx-00` de relleno que el técnico tenía que sustituir **renombrando el fichero**, y ahora se escribe una vez en la cabecera y el nombre sale ya correcto.
+
+Lo componen los dos caminos que crean fichero —el alta rápida y el «Guardar como» de la toma de notas— desde el mismo sitio, para que no puedan divergir. Sin norma elegida queda `TdN_TECNO260201-00` y sin código `TdN_60598`; el `TdN_` no se pierde nunca, porque es lo que dice qué es el fichero.
+
+#### Cómo se identifica una toma de notas abierta
+
+Dos rótulos, y cada uno responde a una pregunta distinta (DD‑105):
+
+| | Dice | Ejemplo |
+|---|---|---|
+| **La lengüeta de la pestaña** | En cuál de las tomas de notas abiertas estoy | `TECNO260201-00 •` |
+| **El título, arriba** | Contra qué norma estoy anotando | `EN IEC 60598-1:2024 + A11:2024 \| TECNO260201-00 •` |
+
+El punto final es la marca de **cambios sin guardar**, y por eso el separador es `|` y nunca un punto: se leía `ALVEI2306 • · Luminarias`, que parecen dos separadores seguidos. Sin código puesto, la pestaña dice **«Sin código»** y el título **«sin código»**.
+
+**La norma va entera y con su año, no como «Luminarias».** El laboratorio tiene dos años de la 60598 instalados a la vez; con el nombre corto, anotar contra el año que no era no se vería hasta emitir el informe. Sale de `meta.designacion`, que **declara cada plantilla**: recortarla del título con una regla de C# sobre dónde está el guion sería inventarse la designación de una norma. Si una plantilla no la trae, se usa su título — añadir una norma no puede exigir rellenar todos los campos nuevos.
+
+El título es también el de la **ventana de Windows**, la del alt‑tab. Los dos dicen lo mismo a propósito: norma y código son exactamente lo que ya lleva dentro el nombre del fichero, así que la barra de tareas no pierde nada y se lee mejor.
+
+Las dos cadenas viven en `RotulosDeTomaDeNotas`, en el núcleo, **para que tengan tests**: ninguna de las pruebas toca la interfaz, así que lo que se quede en el ViewModel no se comprueba nunca.
+
+#### Los dos códigos
+
+La cabecera pide **dos** y no es redundancia (DD‑104):
+
+| | Qué identifica | Ejemplo | Quién lo pone |
+|---|---|---|---|
+| **Código de la toma de notas** | Este documento — una familia del trabajo | `TECNO260201-00` | Se teclea. Es el único obligatorio de verdad |
+| **Código de servicio** | El trabajo entero, que puede tener cuatro familias | `TECNO2602` | Se rellena solo con las 9 primeras del de arriba |
+
+**El de servicio se puede corregir a mano y no se vuelve a pisar.** Hay servicios cuyo código no son las nueve primeras; si el programa insistiera, el técnico lo arreglaría y se lo desharía en la siguiente pulsación. La regla está en `CodigoDeServicio.Sugerir`, en el núcleo y con tests: se rellena solo mientras lo que haya sea exactamente lo que dedujo el programa.
+
+De cada uno cuelga algo distinto, y por eso hacen falta los dos: el **nombre del fichero** y el **aviso de duplicados** van por el de la toma de notas; los **identificadores de muestra** (`EBP_SAFETECNO260201`) y la agrupación del calendario, por el de servicio.
+
+> **El aviso de duplicados cambió de criterio con esto.** Comparaba códigos de servicio, y con cuatro familias por trabajo habría saltado en la segunda, la tercera y la cuarta —lo normal, no un descuido— hasta que nadie lo leyera. Ahora compara el de la toma de notas, que es lo que de verdad no debe repetirse. Los ficheros anteriores a este campo no lo traen y se siguen comparando por el de servicio: es lo único que tienen, y dejarlos fuera sería perder la red de seguridad justo en los más antiguos.
+
+### BBDD: encontrar un servicio de hace meses
+
+La cuarta vista (DD‑109). Nació de algo que hoy se hace de viva voz: *«¿te acuerdas de aquel proyecto de Antares con IP65?»*.
+
+| | |
+|---|---|
+| **Columnas** | Código de la toma de notas · acreditación · técnico 1 · técnico 2 · norma · nº de muestras · IP · IK · estado · laboratorio externo |
+| **Filtros propios** | Caja de búsqueda, IP, IK y acreditación |
+| **Qué enseña** | **Todo**, terminados y archivados incluidos |
+
+**Solo lee.** No hay fichero que mantener: sale del mismo escaneo que alimenta el tablero, el calendario y la carga. Pulsar el código abre esa toma de notas en una pestaña, y ahí se edita — aquí no.
+
+**Ignora el filtro compartido, y es a propósito.** Los otros tres arrancan en «En desarrollo», que deja fuera lo terminado y lo archivado; pero lo que se busca en la BBDD casi siempre está terminado. Con el filtro puesto, la vista nacería escondiendo justo lo que se viene a buscar.
+
+**La caja busca en todas las columnas** —código, técnicos, norma, acreditación, laboratorio externo— porque quien recuerda un proyecto no sabe por cuál lo recuerda. Y los desplegables ofrecen **los valores que de verdad hay** en los proyectos leídos: una lista fija ofrecería grados que nadie ha ensayado y, peor, escondería los que sí.
+
+> **El IP y el IK son por muestra; en el listado se enseña el mayor.** Y «mayor» aquí es un criterio del laboratorio, no un orden físico: **manda la segunda cifra** —la del agua— y la primera solo desempata, así que `IP28` es mayor que `IP54`. Proteger del polvo y proteger del agua no se comparan, pero en una columna hay que poner un valor; por eso la regla vive en `GradosDelServicio`, en un solo sitio y con tests. La «X» cuenta como 0 y **«Luminaria ordinaria» es IP20**. En el IK, «No IK» no es un grado bajo: es no haber ensayo, y deja la celda vacía.
+
+> **Al añadir un campo al resumen hay que subir `CacheDeResumenes.Formato`.** La caché guarda resúmenes entre sesiones; sin subirlo, los guardados con la forma anterior se seguirían dando por buenos y el listado enseñaría huecos en blanco durante días —hasta que cada fichero se tocara por su cuenta— sin que nada lo explicara.
 
 #### El mismo servicio, dos ficheros
 
@@ -1495,7 +1703,7 @@ Se comprueba **releyendo el disco**, no mirando el último escaneo: el proyecto 
 
 Del **paso 1**: `codigoServicio` y `numeroMuestras` **ya estaban** promovidos a datos del proyecto desde el principio; los técnicos no. Ahora `DatosProyecto.Tecnico1` y `Tecnico2` son el único sitio que sabe dónde vive ese dato — antes la clave estaba escrita en seis puntos de cuatro proyectos distintos. Se sigue guardando donde siempre, así que **los proyectos ya escritos se leen igual** y el informe sigue enseñando el técnico; hay tests que lo fijan en los dos sentidos.
 
-Del **paso 2** (DD‑84): la norma principal se apunta al elegirla —`PlantillaEnsayos.AplicarA(principal: true)`— y se guarda en el `.lumproj`. Antes se reconstruía del **patrón con el que se nombran las muestras**, que es una *consecuencia* de haberla elegido y no la elección; con dos normas del mismo patrón —IP 60529 y módulos LED 62031 nombran las dos `EBP_SAFE…`— la pregunta se quedaba sin respuesta y acababa decidiéndola el orden alfabético.
+Del **paso 2** (DD‑84): la norma principal se apunta al elegirla —`PlantillaEnsayos.AplicarA(principal: true)`— y se guarda en el `.lmnlab`. Antes se reconstruía del **patrón con el que se nombran las muestras**, que es una *consecuencia* de haberla elegido y no la elección; con dos normas del mismo patrón —IP 60529 y módulos LED 62031 nombran las dos `EBP_SAFE…`— la pregunta se quedaba sin respuesta y acababa decidiéndola el orden alfabético.
 
 > **Un fallo latente que salió al hacerlo.** Al abrir un proyecto, la norma con la que se cargaba era *la primera de las suyas que estuviera instalada*, leída de un `HashSet` cuyo orden no es de fiar. En un servicio de dos normas podía abrirse por la añadida, y entonces **guardar reescribía el patrón de muestras** —`EBP_SAFE` por `EBP_CLIM`— y con él el identificador de todas las muestras del servicio. Ahora manda la principal que apunta el proyecto, y abrir y guardar ya no puede cambiarla.
 
@@ -1505,7 +1713,7 @@ Los ficheros anteriores no traen el campo: se quedan sin principal apuntada y se
 
 ### Los técnicos del laboratorio
 
-Hasta el 2026‑08‑06 el técnico se escribía a mano, y eso producía **la misma persona con tres grafías distintas** —«D. Martínez», «Daniel Martinez», «daniel martínez»—, lo que rompe el filtro del calendario y cualquier recuento por técnico. Ahora **Técnico 1 y Técnico 2 se eligen de una lista**, que arranca vacía y es obligatoria en el caso de Técnico 1.
+Hasta el 2026‑08‑06 el técnico se escribía a mano, y eso producía **la misma persona con tres grafías distintas** —«D. Martínez», «Daniel Martinez», «daniel martínez»—, lo que rompe el filtro del calendario y cualquier recuento por técnico. Ahora **Técnico 1 y Técnico 2 se eligen de una lista**, que arranca sin nadie y es obligatoria en el caso de Técnico 1.
 
 **Técnico 1 es el responsable del proyecto**: es el que sale en el tablero y por el que filtra el calendario.
 
@@ -1514,7 +1722,9 @@ La lista se edita en **«Configuración | Técnicos…»**. Se llamó *Configura
 | Dónde vive | `tecnicos.json` en la **carpeta de proyectos** (la compartida). Mientras no esté elegida, en la carpeta de plantillas |
 |---|---|
 | Por qué ahí | Añadir un técnico se hace una vez y lo ve todo el laboratorio, en vez de repetirlo en cada equipo |
-| Lista de partida | Daniel Martínez, Daniel Pastor, Javier Ibor, Javier Salvador, Mario Madrigal, Raúl González |
+| Lista de partida | **Ninguno** (DD‑132). Solo viene `(sin técnico)`, el cajón de lo que está sin repartir, para que el desplegable no salga en blanco. Antes venían seis nombres cableados: personas de un laboratorio concreto metidas en el ejecutable |
+| Por qué el cajón lleva ese nombre y no «Sin técnico» | Es **el mismo texto** con el que agrupan el calendario, la carga y los filtros. Con dos nombres parecidos, lo elegido a mano y lo que no tiene técnico saldrían en dos filas distintas queriendo decir lo mismo |
+| Qué dice el diálogo | **Dónde va a parar la lista, y son tres casos**: la compartida, el respaldo en la de proyectos, o solo este equipo. Decía «se guarda en la carpeta de proyectos» —falso desde que las dos carpetas se separaron— y mandaba a elegirla a «Gestión de proyectos», que tampoco es donde está. Es el texto que lee quien mantiene la lista para saber si lo que escribe lo verá alguien más, así que equivocarse ahí es peor que callar. Corregido el 2026‑08‑06; la ruta real va en el consejo emergente |
 
 **Las dos operaciones destructivas no son simétricas** (D‑23, decisión del laboratorio):
 
@@ -1555,17 +1765,19 @@ Verde por debajo del 85 %, ámbar hasta el 100 %, **rojo por encima**: ahí el t
 - **El reparto supone esfuerzo uniforme**, y en un laboratorio no lo es: montaje, dos días en cámara sin tocar nada, medida. En un servicio suelto el reparto mensual es impreciso; sobre el conjunto de un técnico los errores se compensan y sirve para planificar, que es para lo que se usa. La alternativa —teclear días por mes a mano— no la rellenaría nadie.
 - **Un servicio sin importe no cuenta**, y se avisa con «N sin importe» junto al técnico, en vez de rebajar su carga en silencio.
 
-El importe es **dato comercial, no de ensayo**: se guarda con la planificación y **no aparece en el informe** que se firma. Aviso dado al laboratorio: el `.lumproj` es texto plano en la carpeta compartida, así que quien tenga acceso a la carpeta ve los importes.
+El importe es **dato comercial, no de ensayo**: se guarda con la planificación y **no aparece en el informe** que se firma. Aviso dado al laboratorio: el `.lmnlab` es texto plano en la carpeta compartida, así que quien tenga acceso a la carpeta ve los importes.
 
 ### El calendario (línea de tiempo)
 
 Pedido el 2026‑08‑06 con Planyway como referencia. Contesta *cuándo toca cada servicio y qué se ha pasado de plazo*. Es una de las **tres vistas de la misma carpeta**, que se eligen con los botones «Tablero», «Calendario» y «Carga».
 
-**Una tarjeta por toma de notas** (DD‑54). Un servicio con 60598‑1 + ‑2‑3 + IK + 62031 sale como una sola barra, porque todo cuelga de la toma de notas principal.
+**Una tarjeta por toma de notas** (DD‑54). Un servicio con 60598‑1 + ‑2‑3 + IK + 62031 sale como una sola barra, porque todo cuelga de la toma de notas principal — ahí las normas se suman, no se reparten.
+
+**Y un tren de tarjetas por trabajo enlazado**, una por familia y pegadas unas a otras (DD‑118, DD‑119). No confundir las dos cosas: **varias normas dentro de una toma de notas** dan una barra entera; **varias tomas de notas del mismo trabajo** dan varias tarjetas seguidas.
 
 | Dato | Dónde vive |
 |---|---|
-| Inicio y fin previstos | `planificacion.inicio` / `.fin` del `.lumproj` |
+| Inicio y fin previstos | `planificacion.inicio` / `.fin` del `.lmnlab` |
 | Estado | `planificacion.estado`: `porHacer`, `enCurso`, `pendienteCliente`, `terminado` (DD‑51) |
 | Recepción de muestras | `planificacion.recepcionMuestras`, **fecha** y no sí/no (DD‑50) |
 | Archivado | `planificacion.archivado` (DD‑52) |
@@ -1576,18 +1788,40 @@ Pedido el 2026‑08‑06 con Planyway como referencia. Contesta *cuándo toca ca
 
 Cambiado el 2026‑08‑06 a petición del laboratorio. El código del servicio **ya va escrito dentro de su barra**, así que repetirlo a la izquierda no aportaba nada. Lo que le falta al responsable es lo contrario: **cuántos servicios lleva cada técnico y cuánto tiempo le ocupan**.
 
-Por defecto los servicios se **agrupan por Técnico 1**, el responsable. Cada grupo abre con una cabecera —nombre en azul, y debajo «3 proyectos · 10 semanas», más «N fuera de plazo» en rojo si los hay— y bajo ella van sus servicios, con el código pequeño y en gris. Se puede desagrupar con la casilla «Agrupar por técnico». Los servicios sin responsable van al final, bajo «(sin técnico)», que es donde se ve lo que falta por asignar.
+Por defecto los servicios se **agrupan por Técnico 1**, el responsable. Cada grupo abre con una cabecera —nombre en azul, «3 proyectos» al lado y «N fuera de plazo» en rojo si los hay— y bajo ella van sus carriles. Se puede desagrupar con la casilla «Agrupar por técnico». Los servicios sin responsable van al final, bajo «(sin técnico)», que es donde se ve lo que falta por asignar.
 
 **La ocupación cuenta días, no suma duraciones** (`Ocupacion.Dias`). Dos servicios que se solapan no ocupan el doble: el técnico está ocupado una vez. Sumar duraciones exageraría la carga justo de quien lleva varios a la vez, que es a quien se busca. Los tramos pegados —uno acaba el lunes, otro empieza el martes— cuentan como uno solo.
 
-Las dos columnas —nombres y barras— **recorren la misma lista de filas** con las mismas alturas: por eso van alineadas y no hay que sincronizar nada.
+Las dos columnas —cabeceras y barras— **recorren la misma lista de filas** con las mismas alturas: por eso van alineadas y no hay que sincronizar nada. **La cabecera del eje reserva ese mismo ancho**, atado a la misma propiedad: si reservara un hueco que el cuerpo no gasta, las semanas dejarían de caer sobre sus barras.
+
+#### Una fila ya no es un trabajo, es un carril
+
+Cambiado el 2026‑08‑06. Antes cada trabajo se llevaba **su propia fila**, así que un técnico con veinte proyectos daba veinte renglones aunque fueran uno detrás de otro y no coincidieran nunca. El calendario se leía **bajando**, cuando lo que se quiere leer es el tiempo, que va en horizontal.
+
+Ahora los trabajos comparten fila mientras no se pisen. Se recorren por fecha de inicio y **cada uno cae en el primer carril donde quepa**, el más alto disponible; solo se abre carril nuevo cuando ya no cabe en ninguno. Tomando siempre el más alto no hace falta probar combinaciones: salen tantos carriles como trabajos coincidan **el día más cargado**, que es el mínimo posible.
+
+Veinte proyectos seguidos pasan de veinte filas a **una**. Y lo que se cuenta hacia abajo deja de ser cuántos proyectos hay y pasa a ser **cuántos coinciden a la vez**, que es lo que el responsable necesita ver.
+
+| Regla | Por qué |
+|---|---|
+| **Compartir un solo día ya es pisarse** | Dos barras pegadas sin hueco se leen como una sola barra larga, y el calendario mentiría sobre cuándo acaba cada una. Con un día de por medio sí comparten carril |
+| La hora se descarta | Las fechas del calendario son días; una guardada con hora mandaba a un carril nuevo un trabajo que empieza cuando el anterior ya ha terminado |
+| Un fin anterior al inicio vale por un solo día | Es un dato mal guardado, y dejar el carril ocupado hacia atrás descolocaría a todos los demás |
+| **Los carriles son por técnico**, no del calendario entero | Si se repartieran todos juntos, dos técnicos que trabajan las mismas semanas compartirían fila y la cabecera dejaría de decir de quién es lo que hay debajo |
+
+El reparto está en `CarrilesDelCalendario`, en el núcleo, para poder probarlo sin ratón. **Los carriles se recolocan al soltar una barra, nunca durante el arrastre**: rehacerlos a media faena destruiría la tarjeta que tiene cogida el ratón y WPF daría el gesto por perdido.
+
+Dos cosas que arrastra el cambio:
+
+- **La columna de la izquierda se queda sin nombres.** Una fila son varios trabajos, así que no hay *un* nombre que poner. No se pierde nada —el código va escrito dentro de cada barra— pero **sin agrupar por técnico esa columna no tiene nada que decir y se encoge a cero**, que si no serían 230 píxeles de calendario tirados.
+- **Abrir la toma de notas se pasa al botón derecho.** Vivía en el nombre de la izquierda, que ha desaparecido. Ahora es un menú contextual sobre la barra, y abre **la familia que se pulsa**, no la cabecera del grupo. El botón izquierdo se queda para lo de siempre: arrastrar, y con un clic abrir la planificación.
 
 Lo que se ve de un vistazo:
 
 - **línea roja vertical de «hoy»** y la semana en curso resaltada en la cabecera;
 - **barra en rojo** si la fecha de fin ya pasó y el servicio no está terminado — este es el valor de todo el invento, lo demás es decoración;
 - **icono de caja** en la barra si las muestras ya están en el laboratorio, y también en la banda de abajo —muestras aquí y todavía sin planificar es lo que corre prisa—. Va dibujado como trazo, no como imagen, para verse nítido a cualquier tamaño y tomar el color de donde se ponga;
-- los servicios **sin fechas** salen en una banda aparte, con un botón «Planificar…», para que no se pierdan de vista.
+- los servicios **sin fechas** salen en una banda aparte, con un botón «Planificar», para que no se pierdan de vista.
 
 **Las barras se arrastran con el ratón** (2026‑08‑06): el centro mueve el servicio entero conservando la duración, el borde izquierdo cambia solo el inicio y el derecho solo el fin. Cuatro detalles que no son evidentes:
 
@@ -1605,15 +1839,16 @@ Lo que sí hay son tres reglas para que eso no se pague en velocidad:
 
 | Regla | Por qué |
 |---|---|
-| El eje encuadra **solo lo que hay**, más dos semanas de margen | Un eje de diez años dejaría el trabajo real en una franja diminuta |
-| Botones **◀ Hoy ▶**, que añaden u ocultan 8 semanas vacías | Así se llega a cualquier año para planificar allí, sin dibujarlos todos de golpe |
+| El eje encuadra **lo que hay**: dos semanas de margen por delante y **medio año por detrás** del último trabajo (DD‑122) | Sin esa cola, arrastrar un trabajo hasta el borde lo dejaba sin calendario debajo donde soltarlo, y el año siguiente ni se dibujaba. Hacia atrás no hace falta: no se planifica en el pasado |
+| Lo encuadran las fechas del **trabajo entero**, no las de su cabecera | Un grupo de cuatro familias estiraba el calendario solo lo que ocupaba la primera |
+| Botones **◀ Hoy ▶**, que añaden u ocultan 8 semanas vacías | Así se llega a cualquier año para planificar allí, sin dibujarlos todos de golpe. Siguen haciendo falta para ir más allá de esos seis meses |
 | **Horizonte de ±5 años** alrededor de hoy, y tope de `MaximoSemanas = 520` | Un año tecleado mal (3026 en vez de 2026) generaría **cien mil semanas** y colgaría la aplicación |
 
 El horizonte **se mueve con la fecha de hoy**, así que no caduca. Un proyecto cuyas fechas caigan fuera **no encuadra el calendario y no se pierde**: baja a la banda «Sin fechas o fuera del periodo», que es justo donde se ve que hay una errata que corregir.
 
 Coste real: el caso habitual son 30–60 semanas; el peor caso posible, 520 celdas de cabecera más 520 líneas de rejilla, que WPF dibuja sin despeinarse.
 
-Al soltar, el eje **se conserva mientras las fechas nuevas sigan cabiendo**, para que el calendario no se desplace bajo el ratón. Arrastrar el servicio que marca el extremo sí lo reencuadra, porque el eje siempre deja dos semanas de margen alrededor de lo que hay.
+Al soltar, el eje **se conserva mientras las fechas nuevas sigan cabiendo**, para que el calendario no se desplace bajo el ratón. Con medio año de cola por detrás (DD‑122) eso es lo normal: arrastrar hacia adelante ya casi nunca lo reencuadra.
 
 El reparto de responsabilidades: `BarraDePlanificacion` y `ArrastreDeFechas` (núcleo, con tests) llevan la aritmética y el estado del gesto; `ArrastreDeBarra` (interfaz) solo traduce eventos de ratón a llamadas y decide las zonas de los bordes.
 
@@ -1628,9 +1863,27 @@ Al llegar al borde de la vista, **el calendario se desplaza solo** mientras se a
 
 > **Cuarta trampa de WPF.** El clic sobre la barra dejó de abrir el diálogo al añadir el arrastre: `ArrastreDeBarra` suelta la captura del ratón en el `PreviewMouseLeftButtonUp`, y al perder la captura WPF **da el `Click` del botón por cancelado**. La solución no es devolver el evento sino asumirlo: el comportamiento decide si el gesto fue clic o arrastre y ejecuta lo que toque. Filtros: técnico, estado, norma y «ver archivados»; el técnico y la norma se rellenan con lo que haya en los proyectos, no con una lista fija.
 
+> **Octava trampa, hermana de la primera: si la lista se rehace, el arrastre se pierde.** Al pasar de una barra a un tren de tarjetas (DD‑119), lo que se arrastra ya no es un elemento fijo de la plantilla sino **un elemento de un `ItemsControl`**. Si al mover la barra se notifica la colección entera, WPF **destruye y vuelve a crear** las tarjetas, se lleva por delante la que tiene cogido el ratón, salta `LostMouseCapture` y el trabajo vuelve solo a su sitio a mitad del gesto. Por eso la lista se construye **una vez** y durante el arrastre se les **recalcula el tramo a los objetos que ya existen**. Regla: **lo que se arrastra no se puede recrear mientras dura el gesto.**
+>
+> Con ella va otra: **el panel de las tarjetas se mueve con ellas**, así que ya no vale de referencia para medir el recorrido del ratón —daría un desplazamiento que se persigue a sí mismo—. La fila se marca con `ArrastreDeBarra.Carril` y es contra ella contra la que se mide; la fila sí se desplaza con el calendario, que es justo lo que el arrastre necesita para seguir al ratón cuando llega al borde.
+
+**La barra: una fila y nada más** (DD‑108). `Tablero · Calendario · Carga · + · Elegir carpeta… · Actualizar · Filtros`. El **«+»** es el alta rápida, con el verde de gestión y el rótulo entero en el consejo emergente. Los tres filtros —estado, técnico y norma— viven dentro de **«Filtros»**, que abre un diálogo donde además cabe explicar cada uno, cosa que en la barra no cabía. Siguen aplicándose **al elegirlos**, no al cerrar: son los mismos de siempre contra el mismo modelo, y meter un «Aceptar» sería cambiar cómo se comportan por haberlos movido de sitio.
+
+> **Un filtro escondido y mudo es peor que un filtro visible.** Al meterlos en el diálogo desaparecía de la barra la única pista de que el tablero no lo enseña todo. Por eso el botón dice **«Filtros (2)»** y se pinta de verde cuando alguno aparta trabajo, y su consejo emergente resume qué se está viendo. Lo decide `ResumenDeFiltros`, en el núcleo y con tests, y ahí está la regla fina: **«En desarrollo» no cuenta como filtro activo** —es lo que hay puesto al abrir, y contarlo dejaría el aviso encendido siempre hasta que nadie volviera a mirarlo—, pero **sí se nombra en el resumen**, porque tampoco lo enseña todo: deja fuera lo terminado y lo archivado.
+
+> **Séptima trampa de WPF: `DataContext` y `Visibility` en el mismo elemento se estorban.** El `DataContext` se aplica **al propio elemento**, no solo a sus hijos, así que también manda sobre sus ataduras. Poniendo `DataContext="{Binding Bbdd}"` y `Visibility="{Binding VistaBbdd}"` en el mismo `Grid`, la visibilidad pasa a buscar «VistaBbdd» **dentro de `BbddViewModel`**, donde no existe: la atadura falla **sin decir nada**, la visibilidad se queda en su valor de por defecto —visible— y la vista aparece encima de las otras tres. La solución es la que ya usaban el calendario y la carga: **dos `Grid` anidados**, el de fuera decide si se ve y el de dentro cambia el contexto.
+>
+> Es de la misma familia que la segunda y la sexta: **WPF no avisa de las ataduras rotas**. Cuando algo aparece donde no debe o no aparece donde debe, lo primero que hay que mirar es contra qué `DataContext` se está resolviendo.
+
+> **Sexta trampa de WPF, y la que más veces ha picado: un `StackPanel` horizontal no envuelve jamás.** La barra de gestión —vistas, botones, tres filtros— era uno, y al estrechar la ventana **lo que no cabía dejaba de dibujarse**: desaparecían «Actualizar» y los filtros de estado, técnico y norma, sin error y sin barra de desplazamiento. Un `WrapPanel` lo arregla y encima se lee mejor. **Cualquier fila de mandos que pueda quedarse sin sitio va en `WrapPanel`, no en `StackPanel`.** Es la misma familia que la segunda trampa: WPF no avisa de que algo no cupo.
+>
+> Con ella va un corolario: **dentro de un `ScrollViewer` horizontal el ancho disponible es infinito**, así que `HorizontalAlignment="Stretch"` no estira nada y `MaxWidth` no fija ninguna anchura. Los campos de la cabecera se quedaron en un hilo al intentarlo. Ahí los anchos tienen que ser fijos.
+>
+> Y un segundo corolario, que se vio al estrechar las tarjetas del calendario: **dentro de un `StackPanel` horizontal, `TextTrimming` no hace nada**. Como el ancho que recibe el texto es infinito, nunca se cree que le falta sitio, así que no pone los puntos suspensivos y **lo que sobra lo recorta el `ClipToBounds` del borde, a mitad de letra**. Un `Grid` con una columna `Auto` para el icono y una `*` para el texto sí le dice lo que le queda.
+
 > **Quinta trampa de WPF.** **Dentro de un `ItemsPanelTemplate` no resuelven las ataduras**: ni `ElementName` ni `RelativeSource AncestorType=ItemsControl`. La plantilla se aplica fuera del árbol donde viven esos nombres, así que la atadura no falla con ruido —simplemente no llega nunca el valor y el panel se queda con el suyo de por defecto. Costó un rato en la portada, intentando decirle a un `UniformGrid` cuántas columnas según el ancho. **Si hace falta que el panel reaccione al tamaño, se usa un `WrapPanel` con elementos de tamaño fijo**, que se recoloca solo y no necesita que nadie le cuente nada.
 
-**Cómo convive con la toma de notas** (DD‑53). La planificación está dentro del `.lumproj`, pero:
+**Cómo convive con la toma de notas** (DD‑53). La planificación está dentro del `.lmnlab`, pero:
 
 - `RepositorioDeProyectos.ActualizarPlanificacion` es lo único que la escribe: relee el fichero, cambia ese trozo y lo vuelve a guardar entero, **sin tocar un solo dato de ensayo**;
 - `Guardar` (el de la toma de notas) **nunca** la escribe desde memoria: la conserva releyéndola del disco.
@@ -1654,19 +1907,39 @@ Sin esa segunda regla, el técnico que tuviera el proyecto abierto desde hacía 
 | **Proyectos** | Abrir, guardar, guardar como, recientes, apertura por doble clic |
 | **Pestañas** | Varios proyectos abiertos a la vez, más el tablero. Aviso de cambios sin guardar al cerrar pestaña y al cerrar la aplicación |
 | **Informe** | HTML A4 con portada, un apartado por página, equipos, comentarios y avisos |
-| **Gestión de proyectos** | Tres vistas de la misma carpeta —tablero, calendario y carga— con **un solo juego de filtros**: estado, técnico y norma. Ninguna opción general trae lo terminado ni lo archivado, y **«(sin técnico)» se puede pedir** para ver lo que falta por repartir. El tablero da columna por proyecto y tarjeta por sección pendiente; cada norma añadida ocupa una sola línea |
-| **Calendario** | Línea de tiempo en semanas ISO, **agrupada por técnico responsable**: estado, recepción de muestras, archivado y aviso de fuera de plazo. **Las barras se arrastran**: el centro mueve, los bordes cambian inicio o fin. Pulsarlas abre su configuración |
-| **Carga por técnico** | Tabla técnicos × meses en porcentaje de ocupación. El trabajo sale del importe (÷ 105 × 1,3 = horas, a 8 h por jornada) y se reparte entre meses por días entre semana, contra una capacidad de 22 días —10 en agosto, 15 en diciembre— |
-| **Técnicos** | Lista compartida del laboratorio, elegible en Técnico 1 y 2 de las cuatro normas. Se edita en `Configuración`; corregir un nombre se propaga a los proyectos, quitarlo no los toca |
+| **Gestión de proyectos** | Cuatro vistas de la misma carpeta —tablero, calendario, carga y BBDD— con **un solo juego de filtros para las cuatro**: estado, técnico, norma, grado IP, grado IK, acreditación y periodo de ensayo, más una **caja de buscar** en la barra. Los seis primeros viven en el botón «Filtros», que lleva la cuenta de los que apartan trabajo. **«(sin técnico)» se puede pedir** para ver lo que falta por repartir, y **«Cualquier estado»** es lo que hace buscable la BBDD (DD‑128). El tablero da columna por proyecto y tarjeta por sección pendiente |
+| **Calendario** | Línea de tiempo en semanas ISO, **agrupada por técnico responsable**: estado, recepción de muestras, archivado y aviso de fuera de plazo. **Las barras se arrastran**: el centro mueve, los bordes cambian inicio o fin. Pulsarlas abre su configuración. Se dibuja siempre **medio año por detrás** del último trabajo, así que siempre hay sitio donde soltar y el salto de año sale solo (DD‑122) |
+| **El calendario cabe** | Pensado para veinte proyectos a la vez (2026‑08‑05): **cada técnico se pliega** —y se recuerda plegado—, «SIN FECHAS O FUERA DEL PERIODO» también, las filas bajan a 36 px **sin encoger la tarjeta**, que sigue midiendo 30, y la cabecera del técnico pasa a una línea: nombre y «n proyectos» juntos. Se fueron las semanas que ocupaba, la ruta de la carpeta, «◀ Hoy ▶» y el rótulo del periodo. Por el tiempo se camina con la **barra horizontal, que ahora está siempre a la vista**: cada columna tiene su propio desplazamiento vertical, atados entre sí (`ScrollSincronizado.EnVerticalCon`), porque con un solo desplazamiento envolviendo las dos la barra quedaba al final del contenido. **Y la columna de nombres reserva debajo un hueco del alto de esa barra**: sin él dispone de 17 px más, llega al final antes y los nombres se separan de sus barras al bajar. El hueco va ahí y no una barra propia, porque un `ScrollViewer` que permite desplazamiento horizontal mide su contenido con ancho infinito y los nombres largos dejarían de recortarse (la sexta trampa) |
+| **Los proyectos comparten fila** | Una fila es un **carril**, no un trabajo (DD‑129): caben todos los que no se pisen, cada uno colocado lo más arriba posible, y solo se abre fila nueva cuando dos coinciden. Veinte proyectos seguidos pasan de veinte filas a una, y **lo que se cuenta hacia abajo es cuántos coinciden a la vez**. Con ello, la columna de la izquierda se queda **solo con las cabeceras de técnico** —el código va escrito dentro de cada barra— y desaparece del todo al desagrupar. Abrir la toma de notas se hace ahora con el **botón derecho** sobre la barra |
+| **Carga por técnico** | Tabla técnicos × meses en porcentaje de ocupación. El trabajo sale del importe (÷ 105 × 1,3 = horas, a 8 h por jornada) y se reparte entre meses por días entre semana, contra una capacidad de 22 días —10 en agosto, 15 en diciembre—. **Lo agrupado cuenta como todo lo demás, cada familia con su importe** (2026‑08‑05): cuatro familias son cuatro ensayos que ocupan cuatro veces. Ojo: una familia **sin fechas propias no entra**, aunque tenga importe — y en los grupos anteriores a DD‑123 solo la cabecera tenía fechas |
+| **Técnicos** | Lista compartida del laboratorio, elegible en Técnico 1 y 2 de todas las normas. Se edita en `Configuración`; corregir un nombre se propaga a los proyectos, quitarlo no los toca |
 | **Cuatro normas** | 60598‑1, 62031, 60529 (IP) y 62262 (IK), cada una con su plantilla y su catálogo de equipos, elegibles desde la portada. Ver sección 16 |
-| **Portada** | Partida por la mitad: normas, abrir y los **tres últimos abiertos** a la izquierda; tablero, calendario y carga a la derecha, cada uno con enlace directo. Encabezada por el nombre del programa y su **versión** |
-| **Alta rápida** | `Archivo \| Nueva toma de notas…` crea el `.lumproj` con **nombre, técnico y norma**, sin pasar por la cabecera ni por «Guardar como». Lo que falta se ve en rojo. El responsable ya tiene tarjeta que planificar antes de que exista un dato de ensayo |
-| **Nombre de fichero** | `TdN_60598_LEDC42502xx-00.lumproj`, compuesto en un solo sitio para los dos caminos que crean fichero. El `xx` y la revisión los lleva el técnico |
+| **Portada** | Partida por la mitad: normas, abrir y los **tres últimos abiertos** a la izquierda; a la derecha, la zona de gestión encabezada por **«Planificar nueva TdN»** —en verde relleno, porque es lo único de esa zona que crea en vez de mirar— y debajo tablero, calendario, carga y BBDD. Encabezada por el nombre del programa y su **versión**. Antes el alta solo estaba en `Archivo`, y quien planifica tenía que ir a buscarla a la zona del que toma notas (2026‑08‑06) |
+| **Alta rápida** | `Archivo \| Nueva toma de notas` crea el `.lmnlab` con **nombre, técnico y norma**, sin pasar por la cabecera ni por «Guardar como». Lo que falta se ve en rojo. El responsable ya tiene tarjeta que planificar antes de que exista un dato de ensayo |
+| **Ventanas compactas** | Las tres que más crecían se apretaron sin quitar mandos (2026‑08‑05 y 06). **Filtros** pasó de 1351 a 934 px: los cuatro valores cortos en dos parejas —norma con acreditación, IP con IK— y fuera el recuadro que repetía por escrito lo que ya dicen los desplegables, que sigue en el consejo emergente del botón. **Nueva toma de notas**: técnico y norma en dos columnas, las explicaciones largas al consejo emergente, y fuera la frase que enumeraba los campos que faltan —los rótulos ya salen en rojo y «Crear» está apagado—. El aviso de esa ventana se quedó solo para lo que no se ve: un fallo al crear |
+| **El código, completo** | 14 caracteres exactos —`TECNO260201-00`—, con el ejemplo siempre a la vista bajo la caja (2026‑08‑06). De ese código salen el de servicio (nueve), el de familia (once), el identificador de las muestras y el nombre del fichero: uno a medias deja los cuatro mal, y corregirlo después obliga a renombrar. **Se exige por los tres caminos** —al dar de alta, para guardar y para ensayar—, porque si no la regla dependería de por dónde hubiera entrado. En el alta, «Crear» sigue apagado; en la cabecera, el campo va en rojo, **no se guarda** y los apartados de ensayo no aparecen hasta que esté entero. Un proyecto anterior a la regla hay que arreglarlo antes de poder escribirlo, y es a propósito (DD‑130). **El fichero no se renombra solo** al corregir el código: mover el registro de un ensayo sin que nadie lo pida no se hace, así que para que el nombre case se usa «Guardar como». La longitud vive en `CodigoDeServicio`, junto a las otras dos que se recortan del mismo código |
+| **Nombre de fichero** | `TdN_60598_TECNO260201-00.lmnlab`, compuesto en un solo sitio para los dos caminos que crean fichero. El nº de familia y la edición van dentro del código, que se teclea una vez en la cabecera |
+| **Los dos códigos** | El de la **toma de notas** (`TECNO260201-00`) identifica el documento y nombra el fichero; el de **servicio** (`TECNO2602`) son sus nueve primeras, se rellena solo y **se puede corregir sin que se vuelva a pisar**. El aviso de duplicados va por el primero, los identificadores de muestra por el segundo |
 | **Aviso de duplicados** | Al crear una toma de notas se comprueba si ese servicio ya existe en la carpeta, comparando sin mayúsculas ni espacios. Se ofrece abrir la que hay, o crear otra a sabiendas |
-| **Trabajos de varias familias** | Campo **«Grupo»** en la planificación: las tomas de notas del mismo trabajo se enlazan y el calendario las enseña en **una sola barra**, con el avance y el importe sumados. El tablero las sigue viendo por separado |
+| **Trabajos de varias familias** | Campo **«Grupo»** en la planificación: las tomas de notas del mismo trabajo se enlazan y el calendario las enseña como **un tren de tarjetas, una por familia**, pegadas unas a otras, cada una con su código, su color de estado, su consejo emergente y su planificación al pulsarla (DD‑118, DD‑119). El avance y el importe salen sumados, y la fila se rotula con el nombre del grupo más «(agrupación)». El tablero las sigue viendo por separado |
+| **El trabajo va en fila** | Al guardar cualquiera de sus tomas de notas, el grupo **se recoloca y se escribe** (DD‑123): cada una empieza al día siguiente de que acabe la anterior y conserva su duración; sin fin, una semana; sin nada, mañana. **El orden lo dan las fechas de inicio** —adelantar una familia es ponerle una fecha anterior— y se avisa de cuáles se han movido. Se acabaron las dos verdades: el diálogo, el calendario, la BBDD y la exportación leen lo mismo |
+| **Arrastrar el trabajo** | Cogiendo cualquier tarjeta se mueve entero, conservando las distancias; los bordes de fuera lo estiran y tocan solo la familia de ese extremo (`RepartoDelArrastre`). El gesto se guarda **de una vez**, no familia a familia, para que la cadena no se recoloque contra datos a medias |
+| **BBDD** | Cuarta vista de gestión: el listado de las tomas de notas. Solo lee — es una lente sobre el mismo escaneo, no un fichero que mantener (DD‑109). **Ya no tiene filtros propios**: obedece al juego compartido, incluido el estado, así que para lo archivado hay que pedir «Cualquier estado». Enseña además **cuándo se ensayó** cada una |
+| **Cuándo se ensayó** | Al dar un servicio por **terminado**, el programa apunta solo la primera y la última fecha escritas en su toma de notas (`FechasDelEnsayo`). De ahí sale el **filtro por periodo** de la BBDD: «qué se hizo en el primer trimestre» se contesta sin que el técnico teclee un dato más. No sustituyen a las fechas de la planificación —aquellas son las previstas, estas las que ocurrieron— y entra lo que **se solapa** con el periodo, no solo lo que cabe dentro |
+| **Planificación en la toma de notas** | Botón **«Planificación»** entre «Guardar» y «Exportar», con el verde de gestión. Enseña fechas, recepción de muestras, estado, archivado, importe y agrupación, y avisa de lo que corre prisa: fuera de plazo, muestras sin llegar, archivado. El **estado se edita ahí mismo** y se escribe al elegirlo, con `ActualizarPlanificacion` — nunca con `Guardar`, así que no pisa datos de ensayo (DD‑53 en el sentido contrario). Lo demás se edita en el mismo diálogo del tablero. **No sale en el informe**: `LumNotas.Report` no menciona la planificación. Su botón **«Ver en el calendario»** salta a gestión buscando las once primeras del código y **deja los filtros como haga falta para que el servicio se vea**: fuerza el estado solo si está terminado o archivado —los dos casos que lo esconden— y pone el técnico responsable, o «(todos)» si ese técnico no está en la lista. Al principio no tocaba los filtros y llevaba a un calendario vacío; parecía roto (2026‑08‑05) |
+| **Estados de un servicio** | Por planificar, **Planificado**, En curso, Pendiente cliente y Terminado, en ese orden (2026‑08‑05). «Por planificar» se llamaba «Por hacer»; el nombre interno se queda como estaba porque es lo que llevan escrito los ficheros ya guardados |
+| **Lo único que esconde es archivar** | «En desarrollo» trae todo lo que no esté archivado, **terminados incluidos** (2026‑08‑05). Antes los dejaba fuera y eso escondía trabajo vivo: un servicio terminado la semana pasada se sigue mirando. Pedir un estado concreto trae ese y solo ese, y sigue dejando fuera lo archivado |
+| **Fechas bloqueadas** | Interruptor en **los dos sitios donde se ponen fechas** —el diálogo de planificación y el alta rápida— y **candado dibujado en la tarjeta**, junto al icono de la caja. Con él puesto no las mueve nadie: ni el diálogo —las casillas se apagan—, ni el arrastre —basta con que una familia esté bloqueada para que no se arrastre el trabajo, porque coger una tarjeta las mueve todas—, ni **la cadena de un grupo**, que es la vía por la que se rompería sin que nadie lo viera venir. Es para lo comprometido con el cliente |
+| **Cerrar el servicio** | Al **exportar** —siempre, esté como esté— y al completarse el último apartado —una vez por pestaña—, se ofrece pasar el servicio a terminado o archivado. Es lo que evita que la toma de notas quede hecha y el calendario siga diciendo que está en curso durante semanas |
+| **Acreditación** | Obligatoria y múltiple: «Sin acreditar», ENAC, ENEC y CB, con «Sin acreditar» excluyente. Sale en la exportación HTML, que no es un certificado sino la toma de notas que verifica y firma el director técnico (DD‑111) |
+| **Laboratorios externos** | Recuadro «Otros colaboradores» en la cabecera: tantas filas como haga falta, cada una con el laboratorio y **el ensayo y el motivo juntos**. Opcional, texto libre, y consta en la exportación (DD‑110) |
+| **Los dos códigos** | El de la **toma de notas** (`TECNO260201-00`) identifica el documento y nombra el fichero; el de **servicio** son sus nueve primeras, se rellena solo y se puede corregir sin que se vuelva a pisar (DD‑104) |
+| **Grado del servicio** | El IP y el IK de cada muestra suben al listado como **el mayor**, con la regla del laboratorio: manda la segunda cifra y la primera desempata (DD‑112) |
+| **Lo que hace falta para guardar** | Código de la toma de notas —**entero**, 14 caracteres (DD‑130)— y técnico 1, y nada más: sin ellos el fichero no se puede ni nombrar ni atribuir. Ensayar exige mucho más, pero un servicio a medias tiene que poder guardarse (DD‑115) |
+| **.NET 10** | Se saltó de .NET 8 antes de repartir el programa, porque su soporte termina en noviembre de 2026. Costó cinco líneas: el programa no tiene ni una dependencia externa (DD‑107) |
 | **Reportar un problema** | `Ayuda` da el correo de quien mantiene el programa con los datos que hacen falta para reproducir un fallo y acceso al registro de errores |
 | **Normas con año** | El `id` de una plantilla lleva norma, parte y año (`60598-1_2024`), y el fichero se llama `plantilla-<id>_<version>.json`. **Dos años de la misma norma conviven en la misma carpeta**; de un mismo id solo cuenta la versión más alta. Los proyectos guardados con el id antiguo siguen encontrando la suya por `idsAnteriores` |
-| **Trazabilidad de plantilla** | Cada `.lumproj` guarda con qué versión se registró, el informe **declara esa** y no la instalada al imprimir, y al abrir un proyecto grabado con otra versión se avisa |
+| **Trazabilidad de plantilla** | Cada `.lmnlab` guarda con qué versión se registró, el informe **declara esa** y no la instalada al imprimir, y al abrir un proyecto grabado con otra versión se avisa |
 | **Carga en horas** | El trabajo se mide `importe ÷ 105 × 1,3` = horas, a 8 h por jornada — la cuenta del laboratorio, que sale a 80,77 €/h. Los tres números se editan por separado, con la equivalencia a la vista |
 | **Grado por muestra** | IP e IK se eligen en la fila de cada muestra, con el atajo «Luminaria ordinaria». La fila es idéntica en las tres normas que la usan |
 | **Dos carpetas de OneDrive** | Una de proyectos y otra compartida (normas, técnicos, tarifa, versión). Se eligen en `Configuración` y se preguntan solas la primera vez |
@@ -1682,16 +1955,19 @@ Sin esa segunda regla, el técnico que tuviera el proyecto abierto desde hacía 
 | Alta | **Filtro por antigüedad al escanear** («leer solo los últimos 2 años»). Propuesto el 2026‑08‑02 y **pendiente de confirmar el valor por defecto**. Es el único filtro que evita *leer*, no solo *ver*: importa en un equipo nuevo y cuando se publica una norma, que invalida la caché entera. Debe decir siempre cuántos proyectos ha dejado fuera |
 | Media | **Calibración de los equipos.** Ya se registra qué equipo se usó en cada apartado; si el catálogo llevara su fecha de calibración, el programa podría avisar de que un equipo estaba fuera de calibración el día del ensayo. Media función hecha y sin aprovechar — es la no conformidad que detecta el programa antes que el auditor |
 | Media | **Duplicar una toma de notas.** Un trabajo lleva varias familias y todas comparten cliente, código y técnicos. El alta rápida y el enlace por grupo alivian la mitad del problema; lo que falta es **arrancar una familia desde otra ya rellena**, sin repetir la cabecera cuatro veces |
-| Baja | **Buscar en el tablero.** Con años de clientes no hay caja de búsqueda |
-| Baja | **Exportar el calendario o la carga**, para enviarlos a quien no abre el programa. El exportador de HTML ya existe |
+| Media | **Arrastrar la frontera entre dos familias** para mover su fecha de corte. Es **una sola fecha** —el fin de la familia de la izquierda; el inicio de la siguiente sale de la cadena (DD‑123)—, así que el dato es sencillo. Con el tren de tarjetas (DD‑119) la frontera ya es el **borde real** de un elemento real, así que lo que queda es que `ArrastreDeBarra` distinga ese borde del de fuera y escriba solo esa fecha. Se dejó aparte a propósito, para que si algo se rompe se sepa qué lo rompió |
+| Baja | **Exportar el calendario, la carga o el listado**, para enviarlos a quien no abre el programa. El exportador de HTML ya existe |
+| Baja | **Los selectores de fecha dicen «Select a date»**, en inglés: es el texto de fondo por defecto de WPF. Afecta a la planificación y al alta. Se arregla poniéndoles el idioma |
+| Baja | **Los botones de la zona de gestión de la portada no tienen nombre accesible.** Su contenido son dos líneas de texto en vez de una cadena, así que la automatización —y un lector de pantalla— ven un botón sin nombre. Con el ratón funcionan igual. Una línea por botón (`AutomationProperties.Name`) lo arregla. Detectado el 2026‑08‑06 al probar «Planificar nueva TdN», que hubo que pulsar por posición |
+| Baja | **Arrastrar la frontera entre dos familias** de un mismo trabajo para mover su fecha de corte. Es **una sola fecha** —el fin de la de la izquierda; el inicio de la siguiente sale de la cadena (DD‑123)—, y desde el tren de tarjetas esa frontera ya es el **borde real** de un elemento real: lo que falta es que `ArrastreDeBarra` distinga ese borde del de fuera |
 | Baja | **Las tarjetas de clase, Ta y partes ‑2 siguen escritas a mano en el XAML.** Solo se muestran y se exigen donde la norma las declara, pero el asterisco de obligatorio es texto fijo. Se generalizó la cabecera entera el 2026‑08‑01 y **el laboratorio pidió revertirlo**: la pantalla de luminarias se da por buena y no se toca |
-| Media | **`MainWindow.xaml` se ha hecho grande de verdad.** Ya son tres vistas de gestión —tablero, calendario y carga— dentro del mismo fichero, además de la toma de notas y la portada. Toca partirlo en diccionarios de recursos, uno por vista. Ha subido de prioridad porque cada añadido nuevo cuesta más de encontrar |
+| **Alta** | **`MainWindow.xaml` se ha hecho grande de verdad.** Ya son **cuatro** vistas de gestión —tablero, calendario, carga y BBDD— dentro del mismo fichero, además de la toma de notas y la portada. Toca partirlo en diccionarios de recursos, uno por vista. **Ha vuelto a subir de prioridad**: con la BBDD y el tren de tarjetas, encontrar dónde tocar cuesta ya más que el cambio en sí |
 | Alta | **Selectores de fecha y hora en la toma de notas.** Hoy se escriben como texto (`20/07/2026 23:40`). Es lo que más molestará en uso real. La planificación ya usa `DatePicker`, así que el patrón a seguir está hecho |
 | Alta | **Campos calculados de solo lectura.** El radio del arco de lluvia y las dos fuerzas de carga estática están implementados y con tests en `Calculos.cs`, pero la interfaz no sabe mostrar un campo calculado: se rellenan a mano |
 | Media | **Selección automática de equipos IP** (`seleccionAutomaticaEquipos`): declarada en la plantilla, no implementada |
 | Media | **Perfil de usuario** (DD‑08). Con la lista de técnicos ya hecha, lo que falta es saber **quién** está usando el programa, para firmar quién guardó cada cosa |
 | Baja | **La cabecera del calendario no se queda fija al desplazarse en vertical.** Con muchos proyectos habrá que congelarla |
-| Media | **Instalador** y asociación de la extensión `.lumproj`. Estudiado el 2026‑08‑02: la recomendación es **ClickOnce** publicando a una carpeta de red —cada equipo instala una vez y se actualiza solo al arrancar—, con **Inno Setup** como plan B. Publicar **autocontenido**, para no instalar .NET 8 en cada equipo. SmartScreen avisará la primera vez por no estar firmado; firmar cuesta 200‑400 €/año. **No repartirlo hasta que el programa haya pasado un ensayo real completo**: sería repartir el mismo problema a seis ordenadores |
+| Media | **Instalador** y asociación de la extensión `.lmnlab`. La recomendación es **ClickOnce** publicando a una carpeta de red —cada equipo instala una vez y **se actualiza solo al arrancar**—, con **Inno Setup** como plan B. Publicar **dependiente del framework** e instalar el *.NET Desktop Runtime* en cada equipo (DD‑107): son unos MB por actualización en vez de 130, y los parches del runtime llegan por Windows Update. SmartScreen avisará la primera vez por no estar firmado; firmar cuesta 200‑400 €/año. **No repartirlo hasta que el programa haya pasado un ensayo real completo**: sería repartir el mismo problema a seis ordenadores |
 | Baja | Con 30 muestras el informe A4 no cabe: habría que girar la tabla o partirla |
 
 ### Pendiente del laboratorio
@@ -1704,17 +1980,27 @@ Además, la lista de normas que admite la **62031** (`meta.normasCompatibles`) l
 
 - **Login con usuario, contraseña y recuperación por email** (consultado el 2026‑08‑02). En una aplicación de escritorio con ficheros JSON en una carpeta compartida, un login **no protege nada**: los datos se abren con el Bloc de notas sin pasar por él, y los permisos que comprueba el propio programa se saltan cerrando el programa. Lo que hace falta para la ISO 17025 no es autenticación sino **trazabilidad** —quién guardó y cuándo—, que es el perfil de usuario ya pendiente (DD‑08) y cuesta un par de días. Si algún día hay servidor, la autenticación se delega en **Entra ID**, que el laboratorio ya paga con Microsoft 365, en vez de escribir la nuestra.
 - **Varias ventanas** en lugar de pestañas: se valoró por ser mucho más barato, pero el laboratorio prefirió pestañas.
-- **Contraseña para entrar en «Configuración»** (consultado el 2026‑08‑06, al aparecer los importes de las ofertas). Se descartó tras verlo, **porque protegía lo que no importaba**: detrás de ese menú solo están la lista de técnicos y la tarifa, mientras que los importes viven en los `.lumproj` y se ven de tres maneras que no pasan por ahí —el diálogo de cualquier barra del calendario, el Bloc de notas sobre el fichero, y la vista Carga—. Es echar la llave al cajón de los bolígrafos con la caja fuerte abierta.
+- **Contraseña para entrar en «Configuración»** (consultado el 2026‑08‑06, al aparecer los importes de las ofertas). Se descartó tras verlo, **porque protegía lo que no importaba**: detrás de ese menú solo están la lista de técnicos y la tarifa, mientras que los importes viven en los `.lmnlab` y se ven de tres maneras que no pasan por ahí —el diálogo de cualquier barra del calendario, el Bloc de notas sobre el fichero, y la vista Carga—. Es echar la llave al cajón de los bolígrafos con la caja fuerte abierta.
   Añadido a esto, la recuperación no tenía salida decente: sin servidor, la recuperación por correo obligaría a incrustar las credenciales del servidor de correo en el programa, de donde las saca cualquiera. **Si algún día hay que impedir que alguien vea los importes, la respuesta son los permisos de la carpeta** —OneDrive o Windows sobre una subcarpeta—, que sí los respeta el sistema operativo, no una comprobación que hace el propio programa y que se salta cerrándolo.
 
 ### Cómo retomar
 
 ```bash
+dotnet build "…\AplicacionTomaNotas\LumNotas.sln"
 dotnet test "…\AplicacionTomaNotas\LumNotas.sln"
 dotnet run --project "…\AplicacionTomaNotas\src\LumNotas.App"
 ```
 
-Si los **344 tests** pasan, el motor y las cuatro plantillas están sanos. La mayoría de los cambios de norma se hacen **editando el JSON de esa norma** en `plantilla/`, sin tocar código; añadir una norma entera es dejar caer un fichero `plantilla-*.json` en esa carpeta.
+> **`dotnet test` NO reconstruye la aplicación.** Compila el núcleo y los tests, y se para
+> ahí: `LumNotas.App` no es un proyecto de pruebas. Quien cambie algo de la ventana, pase
+> los tests en verde y abra el programa a mirar, estará mirando **el ejecutable de antes**
+> — y concluirá que su cambio no funciona. Pasó tres veces en un solo día (2026‑08‑05).
+> Por eso el `build` va primero en la lista de arriba.
+>
+> Si el `build` falla con `MSB3027 / MSB3021`, no es un error de código: hay una instancia
+> del programa abierta y el `.exe` está bloqueado. Ciérrala.
+
+Si los **562 tests** pasan, el motor y las cinco plantillas están sanos. La mayoría de los cambios de norma se hacen **editando el JSON de esa norma** en `plantilla/`, sin tocar código; añadir una norma entera es dejar caer un fichero `plantilla-*.json` en esa carpeta.
 
 **Dónde poner cada cosa**, que es lo que más se ha repetido al construir esto:
 
@@ -1725,7 +2011,9 @@ Si los **344 tests** pasan, el motor y las cuatro plantillas están sanos. La ma
 | Un filtro nuevo del tablero | `GestionViewModel`, **no** en una vista: valen para las tres |
 | Algo compartido por el laboratorio | La carpeta compartida, y reflejado en `Configuración \| Carpetas…` |
 
-**Ninguno de los 344 tests toca la interfaz**, así que lo que se apoye en WPF hay que escribirlo de forma que la lógica quede fuera. No es purismo: en este equipo no se pueden automatizar los eventos de ratón, y sacar la lógica del gesto al núcleo fue la única manera de comprobar el arrastre del calendario.
+**Ninguno de los 449 tests toca la interfaz**, así que lo que se apoye en WPF hay que escribirlo de forma que la lógica quede fuera. No es purismo: en este equipo no se pueden automatizar los eventos de ratón, y sacar la lógica del gesto al núcleo fue la única manera de comprobar el arrastre del calendario.
+
+> **Lo que sí se puede comprobar a mano, y durante meses se dio por imposible.** **UI Automation sí acciona esta aplicación**: botones, menús y submenús, leyendo además si una entrada está marcada. Lo que fallaba no era la automatización sino dónde se buscaba: **los diálogos y los menús emergentes de WPF no cuelgan del árbol de la ventana principal**. Hay que buscarlos desde el escritorio (`AutomationElement.RootElement`) acotando por identificador de proceso, o enumerando ventanas con `EnumWindows`. Con eso se puede recorrer un menú, abrir un diálogo y fotografiarlo — que es como se han verificado los últimos cambios de pantalla.
 
 ### Punto ciego cerrado
 
@@ -1752,9 +2040,9 @@ Además aparece `Datos ensayo IK-LUM`, el motor de cálculo del IK para luminari
 | Norma | Fichero | Secciones | Apartados |
 |---|---|---|---|
 | Luminarias — EN IEC 60598‑1:2024 + A11:2024 | `plantilla-60598-1_2024_1.0.0.json` | 16 | 45 |
-| Módulos LED — EN 62031:2020 + A11:2021 | `plantilla-62031_2020_A11_1.0.0.json` | 16 | 26 |
-| Grados IP — EN 60529:2018 | `plantilla-60529_2018_1.0.0.json` | 3 | 3 |
-| Grados IK — EN 62262:2002 + A1:2021 | `plantilla-62262_2002_A1_1.0.0.json` | 2 | 2 |
+| Módulos LED — EN IEC 62031:2020 + A11:2021 | `plantilla-62031_2020_A11_1.0.0.json` | 16 | 26 |
+| Grados de protección IP — EN 60529:1991 + enmiendas | `plantilla-60529_1991_1.0.0.json` | 3 | 3 |
+| Grados de protección IK — EN 62262:2002 + A1:2021 | `plantilla-62262_2002_A1_1.0.0.json` | 2 | 2 |
 
 Cada una trae su catálogo de equipos importado por separado (DD‑34): `equipos-60598`, `equipos-62031` (20 grupos), `equipos-60529` (3 grupos) y `equipos-62262` (1 grupo).
 
@@ -1782,11 +2070,11 @@ El motor, el almacenamiento, el árbol, el informe y el tablero ya eran genéric
 | `Clase` era un campo aparte | Vive en el almacén general, bajo `proyecto.clase` |
 | `App.xaml.cs` cargaba una plantilla fija | `CatalogoDeNormas` lista las que haya en la carpeta; añadir una norma es **dejar caer un fichero**, sin recompilar |
 
-El formato `.lumproj` gana `normas`, `patronIdentificador` y `selecciones`, y **sigue leyendo el formato antiguo**: los proyectos de luminarias ya guardados abren sin perder nada.
+El formato `.lmnlab` gana `normas`, `patronIdentificador` y `selecciones`, y **sigue leyendo el formato antiguo**: los proyectos de luminarias ya guardados abren sin perder nada.
 
 ### Cómo se elige la norma
 
-**En la portada**, eligiendo su tarjeta. No hay selector en la cabecera: la norma se decide al empezar y no se conmuta sobre un proyecto a medias, porque cada una tiene su cabecera, sus apartados y sus equipos. Al abrir un `.lumproj` se carga la norma con la que nació, no la que estuviera en pantalla.
+**En la portada**, eligiendo su tarjeta. No hay selector en la cabecera: la norma se decide al empezar y no se conmuta sobre un proyecto a medias, porque cada una tiene su cabecera, sus apartados y sus equipos. Al abrir un `.lmnlab` se carga la norma con la que nació, no la que estuviera en pantalla.
 
 ### Añadir normas a un servicio
 
@@ -1819,7 +2107,7 @@ Al marcar una norma:
 - Cada norma evalúa con **su propio motor** y usa **su propio catálogo de equipos**.
 - El contador de la cabecera **suma todas las normas** (`IndicadorDeAvance.Resultado.Sumar`).
 - El **informe HTML las incluye todas**: la portada lista las normas y cada una abre con su portadilla antes de sus apartados.
-- El `.lumproj` recuerda cuáles lleva, y al abrirlo se recargan solas.
+- El `.lmnlab` recuerda cuáles lleva, y al abrirlo se recargan solas.
 
 Desmarcar una norma retira sus apartados pero **no borra lo anotado**: si se vuelve a marcar, los datos siguen ahí.
 

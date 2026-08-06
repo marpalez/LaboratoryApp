@@ -1,0 +1,87 @@
+{
+  "formato": "lmnlab/1",
+  "versionPlantilla": "1.0.0",
+  "guardadoEl": "2026-08-06T14:53:16.2962485+02:00",
+  "codigoTomaDeNotas": "IPLUM270110-00",
+  "colaboradores": [],
+  "codigoServicio": "IPLUM2701",
+  "numeroMuestras": 1,
+  "normas": [
+    "60598-1_2021"
+  ],
+  "normaPrincipal": "60598-1_2021",
+  "patronIdentificador": "EBP_SAFE{codigoServicio}",
+  "planificacion": {
+    "inicio": "2027-01-02T00:00:00",
+    "fin": "2027-01-17T00:00:00",
+    "estado": "porHacer",
+    "recepcionMuestras": "2026-12-24T00:00:00",
+    "archivado": false,
+    "importe": 3921,
+    "fechasBloqueadas": false
+  },
+  "selecciones": {
+    "partes2": [
+      "-2-1"
+    ],
+    "acreditacion": [
+      "ENAC"
+    ]
+  },
+  "partes2": [],
+  "ipSegundaCifra": [],
+  "ipPrimeraCifra": [],
+  "valores": [
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico1",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Javier Ibor"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "tecnico2",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "Javier Salvador"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "clase",
+      "muestra": 0,
+      "tipo": "texto",
+      "valor": "I"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ta",
+      "muestra": 0,
+      "tipo": "numero",
+      "valor": "25"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "luminariaOrdinaria",
+      "muestra": 1,
+      "tipo": "bool",
+      "valor": "true"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipPrimeraCifra",
+      "muestra": 1,
+      "tipo": "texto",
+      "valor": "IP2X"
+    },
+    {
+      "ambito": "proyecto",
+      "campo": "ipSegundaCifra",
+      "muestra": 1,
+      "tipo": "texto",
+      "valor": "IPX0"
+    }
+  ],
+  "na": [],
+  "checklists": []
+}

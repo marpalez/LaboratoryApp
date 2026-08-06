@@ -3,8 +3,10 @@
     "id": "60598-1_2021",
     "codigoDeFichero": "60598",
     "anioDePublicacion": "2021",
+    "edicion": "9",
     "titulo": "Luminarias — EN IEC 60598-1:2021 + A11:2022 y partes -2",
     "tituloCorto": "Luminarias",
+    "designacion": "EN IEC 60598-1:2021 + A11:2022",
     "normasCompatibles": ["62031_2020_A11"],
     "notaCompatibles": "No admite la 60529 ni la 62262: el IP y el IK ya están dentro de esta toma de notas. El IK se elige por muestra y su sección aparece sola en cuanto alguna lo lleva.",
     "version": "1.0.0",
@@ -51,7 +53,11 @@
 
   "proyecto": {
     "campos": [
-      { "id": "codigoServicio", "etiqueta": "Código de servicio", "tipo": "texto", "formato": "NNNNNAAAA", "obligatorio": true, "origenExcel": "RESUMEN PROYECTO LUM!D3" },
+      { "id": "codigoTomaDeNotas", "etiqueta": "Código de la toma de notas", "tipo": "texto", "obligatorio": true, "nota": "Ejemplo: TECNO260201-00" },
+      { "id": "acreditacion", "etiqueta": "Acreditación", "tipo": "seleccion", "multiple": true, "obligatorio": true,
+        "opciones": ["Sin acreditar", "ENAC", "ENEC", "CB"], "opcionExcluyente": "Sin acreditar",
+        "nota": "Un servicio puede ser varias a la vez. «Sin acreditar» es excluyente." },
+      { "id": "codigoServicio", "etiqueta": "Código de servicio", "tipo": "texto", "formato": "NNNNNAAAA", "obligatorio": true, "nota": "Ejemplo: TECNO2602", "origenExcel": "RESUMEN PROYECTO LUM!D3" },
       { "id": "tecnico1", "etiqueta": "Técnico 1", "tipo": "texto", "obligatorio": true, "origenExcel": "RESUMEN PROYECTO LUM!C5" },
       { "id": "tecnico2", "etiqueta": "Técnico 2", "tipo": "texto", "origenExcel": "RESUMEN PROYECTO LUM!C6" },
       { "id": "numeroMuestras", "etiqueta": "Nº de muestras", "tipo": "entero", "min": 1, "max": 30, "obligatorio": true, "origenExcel": "RESUMEN PROYECTO LUM!D8" },

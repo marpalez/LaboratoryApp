@@ -79,7 +79,7 @@ public sealed class CampoViewModel : ObservableObject
                           int numeroMuestras, Action alCambiar, string? etiquetaPrefijo = null,
                           bool? porMuestra = null)
     {
-        Etiqueta = etiquetaPrefijo is null ? campo.Etiqueta : $"{etiquetaPrefijo} · {campo.Etiqueta}";
+        Etiqueta = etiquetaPrefijo is null ? campo.Etiqueta : $"{etiquetaPrefijo} | {campo.Etiqueta}";
         Unidad = campo.Unidad;
         Nota = campo.Nota;
         PorMuestra = porMuestra ?? campo.PorMuestra;

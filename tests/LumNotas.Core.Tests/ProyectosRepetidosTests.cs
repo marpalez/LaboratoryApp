@@ -49,9 +49,9 @@ public class ProyectosRepetidosTests
     {
         var carpeta = new[]
         {
-            Existente("ANTAR2504", @"C:\clientes\antares\a.lumproj"),
-            Existente("ANTAR2505", @"C:\clientes\antares\b.lumproj"),
-            Existente("antar 2504", @"C:\clientes\otro\c.lumproj", "Mario Madrigal")
+            Existente("ANTAR2504", @"C:\clientes\antares\a.lmnlab"),
+            Existente("ANTAR2505", @"C:\clientes\antares\b.lmnlab"),
+            Existente("antar 2504", @"C:\clientes\otro\c.lmnlab", "Mario Madrigal")
         };
 
         var repetidos = ProyectosRepetidos.ConElMismoCodigo(carpeta, "ANTAR2504");
@@ -64,7 +64,7 @@ public class ProyectosRepetidosTests
     [Fact]
     public void UnProyectoNoChocaConsigoMismo()
     {
-        var propio = @"C:\clientes\antares\a.lumproj";
+        var propio = @"C:\clientes\antares\a.lmnlab";
         var carpeta = new[] { Existente("ANTAR2504", propio) };
 
         Assert.Empty(ProyectosRepetidos.ConElMismoCodigo(carpeta, "ANTAR2504", propio));
@@ -80,7 +80,7 @@ public class ProyectosRepetidosTests
     [Fact]
     public void UnProyectoIlegibleNoCuentaComoRepetido()
     {
-        var roto = AnalizadorDeProyectos.NoLegible(@"C:\clientes\roto.lumproj", DateTime.Now, "json mal formado");
+        var roto = AnalizadorDeProyectos.NoLegible(@"C:\clientes\roto.lmnlab", DateTime.Now, "json mal formado");
 
         Assert.Empty(ProyectosRepetidos.ConElMismoCodigo([roto], "ANTAR2504"));
         Assert.Empty(ProyectosRepetidos.ConElMismoCodigo([roto], ""));

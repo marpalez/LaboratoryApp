@@ -30,6 +30,9 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
             AlExplorar = RefrescarAvisos
         };
 
+        // Desde el panel de planificación de una toma de notas se salta al calendario.
+        Servicios.VerEnElCalendario = VerEnElCalendario;
+
         NuevaPestana = new Comando(() => AbrirPestana());
         CerrarPestana = new ComandoCon<object>(Cerrar);
         ActivarPestana = new ComandoCon<object>(p => Activo = p);
@@ -265,13 +268,11 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
 
     public string Titulo => ActivoDocumento?.Titulo ?? NombreDelPrograma;
 
-    private string _mensaje = "";
-
-    public string Mensaje
-    {
-        get => _mensaje;
-        private set => Establecer(ref _mensaje, value);
-    }
+    // La franja oscura del pie de ventana se quitó el 2026‑08‑06 (DD‑133), y con ella la
+    // propiedad que la alimentaba. Ocupaba sitio en todas las pantallas para no decir nada
+    // casi nunca. Lo que se decía por ahí se repartió: **lo que falla va a una ventana**
+    // —no se pudo abrir, guardar o exportar, y qué falta para poder guardar— y **las
+    // confirmaciones se quitaron**, porque ya se veían por otro lado.
 
     // ---- pestañas ----------------------------------------------------------
 
@@ -293,7 +294,6 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
 
         documento.Cambio = () =>
         {
-            Mensaje = documento.Mensaje;
             Notificar(nameof(Titulo));
             Notificar(nameof(HayDocumento));
         };
@@ -333,6 +333,48 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
         Activo = Gestion;
     }
 
+    /// <summary>
+    /// Salta al calendario buscando un servicio. Lo pide la toma de notas, desde su panel
+    /// de planificación: es el camino de «lo tengo delante, enséñame cuándo tocaba».
+    /// <para>
+    /// <b>Deja los filtros como haga falta para que se vea.</b> Antes no los tocaba, y un
+    /// servicio terminado o archivado llevaba a un calendario vacío: el botón parecía roto
+    /// (2026‑08‑05). El estado solo se cambia en esos dos casos; el técnico, siempre, para
+    /// dejar su fila a la vista.
+    /// </para>
+    /// </summary>
+    public void VerEnElCalendario(DestinoDelCalendario destino)
+    {
+        if (string.IsNullOrWhiteSpace(destino.Codigo)) return;
+
+        Gestion.Busqueda = destino.Codigo;
+
+        if (destino.Estado is { } estado) Gestion.Estado = estado;
+        Gestion.Tecnico = TecnicoQueSePuedeElegir(destino.Tecnico);
+
+        AbrirGestion(Vista.Calendario);
+    }
+
+    /// <summary>
+    /// El técnico del servicio, si está entre los que ofrece el desplegable. Si no lo está
+    /// —el proyecto vive fuera de la carpeta que se escanea, o su responsable ya no tiene
+    /// ningún otro— se pone «(todos)»: filtrar por alguien que no está en la lista dejaría
+    /// el calendario vacío, que es justo lo que este botón viene a evitar.
+    /// </summary>
+    private string TecnicoQueSePuedeElegir(string? tecnico)
+    {
+        var suyo = (tecnico ?? "").Trim();
+
+        if (string.IsNullOrEmpty(suyo))
+            return Gestion.Tecnicos.Contains(CargaPorTecnico.SinTecnico)
+                ? CargaPorTecnico.SinTecnico
+                : GestionViewModel.Cualquiera;
+
+        return Gestion.Tecnicos.FirstOrDefault(
+            t => string.Equals(t, suyo, StringComparison.CurrentCultureIgnoreCase))
+            ?? GestionViewModel.Cualquiera;
+    }
+
     private void EmpezarCon(NormaDisponible norma)
     {
         var documento = ActivoDocumento ?? AbrirPestana();
@@ -356,8 +398,9 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
                     .FirstOrDefault(d => string.Equals(d.Ruta, ruta, StringComparison.OrdinalIgnoreCase))
             is { } yaAbierto)
         {
+            // No se dice nada: la pestaña salta sola a la que ya estaba abierta, y eso se
+            // ve. Antes salía escrito en la franja del pie, que ya no existe (DD‑133).
             Activo = yaAbierto;
-            Mensaje = $"Ya estaba abierto en otra pestaña: {ruta}";
             return;
         }
 
@@ -368,8 +411,6 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
         {
             Activo = documento;
         }
-
-        Mensaje = documento.Mensaje;
     }
 
     private void Registrar(string ruta)
@@ -384,7 +425,12 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
     /// menú <c>Archivo | Proyectos recientes</c> los sigue enseñando todos, que para eso
     /// hay que ir a buscarlo.
     /// </summary>
-    private const int RecientesEnPortada = 3;
+    /// <summary>
+    /// Cuántas tomas de notas recientes salen en la portada. Cinco desde el 2026‑08‑06:
+    /// con tres no llegaba a cubrir un día de trabajo con varias abiertas, y el sitio ya
+    /// estaba ahí. La lista completa sigue en <c>Archivo</c>.
+    /// </summary>
+    private const int RecientesEnPortada = 5;
 
     private void RefrescarRecientes()
     {
