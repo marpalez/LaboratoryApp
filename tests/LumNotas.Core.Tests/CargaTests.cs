@@ -176,8 +176,13 @@ public class CargaTests : IDisposable
 
     // ---- la tabla ----------------------------------------------------------
 
-    private static ServicioPlanificado Servicio(string tecnico, string inicio, string fin, double? importe)
-        => new(tecnico, DateTime.Parse(inicio), DateTime.Parse(fin), importe);
+    /// <remarks>
+    /// Por defecto «En curso», que es un servicio que ocupa. Lo terminado se pide a
+    /// propósito, porque es el caso raro y el que cambia el resultado.
+    /// </remarks>
+    private static ServicioPlanificado Servicio(string tecnico, string inicio, string fin, double? importe,
+                                                EstadoDeProyecto estado = EstadoDeProyecto.EnCurso)
+        => new(tecnico, DateTime.Parse(inicio), DateTime.Parse(fin), importe, estado);
 
     [Fact]
     public void CadaTecnicoTieneSuFilaYLosMesesSonLosQueSeAbarcan()
@@ -194,6 +199,63 @@ public class CargaTests : IDisposable
         Assert.Equal(2, filas.Count);
         Assert.Equal("Daniel Martínez", filas[0].Tecnico);
         Assert.Equal("Javier Ibor", filas[1].Tecnico);
+    }
+
+    // ---- lo terminado no es carga ------------------------------------------
+
+    /// <summary>
+    /// <b>El caso que lo destapó</b>: un técnico con diciembre entero ya cerrado salía al
+    /// 122 % (laboratorio, 2026‑08‑07). La tabla contesta «¿cabe lo que le queda?», y un
+    /// ensayo hecho no ocupa a nadie — avisaba de una sobrecarga que no existía.
+    /// </summary>
+    [Fact]
+    public void UnServicioTerminadoNoOcupaAlTecnico()
+    {
+        var (meses, filas) = CargaPorTecnico.Calcular(
+            [Servicio("Raúl", "2026-12-01", "2026-12-23", 10000, EstadoDeProyecto.Terminado)],
+            new CapacidadMensual());
+
+        // Ni carga, ni fila, ni columna: si fuera lo único que hay, la tabla está vacía.
+        Assert.Empty(filas);
+        Assert.Empty(meses);
+    }
+
+    /// <summary>
+    /// Y no se lleva por delante lo que sí ocupa: en el mismo mes, lo terminado desaparece
+    /// y lo que sigue en marcha se queda con su carga entera.
+    /// </summary>
+    [Fact]
+    public void EnElMismoMesSoloCuentaLoQueSigueEnMarcha()
+    {
+        var (_, filas) = CargaPorTecnico.Calcular([
+            Servicio("Raúl", "2026-12-01", "2026-12-23", 10000, EstadoDeProyecto.Terminado),
+            Servicio("Raúl", "2026-12-01", "2026-12-23", 800, EstadoDeProyecto.EnCurso)
+        ], new CapacidadMensual());
+
+        var soloElVivo = CargaPorTecnico.Calcular(
+            [Servicio("Raúl", "2026-12-01", "2026-12-23", 800)], new CapacidadMensual());
+
+        var conAmbos = filas[0].Meses.Single(c => c.Mes == 12);
+        var esperado = soloElVivo.Filas[0].Meses.Single(c => c.Mes == 12);
+
+        Assert.Equal(esperado.Dias, conAmbos.Dias, 3);
+    }
+
+    /// <summary>
+    /// Los demás estados sí ocupan, incluido «Pendiente cliente»: manda el estado que puso
+    /// la persona (DD‑74), y esperar a que el cliente confirme algo no es haber acabado.
+    /// </summary>
+    [Theory]
+    [InlineData(EstadoDeProyecto.PorHacer)]
+    [InlineData(EstadoDeProyecto.Planificado)]
+    [InlineData(EstadoDeProyecto.EnCurso)]
+    [InlineData(EstadoDeProyecto.PendienteCliente)]
+    public void LosDemasEstadosSiguenOcupando(EstadoDeProyecto estado)
+    {
+        var (_, filas) = CargaPorTecnico.Calcular(
+            [Servicio("Raúl", "2026-12-01", "2026-12-23", 800, estado)], new CapacidadMensual());
+
+        Assert.True(filas[0].Meses.Single(c => c.Mes == 12).Dias > 0);
     }
 
     /// <summary>

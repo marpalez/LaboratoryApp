@@ -7,7 +7,7 @@
         FontFamily="Segoe UI" FontSize="13" Background="White">
 
     <StackPanel Margin="28,24" MaxWidth="430">
-        <TextBlock Text="El proyecto tiene cambios sin guardar" FontSize="17" FontWeight="Bold"
+        <TextBlock Text="La toma de notas tiene cambios sin guardar" FontSize="17" FontWeight="Bold"
                    Foreground="#111827" TextWrapping="Wrap"/>
         <TextBlock Margin="0,8,0,22" Foreground="#6B7280" FontSize="12" TextWrapping="Wrap"
                    Text="Si continúas sin guardar, lo anotado desde la última vez que guardaste se pierde."/>

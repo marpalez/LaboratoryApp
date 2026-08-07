@@ -49,15 +49,21 @@ public sealed class Planificacion
 
     /// <summary>
     /// Retirado de la línea de tiempo. <b>No borra nada</b>: el proyecto sigue en su
-    /// carpeta y vuelve a verse con «Ver archivados». Se guarda en el fichero, no en
+    /// carpeta y vuelve a verse con los filtros «Archivados» o «Cualquier estado». Se
+    /// guarda en el fichero, no en
     /// los ajustes de cada usuario, para que todos vean el mismo calendario.
     /// </summary>
     public bool Archivado { get; set; }
 
     /// <summary>
-    /// Importe de la oferta, en euros. De aquí sale el trabajo que supone el servicio
-    /// —el laboratorio lo mide dividiendo entre 80 €/día—, que es lo que alimenta la
-    /// vista de carga por técnico.
+    /// Importe <b>de esta familia</b>, en euros. De aquí sale el trabajo que supone, y es
+    /// lo que alimenta la vista de carga por técnico.
+    /// <para>
+    /// <b>Es de la familia y no del servicio entero</b>, y así se rotula desde el 2026‑08‑07.
+    /// Un trabajo de cuatro familias son cuatro ensayos que ocupan cuatro veces, así que
+    /// cada una lleva el suyo; poner la oferta completa en una sola dejaría a las otras tres
+    /// sin contar en la carga.
+    /// </para>
     /// <para>
     /// Es dato comercial, no de ensayo: se guarda con la planificación y <b>no aparece
     /// en el informe</b> que se firma.
@@ -132,6 +138,24 @@ public sealed class Planificacion
 
     [JsonIgnore]
     public bool MuestrasRecibidas => RecepcionMuestras is not null;
+
+    /// <summary>
+    /// Lo que dura el trabajo, en semanas y redondeando hacia arriba: un servicio de tres
+    /// días es <c>1W</c> porque ocupa una semana de agenda igualmente.
+    /// <para>
+    /// <b>Es duración, no número de semana.</b> El calendario rotula las suyas con
+    /// <c>S32</c> —«entra en la S32»— y esto se rotula con <c>W</c> para que no se lean
+    /// como lo mismo: <c>3W</c> es «tres semanas de trabajo», no «la semana 3».
+    /// </para>
+    /// </summary>
+    [JsonIgnore]
+    public int? Semanas => Inicio is { } inicio && FinEfectivo is { } fin
+        ? Math.Max(1, (int)Math.Ceiling(((fin.Date - inicio.Date).TotalDays + 1) / 7.0))
+        : null;
+
+    /// <summary>Cómo se enseña. Vacío si no hay fechas: sin ellas no hay duración que decir.</summary>
+    [JsonIgnore]
+    public string RotuloSemanas => Semanas is { } semanas ? $"{semanas}W" : "";
 
     /// <summary>
     /// Fuera de plazo: la fecha de fin ya pasó y el servicio no está terminado. Es el

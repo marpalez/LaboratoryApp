@@ -54,9 +54,11 @@ public static class RequisitosParaGuardar
 
         // «Completar» y no «sin»: el código puede estar escrito y aun así estar a medias,
         // y «no se puede guardar sin código» delante de un campo con texto no se entiende.
+        // El nombre del apartado no se escribe aquí: lo pone quien también rotula el
+        // nodo del índice, o el aviso acaba mandando a una pantalla que ya no se llama así.
         var donde = faltan.Count == 1
-            ? "Está marcado en rojo en «Datos del proyecto»."
-            : "Están marcados en rojo en «Datos del proyecto».";
+            ? $"Está marcado en rojo en «{AltaDeProyecto.SeccionDeDatos}»."
+            : $"Están marcados en rojo en «{AltaDeProyecto.SeccionDeDatos}».";
 
         return "No se puede guardar hasta completar: "
                + string.Join(" y ", faltan).ToLowerInvariant() + ". " + donde;

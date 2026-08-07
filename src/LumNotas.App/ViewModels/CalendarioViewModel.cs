@@ -351,11 +351,14 @@ public sealed class GrupoDeTecnicoViewModel : ObservableObject
         _desplegado = desplegado;
         _alPlegar = alPlegar;
 
-        // El número de proyectos va pegado al nombre, en la misma línea. Las semanas que
-        // ocupaba se quitaron: gastaban un renglón por técnico —y con veinte proyectos eso
-        // son veinte renglones— para un dato que no se mira, porque el tiempo ya se ve
+        // La cuenta va pegada al nombre, en la misma línea. Las semanas que ocupaba se
+        // quitaron: gastaban un renglón por técnico —y con veinte tomas de notas eso son
+        // veinte renglones— para un dato que no se mira, porque el tiempo ya se ve
         // dibujado a la derecha.
-        Proyectos = servicios.Count == 1 ? "1 proyecto" : $"{servicios.Count} proyectos";
+        //
+        // Cuenta **trabajos**, no ficheros: las tomas de notas enlazadas en un grupo van
+        // en una sola barra y aquí suman una.
+        Proyectos = $"{servicios.Count} TdN";
         Retrasados = servicios.Count(s => s.Retrasado);
 
         Alternar = new Comando(() => Desplegado = !Desplegado);
@@ -363,7 +366,7 @@ public sealed class GrupoDeTecnicoViewModel : ObservableObject
 
     public string Tecnico { get; }
 
-    /// <summary>«3 proyectos». Va a continuación del nombre, no debajo.</summary>
+    /// <summary>«3 TdN». Va a continuación del nombre, no debajo.</summary>
     public string Proyectos { get; }
 
     public int Retrasados { get; }
@@ -458,6 +461,59 @@ public sealed class TrozoDeBarraViewModel : ObservableObject
 
     public string Codigo => Miembro.Rotulo;
 
+    /// <summary>
+    /// Lo que va detrás del código dentro de la barra: <c>| 3W | 45 %</c>.
+    /// <para>
+    /// Va en un `Run` aparte y más apagado para que, cuando la barra se quede estrecha, lo
+    /// que sobreviva sea el código. Se recorta por la cola, así que el orden es la prioridad.
+    /// </para>
+    /// <para>
+    /// <b>Las semanas solo si esta familia tiene fechas propias.</b> Las de un grupo que no
+    /// las tiene reciben un trozo repartido del trabajo entero (DD‑123); poner ahí un
+    /// <c>2W</c> sería enseñar como dato suyo lo que es un reparto.
+    /// </para>
+    /// </summary>
+    public string Extra
+    {
+        get
+        {
+            var partes = new[]
+            {
+                Miembro.Planificacion.HayFechas ? Miembro.Planificacion.RotuloSemanas : "",
+                Miembro.PorcentajePonderado is { } porcentaje ? $"{porcentaje} %" : ""
+            }.Where(t => t.Length > 0).ToList();
+
+            return partes.Count == 0 ? "" : "  |  " + string.Join("  |  ", partes);
+        }
+    }
+
+    /// <summary>
+    /// Lo hecho, dibujado dentro de la propia barra al estilo Gantt.
+    /// <para>
+    /// <b>Hace falta porque el texto no cabe.</b> Se comprobó con 47 servicios reales: ni
+    /// siquiera con el zoom al máximo entra «EDISO260909 | 3W | 100 %» en una barra de tres
+    /// semanas, así que el porcentaje que se acababa de poner se perdía en los puntos
+    /// suspensivos en casi todas. El relleno no gasta ancho: se ve igual en una barra de una
+    /// semana que en una de seis.
+    /// </para>
+    /// <para>
+    /// Va en columnas <c>*</c> y no en píxeles a propósito: así se reparte solo mientras se
+    /// arrastra la barra, sin tener que recalcular nada en cada latido del gesto.
+    /// </para>
+    /// </summary>
+    public GridLength Hecho => new(Porcentaje, GridUnitType.Star);
+
+    public GridLength Queda => new(100 - Porcentaje, GridUnitType.Star);
+
+    /// <summary>Sin pesos declarados no se pinta nada, que es lo mismo que decir «no sé».</summary>
+    private int Porcentaje => Math.Clamp(Miembro.PorcentajePonderado ?? 0, 0, 100);
+
+    /// <summary>
+    /// Redondeado solo por la izquierda: es un relleno que crece, y rematarlo también por
+    /// la derecha lo haría parecer una segunda pastilla metida dentro de la barra.
+    /// </summary>
+    public CornerRadius EsquinasHechas => new(EsPrimera ? 7 : 0, 0, 0, EsPrimera ? 7 : 0);
+
     public bool MuestrasRecibidas => Miembro.Planificacion.MuestrasRecibidas;
 
     /// <summary>
@@ -468,16 +524,24 @@ public sealed class TrozoDeBarraViewModel : ObservableObject
 
     /// <summary>
     /// Fuera de plazo. Se mira contra el fin que <b>se está dibujando</b>, no contra el
-    /// guardado, para que la tarjeta cambie de color mientras se arrastra.
+    /// guardado, para que lo diga ya mientras se arrastra.
+    /// <para>
+    /// <b>Ya no cambia el color de la barra</b> (2026‑08‑07). Lo pintaba de rojo, y ese rojo
+    /// tapaba el estado —lo único que la barra dice con el color—: un servicio en curso y
+    /// otro pendiente de cliente se veían iguales por haberse pasado un día de la fecha.
+    /// Sigue diciéndose donde no estorba: en el consejo emergente de la tarjeta y en la
+    /// cuenta de la cabecera de cada técnico.
+    /// </para>
     /// </summary>
     public bool Retrasado => Miembro.Planificacion.Estado != EstadoDeProyecto.Terminado
                              && _tramo.Hasta.Date < _hoy.Date;
 
     /// <summary>
-    /// El de <b>su</b> estado, no el del trabajo. Con una barra única, un trabajo con la
-    /// primera familia terminada y la segunda en curso salía todo de un color.
+    /// El de <b>su</b> estado, y nada más. De su estado y no del trabajo: con una barra
+    /// única, un trabajo con la primera familia terminada y la segunda en curso salía todo
+    /// de un color.
     /// </summary>
-    public string Color => Retrasado ? "#DC2626" : Planificacion.ColorDe(Miembro.Planificacion.Estado);
+    public string Color => Planificacion.ColorDe(Miembro.Planificacion.Estado);
 
     public string Detalle => string.Join("\n",
         new[]

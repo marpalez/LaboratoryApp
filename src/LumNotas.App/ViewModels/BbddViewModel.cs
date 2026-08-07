@@ -29,8 +29,10 @@ public sealed class BbddViewModel : ObservableObject
     /// <see cref="ColeccionEnBloque{T}"/>): son cientos y se rehacen enteras.</summary>
     public ColeccionEnBloque<FilaDeBbdd> Filas { get; } = [];
 
-    /// <summary>Cuántas tomas de notas se están enseñando.</summary>
-    public string Recuento => $"{Filas.Count} toma{(Filas.Count == 1 ? "" : "s")} de notas";
+    // El listado tuvo su propio «47 tomas de notas» encima de la tabla. Se quitó: la línea
+    // de estado de la barra ya dice «47 proyectos | 186 fuera del filtro» dos renglones más
+    // arriba, y la misma cuenta escrita dos veces con dos palabras distintas hacía dudar de
+    // si hablaban de lo mismo. La cuenta sigue estando en el HTML exportado, que se lee solo.
 
     public bool NoHayNada => Filas.Count == 0;
 
@@ -39,6 +41,33 @@ public sealed class BbddViewModel : ObservableObject
 
     /// <summary>Abrir la toma de notas de una fila; lo resuelve la ventana.</summary>
     public Action<string>? Abrir { get; set; }
+
+    // ---- exportar ----------------------------------------------------------
+
+    /// <summary>
+    /// Sacar en papel lo que se está viendo.
+    /// <para>
+    /// <b>Salen todas las filas que hay tras el filtro, no las que caben en la pantalla.</b>
+    /// Si el filtro deja cuatro, se exportan cuatro; si no hay filtro y hay cien, cien. Es
+    /// un cuidado real y no una obviedad: la tabla está <b>virtualizada</b> (DD‑131), así
+    /// que en el árbol visual **solo existen las quince filas que se ven**. Exportar
+    /// recorriendo la pantalla daría quince y parecería correcto. Por eso se exporta
+    /// <see cref="Filas"/>, que es el modelo, y nunca los elementos dibujados.
+    /// </para>
+    /// <para>
+    /// <b>Solo aquí, y no en el tablero ni en el calendario</b> (DD‑140). Esta es la única
+    /// de las cuatro vistas que ya es una tabla: exportarla es escribir en HTML las mismas
+    /// filas y columnas. Las otras dos son dibujos —columnas con tarjetas, barras sobre un
+    /// eje de semanas— y llevarlas a un papel no sería exportar sino inventarse otro
+    /// documento, con otras decisiones y otro mantenimiento.
+    /// </para>
+    /// </summary>
+    public Comando Exportar { get; }
+
+    public BbddViewModel() => Exportar = new Comando(() => AlExportar?.Invoke(), () => HayAlgo);
+
+    /// <summary>Lo resuelve la ventana: pedir el fichero, escribirlo y abrirlo en el visor.</summary>
+    public Action? AlExportar { get; set; }
 
     /// <summary>
     /// Recibe lo que ya ha pasado el filtro. Las ilegibles se quedan fuera: una fila sin
@@ -50,56 +79,12 @@ public sealed class BbddViewModel : ObservableObject
                                   .OrderByDescending(p => p.Modificado)
                                   .Select(p => new FilaDeBbdd(p)));
 
-        Notificar(nameof(Recuento));
         Notificar(nameof(NoHayNada));
         Notificar(nameof(HayAlgo));
+        Exportar.Revisar();
     }
 }
 
-/// <summary>Una línea del listado. Solo texto: aquí no se edita nada.</summary>
-public sealed class FilaDeBbdd(ResumenDeProyecto proyecto)
-{
-    public string Ruta { get; } = proyecto.Ruta;
-
-    public string Codigo { get; } = string.IsNullOrWhiteSpace(proyecto.CodigoTomaDeNotas)
-        ? proyecto.Nombre
-        : proyecto.CodigoTomaDeNotas;
-
-    public string Acreditacion { get; } = string.Join(" | ", proyecto.Acreditaciones);
-    public string Tecnico1 { get; } = proyecto.Tecnico;
-    public string Tecnico2 { get; } = proyecto.Tecnico2;
-
-    /// <summary>La norma con la que nació. Las añadidas no se enseñan: hoy como mucho hay una.</summary>
-    public string Norma { get; } = proyecto.NormaPrincipal;
-
-    public string Muestras { get; } = proyecto.NumeroMuestras.ToString();
-    public string Ip { get; } = proyecto.GradoIp;
-    public string Ik { get; } = proyecto.GradoIk;
-    public string Estado { get; } = EstadoDe(proyecto);
-    public string Colaboradores { get; } = string.Join(" | ", proyecto.Colaboradores);
-
-    /// <summary>
-    /// Cuándo se ensayó de verdad. Se rellena sola al dar el servicio por terminado, así
-    /// que en lo que sigue en marcha está en blanco — y eso mismo se lee de un vistazo.
-    /// </summary>
-    public string Ensayado { get; } = Periodo(proyecto.Planificacion);
-
-    private static string Periodo(Planificacion plan)
-    {
-        if (plan.EnsayoDesde is not { } desde) return "";
-        var hasta = plan.EnsayoHasta ?? desde;
-
-        return desde.Date == hasta.Date
-            ? desde.ToString("dd/MM/yyyy")
-            : $"{desde:dd/MM/yyyy} – {hasta:dd/MM/yyyy}";
-    }
-
-    /// <summary>
-    /// Lo archivado se dice como tal: es lo que explica que un servicio no aparezca en el
-    /// tablero, y sin ello el listado y el tablero parecerían contradecirse.
-    /// </summary>
-    private static string EstadoDe(ResumenDeProyecto proyecto)
-        => proyecto.Planificacion.Archivado
-            ? "Archivado"
-            : Planificacion.EtiquetaDe(proyecto.Planificacion.Estado);
-}
+// FilaDeBbdd se mudó al núcleo (LumNotas.Core.Gestion) al poder exportarse el listado:
+// la tabla del papel tiene que decir lo mismo que la de la pantalla, y para eso las dos
+// tienen que salir de la misma definición.

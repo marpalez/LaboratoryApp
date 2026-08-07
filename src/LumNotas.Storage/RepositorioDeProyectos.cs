@@ -110,7 +110,7 @@ public sealed class RepositorioDeProyectos
     public (DatosProyecto Datos, Planificacion Planificacion) CargarCompleto(string ruta)
     {
         var documento = JsonSerializer.Deserialize<DocumentoProyecto>(File.ReadAllText(ruta), Opciones)
-                        ?? throw new InvalidOperationException($"El proyecto '{ruta}' no se pudo leer.");
+                        ?? throw new InvalidOperationException($"La toma de notas '{ruta}' no se pudo leer.");
 
         var datos = new DatosProyecto
         {
@@ -171,7 +171,7 @@ public sealed class RepositorioDeProyectos
     public bool RenombrarTecnico(string ruta, string viejo, string nuevo)
     {
         var documento = JsonSerializer.Deserialize<DocumentoProyecto>(File.ReadAllText(ruta), Opciones)
-                        ?? throw new InvalidOperationException($"El proyecto '{ruta}' no se pudo leer.");
+                        ?? throw new InvalidOperationException($"La toma de notas '{ruta}' no se pudo leer.");
 
         var cambiado = false;
 
@@ -252,7 +252,7 @@ public sealed class RepositorioDeProyectos
     public void ActualizarPlanificacion(string ruta, Planificacion planificacion)
     {
         var documento = JsonSerializer.Deserialize<DocumentoProyecto>(File.ReadAllText(ruta), Opciones)
-                        ?? throw new InvalidOperationException($"El proyecto '{ruta}' no se pudo leer.");
+                        ?? throw new InvalidOperationException($"La toma de notas '{ruta}' no se pudo leer.");
 
         documento.Planificacion = SoloSiTieneAlgo(planificacion);
         EscribirDeFormaAtomica(ruta, JsonSerializer.Serialize(documento, Opciones));

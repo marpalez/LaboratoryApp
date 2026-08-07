@@ -71,8 +71,15 @@ public sealed class CacheDeResumenes
     /// con la forma anterior no lo trae, y sin esta comprobación el listado enseñaría
     /// huecos en blanco durante días —hasta que cada fichero se tocara por su cuenta—
     /// sin que nada explicara por qué.
+    /// <para>
+    /// <b>El aviso de arriba no bastó.</b> Al subir el porcentaje ponderado al resumen se
+    /// olvidó, y el tablero enseñó las semanas —que se leen del fichero— pero ningún
+    /// porcentaje, porque venía de la caché vieja. Costó media hora de sospechar del
+    /// cálculo, que estaba bien. Desde entonces lo vigila un test que cuenta los campos
+    /// guardados: si aparece uno nuevo y este número no sube, falla.
+    /// </para>
     /// </summary>
-    public const string Formato = "2";
+    public const string Formato = "3";
 
     public ResumenDeProyecto? Recuperar(FileInfo fichero, string plantilla)
         => _entradas.TryGetValue(fichero.FullName, out var entrada)

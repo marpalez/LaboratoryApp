@@ -78,10 +78,78 @@ public class PlanificacionTests : IDisposable
 
         var texto = File.ReadAllText(ruta);
 
-        foreach (var calculado in new[] { "hayFechas", "esVacia", "finEfectivo", "muestrasRecibidas" })
+        foreach (var calculado in new[] { "hayFechas", "esVacia", "finEfectivo", "muestrasRecibidas",
+                                          "semanas", "rotuloSemanas" })
             Assert.DoesNotContain(calculado, texto, StringComparison.OrdinalIgnoreCase);
 
         Assert.Contains("inicio", texto, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // ---- duración en semanas ----------------------------------------------
+
+    /// <summary>
+    /// Las semanas se redondean <b>hacia arriba</b>: un servicio de un día ocupa una
+    /// semana de agenda igual que uno de cinco, y decir «0W» no tendría sentido.
+    /// </summary>
+    [Theory]
+    [InlineData(10, 10, 1)]     // un solo día
+    [InlineData(10, 16, 1)]     // siete días justos, la semana entera
+    [InlineData(10, 17, 2)]     // uno más y ya se va a la segunda
+    [InlineData(10, 30, 3)]     // veintiún días
+    public void LasSemanasSeRedondeanHaciaArriba(int diaInicio, int diaFin, int esperadas)
+    {
+        var plan = new Planificacion
+        {
+            Inicio = new DateTime(2026, 8, diaInicio),
+            Fin = new DateTime(2026, 8, diaFin)
+        };
+
+        Assert.Equal(esperadas, plan.Semanas);
+        Assert.Equal($"{esperadas}W", plan.RotuloSemanas);
+    }
+
+    /// <summary>Sin fechas no hay duración que enseñar, y el rótulo se cae del renglón.</summary>
+    [Fact]
+    public void SinFechasNoHaySemanas()
+    {
+        Assert.Null(new Planificacion().Semanas);
+        Assert.Equal("", new Planificacion().RotuloSemanas);
+
+        // Con solo una de las dos tampoco: media fecha no es un tramo.
+        Assert.Null(new Planificacion { Inicio = new DateTime(2026, 8, 10) }.Semanas);
+        Assert.Null(new Planificacion { Fin = new DateTime(2026, 8, 10) }.Semanas);
+    }
+
+    /// <summary>
+    /// Un fin anterior al inicio es una errata, no una duración negativa: se mide contra
+    /// <see cref="Planificacion.FinEfectivo"/>, que ya la corrige, y sale un día.
+    /// </summary>
+    [Fact]
+    public void UnFinAnteriorAlInicioNoDaSemanasNegativas()
+    {
+        var plan = new Planificacion
+        {
+            Inicio = new DateTime(2026, 8, 20),
+            Fin = new DateTime(2026, 8, 10)
+        };
+
+        Assert.Equal(1, plan.Semanas);
+    }
+
+    /// <summary>
+    /// La hora no cuenta. Dos servicios del mismo día que se teclearon a horas distintas
+    /// tienen que decir lo mismo, o el tablero enseñaría «1W» y «2W» sin motivo.
+    /// </summary>
+    [Fact]
+    public void LaHoraNoCambiaLasSemanas()
+    {
+        var plan = new Planificacion
+        {
+            Inicio = new DateTime(2026, 8, 10, 23, 50, 0),
+            Fin = new DateTime(2026, 8, 16, 0, 10, 0)
+        };
+
+        Assert.Equal(1, plan.Semanas);
     }
 
     /// <summary>

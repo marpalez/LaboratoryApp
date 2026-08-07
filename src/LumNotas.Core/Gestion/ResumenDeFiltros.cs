@@ -49,11 +49,18 @@ public static class ResumenDeFiltros
     /// <summary>
     /// Qué se está viendo, para el consejo emergente del botón. Se nombra siempre el
     /// estado —aunque sea el de por defecto—, porque «En desarrollo» tampoco lo enseña
-    /// todo: deja fuera lo terminado y lo archivado, y quien no lo sepa echará algo en
-    /// falta. Los demás solo salen cuando están puestos, para que la línea diga en un
-    /// vistazo lo que aparta y no una lista de «(todos)».
+    /// todo: <b>deja fuera lo archivado</b>, y quien no lo sepa echará algo en falta. Los
+    /// demás solo salen cuando están puestos, para que la línea diga en un vistazo lo que
+    /// aparta y no una lista de «(todos)».
     /// </summary>
-    public static string Detalle(FiltrosDeGestion filtros)
+    /// <param name="nombreDeNorma">
+    /// Cómo se llama una norma, dado su id. El filtro guarda el <b>id</b> —identidad estable
+    /// (DD‑134)— y aquí hay que escribir la <b>designación</b>, que es lo que entiende quien
+    /// lee: «EN IEC 60598‑1:2024 + A11:2024» y no <c>60598-1_2024</c>. Se recibe de fuera
+    /// porque el núcleo no sabe qué normas hay instaladas. Sin ella se escribe el id, que es
+    /// lo que se hacía antes y sigue siendo mejor que no decir nada.
+    /// </param>
+    public static string Detalle(FiltrosDeGestion filtros, Func<string, string>? nombreDeNorma = null)
     {
         var partes = new List<string>
         {
@@ -63,7 +70,9 @@ public static class ResumenDeFiltros
         };
 
         Anadir("Técnico", filtros.Tecnico);
-        Anadir("Norma", filtros.Norma);
+        Anadir("Norma", FiltrosDeGestion.EsUnFiltro(filtros.Norma) && nombreDeNorma is not null
+                            ? nombreDeNorma(filtros.Norma)
+                            : filtros.Norma);
         Anadir("IP", filtros.Ip);
         Anadir("IK", filtros.Ik);
         Anadir("Acreditación", filtros.Acreditacion);

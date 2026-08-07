@@ -49,7 +49,7 @@ public partial class DialogoAcercaDe : Window
             Titulo.Text = $"Todavía no hay ninguna versión publicada de {ServicioDeVersion.Nombre}";
             Detalle.Text = ServicioDeVersion.HayCarpetaCompartida
                 ? "Publica esta versión si es la que deben utilizar el resto de equipos."
-                : "Elige antes la carpeta de proyectos en «Gestión de proyectos».";
+                : "Elige antes la carpeta de tomas de notas en «Planificación de TdN y servicios».";
         }
 
         var origen = ServicioDePlantillas.Origen;
@@ -87,7 +87,7 @@ public partial class DialogoAcercaDe : Window
         {
             if (!ServicioDeVersion.PublicarEsta(Notas.Text))
             {
-                Avisar("No hay carpeta de proyectos donde publicarla.", error: true);
+                Avisar("No hay carpeta de tomas de notas donde publicarla.", error: true);
                 return;
             }
 

@@ -56,7 +56,11 @@ public class RequisitosParaGuardarTests
 
         Assert.Contains("código de la toma de notas", aviso);
         Assert.Contains("técnico 1", aviso);
-        Assert.Contains("Datos del proyecto", aviso);
+
+        // Por la constante y no por el texto: es la misma que rotula el nodo del índice,
+        // así que el día que cambie el rótulo este test no puede quedarse en verde
+        // apuntando a un apartado que ya no se llama así — que es lo que pasó.
+        Assert.Contains(AltaDeProyecto.SeccionDeDatos, aviso);
 
         Assert.Equal("", RequisitosParaGuardar.Aviso(Con("TECNO260201-00", "Javier Ibor")));
     }

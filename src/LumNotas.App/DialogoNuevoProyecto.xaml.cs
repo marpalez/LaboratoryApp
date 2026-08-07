@@ -198,7 +198,7 @@ public partial class DialogoNuevoProyecto : Window
     {
         var dialogo = new OpenFolderDialog
         {
-            Title = "Carpeta del proyecto",
+            Title = "Carpeta de la toma de notas",
             InitialDirectory = Directory.Exists(Carpeta.Text) ? Carpeta.Text : _carpetaSugerida ?? ""
         };
 
@@ -218,7 +218,7 @@ public partial class DialogoNuevoProyecto : Window
         {
             var capacidad = ServicioDeCapacidad.Capacidad;
             Trabajo.Text = $"≈ {capacidad.HorasDeTrabajo(importe):0.#} h "
-                           + $"({capacidad.DiasDeTrabajo(importe):0.#} jornadas)";
+                           + $"({capacidad.DiasDeTrabajo(importe):0.#} días)";
             return;
         }
 
@@ -249,10 +249,10 @@ public partial class DialogoNuevoProyecto : Window
     {
         var escrito = Grupo.Text.Trim();
 
-        AvisoGrupo.Text = escrito.Length == 0
-            ? "Escribe el mismo nombre en las tomas de notas que sean del mismo trabajo —las familias de un servicio— y el calendario las enseñará en una sola barra. Las fechas y el importe se ponen solo en una de ellas."
-            : $"Se enlazará con las que lleven «{escrito}». No hace falta escribirlo igual: "
-              + "no se distinguen mayúsculas, espacios ni guiones.";
+        // Con la casilla vacía no hay nada que confirmar, y el renglón desaparece: para qué
+        // sirve un grupo lo explica la ⓘ del rótulo, que no gasta alto.
+        AvisoGrupo.Visibility = escrito.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
+        if (escrito.Length > 0) AvisoGrupo.Text = TextosDePlanificacion.GrupoEscrito(escrito);
     }
 
     private void AlCambiarFecha(object remitente, System.Windows.Controls.SelectionChangedEventArgs args)

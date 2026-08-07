@@ -85,6 +85,32 @@
             <Setter Property="Padding" Value="0"/>
         </Style>
 
+        <!--
+            Los dos «Exportar»: el del listado de la BBDD y el del informe de la toma de
+            notas. Sin fondo y con la letra en negrita.
+
+            Fueron negros. El peso de un botón no lo da la importancia de la acción sino
+            **cuántas veces se pulsa**, y exportar es de higos a brevas: en negro ganaban
+            la mirada a «Guardar» y «Actualizar», que son lo que se hace a diario. La
+            negrita y el borde bastan para que se lea como botón.
+
+            «Encima» no puede resolverse bajando la opacidad como en el estilo general
+            —sobre transparente no se ve nada—, así que lo tiñe un disparador propio. Sin
+            él quedaría un botón que no responde al ratón, que se lee como desactivado.
+        -->
+        <Style x:Key="BotonDiscreto" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#111827"/>
+            <Setter Property="BorderBrush" Value="#9CA3AF"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F3F4F6"/>
+                    <Setter Property="BorderBrush" Value="#6B7280"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <!-- Los desplegables, con algo más de aire para que no queden apretados al lado
              de los botones nuevos. No se les rehace la plantilla: un ComboBox son cuatro
              piezas —caja, flecha, desplegable y elemento seleccionado— y redondear la de

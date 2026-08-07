@@ -32,7 +32,7 @@ public class AvisosDeInicioTests
         var aviso = Assert.Single(AvisosDeInicio.Revisar(Correcto with { CarpetaDeProyectos = "" }));
 
         Assert.Equal(NivelDeAviso.Problema, aviso.Nivel);
-        Assert.Contains("carpeta de proyectos", aviso.Texto);
+        Assert.Contains("carpeta de tomas de notas", aviso.Texto);
         Assert.Equal(AccionDeAviso.ElegirCarpetas, aviso.Accion);
     }
 

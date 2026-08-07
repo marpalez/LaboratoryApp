@@ -66,7 +66,7 @@ public partial class DialogoTecnicos : Window
         if (!ServicioDeTecnicos.EsCompartida)
             return "No hay ninguna carpeta del laboratorio elegida, así que la lista se guarda solo en "
                  + "este equipo y no la verá nadie más. Elígela en "
-                 + "«Configuración | Carpetas: proyectos y compartida».";
+                 + "«Configuración | Carpetas: tomas de notas y compartida».";
 
         var compartida = ServicioDeCarpetas.CompartidaElegida;
 
@@ -74,7 +74,7 @@ public partial class DialogoTecnicos : Window
             && string.Equals(compartida, ServicioDeTecnicos.Carpeta(), StringComparison.OrdinalIgnoreCase))
             return "La lista se guarda en la carpeta compartida, así que el cambio lo verá todo el laboratorio.";
 
-        return "Todavía no hay carpeta compartida elegida: la lista se guarda en la de proyectos, que "
+        return "Todavía no hay carpeta compartida elegida: la lista se guarda en la de tomas de notas, que "
              + "también ve todo el laboratorio.";
     }
 
@@ -116,7 +116,7 @@ public partial class DialogoTecnicos : Window
         if (Lista.SelectedItem is not string elegido) return;
 
         var respuesta = MessageBox.Show(
-            $"¿Quitar a {elegido} de la lista?\n\nLos proyectos que ya lo tengan no cambian.",
+            $"¿Quitar a {elegido} de la lista?\n\nLas tomas de notas que ya lo tengan no cambian.",
             "Quitar técnico", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 
         if (respuesta != MessageBoxResult.OK) return;
@@ -125,7 +125,7 @@ public partial class DialogoTecnicos : Window
         Guardar();
         Nombre.Clear();
         Refrescar();
-        Avisar($"«{elegido}» ya no aparece en los desplegables. Sus proyectos siguen a su nombre.");
+        Avisar($"«{elegido}» ya no aparece en los desplegables. Sus tomas de notas siguen a su nombre.");
     }
 
     private void AlRenombrar(object remitente, RoutedEventArgs args)
@@ -139,7 +139,7 @@ public partial class DialogoTecnicos : Window
 
         var respuesta = MessageBox.Show(
             $"¿Corregir «{viejo}» por «{nuevo}»?\n\n" +
-            "Se cambiará también en los proyectos que lo lleven.",
+            "Se cambiará también en las tomas de notas que lo lleven.",
             "Corregir nombre", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 
         if (respuesta != MessageBoxResult.OK) return;
@@ -174,8 +174,8 @@ public partial class DialogoTecnicos : Window
         Nombre.Text = nuevo;
         Refrescar(nuevo);
         Avisar(cambiados == 0
-            ? "Corregido en la lista. Ningún proyecto lo llevaba."
-            : $"Corregido en la lista y en {cambiados} proyecto{(cambiados == 1 ? "" : "s")}.");
+            ? "Corregido en la lista. Ninguna toma de notas lo llevaba."
+            : $"Corregido en la lista y en {cambiados} toma{(cambiados == 1 ? "" : "s")} de notas.");
     }
 
     private void Guardar()

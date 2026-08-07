@@ -9,8 +9,20 @@ namespace LumNotas.App.ViewModels;
 /// plantilla, no de código escrito a mano: añadir un apartado nuevo al JSON lo hace
 /// aparecer aquí sin tocar la aplicación.
 /// </summary>
-public sealed class BloqueViewModel : ObservableObject
+public sealed class BloqueViewModel : ObservableObject, INodoDelIndice
 {
+    private bool _seleccionado;
+
+    /// <inheritdoc/>
+    public bool Seleccionado
+    {
+        get => _seleccionado;
+        set => Establecer(ref _seleccionado, value);
+    }
+
+    /// <inheritdoc/>
+    public string Rotulo => Encabezado;
+
     private readonly MotorDeReglas _motor;
     private readonly DatosProyecto _datos;
     private readonly Bloque _bloque;

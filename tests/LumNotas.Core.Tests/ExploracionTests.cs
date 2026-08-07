@@ -130,6 +130,39 @@ public class ExploracionTests : IDisposable
         Assert.Null(CacheDeResumenes.Cargar(_cache).Recuperar(fichero, "60598/1.0.0"));
     }
 
+    /// <summary>
+    /// <b>Y que nadie se olvide de subirla.</b> El test de arriba comprueba que la marca
+    /// de forma funciona; este comprueba que <b>se acuerda de cambiarla</b>, que es lo que
+    /// falla de verdad.
+    /// <para>
+    /// Pasó el 2026‑08‑06 al subir el porcentaje ponderado al resumen: el cálculo estaba
+    /// bien, los tests pasaban y el tablero seguía sin enseñar el número, porque lo servía
+    /// la caché vieja. Se sospechó del motor de reglas antes que del fichero de caché.
+    /// </para>
+    /// <para>
+    /// Cuenta solo los campos que <b>se guardan</b> —los que tienen <c>init</c>—, no los
+    /// que se calculan al leerlos: añadir un <c>Rotulo</c> o un <c>LineaDeAvance</c> no
+    /// invalida nada porque se recalculan solos.
+    /// </para>
+    /// </summary>
+    [Fact]
+    public void SiElResumenGanaUnCampoHayQueSubirLaMarcaDeForma()
+    {
+        const int camposCuandoSeEscribioEsto = 20;
+        const string formatoDeEntonces = "3";
+
+        var guardados = typeof(ResumenDeProyecto)
+            .GetProperties()
+            .Count(p => p.CanWrite);
+
+        Assert.True(
+            guardados == camposCuandoSeEscribioEsto || CacheDeResumenes.Formato != formatoDeEntonces,
+            $"El resumen tiene ahora {guardados} campos guardados y antes tenía "
+            + $"{camposCuandoSeEscribioEsto}, pero la marca de forma sigue en «{CacheDeResumenes.Formato}». "
+            + "Sube CacheDeResumenes.Formato y actualiza este test: si no, el tablero enseñará "
+            + "el campo nuevo en blanco hasta que cada proyecto se vuelva a tocar.");
+    }
+
     /// <summary>Los datos nuevos del listado suben al resumen sin releer el fichero.</summary>
     [Fact]
     public void ElResumenTraeAcreditacionGradosYColaboradores()

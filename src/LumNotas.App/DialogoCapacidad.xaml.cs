@@ -75,7 +75,7 @@ public partial class DialogoCapacidad : Window
 
         Equivalencia.Text =
             $"Sale a {porHora:0.##} € por hora. Una oferta de 2.000 € son {ejemplo:0.#} horas, "
-            + $"unas {ejemplo / horas:0.#} jornadas.";
+            + $"unas {ejemplo / horas:0.#} días.";
     }
 
     private static double? Leer(System.Windows.Controls.TextBox caja)
@@ -102,7 +102,7 @@ public partial class DialogoCapacidad : Window
 
         if (Leer(HorasPorDia) is not { } horasPorDia || horasPorDia <= 0)
         {
-            Avisar("Las horas de una jornada tienen que ser un número mayor que cero.");
+            Avisar("Las horas de un día de trabajo tienen que ser un número mayor que cero.");
             return;
         }
 

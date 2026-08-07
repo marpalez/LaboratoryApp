@@ -1,34 +1,115 @@
 <Window x:Class="LumNotas.App.DialogoNuevoProyecto"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:LumNotas.App"
         Title="Nueva toma de notas"
-        SizeToContent="Height" Width="560" ResizeMode="NoResize"
+        SizeToContent="Height" Width="620" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         Loaded="AlAbrirse"
         FontFamily="Segoe UI" FontSize="13" Background="White">
 
     <Window.Resources>
+        <!--
+            ===================== TINTAS =====================
+            Las mismas de la portada, para que el programa entero pinte igual.
+        -->
+        <SolidColorBrush x:Key="TintaFuerte" Color="#111827"/>
+        <SolidColorBrush x:Key="TintaMedia"  Color="#374151"/>
+        <SolidColorBrush x:Key="TintaSuave"  Color="#6B7280"/>
+        <SolidColorBrush x:Key="TintaTenue"  Color="#9CA3AF"/>
+        <SolidColorBrush x:Key="BordeSuave"  Color="#E5E7EB"/>
+        <SolidColorBrush x:Key="VerdeGestion" Color="#0F766E"/>
+
+        <!--
+            ===================== RÓTULOS =====================
+            Dos pesos y solo dos, que es lo que separa lo obligatorio de lo opcional:
+            «Etiqueta» manda, «Rotulo» acompaña. El tamaño se deja quieto — la jerarquía
+            la llevan el color y el peso, no seis tamaños distintos.
+        -->
         <Style TargetType="TextBlock" x:Key="Etiqueta">
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="#374151"/>
-            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="Foreground" Value="{StaticResource TintaMedia}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
-        <Style TargetType="TextBlock" x:Key="Opcional">
+        <Style TargetType="TextBlock" x:Key="Rotulo">
+            <Setter Property="Foreground" Value="{StaticResource TintaSuave}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="Apunte">
             <Setter Property="FontSize" Value="11"/>
-            <Setter Property="Foreground" Value="#9CA3AF"/>
-            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="Foreground" Value="{StaticResource TintaTenue}"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
-        <!-- El rótulo menudo de la ventana de planificación, para que las dos se parezcan -->
-        <Style TargetType="TextBlock" x:Key="Rotulo">
-            <Setter Property="Foreground" Value="#374151"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Margin" Value="0,0,0,4"/>
+
+        <!--
+            ===================== LA ⓘ =====================
+            Sustituye a los renglones de aclaración que estaban siempre puestos. Aquí
+            había cinco, y entre todos gastaban un tercio del alto de la ventana para
+            explicar cosas que se leen una vez en la vida.
+
+            Va como `ContentControl` sin contenido: no se enfoca, no entra en el orden
+            del tabulador y no estorba a quien rellena el formulario de teclado. El
+            `Background` transparente no es decorativo — sin él el círculo no recibe el
+            ratón y el consejo no saldría.
+        -->
+        <Style TargetType="ContentControl" x:Key="Ayuda">
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="6,0,0,0"/>
+            <Setter Property="Cursor" Value="Help"/>
+            <Setter Property="ToolTipService.InitialShowDelay" Value="120"/>
+            <Setter Property="ToolTipService.ShowDuration" Value="60000"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContentControl">
+                        <Border x:Name="Circulo" CornerRadius="8" Background="Transparent"
+                                BorderBrush="{StaticResource TintaTenue}" BorderThickness="1">
+                            <TextBlock x:Name="Letra" Text="i" FontSize="10" FontWeight="Bold"
+                                       Foreground="{StaticResource TintaTenue}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!-- Que se note que responde: si no, parece un adorno -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Circulo" Property="BorderBrush"
+                                        Value="{StaticResource TintaMedia}"/>
+                                <Setter TargetName="Circulo" Property="Background" Value="#F3F4F6"/>
+                                <Setter TargetName="Letra" Property="Foreground"
+                                        Value="{StaticResource TintaMedia}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
-        <Style TargetType="TextBlock" x:Key="Seccion">
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="11"/>
-            <Setter Property="Foreground" Value="#0F766E"/>
+
+        <!--
+            El consejo emergente por defecto no envuelve: una frase de tres renglones sale
+            en una sola línea que se va de la pantalla. Con esto, todos los de esta ventana
+            se topan a 320 y parten donde toca.
+        -->
+        <Style TargetType="ToolTip">
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextWrapping="Wrap" MaxWidth="320"
+                                   Foreground="{StaticResource TintaFuerte}"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Cajas y desplegables, con el mismo respiro en toda la ventana -->
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="7,6"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Padding" Value="7,6"/>
         </Style>
     </Window.Resources>
 
@@ -43,184 +124,279 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-    <StackPanel Margin="26,22,26,10">
-        <TextBlock Text="Nueva toma de notas" FontSize="17" FontWeight="Bold" Foreground="#111827"/>
-        <TextBlock Margin="0,3,0,12" Foreground="#6B7280" FontSize="12" TextWrapping="Wrap"
-                   Text="Con lo obligatorio ya se puede planificar. En rojo, lo que falta."/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="26,20,26,16">
 
-        <!-- ======================= OBLIGATORIA ======================= -->
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-            <Border Width="4" Height="14" CornerRadius="2" Background="#0F766E" Margin="0,0,9,0"/>
-            <TextBlock Text="INFORMACIÓN OBLIGATORIA" Style="{StaticResource Seccion}"
-                       VerticalAlignment="Center"/>
-        </StackPanel>
+                <!-- ===================== CABECERA ===================== -->
+                <TextBlock Text="Nueva toma de notas" FontSize="18" FontWeight="Bold"
+                           Foreground="{StaticResource TintaFuerte}"/>
+                <TextBlock Margin="0,3,0,18" Foreground="{StaticResource TintaSuave}" FontSize="12"
+                           TextWrapping="Wrap"
+                           Text="Con lo obligatorio ya se puede planificar. En rojo, lo que falta."/>
 
-        <!--
-            El rótulo se pone rojo mientras el campo esté vacío, igual que las casillas
-            obligatorias de la toma de notas: así se ve qué falta sin leer el aviso de abajo.
-            El ejemplo se fue al hueco de la propia caja, que dice lo mismo sin gastar línea.
-        -->
-        <TextBlock x:Name="EtiquetaNombre" Text="Código de la toma de notas"
-                   Style="{StaticResource Etiqueta}"/>
-        <!-- Fijo, siempre a la vista: quien da de alta el proyecto es quien decide cómo se
-             codifica, y tiene que poder copiar el patrón sin buscarlo. -->
-        <TextBlock Text="Ejemplo: TECNO260201-00" Style="{StaticResource Opcional}"/>
-        <TextBox x:Name="Nombre" Padding="6,5" Margin="0,0,0,2" TextChanged="AlEscribir"/>
-        <TextBlock x:Name="Derivado" Style="{StaticResource Opcional}" Margin="0,0,0,10"/>
-
-        <!-- Responsable y norma, en dos columnas: los dos son un desplegable corto -->
-        <Grid Margin="0,0,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="14"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <StackPanel>
-                <TextBlock x:Name="EtiquetaTecnico" Text="Técnico 1 · responsable"
-                           Style="{StaticResource Etiqueta}"/>
-                <ComboBox x:Name="Tecnico1" Padding="6,5" SelectionChanged="AlElegirTecnico"/>
-            </StackPanel>
-
-            <StackPanel Grid.Column="2">
-                <TextBlock x:Name="EtiquetaNorma" Text="Norma" Style="{StaticResource Etiqueta}"/>
-                <ComboBox x:Name="Norma" Padding="6,5" DisplayMemberPath="Titulo"
-                          SelectionChanged="AlElegirNorma"
-                          ToolTip="Con la que se va a ensayar. Es la que el tablero detalla y la que da nombre al fichero"/>
-            </StackPanel>
-        </Grid>
-
-        <TextBlock x:Name="EtiquetaCarpeta" Text="Carpeta" Style="{StaticResource Etiqueta}"/>
-        <!-- El .lmnlab es el registro del ensayo: tiene que quedar donde le corresponde
-             en el árbol de clientes, no en cualquier sitio. Empieza vacía a propósito —
-             para que se vea que hay que elegirla—, aunque el examinador se abra ya en la
-             carpeta de proyectos. La explicación se fue al consejo emergente. -->
-        <DockPanel Margin="0,0,0,12"
-                   ToolTip="La carpeta de tomas de notas de ese servicio, dentro de la del cliente">
-            <Button DockPanel.Dock="Right" Content="Examinar" Click="AlElegirCarpeta"
-                    Padding="14,6" Margin="8,0,0,0" Cursor="Hand"/>
-            <TextBox x:Name="Carpeta" Padding="6,5" IsReadOnly="True" Background="#F9FAFB"
-                     TextChanged="AlEscribir" TextWrapping="NoWrap"/>
-        </DockPanel>
-
-        <!-- ======================== OPCIONAL ========================= -->
-        <!--
-            Plegada por defecto. El alta es corta a propósito (DD‑83, DD‑85): el
-            responsable crea la tarjeta en cuatro segundos y el técnico rellena el resto.
-            Desplegada de serie, esos cuatro segundos se convertirían en un formulario.
-        -->
-        <Expander x:Name="Opcionales" IsExpanded="False" Margin="0,0,0,4"
-                  Expanded="AlPlegarODesplegar" Collapsed="AlPlegarODesplegar">
-            <Expander.Header>
-                <StackPanel Orientation="Horizontal">
-                    <Border Width="4" Height="14" CornerRadius="2" Background="#9CA3AF" Margin="0,0,9,0"/>
-                    <TextBlock Text="INFORMACIÓN OPCIONAL" Style="{StaticResource Seccion}"
-                               Foreground="#6B7280" VerticalAlignment="Center"/>
-                </StackPanel>
-            </Expander.Header>
-
-            <StackPanel Margin="0,10,0,0">
-                <TextBlock Text="Técnico 2" Style="{StaticResource Etiqueta}"/>
-                <ComboBox x:Name="Tecnico2" Padding="6,5" Margin="0,0,0,12"
-                          ToolTip="Hay servicios con un solo técnico"/>
-
-                <TextBlock Text="Las fechas son solo del calendario; no tocan ningún dato de ensayo."
-                           Style="{StaticResource Opcional}" Margin="0,0,0,8"/>
-
-                <Grid Margin="0,0,0,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="14"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="Inicio previsto" Style="{StaticResource Rotulo}"/>
-                        <DatePicker x:Name="Inicio" SelectedDateChanged="AlCambiarFecha"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="Fin previsto" Style="{StaticResource Rotulo}"/>
-                        <DatePicker x:Name="Fin" SelectedDateChanged="AlCambiarFecha"/>
-                    </StackPanel>
-                </Grid>
-
-                <Grid Margin="0,-6,0,6">
-                    <TextBlock x:Name="Semana" Foreground="#6B7280" FontSize="11" VerticalAlignment="Center"/>
-                    <Button x:Name="BotonQuitarFechas" Content="Quitar fechas" Click="AlQuitarFechas"
-                            HorizontalAlignment="Right" Padding="10,3" FontSize="11" Cursor="Hand"
-                            ToolTip="Deja el servicio como pendiente de planificar"/>
-                </Grid>
-
-                <!-- El mismo candado que el diálogo de planificación: lo comprometido con
-                     el cliente no lo mueve ni el arrastre ni la cadena de un grupo. -->
-                <CheckBox x:Name="Bloquear" Content="Bloquear fechas" Click="AlBloquear"
-                          Margin="0,0,0,12" Cursor="Hand"
-                          ToolTip="Impide cambiarlas aquí, arrastrando la tarjeta y al recolocar un trabajo agrupado"/>
-
-                <Grid Margin="0,0,0,12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="14"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="Estado" Style="{StaticResource Rotulo}"/>
-                        <ComboBox x:Name="Estado" DisplayMemberPath="Etiqueta" SelectedValuePath="Valor"/>
-                    </StackPanel>
-
-                    <!-- De aquí sale el trabajo del servicio para la vista de carga -->
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="Importe de la oferta (€)" Style="{StaticResource Rotulo}"/>
-                        <TextBox x:Name="Importe" Padding="5,4" TextChanged="AlCambiarImporte"/>
-                        <TextBlock x:Name="Trabajo" FontSize="10" Foreground="#6B7280" Margin="0,3,0,0"/>
-                    </StackPanel>
-                </Grid>
-
-                <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8"
-                        Padding="12,10" Margin="0,0,0,12">
+                <!--
+                    ==================== OBLIGATORIA ====================
+                    Lo importante va **sobre blanco y con marco propio**; lo opcional, más
+                    abajo, sobre gris hundido. Antes las dos zonas se distinguían solo por
+                    una pastilla de 4 px de color y pesaban igual a la vista, que es tanto
+                    como no tener jerarquía.
+                -->
+                <Border BorderBrush="{StaticResource BordeSuave}" BorderThickness="1"
+                        CornerRadius="10" Padding="16,14,16,16">
                     <StackPanel>
-                        <CheckBox x:Name="Recibidas" Content="Las muestras ya han llegado"
-                                  Checked="AlMarcarRecibidas" Unchecked="AlMarcarRecibidas"/>
-                        <StackPanel x:Name="ZonaRecepcion" Orientation="Horizontal" Margin="22,8,0,0">
-                            <TextBlock Text="Fecha de recepción" Style="{StaticResource Rotulo}"
-                                       VerticalAlignment="Center" Margin="0,0,10,0"/>
-                            <DatePicker x:Name="Recepcion" Width="150"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                            <Border Width="4" Height="14" CornerRadius="2"
+                                    Background="{StaticResource VerdeGestion}" Margin="0,0,9,0"/>
+                            <TextBlock Text="INFORMACIÓN OBLIGATORIA" FontWeight="Bold" FontSize="11"
+                                       Foreground="{StaticResource VerdeGestion}" VerticalAlignment="Center"/>
                         </StackPanel>
+
+                        <!--
+                            Código y técnico en dos columnas: el código son 14 caracteres y
+                            ocupaba una línea entera él solo. El rótulo se pone rojo mientras
+                            falte, igual que las casillas obligatorias de la toma de notas.
+                        -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <TextBlock x:Name="EtiquetaNombre" Text="Código de la toma de notas"
+                                               Style="{StaticResource Etiqueta}"/>
+                                    <ContentControl Style="{StaticResource Ayuda}"
+                                                    ToolTip="Catorce caracteres: cinco del cliente, cuatro de año y mes, dos de familia y dos de edición del documento. De él salen el código de servicio y el nombre del fichero."/>
+                                </StackPanel>
+
+                                <!--
+                                    El ejemplo estaba en un renglón fijo encima de la caja
+                                    porque quien da de alta tiene que poder copiar el patrón
+                                    sin buscarlo. Sigue estando —dentro de la caja, mientras
+                                    esté vacía— y ya no gasta línea.
+                                -->
+                                <Grid>
+                                    <TextBox x:Name="Nombre" TextChanged="AlEscribir"/>
+                                    <TextBlock Text="TECNO260201-00" IsHitTestVisible="False"
+                                               Foreground="#C7CBD3" Margin="9,0,0,0"
+                                               VerticalAlignment="Center">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=Nombre}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                    <TextBlock x:Name="EtiquetaTecnico" Text="Técnico 1"
+                                               Style="{StaticResource Etiqueta}"/>
+                                    <ContentControl Style="{StaticResource Ayuda}"
+                                                    ToolTip="El responsable. Es por quien se filtra el tablero y bajo quien sale esta toma de notas en el calendario y en la carga."/>
+                                </StackPanel>
+                                <ComboBox x:Name="Tecnico1" SelectionChanged="AlElegirTecnico"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!--
+                            Debajo de las dos columnas y a todo lo ancho: dice qué código de
+                            servicio va a quedar y cómo se va a llamar el fichero, y las dos
+                            cosas juntas no caben en media línea.
+                        -->
+                        <TextBlock x:Name="Derivado" Style="{StaticResource Apunte}" Margin="0,0,0,12"/>
+
+                        <!--
+                            La norma pasa a ancho completo: las designaciones son largas
+                            —«EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02…»— y a media
+                            columna se cortaban.
+                        -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock x:Name="EtiquetaNorma" Text="Norma"
+                                       Style="{StaticResource Etiqueta}"/>
+                            <ContentControl Style="{StaticResource Ayuda}"
+                                            ToolTip="Con la que se va a ensayar. Es la que el tablero detalla apartado por apartado y la que da nombre al fichero."/>
+                        </StackPanel>
+                        <ComboBox x:Name="Norma" DisplayMemberPath="Titulo" Margin="0,0,0,12"
+                                  SelectionChanged="AlElegirNorma"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock x:Name="EtiquetaCarpeta" Text="Carpeta"
+                                       Style="{StaticResource Etiqueta}"/>
+                            <ContentControl Style="{StaticResource Ayuda}"
+                                            ToolTip="La carpeta de tomas de notas de ese servicio, dentro de la del cliente. Empieza vacía a propósito: el fichero es el registro del ensayo y tiene que quedar donde le corresponde."/>
+                        </StackPanel>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Examinar" Click="AlElegirCarpeta"
+                                    Padding="16,6" Margin="8,0,0,0" Cursor="Hand"/>
+                            <TextBox x:Name="Carpeta" IsReadOnly="True" Background="#F9FAFB"
+                                     TextChanged="AlEscribir" TextWrapping="NoWrap"/>
+                        </DockPanel>
                     </StackPanel>
                 </Border>
 
-                <!-- Enlazar las familias de un mismo servicio. No hay fichero de grupo:
-                     el enlace vive dentro de cada toma de notas (DD‑89, DD‑90). -->
-                <TextBlock Text="Grupo" Style="{StaticResource Rotulo}"/>
-                <TextBox x:Name="Grupo" Padding="5,4" TextChanged="AlCambiarGrupo"
-                         ToolTip="El mismo nombre en las tomas de notas del mismo trabajo: el calendario las enseñará como una sola barra"/>
-                <TextBlock x:Name="AvisoGrupo"
-                           Text="El mismo nombre en las familias de un servicio y el calendario las enseña juntas."
-                           Foreground="#9CA3AF" FontSize="11" Margin="0,4,0,4" TextWrapping="Wrap"/>
-            </StackPanel>
-        </Expander>
+                <!--
+                    ===================== OPCIONAL =====================
+                    Plegada por defecto. El alta es corta a propósito (DD‑83, DD‑85): el
+                    responsable crea la tarjeta en cuatro segundos y el técnico rellena el
+                    resto. Desplegada de serie, esos cuatro segundos serían un formulario.
 
-    </StackPanel>
-    </ScrollViewer>
+                    Sobre gris y sin marco, al revés que la de arriba: se lee como un
+                    apartado que se puede saltar.
+                -->
+                <Expander x:Name="Opcionales" IsExpanded="False" Margin="0,14,0,0"
+                          Expanded="AlPlegarODesplegar" Collapsed="AlPlegarODesplegar">
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="INFORMACIÓN OPCIONAL" FontWeight="Bold" FontSize="11"
+                                       Foreground="{StaticResource TintaSuave}" VerticalAlignment="Center"/>
+                            <TextBlock Text="planificación, importe y muestras"
+                                       Style="{StaticResource Apunte}" Margin="10,0,0,0"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Expander.Header>
 
-    <!-- Siempre a la vista, pase lo que pase con el desplazamiento -->
-    <Border Grid.Row="1" Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0"
-            Padding="26,14">
-        <StackPanel>
-            <!-- Solo para lo que ha ido mal. La lista de campos que faltan se fue: los
-                 rótulos ya se ponen en rojo y «Crear» está apagado. -->
-            <TextBlock x:Name="Aviso" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"
-                       Foreground="#B45309" Visibility="Collapsed"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Cancelar" Click="AlCerrar" IsCancel="True" Padding="18,9" Cursor="Hand"/>
-                <Button x:Name="BotonCrear" Content="Crear" Click="AlCrear" IsDefault="True"
-                        Padding="22,9" Margin="8,0,0,0" Cursor="Hand"
-                        Background="#0F766E" Foreground="White" BorderThickness="0"/>
+                    <Border Background="#F9FAFB" BorderBrush="{StaticResource BordeSuave}"
+                            BorderThickness="1" CornerRadius="10" Padding="16,14"
+                            Margin="0,10,0,0">
+                        <StackPanel>
+
+                            <!-- Técnico 2 y estado, en dos columnas -->
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                        <TextBlock Text="Técnico 2" Style="{StaticResource Rotulo}"/>
+                                        <ContentControl Style="{StaticResource Ayuda}"
+                                                        ToolTip="Hay tomas de notas con un solo técnico. Solo se enseña: no filtra ni ordena nada."/>
+                                    </StackPanel>
+                                    <ComboBox x:Name="Tecnico2"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                        <TextBlock Text="Estado" Style="{StaticResource Rotulo}"/>
+                                        <ContentControl Style="{StaticResource Ayuda}"
+                                                        ToolTip="En qué punto está. Lo decide la persona, y es distinto del avance que calcula el programa: una toma de notas puede estar rellena entera y seguir «pendiente cliente»."/>
+                                    </StackPanel>
+                                    <ComboBox x:Name="Estado" DisplayMemberPath="Etiqueta"
+                                              SelectedValuePath="Valor"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Fechas -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Planificación" Style="{StaticResource Rotulo}"
+                                           FontWeight="SemiBold"/>
+                                <ContentControl Style="{StaticResource Ayuda}"
+                                                ToolTip="Estas fechas son solo del calendario: no tocan ningún dato de ensayo. O se ponen las dos, o ninguna."/>
+                            </StackPanel>
+
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <DatePicker x:Name="Inicio" SelectedDateChanged="AlCambiarFecha"/>
+                                <DatePicker Grid.Column="2" x:Name="Fin" SelectedDateChanged="AlCambiarFecha"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,12">
+                                <TextBlock x:Name="Semana" Style="{StaticResource Apunte}"
+                                           VerticalAlignment="Center"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <CheckBox x:Name="Bloquear" Content="Bloquear" Click="AlBloquear"
+                                              VerticalAlignment="Center" Cursor="Hand" FontSize="11"
+                                              ToolTip="Impide cambiarlas aquí, arrastrando la tarjeta y al recolocar un trabajo agrupado"/>
+                                    <Button x:Name="BotonQuitarFechas" Content="Quitar fechas"
+                                            Click="AlQuitarFechas" Padding="10,3" FontSize="11"
+                                            Margin="10,0,0,0" Cursor="Hand"
+                                            ToolTip="Deja la TdN como pendiente de planificar"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Importe -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Importe de la TdN (familia) (€)"
+                                           Style="{StaticResource Rotulo}"/>
+                                <ContentControl Style="{StaticResource Ayuda}"
+                                                ToolTip="De aquí sale el trabajo que supone, y es lo único que alimenta la vista de carga. Es de esta toma de notas, no del servicio entero: si el trabajo tiene cuatro, cada una lleva el suyo."/>
+                            </StackPanel>
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="16"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="Importe" TextChanged="AlCambiarImporte"/>
+                                <TextBlock Grid.Column="2" x:Name="Trabajo" Style="{StaticResource Apunte}"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <!-- Muestras -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <CheckBox x:Name="Recibidas" Content="Las muestras ya han llegado"
+                                          Checked="AlMarcarRecibidas" Unchecked="AlMarcarRecibidas"
+                                          VerticalAlignment="Center" Cursor="Hand"/>
+                                <StackPanel x:Name="ZonaRecepcion" Orientation="Horizontal"
+                                            Margin="14,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="el" Style="{StaticResource Rotulo}"
+                                               Margin="0,0,8,0"/>
+                                    <DatePicker x:Name="Recepcion" Width="140"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Grupo -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Grupo" Style="{StaticResource Rotulo}"/>
+                                <ContentControl Style="{StaticResource Ayuda}"
+                                                ToolTip="{x:Static local:TextosDePlanificacion.Grupo}"/>
+                            </StackPanel>
+                            <TextBox x:Name="Grupo" TextChanged="AlCambiarGrupo"/>
+                            <!--
+                                Solo confirma con qué se va a enlazar lo que se está
+                                escribiendo. La explicación de para qué sirve un grupo se fue
+                                a la ⓘ de arriba: eran cuatro renglones fijos de gris.
+                            -->
+                            <TextBlock x:Name="AvisoGrupo" Style="{StaticResource Apunte}"
+                                       Margin="0,5,0,0" Visibility="Collapsed"/>
+                        </StackPanel>
+                    </Border>
+                </Expander>
+
             </StackPanel>
-        </StackPanel>
-    </Border>
+        </ScrollViewer>
+
+        <!-- Siempre a la vista, pase lo que pase con el desplazamiento -->
+        <Border Grid.Row="1" Background="#F9FAFB" BorderBrush="{StaticResource BordeSuave}"
+                BorderThickness="0,1,0,0" Padding="26,14">
+            <StackPanel>
+                <!-- Solo para lo que ha ido mal. La lista de campos que faltan se fue: los
+                     rótulos ya se ponen en rojo y «Crear» está apagado. -->
+                <TextBlock x:Name="Aviso" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"
+                           Foreground="#B45309" Visibility="Collapsed"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Cancelar" Click="AlCerrar" IsCancel="True" Padding="18,9" Cursor="Hand"/>
+                    <Button x:Name="BotonCrear" Content="Crear" Click="AlCrear" IsDefault="True"
+                            Padding="22,9" Margin="8,0,0,0" Cursor="Hand"
+                            Background="{StaticResource VerdeGestion}" Foreground="White"
+                            BorderThickness="0"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

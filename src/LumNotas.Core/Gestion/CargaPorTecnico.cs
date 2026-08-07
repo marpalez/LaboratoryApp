@@ -1,7 +1,14 @@
 namespace LumNotas.Core.Gestion;
 
-/// <summary>Un servicio tal como lo ve el cálculo de carga: quién, cuándo y por cuánto.</summary>
-public sealed record ServicioPlanificado(string Tecnico, DateTime Inicio, DateTime Fin, double? Importe);
+/// <summary>Un servicio tal como lo ve el cálculo de carga: quién, cuándo, por cuánto y cómo está.</summary>
+/// <param name="Estado">
+/// En qué punto está. Hace falta aquí porque <b>lo terminado no es carga</b>: la tabla dice
+/// lo que queda por hacer, no lo que se hizo. Se pide sin valor por defecto a propósito —
+/// con uno, quien añadiera otra vista que llame a este cálculo se lo dejaría sin poner y los
+/// terminados volverían a contar en silencio, que es justo lo que pasó.
+/// </param>
+public sealed record ServicioPlanificado(
+    string Tecnico, DateTime Inicio, DateTime Fin, double? Importe, EstadoDeProyecto Estado);
 
 /// <summary>Lo que un técnico tiene comprometido en un mes.</summary>
 public sealed record CeldaDeCarga(int Ano, int Mes, double Dias, int Capacidad)
@@ -23,11 +30,28 @@ public sealed record FilaDeCarga(string Tecnico, IReadOnlyList<CeldaDeCarga> Mes
 /// que abarca en proporción a sus días entre semana. La suma de un técnico se compara
 /// con la capacidad del mes, que no es la misma en agosto que en marzo.
 /// </para>
+/// <para>
+/// <b>Lo terminado no cuenta</b> (DD‑142). La pregunta es «¿cabe lo que le queda?», y un
+/// ensayo hecho no ocupa a nadie. Sin esto, un técnico con diciembre entero ya cerrado salía
+/// al <b>122 %</b> —caso real del laboratorio, 2026‑08‑07— y la tabla avisaba de una
+/// sobrecarga que no existía, que es la manera más rápida de que se deje de mirar.
+/// </para>
 /// </summary>
 public static class CargaPorTecnico
 {
     /// <summary>Etiqueta de los servicios que aún no tienen responsable.</summary>
     public const string SinTecnico = "(sin técnico)";
+
+    /// <summary>
+    /// Si un servicio ocupa a su técnico. Un ensayo <b>terminado</b> ya no: está hecho.
+    /// <para>
+    /// Se mira el estado que puso la persona, no el avance que calcula el motor (DD‑74): un
+    /// servicio con todas las secciones rellenas pero esperando confirmación del cliente
+    /// sigue pudiendo dar trabajo, y quien lo sabe es quien lo lleva.
+    /// </para>
+    /// </summary>
+    public static bool Ocupa(ServicioPlanificado servicio)
+        => servicio.Estado != EstadoDeProyecto.Terminado;
 
     /// <summary>
     /// Construye la tabla. Los meses son los que abarcan los servicios, de modo que no
@@ -36,7 +60,10 @@ public static class CargaPorTecnico
     public static (IReadOnlyList<(int Ano, int Mes)> Meses, IReadOnlyList<FilaDeCarga> Filas) Calcular(
         IEnumerable<ServicioPlanificado> servicios, CapacidadMensual capacidad)
     {
-        var lista = servicios.Where(s => s.Fin.Date >= s.Inicio.Date).ToList();
+        // Lo terminado se descarta aquí y no en la vista: **también deja de fijar los meses
+        // de la tabla**. Filtrándolo después, un servicio cerrado en marzo seguía abriendo
+        // la columna de marzo, que salía vacía y sin explicación.
+        var lista = servicios.Where(s => s.Fin.Date >= s.Inicio.Date && Ocupa(s)).ToList();
         if (lista.Count == 0) return ([], []);
 
         var meses = MesesQueAbarcan(lista);

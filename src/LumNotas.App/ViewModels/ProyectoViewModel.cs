@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using LumNotas.Core.Datos;
+using LumNotas.Core.Gestion;
 using LumNotas.Core.Motor;
 using LumNotas.Core.Plantilla;
 
@@ -216,8 +217,20 @@ public sealed class ColaboradorViewModel : ObservableObject
 /// Cabecera del proyecto: lo que en el Excel era la hoja «RESUMEN PROYECTO LUM».
 /// Se muestra como un apartado más, el primero de la lista.
 /// </summary>
-public sealed class ProyectoViewModel : ObservableObject
+public sealed class ProyectoViewModel : ObservableObject, INodoDelIndice
 {
+    private bool _seleccionado;
+
+    /// <inheritdoc/>
+    public bool Seleccionado
+    {
+        get => _seleccionado;
+        set => Establecer(ref _seleccionado, value);
+    }
+
+    /// <inheritdoc/>
+    public string Rotulo => Encabezado;
+
     private readonly PlantillaEnsayos _plantilla;
 
     /// <summary>
@@ -300,7 +313,7 @@ public sealed class ProyectoViewModel : ObservableObject
         _alCambiarMuestras();   // las cabeceras de columna llevan el número de muestra
     }
 
-    public string Encabezado => "Datos del proyecto";
+    public string Encabezado => AltaDeProyecto.SeccionDeDatos;
     public string Seccion => "Cabecera";
 
     /// <summary>

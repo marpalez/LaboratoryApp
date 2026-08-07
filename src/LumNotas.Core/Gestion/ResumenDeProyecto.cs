@@ -74,6 +74,24 @@ public sealed record ResumenDeProyecto
     public int SeccionesAplicables { get; init; }
 
     /// <summary>
+    /// El porcentaje <b>ponderado</b>, redondeado. Es <b>el mismo número que estampa el
+    /// informe</b>, y por eso es este y no otro: el laboratorio no puede tener dos «% del
+    /// proyecto» que digan cosas distintas según dónde se mire.
+    /// <para>
+    /// Sale de los pesos que declara la plantilla —3, 5 y 10, heredados del Excel—, así que
+    /// mide <b>esfuerzo declarado</b> y no apartados contados. Contar apartados haría que
+    /// «Calentamiento y endurancia», que son días de cámara, valiera lo mismo que un
+    /// marcado que se mira en un minuto.
+    /// </para>
+    /// <para>
+    /// <b>Es nulo, no cero, cuando la norma no declara pesos.</b> Un cero sería una mentira
+    /// fija: un servicio terminado seguiría enseñando «0 %» para siempre. Sin peso no hay
+    /// número, igual que sin fechas no hay duración.
+    /// </para>
+    /// </summary>
+    public int? PorcentajePonderado { get; init; }
+
+    /// <summary>
     /// Cómo se encabeza este servicio en el tablero y en el calendario: <c>TECNO260201</c>,
     /// las once primeras del código de la toma de notas — servicio y número de familia,
     /// sin la edición del documento.
@@ -106,6 +124,22 @@ public sealed record ResumenDeProyecto
     public string Avance => Error is not null
         ? "no se pudo leer"
         : $"{SeccionesCompletadas}/{SeccionesAplicables} secciones";
+
+    /// <summary>
+    /// Todo lo que resume el trabajo, en un renglón: <c>3W | 45 % | 7/16 secciones</c>.
+    /// <para>
+    /// Se arma aquí y no en cada vista para que el tablero y el calendario no se inventen
+    /// dos formas de escribir lo mismo. <b>Lo que falta se cae del renglón</b> en vez de
+    /// dejar un hueco entre barras: sin fechas no hay <c>3W</c>, y sin pesos no hay <c>%</c>.
+    /// </para>
+    /// </summary>
+    public string LineaDeAvance => string.Join("  |  ",
+        new[]
+        {
+            Planificacion.RotuloSemanas,
+            PorcentajePonderado is { } porcentaje ? $"{porcentaje} %" : "",
+            Avance
+        }.Where(t => t.Length > 0));
 }
 
 /// <summary>Calcula el resumen de un proyecto reutilizando el motor de reglas.</summary>
@@ -134,12 +168,18 @@ public static class AnalizadorDeProyectos
         Planificacion? planificacion = null)
     {
         var ordenadas = Ordenar(normas, datos);
+
+        // Un motor por norma, construido una sola vez: lo usan tanto el recuento de
+        // secciones como el indicador ponderado, y montarlo dos veces sería pagar dos
+        // veces lo más caro del escaneo.
+        var motores = ordenadas.Select(p => new MotorDeReglas(p, datos)).ToList();
+
         var pendientes = new List<SeccionPendiente>();
         var completadas = 0;
         var aplicables = 0;
 
         // La principal, sección a sección.
-        foreach (var seccion in Contar(ordenadas[0], datos))
+        foreach (var seccion in Contar(motores[0]))
         {
             aplicables++;
             if (seccion.Pendientes == 0) completadas++;
@@ -147,9 +187,10 @@ public static class AnalizadorDeProyectos
         }
 
         // Cada añadida, en una línea.
-        foreach (var añadida in ordenadas.Skip(1))
+        for (var i = 1; i < ordenadas.Count; i++)
         {
-            var suyas = Contar(añadida, datos).ToList();
+            var añadida = ordenadas[i];
+            var suyas = Contar(motores[i]).ToList();
             if (suyas.Count == 0) continue;
 
             var pendientesEnLaNorma = suyas.Sum(s => s.Pendientes);
@@ -161,8 +202,13 @@ public static class AnalizadorDeProyectos
                 TituloDe(añadida), pendientesEnLaNorma, suyas.Sum(s => s.Aplicables)));
         }
 
+        // El mismo indicador que estampa el informe, sumando todas las normas del servicio.
+        var avance = IndicadorDeAvance.Resultado.Sumar(
+            motores.Select(m => new IndicadorDeAvance(m).Calcular()));
+
         return new ResumenDeProyecto
         {
+            PorcentajePonderado = Redondear(avance),
             Ruta = ruta,
             Nombre = Path.GetFileNameWithoutExtension(ruta),
             CodigoTomaDeNotas = datos.CodigoTomaDeNotas,
@@ -186,14 +232,31 @@ public static class AnalizadorDeProyectos
     }
 
     /// <summary>
+    /// El porcentaje que se enseña, a partir del indicador ponderado.
+    /// <para>
+    /// Dos cuidados. <b>Sin peso declarado no hay número</b> —nulo, no cero—, porque un cero
+    /// fijo diría «0 %» hasta en un servicio terminado. Y <b>solo dice 100 % cuando no queda
+    /// peso</b>: redondear al alza un 99,6 % pondría el cartel de acabado en un trabajo al
+    /// que todavía le falta un ensayo, que es justo el error que nadie perdona.
+    /// </para>
+    /// </summary>
+    private static int? Redondear(IndicadorDeAvance.Resultado avance)
+    {
+        if (avance.PesoTotal == 0) return null;
+        return avance.PesoEjecutado == avance.PesoTotal
+            ? 100
+            : (int)Math.Floor(avance.PorcentajePonderado);
+    }
+
+    /// <summary>
     /// Las secciones de una norma que aportan algo: las que tienen al menos un apartado
     /// aplicable. Una sección entera que no aplica no cuenta para el avance.
     /// </summary>
-    private static IEnumerable<SeccionPendiente> Contar(PlantillaEnsayos plantilla, DatosProyecto datos)
+    private static IEnumerable<SeccionPendiente> Contar(MotorDeReglas motor)
     {
-        var motor = new MotorDeReglas(plantilla, datos);
+        var datos = motor.Datos;
 
-        foreach (var seccion in plantilla.Secciones)
+        foreach (var seccion in motor.Plantilla.Secciones)
         {
             var visibles = seccion.Bloques.Where(b => EstadoDeApartado.EsVisible(motor, b)).ToList();
             var estados = visibles.Select(b => EstadoDeApartado.De(motor, datos, b)).ToList();

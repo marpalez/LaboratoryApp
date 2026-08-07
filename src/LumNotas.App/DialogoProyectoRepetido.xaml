@@ -1,7 +1,7 @@
 <Window x:Class="LumNotas.App.DialogoProyectoRepetido"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Ese proyecto ya existe"
+        Title="Esa toma de notas ya existe"
         SizeToContent="Height" Width="580" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         FontFamily="Segoe UI" FontSize="13" Background="White">
@@ -10,7 +10,7 @@
         <TextBlock x:Name="Titulo" FontSize="17" FontWeight="Bold"
                    Foreground="#111827" TextWrapping="Wrap"/>
         <TextBlock Margin="0,8,0,16" Foreground="#6B7280" FontSize="12" TextWrapping="Wrap"
-                   Text="Seguramente lo dio de alta el responsable para planificarlo. Si creas otro, tendréis el mismo servicio en dos ficheros: el tuyo con los datos y el suyo con las fechas."/>
+                   Text="Seguramente lo dio de alta el responsable para planificarlo. Si creas otro, tendréis la misma toma de notas en dos ficheros: el tuyo con los datos y el suyo con las fechas."/>
 
         <!-- Con quién chocas y dónde está: sin esto el aviso no sirve para decidir -->
         <ItemsControl x:Name="Existentes" Margin="0,0,0,20">

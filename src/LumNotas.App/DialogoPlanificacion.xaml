@@ -1,117 +1,257 @@
 <Window x:Class="LumNotas.App.DialogoPlanificacion"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Planificación del servicio"
-        SizeToContent="WidthAndHeight" ResizeMode="NoResize"
+        xmlns:local="clr-namespace:LumNotas.App"
+        Title="Planificación de la TdN"
+        SizeToContent="Height" Width="520" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
         FontFamily="Segoe UI" FontSize="13" Background="White">
 
+    <!--
+        Las mismas tintas, rótulos y ⓘ que «Nueva toma de notas»: los dos diálogos
+        planifican lo mismo y tienen que parecerse. Van copiados y no compartidos en un
+        diccionario porque son dos ventanas pequeñas y un `ResourceDictionary` aparte
+        obligaría a mirar en tres ficheros para entender una.
+    -->
     <Window.Resources>
+        <SolidColorBrush x:Key="TintaFuerte" Color="#111827"/>
+        <SolidColorBrush x:Key="TintaMedia"  Color="#374151"/>
+        <SolidColorBrush x:Key="TintaSuave"  Color="#6B7280"/>
+        <SolidColorBrush x:Key="TintaTenue"  Color="#9CA3AF"/>
+        <SolidColorBrush x:Key="BordeSuave"  Color="#E5E7EB"/>
+
         <Style TargetType="TextBlock" x:Key="Rotulo">
-            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Foreground" Value="{StaticResource TintaSuave}"/>
             <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="Apunte">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{StaticResource TintaTenue}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <!--
+            La ⓘ, y **solo en dos sitios**: el grupo y archivar, que son los que necesitan
+            un párrafo entero para explicarse. Lo demás se entiende con su rótulo, y un
+            formulario sembrado de circulitos cansa más que los renglones que sustituye.
+        -->
+        <Style TargetType="ContentControl" x:Key="Ayuda">
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="6,0,0,0"/>
+            <Setter Property="Cursor" Value="Help"/>
+            <Setter Property="ToolTipService.InitialShowDelay" Value="120"/>
+            <Setter Property="ToolTipService.ShowDuration" Value="60000"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContentControl">
+                        <Border x:Name="Circulo" CornerRadius="8" Background="Transparent"
+                                BorderBrush="{StaticResource TintaTenue}" BorderThickness="1">
+                            <TextBlock x:Name="Letra" Text="i" FontSize="10" FontWeight="Bold"
+                                       Foreground="{StaticResource TintaTenue}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Circulo" Property="BorderBrush"
+                                        Value="{StaticResource TintaMedia}"/>
+                                <Setter TargetName="Circulo" Property="Background" Value="#F3F4F6"/>
+                                <Setter TargetName="Letra" Property="Foreground"
+                                        Value="{StaticResource TintaMedia}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="ToolTip">
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextWrapping="Wrap" MaxWidth="320"
+                                   Foreground="{StaticResource TintaFuerte}"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="7,6"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Padding" Value="7,6"/>
+        </Style>
+
+        <!-- Cada bloque del formulario, en su tarjeta -->
+        <Style TargetType="Border" x:Key="Bloque">
+            <Setter Property="BorderBrush" Value="{StaticResource BordeSuave}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="14,12"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
         </Style>
     </Window.Resources>
 
-    <StackPanel Margin="26,22" Width="400">
-        <TextBlock x:Name="Titulo" FontSize="17" FontWeight="Bold" Foreground="#111827"
-                   TextWrapping="Wrap"/>
-        <TextBlock Margin="0,4,0,18" Foreground="#6B7280" FontSize="12" TextWrapping="Wrap"
-                   Text="Estas fechas solo se usan para el calendario. No cambian ningún dato de ensayo."/>
+    <!--
+        Los botones fuera del desplazamiento, igual que en el alta: con la ventana en una
+        pantalla pequeña, «Guardar» no puede quedarse por debajo del borde.
+    -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <Grid Margin="0,0,0,14">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="14"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="26,20,26,16">
 
-            <StackPanel Grid.Column="0">
-                <TextBlock Text="Inicio previsto" Style="{StaticResource Rotulo}"/>
-                <DatePicker x:Name="Inicio" SelectedDateChanged="AlCambiarFecha"/>
+                <!-- ===================== CABECERA ===================== -->
+                <TextBlock x:Name="Titulo" FontSize="18" FontWeight="Bold"
+                           Foreground="{StaticResource TintaFuerte}" TextWrapping="Wrap"/>
+                <TextBlock Margin="0,3,0,18" Foreground="{StaticResource TintaSuave}" FontSize="12"
+                           TextWrapping="Wrap"
+                           Text="Estas fechas solo se usan para el calendario. No cambian ningún dato de ensayo."/>
+
+                <!-- ===================== FECHAS ===================== -->
+                <Border Style="{StaticResource Bloque}">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel>
+                                <TextBlock Text="Inicio previsto" Style="{StaticResource Rotulo}"
+                                           Margin="0,0,0,5"/>
+                                <DatePicker x:Name="Inicio" SelectedDateChanged="AlCambiarFecha"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Fin previsto" Style="{StaticResource Rotulo}"
+                                           Margin="0,0,0,5"/>
+                                <DatePicker x:Name="Fin" SelectedDateChanged="AlCambiarFecha"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!--
+                            La semana, el candado y «Quitar fechas» en un solo renglón. Antes
+                            eran tres filas: la semana con el botón, el candado debajo y un
+                            párrafo explicándolo. Las tres cosas hablan de estas dos fechas.
+                        -->
+                        <Grid>
+                            <TextBlock x:Name="Semana" Style="{StaticResource Apunte}"
+                                       VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <CheckBox x:Name="Bloquear" Content="Bloquear" Click="AlBloquear"
+                                          VerticalAlignment="Center" Cursor="Hand" FontSize="11"
+                                          ToolTip="Con el candado puesto no las mueve nadie: ni este diálogo, ni el arrastre en el calendario, ni la cadena de un trabajo agrupado"/>
+                                <Button x:Name="BotonQuitarFechas" Content="Quitar fechas"
+                                        Click="AlQuitarFechas" Padding="10,3" FontSize="11"
+                                        Margin="10,0,0,0" Cursor="Hand"
+                                        ToolTip="Deja la TdN como pendiente de planificar"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- ===================== ESTADO E IMPORTE ===================== -->
+                <Border Style="{StaticResource Bloque}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel>
+                            <TextBlock Text="Estado" Style="{StaticResource Rotulo}" Margin="0,0,0,5"/>
+                            <ComboBox x:Name="Estado" DisplayMemberPath="Etiqueta"
+                                      SelectedValuePath="Valor"/>
+                        </StackPanel>
+
+                        <!-- De aquí sale el trabajo de esta TdN para la vista de carga -->
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Importe de la TdN (familia) (€)"
+                                       Style="{StaticResource Rotulo}" Margin="0,0,0,5"/>
+                            <TextBox x:Name="Importe" TextChanged="AlCambiarImporte"/>
+                            <TextBlock x:Name="Trabajo" Style="{StaticResource Apunte}"
+                                       Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- ===================== MUESTRAS ===================== -->
+                <!--
+                    La casilla y la fecha en el mismo renglón: la fecha solo aparece si se
+                    marca, y en vertical dejaba un hueco que saltaba al marcarla.
+                -->
+                <Border Style="{StaticResource Bloque}">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox x:Name="Recibidas" Content="Las muestras ya han llegado"
+                                  Checked="AlMarcarRecibidas" Unchecked="AlMarcarRecibidas"
+                                  VerticalAlignment="Center" Cursor="Hand"/>
+                        <StackPanel x:Name="ZonaRecepcion" Orientation="Horizontal"
+                                    Margin="14,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="el" Style="{StaticResource Rotulo}" Margin="0,0,8,0"/>
+                            <DatePicker x:Name="Recepcion" Width="140"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ===================== GRUPO Y ARCHIVAR ===================== -->
+                <!--
+                    Los dos únicos con ⓘ. Son los que necesitan un párrafo: qué hace enlazar
+                    varias TdN, y cómo se recupera lo archivado. Los cuatro renglones grises
+                    que ocupaban antes eran casi un tercio de la ventana.
+                -->
+                <Border Style="{StaticResource Bloque}" Margin="0,0,0,0">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Grupo" Style="{StaticResource Rotulo}"/>
+                            <ContentControl Style="{StaticResource Ayuda}"
+                                            ToolTip="{x:Static local:TextosDePlanificacion.Grupo}"/>
+                        </StackPanel>
+                        <TextBox x:Name="Grupo" TextChanged="AlCambiarGrupo"/>
+                        <!-- Solo confirma con qué se va a enlazar lo que se escribe -->
+                        <TextBlock x:Name="AvisoGrupo" Style="{StaticResource Apunte}"
+                                   Margin="0,5,0,0" Visibility="Collapsed"/>
+
+                        <Border Background="{StaticResource BordeSuave}" Height="1"
+                                Margin="0,14,0,12"/>
+
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox x:Name="Archivar" Content="Quitar del calendario (archivar)"
+                                      VerticalAlignment="Center" Cursor="Hand"/>
+                            <ContentControl Style="{StaticResource Ayuda}"
+                                            ToolTip="{x:Static local:TextosDePlanificacion.Archivar}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
             </StackPanel>
+        </ScrollViewer>
 
-            <StackPanel Grid.Column="2">
-                <TextBlock Text="Fin previsto" Style="{StaticResource Rotulo}"/>
-                <DatePicker x:Name="Fin" SelectedDateChanged="AlCambiarFecha"/>
-            </StackPanel>
-        </Grid>
-
-        <Grid Margin="0,-8,0,10">
-            <TextBlock x:Name="Semana" Foreground="#6B7280" FontSize="11" VerticalAlignment="Center"/>
-            <!-- Sin fechas, el servicio vuelve a la banda de pendientes de planificar -->
-            <Button x:Name="BotonQuitarFechas" Content="Quitar fechas" Click="AlQuitarFechas"
-                    HorizontalAlignment="Right" Padding="10,3" FontSize="11" Cursor="Hand"
-                    ToolTip="Deja el servicio como pendiente de planificar"/>
-        </Grid>
-
-        <!-- Lo comprometido con el cliente se blinda: en el calendario se planifica
-             arrastrando, y un roce con el ratón mueve un trabajo sin que nadie se entere. -->
-        <CheckBox x:Name="Bloquear" Content="Bloquear fechas" Click="AlBloquear"
-                  Margin="0,0,0,4" Cursor="Hand"
-                  ToolTip="Impide cambiarlas aquí, arrastrando la tarjeta y al recolocar un trabajo agrupado"/>
-        <TextBlock Text="Con el candado puesto, estas fechas no las mueve nadie: ni este diálogo, ni el arrastre, ni la cadena de un trabajo agrupado."
-                   Foreground="#9CA3AF" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,14"/>
-
-        <Grid Margin="0,0,0,16">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="14"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <StackPanel Grid.Column="0">
-                <TextBlock Text="Estado" Style="{StaticResource Rotulo}"/>
-                <ComboBox x:Name="Estado" DisplayMemberPath="Etiqueta" SelectedValuePath="Valor"/>
-            </StackPanel>
-
-            <!-- De aquí sale el trabajo del servicio para la vista de carga -->
-            <StackPanel Grid.Column="2">
-                <TextBlock Text="Importe de la oferta (€)" Style="{StaticResource Rotulo}"/>
-                <TextBox x:Name="Importe" Padding="5,4" TextChanged="AlCambiarImporte"/>
-                <TextBlock x:Name="Trabajo" FontSize="10" Foreground="#6B7280" Margin="0,3,0,0"/>
-            </StackPanel>
-        </Grid>
-
-        <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8"
-                Padding="14,12" Margin="0,0,0,16">
+        <Border Grid.Row="1" Background="#F9FAFB" BorderBrush="{StaticResource BordeSuave}"
+                BorderThickness="0,1,0,0" Padding="26,14">
             <StackPanel>
-                <CheckBox x:Name="Recibidas" Content="Las muestras ya han llegado"
-                          Checked="AlMarcarRecibidas" Unchecked="AlMarcarRecibidas"/>
-                <StackPanel x:Name="ZonaRecepcion" Orientation="Horizontal" Margin="22,10,0,0">
-                    <TextBlock Text="Fecha de recepción" Style="{StaticResource Rotulo}"
-                               VerticalAlignment="Center" Margin="0,0,10,0"/>
-                    <DatePicker x:Name="Recepcion" Width="150"/>
+                <TextBlock x:Name="Aviso" Foreground="#DC2626" FontSize="12" TextWrapping="Wrap"
+                           Margin="0,0,0,10" Visibility="Collapsed"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Cancelar" Click="AlCancelar" IsCancel="True"
+                            Padding="18,9" Margin="0,0,8,0" Cursor="Hand"/>
+                    <Button x:Name="BotonGuardar" Content="Guardar" Click="AlGuardar" IsDefault="True"
+                            Padding="22,9" Cursor="Hand"
+                            Background="#2563EB" Foreground="White" BorderThickness="0"/>
                 </StackPanel>
             </StackPanel>
         </Border>
-
-        <!--
-            Enlazar las familias de un mismo servicio. Se teclea el mismo nombre en las
-            que van juntas y el calendario las enseña como una sola barra. No hay fichero
-            de grupo: el enlace vive dentro de cada toma de notas (DD‑89, DD‑90).
-        -->
-        <TextBlock Text="Grupo" Style="{StaticResource Rotulo}"/>
-        <TextBox x:Name="Grupo" Padding="5,4" TextChanged="AlCambiarGrupo"/>
-        <TextBlock x:Name="AvisoGrupo"
-                   Text="Escribe el mismo nombre en las tomas de notas que sean del mismo trabajo —las familias de un servicio— y el calendario las enseñará en una sola barra. Las fechas y el importe se ponen solo en una de ellas."
-                   Foreground="#9CA3AF" FontSize="11" Margin="0,4,0,18" TextWrapping="Wrap"/>
-
-        <CheckBox x:Name="Archivar" Content="Quitar del calendario (archivar)" Margin="0,0,0,4"/>
-        <TextBlock Text="El proyecto sigue en su carpeta; vuelve a verse con «Ver archivados»."
-                   Foreground="#9CA3AF" FontSize="11" Margin="22,0,0,18" TextWrapping="Wrap"/>
-
-        <TextBlock x:Name="Aviso" Foreground="#DC2626" FontSize="12" TextWrapping="Wrap"
-                   Margin="0,0,0,12" Visibility="Collapsed"/>
-
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Cancelar" Click="AlCancelar" IsCancel="True"
-                    Padding="18,9" Margin="0,0,10,0" Cursor="Hand"
-                    Background="#E5E7EB" Foreground="#374151" BorderThickness="0"/>
-            <Button x:Name="BotonGuardar" Content="Guardar" Click="AlGuardar" IsDefault="True"
-                    Padding="18,9" Cursor="Hand"
-                    Background="#2563EB" Foreground="White" BorderThickness="0"/>
-        </StackPanel>
-    </StackPanel>
+    </Grid>
 </Window>

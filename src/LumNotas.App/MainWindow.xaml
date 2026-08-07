@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:LumNotas.App.ViewModels"
         xmlns:local="clr-namespace:LumNotas.App"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         Title="{Binding Titulo}" Height="820" Width="1280"
         MinHeight="520" MinWidth="620"
         FontFamily="Segoe UI" FontSize="13" Background="#F5F6F8">
@@ -25,6 +26,21 @@
         <!-- Candado: las fechas de este trabajo están blindadas y no las mueve el arrastre.
              Mismo tamaño y mismo trazo que la caja, para que convivan en la tarjeta. -->
         <Geometry x:Key="IconoCandado">M2.5,6.5 H11.5 V13 H2.5 Z M4.5,6.5 V4.5 A2.5,2.5 0 0 1 9.5,4.5 V6.5</Geometry>
+
+        <!--
+            Iconos de la portada. Mismo lienzo de 14 y mismo trazo que la caja y el candado,
+            para que todo el programa dibuje igual.
+
+            Están para que las cuatro vistas de gestión —cuatro palabras abstractas— se
+            distingan sin leerlas. En las recientes no hay ninguno: un icono repetido cinco
+            veces no informa de nada y solo roba ancho al nombre.
+        -->
+        <Geometry x:Key="IconoCarpeta">M1,3.5 H5.5 L7,5.5 H13 V12 H1 Z</Geometry>
+        <Geometry x:Key="IconoNuevo">M7,2.5 V11.5 M2.5,7 H11.5</Geometry>
+        <Geometry x:Key="IconoTablero">M2,2 V12 M7,2 V12 M12,2 V12 M2,2 H12 M2,7 H7 M7,9.5 H12</Geometry>
+        <Geometry x:Key="IconoCalendario">M1.5,3.5 H12.5 V12.5 H1.5 Z M1.5,6.5 H12.5 M4.5,1.5 V3.5 M9.5,1.5 V3.5</Geometry>
+        <Geometry x:Key="IconoCarga">M1.5,12.5 H12.5 M3.5,12.5 V8 M7,12.5 V4.5 M10.5,12.5 V6.5</Geometry>
+        <Geometry x:Key="IconoBuscar">M6,1.5 A4.5,4.5 0 1 1 5.99,1.5 Z M9.4,9.4 L12.8,12.8</Geometry>
 
         <!-- Caja de texto obligatoria: borde rojo y más grueso mientras esté vacía -->
         <Style x:Key="Obligatorio" TargetType="TextBox">
@@ -79,6 +95,43 @@
         </Style>
 
         <!-- ===== Portada ===== -->
+        <!--
+            SISTEMA DE LA PORTADA (2026‑08‑06). Solo lo que usa esta pantalla; no hay
+            sistema general y no se inventa uno para el resto de la aplicación.
+
+            TRES TAMAÑOS DE TEXTO Y NINGUNO MÁS. Antes había nueve —26, 14, 13, 12,5, 12,
+            11,5 y 11— y con eso la pantalla no podía tener jerarquía: nueve pesos son
+            ninguno. Ahora: el nombre del programa, lo que se pulsa, y lo que acompaña.
+
+            ESPACIADO EN 4/8: 4, 8, 12, 16, 24, 32. Nada intermedio.
+
+            CONTRASTE. Los dos que fallaban AA están corregidos y anotados abajo. El
+            gris suave es el más claro que pasa 4,5:1 sobre blanco (4,90:1); por debajo
+            de ese no se baja.
+        -->
+        <sys:Double x:Key="TamTitulo">26</sys:Double>
+        <sys:Double x:Key="TamAccion">14</sys:Double>
+        <sys:Double x:Key="TamApoyo">12</sys:Double>
+
+        <SolidColorBrush x:Key="TintaFuerte" Color="#111827"/>
+        <!-- 4,90:1 sobre blanco. Sustituye a #9CA3AF, que daba 2,54:1 y suspendía AA -->
+        <SolidColorBrush x:Key="TintaSuave" Color="#6B7280"/>
+        <!-- 6,20:1 sobre el gris de la píldora de versión, donde #6B7280 daba 4,06:1 -->
+        <SolidColorBrush x:Key="TintaSobreGris" Color="#4B5563"/>
+        <SolidColorBrush x:Key="AzulNotas" Color="#2563EB"/>
+        <SolidColorBrush x:Key="VerdeGestion" Color="#0F766E"/>
+        <SolidColorBrush x:Key="BordeSuave" Color="#D8DCE2"/>
+
+        <!--
+            El foco, que antes no existía. Los estilos de la portada rehacían la plantilla
+            entera y se quedaban sin el adorno punteado de WPF, así que quien navegue con
+            el tabulador no veía dónde estaba: fallo de WCAG 2.4.7.
+
+            Se dibuja como anillo propio encima de la caja. Contra el azul da 3,47:1 y
+            contra el blanco 17,8:1, ambos por encima del 3:1 que pide un elemento de
+            interfaz (WCAG 1.4.11).
+        -->
+        <SolidColorBrush x:Key="AnilloFoco" Color="#111827"/>
 
         <!-- Cada zona de la portada: la de tomar notas y la de gestionar -->
         <Style x:Key="ZonaInicio" TargetType="Border">
@@ -86,14 +139,162 @@
             <Setter Property="BorderBrush" Value="#E5E7EB"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="14"/>
-            <Setter Property="Padding" Value="16,16"/>
+            <Setter Property="Padding" Value="16"/>
         </Style>
 
         <!-- Rótulo de zona, con su barrita de color delante -->
         <Style x:Key="RotuloZona" TargetType="TextBlock">
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontSize" Value="{StaticResource TamApoyo}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <!--
+            LOS TRES PESOS DE LA PORTADA. Uno por nivel y ninguno más, para que el peso
+            visual signifique algo:
+
+              · Primaria  — relleno de color. **Una por zona.** El laboratorio decidió que
+                            tomar notas y gestionar pesan lo mismo (DD‑80), así que forzar
+                            una sola en toda la pantalla mentiría sobre para quién es el
+                            programa. La regla se aplica dentro de cada zona.
+              · Secundaria — contorno. Lo frecuente que no es la primaria.
+              · Terciaria  — sin caja hasta que se pasa por encima. Lo esporádico.
+
+            Los tres declaran los CINCO estados. Antes declaraban uno —encima— porque
+            sustituían la plantilla del estilo global y perdían los suyos sin avisar.
+            Falta a propósito el sexto, *cargando*: ninguna acción de esta pantalla tarda
+            lo suficiente. Abrir levanta el diálogo de Windows en el acto y el escaneo
+            tiene su barra de progreso ya en la vista de gestión.
+
+            Altura mínima 44 en las tres: es el objetivo táctil de WCAG 2.5.8. Las filas
+            de recientes medían 25.
+        -->
+        <Style x:Key="AccionPrimaria" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="MinHeight" Value="48"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource AzulNotas}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="Caja" CornerRadius="10" Padding="16,12"
+                                    Background="{TemplateBinding Background}">
+                                <ContentPresenter VerticalAlignment="Center"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                            </Border>
+                            <Border x:Name="Foco" CornerRadius="10" BorderThickness="2"
+                                    BorderBrush="{StaticResource AnilloFoco}"
+                                    IsHitTestVisible="False" Visibility="Collapsed"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Caja" Property="Opacity" Value="0.88"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Caja" Property="Opacity" Value="0.72"/>
+                                <Setter TargetName="Caja" Property="RenderTransform">
+                                    <Setter.Value><TranslateTransform Y="1"/></Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Foco" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Caja" Property="Opacity" Value="0.45"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AccionSecundaria" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="MinHeight" Value="44"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="Caja" CornerRadius="8" Padding="12,8" Background="White"
+                                    BorderBrush="{StaticResource BordeSuave}" BorderThickness="1">
+                                <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            </Border>
+                            <Border x:Name="Foco" CornerRadius="8" BorderThickness="2"
+                                    BorderBrush="{StaticResource AnilloFoco}"
+                                    IsHitTestVisible="False" Visibility="Collapsed"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Caja" Property="Background" Value="#F3F6FB"/>
+                                <Setter TargetName="Caja" Property="BorderBrush" Value="#9DB4E8"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Caja" Property="Background" Value="#E7EDFA"/>
+                                <Setter TargetName="Caja" Property="RenderTransform">
+                                    <Setter.Value><TranslateTransform Y="1"/></Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Foco" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Caja" Property="Opacity" Value="0.45"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AccionTerciaria" TargetType="Button">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="MinHeight" Value="44"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border x:Name="Caja" CornerRadius="8" Padding="12,8"
+                                    Background="Transparent" BorderThickness="1"
+                                    BorderBrush="Transparent">
+                                <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            </Border>
+                            <Border x:Name="Foco" CornerRadius="8" BorderThickness="2"
+                                    BorderBrush="{StaticResource AnilloFoco}"
+                                    IsHitTestVisible="False" Visibility="Collapsed"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Caja" Property="Background" Value="#F3F4F6"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Caja" Property="Background" Value="#E5E7EB"/>
+                                <Setter TargetName="Caja" Property="RenderTransform">
+                                    <Setter.Value><TranslateTransform Y="1"/></Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Foco" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Caja" Property="Opacity" Value="0.45"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!--
@@ -101,178 +302,11 @@
             norma: WPF no redondea un Button, así que la plantilla se rehace sobre un
             Border. Ocupa todo el ancho de su zona porque son una lista, no una rejilla.
         -->
-        <!--
-            El acceso destacado de la zona de gestión: mismo tamaño y misma forma que los
-            demás, pero relleno del verde del laboratorio. Se usa para lo único que aquí
-            no es mirar sino crear, así que tiene que distinguirse de un vistazo.
-        -->
-        <Style x:Key="AccesoGestionPrincipal" TargetType="Button">
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Margin" Value="0,0,0,8"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Caja" CornerRadius="10" Padding="12,10"
-                                Background="#0F766E" BorderBrush="#0F766E" BorderThickness="1">
-                            <ContentPresenter/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Caja" Property="Background" Value="#115E59"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
-        <!--
-            El azul de la zona de toma de notas, gemelo del verde de gestión: mismo
-            tamaño, mismo redondeo, mismo gesto. Cada mitad de la portada tiene un solo
-            botón lleno de color, y es el que se pulsa más.
-        -->
-        <Style x:Key="AccesoTomaDeNotasPrincipal" TargetType="Button">
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Margin" Value="0,0,0,8"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Caja" CornerRadius="10" Padding="12,10"
-                                Background="#2563EB" BorderBrush="#2563EB" BorderThickness="1">
-                            <ContentPresenter/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Caja" Property="Background" Value="#1D4ED8"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
-        <!--
-            Una toma de notas reciente. Se dibuja como fila con caja, no como enlace
-            suelto: son cinco y en fila de texto azul no se distinguía dónde acababa una
-            y empezaba la siguiente. El código manda; la carpeta va debajo y en gris,
-            porque lo que se busca es el servicio, no dónde está.
-        -->
-        <Style x:Key="FilaReciente" TargetType="Button">
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="Margin" Value="0,0,12,3"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Caja" CornerRadius="6" Padding="9,4"
-                                Background="#F8FAFC" BorderBrush="#E5E7EB" BorderThickness="1">
-                            <ContentPresenter/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Caja" Property="Background" Value="#EFF6FF"/>
-                                <Setter TargetName="Caja" Property="BorderBrush" Value="#BFDBFE"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
-        <!--
-            Elegir norma para empezar. Es una **fila y no una tarjeta cuadrada** desde que
-            el título es la designación entera —«EN IEC 60598-1:2021 + A11:2022»—: en una
-            tarjeta de 118 px eso no cabe de ninguna manera, y ensancharlas dejaba dos por
-            fila y tres filas. En fila caben las cinco, una debajo de otra, y ocupan menos
-            que las dos filas de tarjetas de antes.
-        -->
-        <Style x:Key="FilaNorma" TargetType="Button">
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="Margin" Value="0,0,12,5"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Caja" CornerRadius="8" Padding="11,7"
-                                Background="White" BorderBrush="#DBEAFE" BorderThickness="1">
-                            <ContentPresenter/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Caja" Property="Background" Value="#EFF6FF"/>
-                                <Setter TargetName="Caja" Property="BorderBrush" Value="#93C5FD"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
-        <Style x:Key="AccesoGestion" TargetType="Button">
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Margin" Value="0,0,0,8"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Caja" CornerRadius="10" Padding="12,10"
-                                Background="#F0FDFA" BorderBrush="#CCFBF1" BorderThickness="1">
-                            <ContentPresenter/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Caja" Property="Background" Value="#CCFBF1"/>
-                                <Setter TargetName="Caja" Property="BorderBrush" Value="#0F766E"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
-        <!--
-            Tarjeta de norma. WPF no da esquinas redondeadas en Button, así que la
-            plantilla se rehace sobre un Border; de paso se marca al pasar por encima.
-        -->
-        <Style x:Key="TarjetaNorma" TargetType="Button">
-            <Setter Property="Cursor" Value="Hand"/>
-            <!--
-                Todas exactamente del mismo tamaño. Antes se ajustaban al texto y quedaban
-                desparejas —«IP» estrecha, «Módulos LED» ancha— sin más motivo que la
-                longitud del nombre; con cinco normas eso ya se notaba.
-            -->
-            <!--
-                El ancho lo manda la ventana mínima, no el gusto: dos tarjetas más sus
-                márgenes tienen que caber en la columna izquierda cuando la ventana está
-                en 620. Cada píxel que se le quite aquí es un píxel menos de mínimo.
-            -->
-            <Setter Property="Width" Value="118"/>
-            <Setter Property="Height" Value="96"/>
-            <Setter Property="Margin" Value="0,0,8,8"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Caja" CornerRadius="10" Background="#F8FAFC"
-                                BorderBrush="#E5E7EB" BorderThickness="1" Padding="12,10">
-                            <ContentPresenter VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Caja" Property="Background" Value="#EFF6FF"/>
-                                <Setter TargetName="Caja" Property="BorderBrush" Value="#2563EB"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Caja" Property="Background" Value="#DBEAFE"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
         <!-- Selector de vista del tablero. La activa va en negrita y con fondo, igual
              que las pestañas: es el mismo gesto de «aquí estás». -->
@@ -345,10 +379,28 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Caja" CornerRadius="{Binding Esquinas}" Padding="8,0"
+                        <Border x:Name="Caja" CornerRadius="{Binding Esquinas}"
                                 ClipToBounds="True"
                                 Background="{TemplateBinding Background}">
-                            <ContentPresenter VerticalAlignment="Center"/>
+                            <!--
+                                Lo hecho, aclarado sobre el color del estado. El texto no cabe
+                                en una barra de dos semanas ni con el zoom al máximo, así que
+                                el porcentaje se dice también con la forma, que no gasta ancho.
+
+                                Columnas «*» y no anchos en píxeles: se reparten solas mientras
+                                se arrastra la barra, sin recalcular nada en cada latido. El
+                                relleno va debajo del texto, no al lado.
+                            -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="{Binding Hecho}"/>
+                                    <ColumnDefinition Width="{Binding Queda}"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Background="#38FFFFFF"
+                                        CornerRadius="{Binding EsquinasHechas}"/>
+                                <ContentPresenter Grid.ColumnSpan="2" Margin="8,0"
+                                                  VerticalAlignment="Center"/>
+                            </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -540,7 +592,7 @@
             <StackPanel>
                 <TextBlock Text="Planificación" FontSize="21" FontWeight="Bold"
                            Foreground="#111827" Margin="0,0,0,4"/>
-                <TextBlock Text="Lo que dice gestión de este servicio. No se imprime en el informe."
+                <TextBlock Text="Lo que dice la planificación de esta TdN. No se imprime en el informe."
                            Foreground="#9CA3AF" FontSize="12" Margin="0,0,0,14" TextWrapping="Wrap"/>
 
                 <!-- Sin fichero no hay dónde leer ni dónde escribir -->
@@ -598,7 +650,7 @@
 
                     <Border Style="{StaticResource Tarjeta}">
                         <StackPanel>
-                            <TextBlock Text="Estado del servicio" FontWeight="Bold" FontSize="15"
+                            <TextBlock Text="Estado de la TdN" FontWeight="Bold" FontSize="15"
                                        Foreground="#1F2937" Margin="0,0,0,4"/>
                             <!-- Lo único que se edita aquí. Se escribe en el fichero al
                                  elegirlo, igual que desde el calendario. -->
@@ -623,7 +675,9 @@
                                 <TextBlock Grid.Column="1" Text="{Binding Archivado}" Margin="0,0,0,8"
                                            FontWeight="SemiBold" Foreground="#111827"/>
 
-                                <TextBlock Grid.Row="1" Text="Importe de la oferta" Margin="0,0,0,8"
+                                <!-- El mismo rótulo que en los dos diálogos que lo editan: es
+                                     el mismo dato, y aquí solo se lee. -->
+                                <TextBlock Grid.Row="1" Text="Importe de la TdN (familia)" Margin="0,0,0,8"
                                            Foreground="#374151"/>
                                 <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Importe}" Margin="0,0,0,8"
                                            FontWeight="SemiBold" Foreground="#111827"/>
@@ -645,7 +699,7 @@
                                 Command="{Binding VerEnCalendario}"
                                 Padding="16,8" Cursor="Hand" Margin="0,0,10,0"
                                 Background="#0F766E" Foreground="White" BorderThickness="0"
-                                ToolTip="Abre gestión en el calendario buscando este servicio"/>
+                                ToolTip="Abre gestión en el calendario buscando esta TdN"/>
 
                         <Button Content="Planificar" Command="{Binding Planificar}"
                                 Padding="16,8" Cursor="Hand"
@@ -885,7 +939,7 @@
                 <Border Style="{StaticResource Tarjeta}"
                         Visibility="{Binding HayNormasAnadibles, Converter={StaticResource BoolAVisible}}">
                     <StackPanel>
-                        <TextBlock Text="Otras normas de este servicio" FontWeight="Bold" FontSize="15"
+                        <TextBlock Text="Otras normas de esta TdN" FontWeight="Bold" FontSize="15"
                                    Foreground="#1F2937" Margin="0,0,0,4"/>
                         <TextBlock Text="Sus apartados se añaden al final del índice y salen también en el informe."
                                    Foreground="#6B7280" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
@@ -1108,10 +1162,13 @@
                     <Button Content="Planificación" Command="{Binding VerPlanificacion}" Padding="18,7"
                             Background="#0F766E" Foreground="White" BorderThickness="0"
                             Cursor="Hand" VerticalAlignment="Center" Margin="0,0,8,0"
-                            ToolTip="Fechas, estado, muestras e importe de este servicio"/>
+                            ToolTip="Fechas, estado, muestras e importe de esta TdN"/>
 
+                    <!-- Discreto a propósito, ver el estilo. Al lado de «Guardar» y
+                         «Planificación», que llevan color, se distingue igual: es el
+                         único de los tres sin fondo. -->
                     <Button Content="Exportar" Command="{Binding ExportarInforme}" Padding="18,7"
-                            Background="#111827" Foreground="White" BorderThickness="0"
+                            Style="{StaticResource BotonDiscreto}"
                             Cursor="Hand" VerticalAlignment="Center"/>
                 </StackPanel>
             </Grid>
@@ -1145,6 +1202,22 @@
                             <!-- Oculta las secciones que se quedan sin apartados aplicables -->
                             <Setter Property="Visibility"
                                     Value="{Binding Visible, Converter={StaticResource BoolAVisible}}"/>
+                            <!--
+                                Lo señalado lo manda el nodo, en los dos sentidos.
+                                `TreeView.SelectedItem` es de solo lectura: sin esta atadura no
+                                hay forma de quitarle la marca al árbol cuando se sale por el
+                                botón «Planificación», y el nodo se quedaba señalado sin ser el
+                                panel abierto — con lo que volver a pulsarlo no avisaba de nada.
+                            -->
+                            <Setter Property="IsSelected" Value="{Binding Seleccionado, Mode=TwoWay}"/>
+                            <!--
+                                Cómo se anuncia el nodo. Va en el contenedor y no dentro de la
+                                plantilla porque **el elemento que ve la automatización es el
+                                `TreeViewItem`**, no la rejilla que lleva dentro. Puesto en la
+                                plantilla no sirve de nada: se probó, y los 31 nodos seguían
+                                diciendo «LumNotas.App.ViewModels.SeccionViewModel».
+                            -->
+                            <Setter Property="AutomationProperties.Name" Value="{Binding Rotulo}"/>
                             <Style.Triggers>
                                 <!-- El documento marca la sección del apartado abierto -->
                                 <DataTrigger Binding="{Binding Expandida}" Value="True">
@@ -1314,17 +1387,22 @@
                     -->
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{x:Static vm:VentanaPrincipalViewModel.NombreDelPrograma}"
-                                   FontSize="26" FontWeight="Bold" Foreground="#111827"/>
-                        <Border CornerRadius="9" Background="#E8EAEE" Padding="8,2"
-                                Margin="10,0,0,0" VerticalAlignment="Center">
+                                   FontSize="{StaticResource TamTitulo}" FontWeight="Bold"
+                                   Foreground="{StaticResource TintaFuerte}"/>
+                        <Border CornerRadius="9" Background="#E8EAEE" Padding="8,4"
+                                Margin="8,0,0,0" VerticalAlignment="Center">
+                            <!-- Tinta más oscura que el gris de siempre: sobre este gris,
+                                 #6B7280 daba 4,06:1 y suspendía AA. Ahora 6,20:1 -->
                             <TextBlock Text="{x:Static vm:VentanaPrincipalViewModel.VersionEnEjecucion}"
-                                       FontSize="11" Foreground="#6B7280"/>
+                                       FontSize="{StaticResource TamApoyo}"
+                                       Foreground="{StaticResource TintaSobreGris}"/>
                         </Border>
                     </StackPanel>
                     <!-- Sin citar la norma: el programa lleva cuatro y las que se dejen
                          caer en la carpeta, así que nombrar una sola sobraba -->
-                    <TextBlock Text="Software de toma de notas primarias para ensayos y gestión de proyectos"
-                               Foreground="#6B7280" FontSize="12" Margin="0,6,0,26" TextWrapping="Wrap"/>
+                    <TextBlock Text="Software de toma de notas primarias para ensayos y planificación de servicios"
+                               Foreground="{StaticResource TintaSuave}" FontSize="{StaticResource TamApoyo}"
+                               Margin="0,8,0,24" TextWrapping="Wrap"/>
 
                     <!--
                         Avisos. No existe si no hay nada que hacer: un recuadro que casi
@@ -1386,90 +1464,109 @@
                         -->
                         <Border Grid.Column="0" Style="{StaticResource ZonaInicio}">
                             <StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <!-- El margen de abajo era del renglón de apoyo que había
+                                     debajo; al quitarlo pasa aquí, o los botones subirían a
+                                     pegarse al rótulo de la zona. -->
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
                                     <Border Width="4" Height="16" CornerRadius="2" Background="#2563EB"
-                                            Margin="0,0,9,0"/>
+                                            Margin="0,0,8,0"/>
                                     <TextBlock Text="TOMA DE NOTAS" Style="{StaticResource RotuloZona}"
                                                Foreground="#2563EB"/>
                                 </StackPanel>
-                                <TextBlock Text="Abre una toma de notas"
-                                           TextWrapping="Wrap"
-                                           FontSize="12" Foreground="#6B7280" Margin="13,0,0,16"/>
 
                                 <!--
-                                    Abrir y lo reciente, **a la misma altura**: son la misma
-                                    idea —volver a una toma de notas que ya existe— y en
-                                    vertical gastaban dos veces el alto para eso. Empezar una
-                                    nueva va debajo, cruzando las dos columnas.
+                                    LA PRIMARIA DE ESTA ZONA, y la única con relleno de color
+                                    aquí dentro. Ancho completo y 48 de alto: es lo más pulsado
+                                    del lado izquierdo, así que es lo más grande y lo primero
+                                    donde cae el ojo al entrar en la zona.
 
-                                    Ancho fijo a la izquierda y el resto para las recientes:
-                                    el botón no necesita crecer y los nombres sí.
+                                    Antes medía 150×40 y compartía peso con las cinco filas de
+                                    norma, que llevaban caja y borde propios. Con seis cosas
+                                    del mismo peso no había primera.
                                 -->
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                                <!-- Ajustada al texto y no a todo el ancho: un botón de 780 px
+                                     para tres palabras no se lee como un botón, se lee como
+                                     una banda. El relleno del estilo (16,12) le da el aire. -->
+                                <Button Style="{StaticResource AccionPrimaria}"
+                                        Background="{StaticResource AzulNotas}"
+                                        HorizontalAlignment="Left"
+                                        Command="{Binding DataContext.Abrir, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        AutomationProperties.Name="Abrir TdN existente"
+                                        ToolTip="Abrir una toma de notas que ya existe (Ctrl+O)">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Data="{StaticResource IconoCarpeta}" Stroke="White"
+                                              StrokeThickness="1.3" StrokeLineJoin="Round"
+                                              VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                        <TextBlock Text="Abrir TdN existente" FontSize="{StaticResource TamAccion}"
+                                                   FontWeight="Bold" Foreground="White"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
 
-                                    <!-- Empezar por la norma y el alta rápida hacen lo mismo, y
-                                         tenerlos juntos aquí era ofrecer dos caminos para una
-                                         sola cosa. El alta se queda en «Archivo» y en la barra
-                                         del tablero, que es donde está el responsable. -->
-                                    <Button Grid.Column="0" Width="150" VerticalAlignment="Top"
-                                            Style="{StaticResource AccesoTomaDeNotasPrincipal}"
-                                            Command="{Binding DataContext.Abrir, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            ToolTip="Abrir una toma de notas que ya existe (Ctrl+O)">
-                                        <TextBlock Text="Abrir existente" FontSize="14" FontWeight="Bold"
-                                                   Foreground="White" TextWrapping="Wrap"/>
-                                    </Button>
-
-                                    <StackPanel Grid.Column="1" Margin="14,0,0,0"
-                                                Visibility="{Binding DataContext.HayRecientes, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolAVisible}}">
+                                <StackPanel Margin="0,16,0,0"
+                                            Visibility="{Binding DataContext.HayRecientes, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolAVisible}}">
                                         <TextBlock Text="RECIENTES"
-                                                   Style="{StaticResource RotuloZona}" Foreground="#9CA3AF"
-                                                   Margin="0,0,0,6"/>
+                                                   Style="{StaticResource RotuloZona}"
+                                                   Foreground="{StaticResource TintaSuave}"
+                                                   Margin="0,0,0,8"/>
 
+                                        <!--
+                                            DOS COLUMNAS. Un nombre de toma de notas ocupa
+                                            unos 24 caracteres; a lo ancho de la zona cabían
+                                            tres veces. Cinco rectángulos de 780 px para eso
+                                            era tirar el ancho y gastar el alto, que es lo
+                                            que escasea.
+                                        -->
                                         <ItemsControl ItemsSource="{Binding DataContext.UltimosAbiertos, RelativeSource={RelativeSource AncestorType=Window}}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><UniformGrid Columns="2"/></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Button Style="{StaticResource FilaReciente}"
+                                            <!--
+                                                SECUNDARIA: contorno. Volver a lo de ayer es lo
+                                                más frecuente después de abrir, pero no puede
+                                                llevar relleno de color o habría dos primeras.
+
+                                                Solo el nombre, en una línea; la carpeta vive en
+                                                el consejo emergente. Rejilla y no StackPanel:
+                                                dentro de un StackPanel el ancho es infinito y el
+                                                nombre no sabría dónde recortarse (sexta trampa).
+                                            -->
+                                            <!-- Del alto y la letra de las filas de norma: una
+                                                 sola línea de texto no necesitaba 44 px de
+                                                 caja. Sigue muy por encima del objetivo táctil
+                                                 que pide AA (24), aunque por debajo del 44 de
+                                                 la regla que traíamos. -->
+                                            <Button Style="{StaticResource AccionSecundaria}"
+                                                    Margin="0,0,8,6" MinHeight="34" Padding="12,6"
                                                     ToolTip="{Binding Ruta}"
                                                     Command="{Binding DataContext.AbrirReciente,
                                                               RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    CommandParameter="{Binding Ruta}">
-                                                <!--
-                                                    Solo el nombre, en una línea. La carpeta se
-                                                    quitó: son cinco filas y con dos líneas cada
-                                                    una el panel no cabía en una pantalla de 800.
-                                                    Sigue estando en el consejo emergente, que es
-                                                    donde se mira cuando hace falta desempatar dos
-                                                    servicios parecidos.
-
-                                                    Rejilla y no StackPanel: dentro de un StackPanel
-                                                    el ancho es infinito y el nombre no sabría dónde
-                                                    recortarse (la sexta trampa). Con la columna «*»
-                                                    sí termina en puntos suspensivos.
-                                                -->
+                                                    CommandParameter="{Binding Ruta}"
+                                                    AutomationProperties.Name="{Binding Nombre}">
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Text="{Binding Nombre}" FontSize="11.5"
-                                                               FontWeight="SemiBold" Foreground="#1D4ED8"
+                                                    <TextBlock Text="{Binding Nombre}"
+                                                               FontSize="{StaticResource TamApoyo}"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{StaticResource TintaFuerte}"
                                                                TextTrimming="CharacterEllipsis"/>
                                                 </Grid>
                                             </Button>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                         </ItemsControl>
-                                    </StackPanel>
-                                </Grid>
+                                </StackPanel>
 
-                                <Border Height="1" Background="#EEF0F3" Margin="0,14,12,14"/>
+                                <Border Height="1" Background="#EEF0F3" Margin="0,24,0,16"/>
 
                                 <TextBlock Text="O crea una nueva con la norma que necesites"
-                                           TextWrapping="Wrap" FontSize="12.5" Foreground="#6B7280"
-                                           Margin="0,0,0,10"/>
+                                           TextWrapping="Wrap" FontSize="{StaticResource TamApoyo}"
+                                           Foreground="{StaticResource TintaSuave}"
+                                           Margin="0,0,0,8"/>
 
                                 <!--
                                     Una fila por norma instalada. Sale de CatalogoDeNormas,
@@ -1477,16 +1574,29 @@
                                     tocar nada — incluido el orden, que lo da el título.
                                 -->
                                 <ItemsControl ItemsSource="{Binding Normas}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><UniformGrid Columns="2"/></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Button Style="{StaticResource FilaNorma}"
+                                            <!--
+                                                TERCIARIA: sin caja hasta que se pasa por encima.
+                                                Estrenar norma es lo menos frecuente de la zona y
+                                                llevaba caja y borde propios, igual que las
+                                                recientes. Sigue midiendo 44 de alto: rebajar el
+                                                peso visual no es rebajar el objetivo táctil.
+
+                                                Rejilla y no StackPanel: dentro de un StackPanel
+                                                el ancho es infinito y la designación no sabría
+                                                dónde recortarse.
+                                            -->
+                                            <Button Style="{StaticResource AccionTerciaria}"
+                                                    Margin="0,0,8,4"
                                                     Command="{Binding DataContext.EmpezarConNorma,
                                                               RelativeSource={RelativeSource AncestorType=Window}}"
                                                     CommandParameter="{Binding}"
+                                                    AutomationProperties.Name="{Binding Titulo}"
                                                     ToolTip="{Binding Titulo}">
-                                                <!-- Rejilla y no StackPanel: dentro de un
-                                                     StackPanel el ancho es infinito y la
-                                                     designación no sabría dónde recortarse -->
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition Width="*"/>
@@ -1495,12 +1605,14 @@
                                                         <!-- La designación entera, con sus
                                                              enmiendas: es lo que distingue dos
                                                              años de la misma norma -->
-                                                        <TextBlock Text="{Binding Designacion}" FontSize="13"
-                                                                   FontWeight="Bold" Foreground="#2563EB"
+                                                        <TextBlock Text="{Binding Designacion}"
+                                                                   FontSize="{StaticResource TamApoyo}"
+                                                                   FontWeight="SemiBold"
+                                                                   Foreground="{StaticResource TintaFuerte}"
                                                                    TextTrimming="CharacterEllipsis"/>
                                                         <TextBlock Text="{Binding DescripcionConEdicion}"
-                                                                   FontSize="11.5" Foreground="#6B7280"
-                                                                   Margin="0,1,0,0"
+                                                                   FontSize="{StaticResource TamApoyo}"
+                                                                   Foreground="{StaticResource TintaSuave}"
                                                                    TextTrimming="CharacterEllipsis"/>
                                                     </StackPanel>
                                                 </Grid>
@@ -1516,18 +1628,18 @@
                             Cada vista tiene su enlace directo: entrar a la de gestión y luego
                             buscar el botón de la vista eran dos pasos para lo mismo.
                         -->
-                        <Border Grid.Column="1" Margin="18,0,0,0" VerticalAlignment="Top"
+                        <Border Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Top"
                                 Style="{StaticResource ZonaInicio}">
                             <StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <!-- Igual que la zona de al lado: el margen del renglón de
+                                     apoyo que se quitó se hereda aquí, para que las dos
+                                     columnas sigan empezando a la misma altura. -->
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
                                     <Border Width="4" Height="16" CornerRadius="2" Background="#0F766E"
-                                            Margin="0,0,9,0"/>
-                                    <TextBlock Text="GESTIÓN DE PROYECTOS" Style="{StaticResource RotuloZona}"
+                                            Margin="0,0,8,0"/>
+                                    <TextBlock Text="GESTIÓN DE SERVICIOS" Style="{StaticResource RotuloZona}"
                                                Foreground="#0F766E"/>
                                 </StackPanel>
-                                <TextBlock Text="Mira cómo van todos los servicios sin abrirlos uno a uno"
-                                           TextWrapping="Wrap"
-                                           FontSize="12" Foreground="#6B7280" Margin="13,0,0,16"/>
 
                                 <!--
                                     Dar de alta encabeza la zona (2026‑08‑06). Antes no
@@ -1537,67 +1649,115 @@
                                     la zona del que toma notas para hacer algo que es suyo.
                                     Abre la misma ventana que ese menú.
                                 -->
-                                <Button Style="{StaticResource AccesoGestionPrincipal}"
+                                <!-- Ajustada al texto, como la azul. Y con aire por debajo: pegada
+                                     a la rejilla de vistas parecía la primera de las cinco en vez
+                                     de la acción que encabeza la zona. -->
+                                <Button Style="{StaticResource AccionPrimaria}"
+                                        Background="{StaticResource VerdeGestion}"
+                                        HorizontalAlignment="Left" Margin="0,0,0,20"
                                         Command="{Binding DataContext.NuevoProyecto, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        AutomationProperties.Name="Planificar nueva toma de notas"
                                         ToolTip="Da de alta la toma de notas para poder planificarla: con el código, el técnico y la norma ya se puede">
                                     <!-- Sin subtexto: lo que explicaba está en el consejo
                                          emergente. Este botón y el azul de la izquierda son
                                          los dos que más se pulsan y no necesitan que se les
                                          explique nada cada vez. -->
-                                    <TextBlock Text="Planificar nueva TdN" FontSize="14" FontWeight="Bold"
-                                               Foreground="White" TextWrapping="Wrap"/>
-                                </Button>
-
-                                <Button Style="{StaticResource AccesoGestion}"
-                                        Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{x:Static vm:Vista.Tablero}">
-                                    <StackPanel>
-                                        <TextBlock Text="Tablero" FontSize="14" FontWeight="Bold"
-                                                   Foreground="#0F766E"/>
-                                        <TextBlock Text="Qué falta por rellenar, servicio a servicio"
-                                                   TextWrapping="Wrap" FontSize="12" Foreground="#115E59"
-                                                   Margin="0,2,0,0"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Data="{StaticResource IconoNuevo}" Stroke="White"
+                                              StrokeThickness="1.6" StrokeLineJoin="Round"
+                                              VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                        <TextBlock Text="Planificar nueva TdN" FontSize="{StaticResource TamAccion}"
+                                                   FontWeight="Bold" Foreground="White"
+                                                   VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
 
-                                <Button Style="{StaticResource AccesoGestion}"
-                                        Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{x:Static vm:Vista.Calendario}">
-                                    <StackPanel>
-                                        <TextBlock Text="Calendario" FontSize="14" FontWeight="Bold"
-                                                   Foreground="#0F766E"/>
-                                        <TextBlock Text="Línea temporal de planificación"
-                                                   TextWrapping="Wrap" FontSize="12" Foreground="#115E59"
-                                                   Margin="0,2,0,0"/>
-                                    </StackPanel>
-                                </Button>
+                                <!--
+                                    LAS CUATRO VISTAS, EN REJILLA 2×2 Y CON ICONO. Eran
+                                    cuatro filas apiladas a todo lo ancho para escribir una
+                                    palabra: gastaban el alto de la zona y dejaban muerto el
+                                    ancho. En dos por dos ocupan la mitad de alto.
 
-                                <Button Style="{StaticResource AccesoGestion}"
-                                        Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{x:Static vm:Vista.Carga}">
-                                    <StackPanel>
-                                        <TextBlock Text="Carga" FontSize="14" FontWeight="Bold"
-                                                   Foreground="#0F766E"/>
-                                        <TextBlock Text="Carga de trabajo por técnico/mes"
-                                                   TextWrapping="Wrap" FontSize="12" Foreground="#115E59"
-                                                   Margin="0,2,0,0"/>
-                                    </StackPanel>
-                                </Button>
+                                    El icono no es adorno: «Tablero», «Calendario», «Carga»
+                                    y «BBDD» son cuatro palabras abstractas que hay que leer
+                                    una a una. Con un dibujo se distinguen antes de leerlas,
+                                    y a los tres días se pulsa por la forma.
+                                -->
+                                <UniformGrid Columns="2">
+                                    <Button Style="{StaticResource AccionSecundaria}" Margin="0,0,8,8"
+                                            Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{x:Static vm:Vista.Tablero}"
+                                            AutomationProperties.Name="Tablero"
+                                            ToolTip="Qué falta por rellenar, TdN a TdN">
+                                        <StackPanel>
+                                            <Path Data="{StaticResource IconoTablero}"
+                                                  Stroke="{StaticResource VerdeGestion}" StrokeThickness="1.3"
+                                                  StrokeLineJoin="Round" HorizontalAlignment="Left"
+                                                  Margin="0,0,0,8"/>
+                                            <TextBlock Text="Tablero" FontSize="{StaticResource TamAccion}" FontWeight="Bold"
+                                                       Foreground="{StaticResource TintaFuerte}"/>
+                                            <TextBlock Text="Qué falta por rellenar"
+                                                       TextWrapping="Wrap" FontSize="{StaticResource TamApoyo}"
+                                                       Foreground="{StaticResource TintaSuave}"/>
+                                        </StackPanel>
+                                    </Button>
 
-                                <!-- La cuarta mira hacia atrás y no hacia lo que queda por
-                                     hacer, así que se dice que también enseña lo terminado:
-                                     es lo que la distingue de las otras tres. -->
-                                <Button Style="{StaticResource AccesoGestion}"
-                                        Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{x:Static vm:Vista.Bbdd}">
-                                    <StackPanel>
-                                        <TextBlock Text="BBDD" FontSize="14" FontWeight="Bold"
-                                                   Foreground="#0F766E"/>
-                                        <TextBlock Text="Buscar cualquier TdN"
-                                                   TextWrapping="Wrap" FontSize="12" Foreground="#115E59"
-                                                   Margin="0,2,0,0"/>
-                                    </StackPanel>
-                                </Button>
+                                    <Button Style="{StaticResource AccionSecundaria}" Margin="0,0,0,8"
+                                            Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{x:Static vm:Vista.Calendario}"
+                                            AutomationProperties.Name="Calendario"
+                                            ToolTip="Línea temporal de planificación">
+                                        <StackPanel>
+                                            <Path Data="{StaticResource IconoCalendario}"
+                                                  Stroke="{StaticResource VerdeGestion}" StrokeThickness="1.3"
+                                                  StrokeLineJoin="Round" HorizontalAlignment="Left"
+                                                  Margin="0,0,0,8"/>
+                                            <TextBlock Text="Calendario" FontSize="{StaticResource TamAccion}" FontWeight="Bold"
+                                                       Foreground="{StaticResource TintaFuerte}"/>
+                                            <TextBlock Text="Línea temporal"
+                                                       TextWrapping="Wrap" FontSize="{StaticResource TamApoyo}"
+                                                       Foreground="{StaticResource TintaSuave}"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Style="{StaticResource AccionSecundaria}" Margin="0,0,8,0"
+                                            Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{x:Static vm:Vista.Carga}"
+                                            AutomationProperties.Name="Carga"
+                                            ToolTip="Carga de trabajo por técnico y mes">
+                                        <StackPanel>
+                                            <Path Data="{StaticResource IconoCarga}"
+                                                  Stroke="{StaticResource VerdeGestion}" StrokeThickness="1.3"
+                                                  StrokeLineJoin="Round" HorizontalAlignment="Left"
+                                                  Margin="0,0,0,8"/>
+                                            <TextBlock Text="Carga" FontSize="{StaticResource TamAccion}" FontWeight="Bold"
+                                                       Foreground="{StaticResource TintaFuerte}"/>
+                                            <TextBlock Text="Por técnico y mes"
+                                                       TextWrapping="Wrap" FontSize="{StaticResource TamApoyo}"
+                                                       Foreground="{StaticResource TintaSuave}"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <!-- La cuarta mira hacia atrás y no hacia lo que queda por
+                                         hacer: por eso la lupa y no otra cosa. -->
+                                    <Button Style="{StaticResource AccionSecundaria}" Margin="0"
+                                            Command="{Binding DataContext.IrAVistaDeGestion, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{x:Static vm:Vista.Bbdd}"
+                                            AutomationProperties.Name="BBDD"
+                                            ToolTip="Buscar cualquier toma de notas, también las terminadas">
+                                        <StackPanel>
+                                            <Path Data="{StaticResource IconoBuscar}"
+                                                  Stroke="{StaticResource VerdeGestion}" StrokeThickness="1.3"
+                                                  StrokeLineJoin="Round" HorizontalAlignment="Left"
+                                                  Margin="0,0,0,8"/>
+                                            <TextBlock Text="BBDD" FontSize="{StaticResource TamAccion}" FontWeight="Bold"
+                                                       Foreground="{StaticResource TintaFuerte}"/>
+                                            <TextBlock Text="Buscar cualquier TdN"
+                                                       TextWrapping="Wrap" FontSize="{StaticResource TamApoyo}"
+                                                       Foreground="{StaticResource TintaSuave}"/>
+                                        </StackPanel>
+                                    </Button>
+                                </UniformGrid>
 
                             </StackPanel>
                         </Border>
@@ -1703,6 +1863,28 @@
                                     </Button.Style>
                                 </Button>
                             </StackPanel>
+
+                            <!--
+                                Exportar el listado. Solo se puede en la BBDD (DD‑140), así
+                                que aparece y desaparece — y por eso va **el último de la
+                                barra**: delante de él no hay nada que se mueva de sitio al
+                                entrar y salir.
+
+                                Vivió una fila más abajo, en una franja propia junto a «47
+                                tomas de notas». La franja se quitó: repetía la cuenta que ya
+                                da la línea de estado y gastaba un renglón entero de tabla
+                                para un solo botón.
+
+                                Discreto a propósito —sin fondo y en negrita, ver el
+                                estilo—, el mismo que «Exportar» en la toma de notas: es
+                                la misma acción y no puede cambiar de aspecto según la
+                                pestaña.
+                            -->
+                            <Button Content="Exportar" Command="{Binding Bbdd.Exportar}"
+                                    Style="{StaticResource BotonDiscreto}"
+                                    Padding="18,6" Cursor="Hand" Margin="18,0,0,6"
+                                    Visibility="{Binding VistaBbdd, Converter={StaticResource BoolAVisible}}"
+                                    ToolTip="Guardar en HTML todas las tomas de notas del listado, para imprimir en A4 apaisado"/>
                         </WrapPanel>
 
                         <!-- Ajustes propios de la línea de tiempo. Los filtros están arriba,
@@ -1786,12 +1968,58 @@
                                 <Border Width="290" Margin="0,0,14,0" Background="#EEF0F3"
                                         CornerRadius="8" Padding="12" VerticalAlignment="Top">
                                     <StackPanel>
-                                        <!-- Servicio y familia, sin la edición del documento -->
-                                        <TextBlock Text="{Binding Rotulo}" FontWeight="Bold"
-                                                   FontSize="15" Foreground="#111827" TextWrapping="Wrap"/>
+                                        <!--
+                                            Servicio y familia, sin la edición del documento, con los
+                                            mismos dos avisos que lleva la barra del calendario. Aquí
+                                            hacen más falta todavía: el tablero es donde se decide qué
+                                            se coge hoy, y eso depende de si la muestra está en el
+                                            laboratorio tanto como de lo que quede por rellenar.
+
+                                            Rejilla y no StackPanel: dentro de un StackPanel horizontal
+                                            el ancho es infinito y el rótulo dejaría de envolver. Es la
+                                            misma trampa que en las barras del calendario.
+                                        -->
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Top"
+                                                        Margin="0,4,0,0">
+                                                <!--
+                                                    Ámbar el que urge y gris el que solo informa: que las
+                                                    muestras estén aquí mueve a hacer algo; que las fechas
+                                                    estén blindadas solo avisa de que no se toquen.
+                                                -->
+                                                <Path Data="{StaticResource IconoCaja}"
+                                                      Stroke="#B45309" StrokeThickness="1.2"
+                                                      StrokeLineJoin="Round" Margin="0,0,6,0"
+                                                      ToolTip="Las muestras ya están en el laboratorio"
+                                                      Visibility="{Binding Planificacion.MuestrasRecibidas,
+                                                                   Converter={StaticResource BoolAVisible}}"/>
+
+                                                <Path Data="{StaticResource IconoCandado}"
+                                                      Stroke="#6B7280" StrokeThickness="1.2"
+                                                      StrokeLineJoin="Round" Margin="0,0,6,0"
+                                                      ToolTip="Fechas bloqueadas"
+                                                      Visibility="{Binding Planificacion.FechasBloqueadas,
+                                                                   Converter={StaticResource BoolAVisible}}"/>
+                                            </StackPanel>
+
+                                            <TextBlock Grid.Column="1" Text="{Binding Rotulo}" FontWeight="Bold"
+                                                       FontSize="15" Foreground="#111827" TextWrapping="Wrap"/>
+                                        </Grid>
                                         <TextBlock Text="{Binding Tecnico}" Foreground="#6B7280" FontSize="11"/>
-                                        <TextBlock Text="{Binding Avance}" Foreground="#374151" FontSize="12"
-                                                   FontWeight="SemiBold" Margin="0,4,0,10"/>
+                                        <!--
+                                            «3W | 45 % | 7/16 secciones». El renglón lo arma el
+                                            resumen, no la vista, para que el calendario no se
+                                            invente otra forma de escribir lo mismo. Lo que no
+                                            hay se cae solo: sin fechas no hay semanas y sin
+                                            pesos declarados no hay porcentaje.
+                                        -->
+                                        <TextBlock Text="{Binding LineaDeAvance}" Foreground="#374151" FontSize="12"
+                                                   FontWeight="SemiBold" Margin="0,4,0,10"
+                                                   TextTrimming="CharacterEllipsis"/>
 
                                         <!-- Una tarjeta por sección pendiente -->
                                         <ItemsControl ItemsSource="{Binding SeccionesPendientes}">
@@ -1911,7 +2139,7 @@
                                     MaxWidth="{Binding ViewportWidth,
                                                RelativeSource={RelativeSource AncestorType=ScrollViewer}}">
                                 <TextBlock FontSize="11" Foreground="#4B5563" TextWrapping="Wrap" MaxWidth="620"
-                                           Text="El trabajo de cada servicio sale de su oferta y se reparte entre los meses que abarca, en proporción a sus días entre semana. Se compara con lo que cabe en cada mes, que no es lo mismo en agosto que en marzo. Verde por debajo del 85 %, ámbar hasta el 100 %, rojo por encima."/>
+                                           Text="El trabajo de cada TdN sale de su importe y se reparte entre los meses que abarca, en proporción a sus días.&#10;Para modificar el cálculo y los días de cada mes, ir a «Configuración» → «Capacidad y tarifa».&#10;&#10;Las tomas de notas con estado «Terminado» y «Archivados», por defecto no se computan como carga.&#10;Para ver la carga de trabajo de las tomas de notas «Archivados», usar los filtros.&#10;La carga de trabajo de las tomas de notas «Terminado» no se computa nunca, ni siquiera eligiendo el filtro."/>
                             </Border>
                         </StackPanel>
                     </ScrollViewer>
@@ -1933,19 +2161,18 @@
                 <Grid Grid.Row="1"
                       Visibility="{Binding VistaBbdd, Converter={StaticResource BoolAVisible}}">
                 <Grid DataContext="{Binding Bbdd}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                    <!--
+                        Aquí había una segunda barra de filtros —buscar, IP, IK y
+                        acreditación— propia del listado. Se fue al botón «Filtros», que
+                        ahora manda en las cuatro vistas.
 
-                    <!-- Aquí había una segunda barra de filtros —buscar, IP, IK y
-                         acreditación— propia del listado. Se fue al botón «Filtros», que
-                         ahora manda en las cuatro vistas; queda solo la cuenta. -->
-                    <Border Background="White" BorderBrush="#E1E4E8" BorderThickness="0,0,0,1"
-                            Padding="20,8">
-                        <TextBlock Text="{Binding Recuento}" VerticalAlignment="Center"
-                                   FontSize="11" Foreground="#9CA3AF"/>
-                    </Border>
+                        Y detrás quedó una franja con «47 tomas de notas» y el botón de
+                        exportar, que también se ha ido: **la cuenta ya la da la línea de
+                        estado** dos renglones más arriba —«47 proyectos | 186 fuera del
+                        filtro»— y decirla otra vez, con otras palabras para lo mismo, solo
+                        servía para hacer dudar de si hablaban de lo mismo. El botón subió a
+                        la barra de mandos, que es donde están las otras acciones.
+                    -->
 
                     <!--
                         Doce columnas no caben en una ventana estrecha, y aquí no se
@@ -1962,7 +2189,7 @@
                         la lista se mediría con altura infinita, tendría que crear las 250
                         filas de golpe y no virtualizaría nada (la sexta trampa, en vertical).
                     -->
-                    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto"
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                   VerticalScrollBarVisibility="Disabled" Padding="20,12">
                         <Grid HorizontalAlignment="Left">
                             <Grid.RowDefinitions>
@@ -2201,7 +2428,7 @@
                                             <Button Command="{Binding Alternar}" Cursor="Hand"
                                                     Background="Transparent" BorderThickness="0"
                                                     Padding="8,0" HorizontalContentAlignment="Left"
-                                                    ToolTip="Plegar o desplegar sus proyectos">
+                                                    ToolTip="Plegar o desplegar sus TdN">
                                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                                     <TextBlock Text="{Binding Marca}" FontSize="10"
                                                                Foreground="#64748B" Margin="0,0,5,0"
@@ -2357,11 +2584,23 @@
                                                                                   Visibility="{Binding FechasBloqueadas,
                                                                                                Converter={StaticResource BoolAVisible}}"/>
                                                                         </StackPanel>
-                                                                        <TextBlock Grid.Column="1" Text="{Binding Codigo}"
+                                                                        <!--
+                                                                            El código manda y las semanas y el
+                                                                            porcentaje van detrás, más apagados:
+                                                                            el recorte muerde por la cola, así
+                                                                            que en una barra estrecha lo que se
+                                                                            pierde es el añadido y no el nombre.
+                                                                        -->
+                                                                        <TextBlock Grid.Column="1"
                                                                                    Foreground="White"
                                                                                    FontSize="11" FontWeight="SemiBold"
                                                                                    VerticalAlignment="Center"
-                                                                                   TextTrimming="CharacterEllipsis"/>
+                                                                                   TextTrimming="CharacterEllipsis">
+                                                                            <Run Text="{Binding Codigo, Mode=OneWay}"/><Run
+                                                                                   Text="{Binding Extra, Mode=OneWay}"
+                                                                                   FontWeight="Normal"
+                                                                                   Foreground="#CCFFFFFF"/>
+                                                                        </TextBlock>
                                                                     </Grid>
                                                                 </Button>
                                                             </DataTemplate>
@@ -2499,7 +2738,7 @@
                     cuatro por su nombre para quien ya sabe adónde va. La marca dice en
                     cuál se está, que es la pregunta que se hace al abrir el menú.
                 -->
-                <MenuItem Header="_Gestión de proyectos">
+                <MenuItem Header="_Planificación de TdN y servicios">
                     <MenuItem Header="_Ir a gestión" Command="{Binding IrAGestion}"
                               ToolTip="Abre gestión en la vista en la que estabas"/>
                     <Separator/>
@@ -2508,7 +2747,7 @@
                               CommandParameter="{x:Static vm:Vista.Tablero}"
                               IsCheckable="True"
                               IsChecked="{Binding Gestion.VistaTablero, Mode=OneWay}"
-                              ToolTip="Qué falta por rellenar, servicio a servicio"/>
+                              ToolTip="Qué falta por rellenar, TdN a TdN"/>
                     <MenuItem Header="_Calendario"
                               Command="{Binding IrAVistaDeGestion}"
                               CommandParameter="{x:Static vm:Vista.Calendario}"
@@ -2535,9 +2774,9 @@
                 <!-- Lo primero: de esta carpeta sale todo lo demás -->
                 <!-- El nombre las dice las dos: son la carpeta donde se buscan los
                      proyectos y la compartida, y en una sola ventana no se adivinaba -->
-                <MenuItem Header="_Carpetas: proyectos y compartida"
+                <MenuItem Header="_Carpetas: tomas de notas y compartida"
                           Command="{Binding ElegirCarpetaDelLaboratorio}"
-                          ToolTip="Dónde se buscan los proyectos y dónde están las normas, los técnicos y la tarifa"/>
+                          ToolTip="Dónde se buscan las tomas de notas y dónde están las normas, los técnicos y la tarifa"/>
                 <Separator/>
                 <MenuItem Header="_Técnicos" Command="{Binding EditarTecnicos}"/>
                 <MenuItem Header="_Capacidad y tarifa" Command="{Binding EditarCapacidad}"/>

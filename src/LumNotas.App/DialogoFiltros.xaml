@@ -27,7 +27,7 @@
 
         <TextBlock Text="Mostrar" Style="{StaticResource Etiqueta}"/>
         <TextBlock Style="{StaticResource Pista}"
-                   Text="«En desarrollo» deja fuera lo terminado y lo archivado. Para buscar un servicio antiguo, «Cualquier estado»."/>
+                   Text="«En desarrollo» incluye todos los estados excepto los «Archivados». Seleccionar «Cualquier estado» para mostrar también los «Archivados»."/>
         <ComboBox ItemsSource="{Binding Estados}" SelectedItem="{Binding Estado}"
                   Padding="6,5" Margin="0,0,0,14"/>
 
@@ -50,7 +50,14 @@
 
             <StackPanel>
                 <TextBlock Text="Norma" Style="{StaticResource Etiqueta}"/>
-                <ComboBox ItemsSource="{Binding Normas}" SelectedItem="{Binding Norma}" Padding="6,5"/>
+                <!--
+                    `SelectedValue` y no `SelectedItem`: la lista lleva objetos con dos
+                    campos —la designación que se lee y el id por el que se filtra— y lo que
+                    viaja al filtro tiene que ser el id.
+                -->
+                <ComboBox ItemsSource="{Binding Normas}" Padding="6,5"
+                          DisplayMemberPath="Rotulo" SelectedValuePath="Id"
+                          SelectedValue="{Binding Norma}"/>
             </StackPanel>
 
             <StackPanel Grid.Column="2">
@@ -85,7 +92,7 @@
              darse por terminada, así que solo encuentra servicios cerrados. -->
         <TextBlock Text="Ensayado entre" Style="{StaticResource Etiqueta}"/>
         <TextBlock Style="{StaticResource Pista}"
-                   Text="Solo salen los servicios terminados: son los que tienen apuntado cuándo se ensayaron."/>
+                   Text="Solo salen las TdN terminadas: son las que tienen apuntado cuándo se ensayaron."/>
         <Grid Margin="0,0,0,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

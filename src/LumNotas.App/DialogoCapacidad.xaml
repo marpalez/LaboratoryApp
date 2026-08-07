@@ -29,7 +29,7 @@
         <TextBlock x:Name="Equivalencia" FontSize="11" Foreground="#9CA3AF" Margin="0,0,0,14"
                    TextWrapping="Wrap"/>
 
-        <TextBlock Text="Horas que tiene una jornada" Foreground="#374151"
+        <TextBlock Text="Horas que tiene un día de trabajo" Foreground="#374151"
                    FontSize="12" Margin="0,0,0,4"/>
         <TextBlock Text="Para pasar las horas a días, que es como se declara la capacidad de cada mes."
                    Foreground="#9CA3AF" FontSize="11" Margin="0,0,0,4"/>

@@ -45,6 +45,7 @@ public sealed class GestionViewModel : ObservableObject
         _explorador = new ExploradorDeProyectos(repositorio);
         Calendario = new CalendarioViewModel(Planificar, ruta => AbrirProyecto?.Invoke(ruta), Guardar);
         Bbdd.Abrir = ruta => AbrirProyecto?.Invoke(ruta);
+        Bbdd.AlExportar = () => ExportarListado?.Invoke(Bbdd.Filas);
 
         Refrescar = new Comando(Explorar);
         VerTablero = new Comando(() => VistaActual = Vista.Tablero);
@@ -78,6 +79,17 @@ public sealed class GestionViewModel : ObservableObject
 
     /// <summary>Abrir un proyecto en una pestaña; lo resuelve la ventana.</summary>
     public Action<string>? AbrirProyecto { get; set; }
+
+    /// <summary>
+    /// Sacar en papel el listado de la BBDD; lo resuelve la ventana, que es quien sabe pedir
+    /// un fichero y abrir el visor.
+    /// <para>
+    /// Van solo las filas. Llegó a mandarse también el detalle de los filtros, para que el
+    /// papel dijera qué estaba apartando, y el laboratorio lo quitó al verlo: el listado se
+    /// mira en el momento y junto a la pantalla de la que sale.
+    /// </para>
+    /// </summary>
+    public Action<IReadOnlyList<FilaDeBbdd>>? ExportarListado { get; set; }
 
     /// <summary>
     /// Proyectos de la carpeta del laboratorio que ya usan ese código de servicio.
@@ -261,7 +273,12 @@ public sealed class GestionViewModel : ObservableObject
     // ---- como pestaña ------------------------------------------------------
 
     /// <summary>El tablero es una pestaña más, así que necesita rótulo y saber si manda.</summary>
-    public string Rotulo => "Gestión de proyectos";
+    /// <summary>
+    /// Cómo se llama la pestaña. <b>Nombra las dos cosas que se ven dentro</b>: se planifican
+    /// tomas de notas —cada una con sus fechas y su importe— y se miran servicios, que es
+    /// como el laboratorio agrupa lo que le encarga un cliente.
+    /// </summary>
+    public string Rotulo => "Planificación de TdN y servicios";
 
     private bool _esActivo;
 
@@ -354,7 +371,23 @@ public sealed class GestionViewModel : ObservableObject
     /// <summary>Técnicos y normas que hay en los proyectos, con «(todos)» al principio.</summary>
     public ObservableCollection<string> Tecnicos { get; } = [Cualquiera];
 
-    public ObservableCollection<string> Normas { get; } = [Cualquiera];
+    /// <summary>
+    /// Las normas que hay en los proyectos, <b>por su designación</b> —«EN IEC 60598‑1:2024
+    /// + A11:2024»— y no por su id interno.
+    /// <para>
+    /// El desplegable ofrecía <c>60598-1_2024</c> y <c>62262_2002_A1</c>, que es como se
+    /// llaman los ficheros de plantilla y no como se llama una norma para nadie. Es el mismo
+    /// criterio que ya seguían la columna NORMA de la BBDD y la cabecera de la toma de
+    /// notas: el id no le dice nada a quien filtra.
+    /// </para>
+    /// <para>
+    /// <b>Se enseña la designación pero se sigue filtrando por el id</b>, que es la
+    /// identidad estable de una norma. Las designaciones cambian —la de la 60529 se
+    /// corrigió entera el 2026‑08‑06 (DD‑134)— y filtrar por un texto que cambia habría
+    /// dejado de encontrar los proyectos guardados.
+    /// </para>
+    /// </summary>
+    public ObservableCollection<OpcionDeNorma> Normas { get; } = [OpcionDeNorma.Todas];
 
     /// <summary>
     /// Filtrar por responsable. Vale para las tres vistas: en el tablero enseña lo que
@@ -474,7 +507,7 @@ public sealed class GestionViewModel : ObservableObject
     public bool HayFiltros => ResumenDeFiltros.Cuantos(Filtros) > 0;
 
     /// <summary>Qué se está viendo, para el consejo emergente y la línea de estado.</summary>
-    public string DetalleFiltros => ResumenDeFiltros.Detalle(Filtros);
+    public string DetalleFiltros => ResumenDeFiltros.Detalle(Filtros, DesignacionDe);
 
     /// <summary>
     /// Deja los filtros como al abrir el programa. <b>La caja de buscar también</b>: quien
@@ -549,7 +582,7 @@ public sealed class GestionViewModel : ObservableObject
             Calendario.Cargar([]);
             Carga.Cargar([]);
             Bbdd.Cargar([]);
-            Mensaje = "Elige la carpeta donde el laboratorio guarda los proyectos.";
+            Mensaje = "Elige la carpeta donde el laboratorio guarda las tomas de notas.";
             return;
         }
 
@@ -598,7 +631,7 @@ public sealed class GestionViewModel : ObservableObject
 
         Rellenar(Tecnicos, todos.Select(p => p.Tecnico), ref _tecnico, nameof(Tecnico),
                  CargaPorTecnico.SinTecnico);
-        Rellenar(Normas, todos.SelectMany(p => p.Normas), ref _norma, nameof(Norma));
+        RellenarNormas(todos.SelectMany(p => p.Normas));
         Rellenar(OpcionesIp, todos.Select(p => p.GradoIp), ref _ip, nameof(Ip));
         Rellenar(OpcionesIk, todos.Select(p => p.GradoIk), ref _ik, nameof(Ik));
         Rellenar(OpcionesAcreditacion, todos.SelectMany(p => p.Acreditaciones),
@@ -647,11 +680,13 @@ public sealed class GestionViewModel : ObservableObject
     /// </summary>
     private string ResumenDeLoLeido()
     {
-        if (_ultimos.Count == 0) return $"No hay proyectos en {Carpeta}";
+        if (_ultimos.Count == 0) return $"No hay tomas de notas en {Carpeta}";
 
         var ocultos = _ultimos.Count - _visibles;
 
-        return $"{_visibles} proyecto{(_visibles == 1 ? "" : "s")}"
+        // «TdN» y no «tomas de notas»: la línea cuenta cuatro datos separados por barras y
+        // el rótulo largo se comería el sitio de los otros tres.
+        return $"{_visibles} TdN"
                + (ocultos == 0 ? "" : $" | {ocultos} fuera del filtro")
                + $" | leídos en {_leidoEn.TotalSeconds:0.0} s"
                + $" | actualizado a las {_actualizadoA:HH:mm}";
@@ -697,6 +732,58 @@ public sealed class GestionViewModel : ObservableObject
         elegido = Cualquiera;
         Notificar(propiedad);
     }
+
+    /// <summary>
+    /// Igual que <see cref="Rellenar"/> pero traduciendo cada id a su designación. Va aparte
+    /// porque es el único desplegable donde lo que se enseña y lo que se filtra no son la
+    /// misma cadena.
+    /// </summary>
+    /// <remarks>
+    /// Una norma que ya no esté instalada —o un proyecto viejo con un id retirado— se queda
+    /// <b>con su id como rótulo</b> en vez de desaparecer del desplegable. Feo, pero honrado:
+    /// esos proyectos existen y hay que poder filtrarlos; borrarlos de la lista los volvería
+    /// inalcanzables sin decir por qué.
+    /// </remarks>
+    private void RellenarNormas(IEnumerable<string> ids)
+    {
+        var lista = ids.Where(id => !string.IsNullOrWhiteSpace(id))
+                       .Distinct(StringComparer.OrdinalIgnoreCase)
+                       .Select(id => new OpcionDeNorma(id, DesignacionDe(id)))
+                       .OrderBy(o => o.Rotulo, StringComparer.CurrentCultureIgnoreCase)
+                       .ToList();
+
+        Normas.Clear();
+        Normas.Add(OpcionDeNorma.Todas);
+        foreach (var opcion in lista) Normas.Add(opcion);
+
+        if (Normas.Any(o => o.Id.Equals(_norma, StringComparison.OrdinalIgnoreCase))) return;
+
+        _norma = Cualquiera;
+        Notificar(nameof(Norma));
+    }
+
+    /// <summary>Cómo se llama esa norma, o su id si el laboratorio ya no la tiene instalada.</summary>
+    private string DesignacionDe(string id)
+        => _normasInstaladas.TryGetValue(id, out var plantilla)
+            ? plantilla.Meta.ComoSeLlamaLaNorma
+            : id;
+}
+
+/// <summary>
+/// Una norma en el desplegable de filtros: se <b>enseña</b> su designación y se
+/// <b>filtra</b> por su id.
+/// <para>
+/// Son dos cosas distintas y por eso van en dos campos. El id es la identidad estable de
+/// una norma; la designación es cómo se llama hoy, y cambia — la de la 60529 se corrigió
+/// entera (DD‑134). Guardar el filtro por designación habría dejado de encontrar los
+/// proyectos el día que se corrigiera un texto.
+/// </para>
+/// </summary>
+public sealed record OpcionDeNorma(string Id, string Rotulo)
+{
+    /// <summary>La opción de no filtrar. Se llama igual por los dos lados.</summary>
+    public static OpcionDeNorma Todas { get; } =
+        new(FiltrosDeGestion.Cualquiera, FiltrosDeGestion.Cualquiera);
 }
 
 /// <summary>Las tres preguntas del responsable sobre la misma carpeta de proyectos.</summary>

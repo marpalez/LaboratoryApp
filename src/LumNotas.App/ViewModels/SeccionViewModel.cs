@@ -7,8 +7,20 @@ namespace LumNotas.App.ViewModels;
 /// Una sección de la norma en el árbol del índice. Agrupa sus apartados y resume su
 /// estado, para que el técnico vea de un vistazo dónde falta algo sin desplegarla.
 /// </summary>
-public sealed class SeccionViewModel : ObservableObject
+public sealed class SeccionViewModel : ObservableObject, INodoDelIndice
 {
+    private bool _seleccionado;
+
+    /// <inheritdoc/>
+    public bool Seleccionado
+    {
+        get => _seleccionado;
+        set => Establecer(ref _seleccionado, value);
+    }
+
+    /// <inheritdoc/>
+    public string Rotulo => Titulo;
+
     private readonly IReadOnlyList<BloqueViewModel> _todos;
 
     public SeccionViewModel(string titulo, IReadOnlyList<BloqueViewModel> apartados)

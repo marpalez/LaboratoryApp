@@ -4,6 +4,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using LumNotas.App.ViewModels;
+using LumNotas.Core.Gestion;
+using LumNotas.Report;
 using LumNotas.Storage;
 using Microsoft.Win32;
 
@@ -101,6 +103,36 @@ public partial class MainWindow : Window
             return respuesta;
         };
 
+        // Sacar en papel el listado de la BBDD. Mismo camino que el informe de ensayo —pedir
+        // fichero, escribir, abrir el visor— pero sin preguntar por el estado del servicio:
+        // esto no cierra ningún trabajo, solo enseña lo que hay.
+        modelo.Gestion.ExportarListado = filas =>
+        {
+            try
+            {
+                var dialogo = new SaveFileDialog
+                {
+                    Filter = "Listado en HTML (*.html)|*.html",
+                    Title = "Exportar el listado",
+                    // Con la fecha dentro, dos listados del mismo día no se pisan sin avisar
+                    // y se ve de qué momento es cada uno sin abrirlo.
+                    FileName = $"Listado_tomas_de_notas_{DateTime.Now:yyyy-MM-dd}",
+                    DefaultExt = ExportadorDeListado.Extension
+                };
+
+                if (dialogo.ShowDialog(this) != true) return;
+
+                new ExportadorDeListado().Exportar([.. filas], dialogo.FileName);
+
+                // Que se ha exportado se ve: el listado se abre solo, a continuación.
+                modelo.Servicios.AbrirEnElVisor?.Invoke(dialogo.FileName);
+            }
+            catch (Exception ex)
+            {
+                modelo.Servicios.Avisar?.Invoke($"No se pudo exportar el listado:\n\n{ex.Message}");
+            }
+        };
+
         // Lo que no ha salido bien. Interrumpe a propósito: sustituye a la franja del pie
         // de ventana, que se quitó (DD‑133), y por aquí pasan los cuatro únicos avisos de
         // que algo ha fallado. Uno que se pueda pasar por alto no serviría.
@@ -123,7 +155,7 @@ public partial class MainWindow : Window
         {
             var dialogo = new OpenFolderDialog
             {
-                Title = "Carpeta donde el laboratorio guarda los proyectos",
+                Title = "Carpeta donde el laboratorio guarda las tomas de notas",
                 InitialDirectory = Directory.Exists(actual) ? actual : ""
             };
             return dialogo.ShowDialog(this) == true ? dialogo.FolderName : null;

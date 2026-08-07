@@ -21,10 +21,10 @@
                    Text="Son dos carpetas distintas de OneDrive. Se eligen una vez en cada equipo."/>
 
         <!-- ===== 1. Proyectos ===== -->
-        <TextBlock Text="1 · Dónde están los proyectos" FontWeight="SemiBold" Foreground="#374151"
+        <TextBlock Text="1 · Dónde están las tomas de notas" FontWeight="SemiBold" Foreground="#374151"
                    Margin="0,0,0,4"/>
         <TextBlock Margin="0,0,0,6" Foreground="#6B7280" FontSize="11" TextWrapping="Wrap"
-                   Text="La carpeta que los contiene a todos, aunque cada uno cuelgue de su cliente y su servicio. Se busca dentro de ella y de todas sus subcarpetas."/>
+                   Text="La carpeta que las contiene a todas, aunque cada una cuelgue de su cliente y su servicio. Se busca dentro de ella y de todas sus subcarpetas."/>
 
         <Border x:Name="EstadoProyectos" Style="{StaticResource Ficha}">
             <StackPanel>
@@ -33,14 +33,14 @@
                            TextWrapping="Wrap"/>
             </StackPanel>
         </Border>
-        <Button Content="Elegir carpeta de proyectos" Click="AlElegirProyectos" Padding="14,7"
+        <Button Content="Elegir carpeta de tomas de notas" Click="AlElegirProyectos" Padding="14,7"
                 Cursor="Hand" HorizontalAlignment="Left" Margin="0,0,0,20"/>
 
         <!-- ===== 2. Configuración compartida ===== -->
         <TextBlock Text="2 · Dónde está lo compartido" FontWeight="SemiBold" Foreground="#374151"
                    Margin="0,0,0,4"/>
         <TextBlock Margin="0,0,0,6" Foreground="#6B7280" FontSize="11" TextWrapping="Wrap"
-                   Text="Las normas, la lista de técnicos, la tarifa y la versión del programa. Tiene que poder leerla todo el mundo. Si se deja en blanco, se usa la de proyectos."/>
+                   Text="Las normas, la lista de técnicos, la tarifa y la versión del programa. Tiene que poder leerla todo el mundo. Si se deja en blanco, se usa la de tomas de notas."/>
 
         <Border x:Name="EstadoCompartida" Style="{StaticResource Ficha}">
             <StackPanel>
@@ -53,9 +53,9 @@
         <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
             <Button Content="Elegir carpeta compartida" Click="AlElegirCompartida" Padding="14,7"
                     Cursor="Hand"/>
-            <Button x:Name="BotonUsarProyectos" Content="Usar la de proyectos" Click="AlUsarProyectos"
+            <Button x:Name="BotonUsarProyectos" Content="Usar la de tomas de notas" Click="AlUsarProyectos"
                     Padding="14,7" Margin="8,0,0,0" Cursor="Hand"
-                    ToolTip="Deja la carpeta compartida en blanco: se usará la de proyectos"/>
+                    ToolTip="Deja la carpeta compartida en blanco: se usará la de tomas de notas"/>
         </StackPanel>
 
         <TextBlock x:Name="Aviso" Foreground="#B45309" FontSize="12" TextWrapping="Wrap"

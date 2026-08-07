@@ -80,9 +80,9 @@ public class ResumenDeFiltrosTests
 
     /// <summary>
     /// El estado se nombra siempre, aunque sea el de por defecto: «En desarrollo» tampoco
-    /// lo enseña todo —deja fuera lo terminado y lo archivado— y quien no lo sepa echará
-    /// algo en falta sin saber por qué. Ahora manda también en la BBDD, así que es la
-    /// explicación de por qué un servicio antiguo no aparece al buscarlo.
+    /// lo enseña todo —<b>deja fuera lo archivado</b>— y quien no lo sepa echará algo en
+    /// falta sin saber por qué. Ahora manda también en la BBDD, así que es la explicación
+    /// de por qué un servicio archivado no aparece al buscarlo.
     /// </summary>
     [Fact]
     public void ElDetalleNombraSiempreElEstado()
@@ -118,6 +118,37 @@ public class ResumenDeFiltrosTests
         Assert.Contains("IP65", detalle);
         Assert.Contains("ENAC", detalle);
         Assert.Contains("antar", detalle);
+    }
+
+    /// <summary>
+    /// La norma se guarda por su <b>id</b> —identidad estable— y se escribe por su
+    /// <b>designación</b>, que es lo que entiende quien lee el aviso. El desplegable de
+    /// filtros ofrecía <c>60598-1_2024</c>, que es como se llama un fichero de plantilla y
+    /// no como se llama una norma para nadie.
+    /// </summary>
+    [Fact]
+    public void LaNormaSeEscribePorSuDesignacionYNoPorSuId()
+    {
+        var filtros = new FiltrosDeGestion { Norma = "60598-1_2024" };
+
+        var detalle = ResumenDeFiltros.Detalle(
+            filtros, id => id == "60598-1_2024" ? "EN IEC 60598-1:2024 + A11:2024" : id);
+
+        Assert.Contains("EN IEC 60598-1:2024 + A11:2024", detalle);
+        Assert.DoesNotContain("60598-1_2024", detalle);
+    }
+
+    /// <summary>
+    /// Sin quien traduzca —o con una norma que ya no esté instalada— se escribe el id. Feo,
+    /// pero mejor que callar: ese filtro está apartando trabajo y hay que decirlo.
+    /// </summary>
+    [Fact]
+    public void SinTraductorSeEscribeElIdEnVezDeCallar()
+    {
+        var filtros = new FiltrosDeGestion { Norma = "60598-1_2024" };
+
+        Assert.Contains("60598-1_2024", ResumenDeFiltros.Detalle(filtros));
+        Assert.Contains("60598-1_2024", ResumenDeFiltros.Detalle(filtros, id => id));
     }
 
     /// <summary>

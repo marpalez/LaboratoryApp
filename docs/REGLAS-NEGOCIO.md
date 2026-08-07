@@ -2,7 +2,7 @@
 
 **Origen:** `TomaDeNotasExcel.xlsx`, plantilla v2.1
 **Extraído el:** 2026-07-29 (última modificación del libro: 2026-07-29)
-**Versión del documento:** 3.75 — documento de traspaso al día
+**Versión del documento:** 3.98 — documento de traspaso al día
 **Actualizado:** 2026‑08‑06
 **Propósito:** nació como documento de revisión previo a programar —cada regla extraída del Excel debía ser **confirmada, corregida o eliminada** por el laboratorio— y hoy es además el **documento de traspaso** de la aplicación: qué hace, por qué se decidió así y qué queda pendiente. Lo que sigue sin confirmar va marcado con ⏳.
 
@@ -55,6 +55,21 @@ Las partes excluidas se conservan en este documento marcadas como 🚫 **fuera d
 | 2026‑08‑01 | DD‑33 | **El identificador de muestra sale de la plantilla.** En IK 62262 el laboratorio usa `EBP_CLIM…` en lugar de `EBP_SAFE…` |
 | 2026‑08‑01 | DD‑34 | **Los catálogos de equipos se importan por separado**, uno por norma |
 | 2026‑08‑01 | DD‑35 | **Qué es obligatorio en la cabecera lo decide la plantilla**, no el código: se leen los campos con `obligatorio: true` |
+| 2026‑08‑07 | DD‑149 | **El nombre de un apartado no se escribe dos veces** (`AltaDeProyecto.SeccionDeDatos`). El aviso de que no se puede guardar mandaba a arreglarlo «en «Datos del proyecto»» — **un apartado que ya no se llamaba así**: con el glosario (DD‑145) el nodo pasó a «Datos de la TdN» y el aviso se quedó atrás, porque lo redacta el núcleo y el rótulo lo pone la ventana y **no se ven entre sí**. Lo peor no era la palabra sino que el aviso **mandaba a un sitio inexistente**, que es justo lo contrario de lo que hace un aviso. Ahora la constante vive en el núcleo y la lee el rótulo, así que no puede haber dos nombres. El test lo comprueba **por la constante y no por el texto**, o volvería a quedarse en verde señalando lo que ya no existe. De paso se corrigieron los rezagados del mismo glosario que sí se ven: los dos avisos de portada («carpeta de tomas de notas»), «Esa toma de notas ya existe», «Cerrar la toma de notas», la cuenta del diálogo de carpetas, el aviso de renombrar técnicos, «Buscando / Leyendo tomas de notas» y el error de lectura del repositorio. **Lo que no se tocó**: `"proyecto"` como ámbito de datos dentro de las plantillas y de cada `.lmnlab`, `CarpetaDeProyectos` en el `ajustes.json` y los nombres de clase — renombrarlos dejaría ilegible lo ensayado (DD‑145) |
+| 2026‑08‑07 | DD‑148 | **Los dos «Exportar» son botones discretos** (`BotonDiscreto`): sin fondo, la letra en negrita y un borde gris. Eran negros, como lo más importante de su barra, y lo pidió el laboratorio al revés: **el peso de un botón no lo da la acción sino cuántas veces se pulsa**, y exportar es de higos a brevas mientras «Guardar» y «Actualizar» son de todos los días. Van los dos igual —el listado de la BBDD y el informe de la TdN— porque es la misma acción y no puede cambiar de aspecto según la pestaña, y el estilo está escrito **una sola vez** en `App.xaml` por lo mismo que los textos de planificación (DD‑143). Tiene un detalle que no es evidente: el estilo general resuelve el «encima» **bajando la opacidad**, que sobre un fondo transparente no se ve, así que este lleva su propio disparador que lo tiñe — sin él quedaría un botón que no responde al ratón, y eso se lee como desactivado |
+| 2026‑08‑07 | DD‑147 | **«Planificación de la TdN» se rediseña igual que el alta, pero con dos ⓘ y no siete.** Los dos diálogos planifican lo mismo y ahora se parecen: mismas tintas, mismos rótulos, mismo pie con los botones fuera del desplazamiento. El contenido se reparte en **cuatro tarjetas** —fechas, estado e importe, muestras, grupo y archivar— en vez de un chorro de dieciséis controles apilados. **La ⓘ solo donde hace falta un párrafo**: el grupo y archivar. El laboratorio lo pidió así —«no te pases»— y tiene razón: un formulario sembrado de circulitos cansa más que los renglones que sustituye, y el resto de campos se entienden con su rótulo. La semana, el candado y «Quitar fechas» pasan a **un solo renglón**: eran tres filas y las tres hablan de las mismas dos fechas. El título pasa a **«Planificación de la TdN»**, que se había quedado sin aplicar del glosario (DD‑145) |
+| 2026‑08‑07 | DD‑146 | **Las aclaraciones fijas del alta pasan a una ⓘ**, y las dos zonas dejan de pesar lo mismo. «Nueva toma de notas» tenía **cinco renglones de texto gris permanente** —el ejemplo del código, para qué son las fechas, qué es un grupo (cuatro líneas desde DD‑143)— que entre todos gastaban un tercio del alto para explicar cosas que se leen una vez en la vida. Van a un círculo gris de 16 px con el texto en el consejo emergente. **No se pierde nada**: el ejemplo del código sigue siempre a la vista, pero **dentro de la caja mientras está vacía**, que era el motivo por el que estaba fijo (quien da de alta tiene que poder copiar el patrón), y el renglón del grupo pasa a enseñar **solo la confirmación** de con qué se va a enlazar, que es lo único que cambia al teclear. La ⓘ va como `ContentControl` **sin foco ni parada de tabulador**: quien rellena de teclado no se la encuentra en medio. **Jerarquía**: lo obligatorio en tarjeta blanca con marco, lo opcional sobre gris hundido — antes se distinguían solo por una pastilla de 4 px y pesaban igual, que es no tener jerarquía. Y la norma pasa a ancho completo, que a media columna cortaba designaciones como «EN 60529:1991 + A1:2000 + A2:2013 + AC:2019‑02…» |
+| 2026‑08‑07 | DD‑145 | **Hay un glosario y la interfaz lo cumple.** Cuatro palabras para lo mismo —proyecto, servicio, familia, toma de notas— repartidas por las pantallas según quién escribió cada una. Se fijó con el laboratorio: **toma de notas** (o **TdN** donde no cabe), **servicio** solo para el código de 9, **día** en vez de jornada, y **semana**. Lo que lo decidió no fue el gusto sino una comprobación: **el código de servicio no agrupa nada** —lo que junta las TdN en el calendario es el campo «Grupo», texto libre y vacío por defecto—, así que «servicio» era una palabra sin trabajo que hacer. Se cambiaron **los rótulos, no el código**: `"proyecto"` es el ámbito de datos dentro de las cinco plantillas y de cada `.lmnlab` guardado, y `CarpetaDeProyectos` la clave del `ajustes.json` de cada equipo — renombrarlos dejaría ilegible lo ensayado y borraría las carpetas de los seis ordenadores. La pestaña pasa a **«Planificación de TdN y servicios»**, que es lo único que conserva las dos palabras porque dentro se ven las dos cosas |
+| 2026‑08‑07 | DD‑144 | **El importe se rotula «Importe de la familia», no «de la oferta»**, y el trabajo que sale de él se cuenta en **días**, no en «jornadas». No es cosmética: se llamaba «oferta» y la oferta es del **servicio entero**, así que el rótulo empujaba a poner los 8 000 € del trabajo en una familia y dejar las otras tres en blanco — que es exactamente lo que hace que la carga diga que el técnico está libre cuando no lo está. Va con la corrección del texto de grupo (DD‑143): **cada familia lleva sus fechas y su importe**. Cambia en los **tres** sitios donde se lee ese dato —los dos diálogos que lo editan y el panel de planificación de la toma de notas, que solo lo enseña— porque un rótulo distinto para el mismo campo se lee como dos campos distintos |
+| 2026‑08‑07 | DD‑143 | **Los dos diálogos que planifican explican lo mismo con las mismas palabras**, y esas palabras están escritas **una sola vez** (`TextosDePlanificacion`). «Nueva toma de notas» y «Planificación del servicio» hacen lo mismo y lo contaban distinto, cada uno con el texto copiado en **dos sitios** —el XAML para el rótulo inicial y el código para cuando se vacía la casilla—: cuatro copias de la misma frase. El XAML las lee con `{x:Static}`, así que ya no hay copia que se pueda quedar atrás. **No es manía de limpieza**: con el texto duplicado, corregir uno y olvidar el otro no es un descuido posible sino lo que pasa siempre — el diálogo de filtros estuvo dos días diciendo algo que había dejado de ser cierto. De paso se corrigieron **tres frases que ya mentían**: el grupo decía que «las fechas y el importe se ponen solo en una de ellas» cuando hoy **cada familia necesita las suyas** —el calendario las encadena cada una durando lo suyo (DD‑123) y la carga cuenta cada importe—; archivar remitía a un botón «Ver archivados» **que ya no existe**, sustituido por los filtros compartidos; y el candado tenía debajo un renglón que repetía su propio consejo emergente, que se quitó |
+| 2026‑08‑07 | DD‑142 | **Un servicio terminado no cuenta en la carga del técnico.** La tabla contesta «¿cabe lo que le queda?», y un ensayo hecho no ocupa a nadie. Lo destapó el laboratorio probando: **Raúl, diciembre de 2026, todo terminado y un 122 %** — la tabla avisaba de una sobrecarga que no existía, que es la forma más rápida de que se deje de mirar. No fue una decisión sino un descuido con dos días de vida: DD‑79 ya había dado por malo justo esto, se sacó excluyendo lo terminado del filtro, y el 2026‑08‑05 lo terminado volvió al filtro **sin que nadie se acordara de la carga**. El arreglo va donde tenía que estar desde el principio: **en `CargaPorTecnico`, no en el filtro ni en la vista**, para que lo terminado se siga viendo en el tablero, el calendario y la BBDD y solo deje de contar donde la pregunta es si cabe. Se descarta **antes de calcular los meses**, así que un servicio cerrado en marzo tampoco abre una columna de marzo vacía. `ServicioPlanificado` pasa a llevar el estado **sin valor por defecto**: con uno, la próxima vista que llame a este cálculo se lo dejaría sin poner y los terminados volverían a contar en silencio — exactamente como acaba de pasar |
+| 2026‑08‑07 | DD‑141 | **La barra del calendario lleva el color de su estado y nada más.** Se pintaba de rojo cuando la fecha de fin ya había pasado y el servicio no estaba terminado. Se quitó porque **tapaba el estado**: el color de la barra es lo único que lo dice —gris por planificar, morado planificado, azul en curso, ámbar pendiente de cliente, verde terminado— y el rojo lo borraba, de modo que un servicio en curso y otro esperando al cliente se veían iguales por haberse pasado un día de la fecha. **Fuera de plazo no se deja de decir**, se dice donde no compite: en el consejo emergente de la tarjeta y en el «N fuera de plazo» de la cabecera de cada técnico. La propiedad `Retrasado` se queda, que es la que alimenta esas dos |
+| 2026‑08‑06 | DD‑140 | **El listado de la BBDD se exporta a HTML en A4 apaisado, y solo el listado.** Mismo formato y mismo motivo que el informe de ensayo (DD‑06): es texto, sin dependencias, y de ahí sale el PDF con Ctrl+P. **Apaisado porque son once columnas**: en vertical quedan 180 mm útiles y habría que partir la tabla o encoger la letra hasta no leerse. **Sale el listado entero, no lo que cabe en el monitor** — si el filtro deja cuatro, cuatro; si hay cien, cien. No es una obviedad: la tabla está virtualizada (DD‑131), así que **en pantalla solo existen las filas que se ven**, y exportar recorriendo lo dibujado habría dado quince pareciendo correcto; se exporta el modelo. Para que el papel no pueda discrepar de la pantalla, **`FilaDeBbdd` se mudó al núcleo** y las columnas se declaran una sola vez (`FilaDeBbdd.Columnas`), de donde beben la tabla y el HTML. **La cabecera lleva el título y la cuenta, y nada más.** Se entregó con tres cosas más —fecha y hora de generación, la línea de filtros y un aviso de que no es un informe de ensayo— y **el laboratorio quitó las tres al revisarlo** (2026‑08‑07). El argumento con el que se habían puesto era que un listado filtrado impreso sin decirlo miente por omisión; pesó más que **el listado se mira en el momento y junto a la pantalla de la que sale**, así que repetir ahí lo que ya se sabe solo robaba sitio a la tabla. Al quitar la fecha hubo que quitarla **también del `<title>`**, que no se ve en la página pero los navegadores lo imprimen en la cabecera de cada hoja: se habría colado por detrás lo que se acababa de quitar por delante. Lo vigila un test, porque las tres son de las que vuelven a aparecer «por si acaso» al tocar la cabecera. **No se pone en el tablero ni en el calendario** (lo descartó el laboratorio y coincide con lo razonable): la BBDD ya es una tabla y exportarla es escribirla; las otras dos son dibujos —tarjetas en columnas, barras sobre un eje de semanas— y llevarlas al papel no sería exportar sino inventar otro documento con otro mantenimiento. **El botón va el último de la barra de mandos** y nació negro, el mismo negro que «Exportar» en la toma de notas. Se quedó sin fondo y en negrita al día siguiente, y con él el otro (DD‑148). Nació en una franja propia encima de la tabla, junto a un «47 tomas de notas», y las dos cosas se corrigieron al verlas: la franja gastaba un renglón entero de tabla para un botón, y la cuenta **ya la daba la línea de estado** dos renglones más arriba —«47 proyectos \| 186 fuera del filtro»—, con lo que decirla otra vez y con otras palabras solo hacía dudar de si hablaban de lo mismo. Que aparezca y desaparezca al cambiar de vista no mueve nada **porque va el último**: delante de él no hay nada que recolocar |
+| 2026‑08‑06 | DD‑139 | **Los nodos del índice se anuncian por su rótulo** (`INodoDelIndice.Rotulo`). Los 31 nodos de una toma de notas se anunciaban como `LumNotas.App.ViewModels.SeccionViewModel`: WPF solo deduce el nombre accesible cuando la cabecera es una **cadena**, y aquí son plantillas con rejilla, píldora y punto de color, así que se rinde y llama a `ToString()`. **Lo que lo empujó no fue la accesibilidad sino la verificación**: sin nombres, los guiones que manejan el programa —única forma de comprobar un cambio de pantalla, porque ninguno de los 577 tests toca la interfaz— tienen que pulsar **por posición** (`items.Item(4)`), y eso se rompe en silencio en cuanto una sección deja de aplicar y desaparece del árbol: el guion sigue en verde pero sobre el apartado equivocado. Ahora se busca por «Sección 7 ‑ Construcción», que o encuentra lo que busca o falla. **El nombre no lleva la cuenta de apartados** aunque se vea al lado: cambia sola al rellenar y dejaría de encontrarse; eso vive en el ToolTip, que UIA publica como texto de ayuda. **Y va en el contenedor, no en la plantilla**: el elemento que ve la automatización es el `TreeViewItem`, no la rejilla de dentro — puesto dentro de la plantilla no hace nada, que fue el primer intento y hubo que deshacerlo. Quedan sin nombre 38 botones, 7 desplegables y 4 cajas de la toma de notas: se dejan apuntados, no urgen |
+| 2026‑08‑06 | DD‑138 | **Lo que señala el índice lo manda el documento, no el árbol.** Cada nodo lleva su propio `Seleccionado` y `TreeViewItem.IsSelected` se ata a él **en los dos sentidos**. Nace de un fallo: en una toma de notas nueva se pulsaba «Planificación» y **ya no había forma de volver a «Datos del proyecto»**. El motivo es que `TreeView.SelectedItem` es de **solo lectura**, así que la navegación colgaba de `SelectedItemChanged` — y «Planificación» se alcanza por un botón de la barra que no está en el árbol. Al pulsarlo, el índice **seguía señalando «Datos del proyecto»**, con lo que volver a pulsar ese nodo no cambiaba la selección y **no disparaba ningún evento**. Dos fallos por el precio de uno: el índice mentía sobre dónde estabas, y el nodo señalado se volvía el único al que no se podía ir. Con la atadura, salir por un botón **apaga la marca del árbol** y el nodo vuelve a responder. Solo hace falta apagar: al encender uno, el árbol apaga el anterior por su cuenta, porque no deja marcar dos a la vez |
+| 2026‑08‑06 | DD‑137 | **El % que enseñan el tablero y el calendario es el ponderado, el mismo que estampa el informe.** Se pidió «un % de proyecto realizado, aunque sea estimación» y el programa sabía contarlo de tres maneras: por **secciones** (`7/16`, lo que ya salía en la tarjeta), por **apartados**, y por **peso** —`IndicadorDeAvance`, heredado del Excel (DD‑11 / D‑18) y ya impreso en el informe—. Se estuvo a punto de elegir el de secciones por ser el que ya estaba a mano, hasta que apareció el tercero: con él, **el tablero habría dicho 6 % y el PDF firmado 45 %**, y nadie sabría cuál mirar. Manda el del informe. Además es el único que se acerca a medir esfuerzo: por secciones, cerrar la sección 7 —trece apartados, un día de trabajo— movía el marcador seis puntos. **Nunca dice 100 % por redondeo**: se trunca hacia abajo salvo cuando no queda peso, porque un 99,6 % redondeado al alza pondría el cartel de acabado en un servicio al que le falta un ensayo. **Y sin pesos declarados no hay número, no un cero**: un cero sería mentira fija hasta en un servicio terminado. No costó rendimiento: el escaneo ya construía el motor de reglas de cada norma y ahora se reutiliza en vez de montar otro, así que 250 proyectos siguen leyéndose en 1,3 s. **Por el camino se dio por buena una lectura falsa de las plantillas** —contar los pesos leyendo el JSON a mano, sin bajar a los subapartados, dio «solo 18 conceptos y endurancia a cero» y con eso se llegó a proponer al laboratorio que rellenara pesos que ya estaban puestos—. Contado con el propio motor, que es lo que había que hacer desde el principio, son **23 conceptos y 217 puntos, con endurancia en 100**. La lección: para saber qué dice una plantilla, se le pregunta al motor, no al fichero |
+| 2026‑08‑06 | DD‑136 | **La cabecera de cada columna del tablero lleva los dos iconos del calendario**: la caja cuando las muestras ya están en el laboratorio y el candado cuando las fechas están blindadas. El tablero es donde se decide **qué se coge hoy**, y eso no lo contesta solo el avance: un servicio con doce apartados por delante cuya muestra sigue en el transportista no se puede empezar, y hasta ahora ese dato había que ir a buscarlo al calendario. **No se dibujó nada nuevo** — son los mismos `IconoCaja` e `IconoCandado`, que van como trazo justo para poder cambiar de color según el fondo: blancos sobre la barra, **ámbar** el que empuja a hacer algo y **gris** el que solo informa. La ausencia es la señal contraria: no hay icono de «muestras aún sin llegar», porque dieciséis columnas con un icono tachado no dicen nada. El rótulo va en una **rejilla** y no en un `StackPanel` horizontal, o dejaría de envolver — la misma trampa que ya estaba escrita para las barras del calendario |
+| 2026‑08‑06 | DD‑135 | **La portada se rediseña con tres pesos, rejillas y nombres accesibles.** La auditoría encontró que tenía **dos primarias** —el azul y el verde, idénticos de tamaño y forma—, y dos primarias son ninguna: el ojo se partía en dos al entrar y no volvía a tener ancla. Se resuelve con **una primaria por zona** y no una por pantalla: forzar una sola contradiría DD‑80, que dice que tomar notas y gestionar pesan lo mismo, y mentiría sobre para quién es el programa. Tres estilos —`AccionPrimaria` (relleno), `AccionSecundaria` (contorno), `AccionTerciaria` (sin caja)— sustituyen a seis que declaraban **un solo estado** cada uno; ahora los cinco: normal, encima, pulsado, **foco** y desactivado. Falta *cargando* a propósito: ninguna acción de esta pantalla tarda lo suficiente. **Lo que se arregló y era falta de accesibilidad, no de gusto**: el foco de teclado no se veía (WCAG 2.4.7) porque los estilos rehacían la plantilla y perdían el adorno de WPF; el rótulo «RECIENTES» daba 2,54:1 y la píldora de versión 4,06:1, los dos por debajo de AA; los objetivos táctiles de las recientes medían 25 px; y **los dieciséis botones se anunciaban sin nombre** (WCAG 4.1.2) — un lector de pantalla decía «botón» y callaba. **Y de espacio**: cinco rectángulos a todo lo ancho para un nombre de 24 caracteres tiraban el ancho y gastaban el alto; recientes, normas y las cuatro vistas pasan a rejillas de dos columnas, y las vistas ganan icono porque «Tablero», «Calendario», «Carga» y «BBDD» son cuatro palabras abstractas que había que leer una a una. De nueve tamaños de texto a **tres** (26/14/12) y espaciado en 4/8. **Sigue sin resolverse el fondo**: son 16 destinos que ya están todos en la barra de menús, y la única solución real —esconder las normas detrás de un botón— la descartó el laboratorio |
 | 2026‑08‑06 | DD‑134 | **La plantilla declara la edición de la norma** (`meta.edicion`), y la portada la enseña: «Luminarias \| Ed. 9». Va en un campo **aparte del año de publicación** y no se deduce de él: son dos cosas distintas y el programa ya las confundió una vez (DD‑101). Es opcional — sin ella se enseña solo el nombre, porque un «Ed.» sin número parece un dato a medio escribir. Al darlas, el laboratorio corrigió dos cosas más: la **60598‑1 de 2021 es la 9.ª y la de 2024 la 10.ª** —la ficha de DD‑101 decía lo contrario— y la **designación de la 60529 estaba mal**: no es `EN 60529:2018` sino `EN 60529:1991 + A1:2000 + A2:2013 + AC:2019-02 + AC:2016-12 + corrigendum May 1993`. Eso obligó a **renombrar su identidad** a `60529_1991`, porque hay un test que exige que la designación lleve dentro el año que identifica a la norma —lo único que separa dos plantillas de la misma— y con la designación nueva dejaba de cumplirse. Con el renombrado hubo que mover también el catálogo de equipos —se llama como su plantilla— y actualizar el `normasCompatibles` de las otras dos que la citaban; **lo cazaron los tests, no la vista**. Se llegó a poner `60529_2018` en `idsAnteriores` para no dejar huérfano lo ya guardado (DD‑95), y **el laboratorio pidió quitarlo**: se está en desarrollo, no hay ensayos que conservar, y una norma mal designada no debe poder abrirse ni por compatibilidad. Se borraron las 36 tomas de notas de prueba que la citaban, sus dos ficheros de las tres carpetas donde estaban publicados, y el reconocimiento del id viejo. **De la 60529 errónea no queda nada** |
 | 2026‑08‑06 | DD‑133 | **Se quita la franja oscura del pie de ventana.** Ocupaba sitio en todas las pantallas para no decir nada casi nunca, y una franja que casi siempre está vacía es justo la que nadie mira el día que importa. Lo que se decía por ahí se repartió en dos: **lo que falla va a una ventana** —no se pudo abrir, guardar o exportar, qué falta para poder guardar, y que la toma de notas se registró con otra versión de la norma—, porque un «no se pudo guardar» tiene que interrumpir; y **las confirmaciones se borraron** —«Guardado en…», «Abierto…», «Exportado a…», «Ya estaba abierto en otra pestaña»—, porque ya se veían por otro lado: la ruta está bajo el título, el punto de «sin guardar» desaparece solo al guardar, el informe se abre en el visor y la pestaña salta sola. Se listaron los diez mensajes antes de tocar nada: **borrar la franja sin más habría dejado cuatro fallos en silencio**, incluido el aviso de que no se puede guardar, que es de esta misma mañana (DD‑130). Los modelos de vista no llaman a `MessageBox`: piden `ServiciosDeVentana.Avisar`, igual que ya piden abrir un fichero |
 | 2026‑08‑06 | DD‑132 | **Una instalación nueva no trae ningún técnico.** Hasta hoy el programa venía con **seis nombres cableados** —los del laboratorio el día que se escribió el código— y eso está mal por dos motivos: mete personas concretas de un laboratorio concreto dentro del ejecutable, y quien lo instale en otro sitio se encuentra una plantilla ajena que tiene que borrar a mano. La lista la hace cada laboratorio desde `Configuración`, que es de donde tiene que salir. **Lo único que viene es el cajón de los que están sin asignar**, y con el mismo texto que ya usaban el calendario, la carga y los filtros —`(sin técnico)`, con sus paréntesis— y no uno parecido: si el catálogo dijera «Sin técnico» y las vistas «(sin técnico)», un servicio al que alguien le elige el cajón a mano y otro que sencillamente no tiene técnico saldrían en **dos filas distintas queriendo decir lo mismo**. Los paréntesis siguen haciendo su trabajo —nadie se llama así, luego no puede chocar con una persona—, pero **deja de ser cierto que el rótulo no esté en el catálogo**: el test que lo exigía se dio la vuelta, con el motivo escrito dentro. **A quien ya tenga su `tecnicos.json` no le cambia nada**: solo afecta a las instalaciones sin fichero, o con el fichero roto |
@@ -1112,11 +1127,74 @@ LumNotas.App           interfaz WPF (MVVM)
 | `plantilla/plantilla-<id>_<version>.json` | Una por norma y año, p. ej. `plantilla-60598-1_2024_1.0.0.json`, con su catálogo `equipos-60598-1_2024_1.0.0.json` al lado |
 | `tests/LumNotas.Core.Tests` | **562 tests, verificados en verde el 2026‑08‑06.** Cubren los ocho patrones, los nueve cálculos, los defectos corregidos, la integridad de la plantilla, el ciclo de guardado, varios proyectos simultáneos, el informe, el tablero y la planificación (semanas ISO, cambio de año, el gesto de arrastre completo, que años lejanos y erratas de año no rompan el eje, y que planificar y anotar no se pisen), y la lista de técnicos (que quitar no toque los proyectos y corregir sí), y la ocupación por técnico (que lo solapado no cuente dos veces), y la carga mensual (tarifa, capacidad, reparto entre meses y que no se pierda trabajo), y el escaneo de la matrioska de clientes (que encuentre lo hondo, que la caché caduque bien, que una rama rota no lo tumbe y que una norma añadida ocupe una sola línea con la cuenta de toda ella), y **qué proyecto se ve** (`FiltrosDeGestion`, que decide por las cuatro vistas a la vez), y **cuándo se ensayó** (que solo cuenten las fechas de verdad y que el periodo case por solapamiento), y **los carriles del calendario** (`CarrilesDelCalendario`: que lo que no se pisa quepa en una fila, que tocarse un día no baste para compartirla, que se suba al hueco libre de arriba y que no se gasten más filas de las que hacen falta), y **el código entero** (que las tres longitudes encajen, que los tres caminos exijan lo mismo, y que un código a medias no llegue al disco) |
 
+### Glosario: cómo se llaman las cosas
+
+Fijado con el laboratorio el 2026‑08‑07. **Vale para todo lo que se ve**; el código y los comentarios se quedaron como estaban a propósito (ver el final).
+
+| Concepto | Palabra | Ejemplo |
+|---|---|---|
+| El documento de 14 caracteres. **Lo que se planifica**: fechas, importe, estado | **toma de notas** en frases · **TdN** en botones y columnas | `TECNO260201-00` |
+| El encargo del cliente, 9 caracteres | **servicio**, y casi siempre como «código de servicio» | `TECNO2602` |
+| Enlazar varias TdN a mano. Voluntario, vacío por defecto | **grupo** | «Grupo: torres 2026» |
+| Unidad de trabajo | **día** | «≈ 25 h (3,2 días)» |
+| Unidad de planificación | **semana** | «3W», «S32» |
+
+**Retiradas:** *proyecto* → toma de notas · *jornada* → día · *familia* (como rótulo) → toma de notas · *servicio* en prosa → toma de notas.
+
+**Las dos zonas de la portada se llaman «TOMA DE NOTAS» y «GESTIÓN DE SERVICIOS»**, y ninguna lleva renglón de apoyo debajo: los tenía —«Abre una toma de notas», «Mira cómo van todas las TdN»— y se quitaron el 2026‑08‑07 porque describían lo que el botón de debajo ya dice. El margen que gastaban se heredó al rótulo de la zona, para que las dos columnas sigan arrancando a la misma altura.
+
+#### Por qué «servicio» casi no aparece
+
+Porque el programa casi no lo usa. Se comprobó antes de decidirlo: **el código de servicio no agrupa nada**. Lo que junta varias TdN en una barra del calendario es el campo **«Grupo»**, texto libre que se teclea a mano y que **está vacío por defecto porque el laboratorio decide caso a caso** si quiere agrupar. Dos TdN con el mismo `TECNO2602` no se enlazan solas.
+
+Así que el código de servicio es un dato **derivado** que se enseña en la cabecera y se imprime en el informe, y nada más. Sobrevive en «Código de servicio» y en el rótulo de la pestaña.
+
+#### Los tres cortes del código
+
+```
+TECNO260201-00
+└───────┘         9  → servicio
+└─────────┘      11  → familia
+└────────────┘   14  → toma de notas
+            └┘       → edición del documento
+```
+
+**El corte de 11 se sigue usando para rotular** las tarjetas del tablero y las barras del calendario, y se queda así aunque el laboratorio avise de que los dos dígitos de familia no siempre casan con una familia real: da igual, porque **las muestras se renombran dentro de cada TdN**.
+
+Dos ediciones de la misma familia —`-00` y `-01`— son **dos tomas de notas distintas y cuentan dos veces** en la carga. Es lo que el laboratorio quiere: si existe la `-01` es porque la `-00` se archivó, y eso lo decide quien trabaja, no el programa.
+
+#### La regla de TdN
+
+**TdN** donde el sitio manda: botones, cabeceras de columna, rótulos de campo, la línea de estado.
+**Toma de notas** en cualquier frase que se lea seguida.
+
+Nunca las dos en el mismo renglón.
+
+#### Lo que no se tocó, y por qué
+
+**Las claves de datos.** `"proyecto"` es el *ámbito* dentro de las cinco plantillas y dentro de **cada `.lmnlab` guardado** — 34 apariciones en código más las plantillas. Renombrarlo dejaría ilegible todo lo ensayado. Igual con `CarpetaDeProyectos`, que es la clave del `ajustes.json` de cada equipo: cambiarla borraría las carpetas configuradas de los seis ordenadores.
+
+**Los nombres de código.** `ResumenDeProyecto`, `DialogoNuevoProyecto`, `ExploradorDeProyectos`… No los ve nadie y son cientos de renombrados con riesgo de romper lo que funciona. Se dejan.
+
+> Ahí está además la mejor prueba de que «servicio» era ambiguo: el código tiene `ServicioDeTecnicos` y `ServicioDeCapacidad`, donde significa *componente de software*, junto a `ServicioPlanificado`, donde significa el encargo del cliente. La misma palabra para dos cosas dentro del mismo programa.
+
 ### Cómo se escriben los rótulos
 
 **Sin puntos suspensivos.** Ni en botones, ni en menús, ni en textos de la interfaz: «Planificar», no «Planificar…»; «Elegir carpeta», no «Elegir carpeta…». Es una decisión del laboratorio (2026‑08‑05) y vale para lo que se añada a partir de ahora.
 
 Se dejaron a propósito los de los **comentarios del código** donde significan «etcétera» o un rango —`M1…Mn`, `tornillos, uniones…`, `EBP_SAFE…`—: ahí no son un rótulo, son notación.
+
+**Un texto que sale en dos sitios se escribe en uno** (DD‑143). Los dos diálogos que planifican compartían tres explicaciones y las llevaban copiadas en cuatro sitios; ahora viven en `TextosDePlanificacion` y el XAML las lee con `{x:Static}`. La regla vale para lo que venga: **si dos pantallas dicen lo mismo, la frase es una constante, no dos literales**. Es lo único que impide el fallo que ya ha aparecido tres veces esta semana — corregir una copia, olvidar la otra, y que el programa siga explicando durante días algo que dejó de ser verdad.
+
+**El separador es `|`, no `·`** (2026‑08‑06). Vale para todo lo que el programa compone juntando dos datos: la línea de estado de gestión —«250 proyectos | 201 fuera del filtro | leídos en 0,9 s»—, el resumen de filtros, los avisos de la portada, el detalle de las barras del calendario, las columnas de acreditación y colaboradores de la BBDD, la ocupación por técnico, la carga, el título de los apartados y el subtexto de las normas. Catorce ficheros.
+
+Tres sitios **conservan el punto medio a propósito**, porque ahí no separa dos cosas:
+
+- Dentro de las **plantillas**, donde es contenido de la norma: «Ensayo de humedad · inicio», «E14 ó B15 · 1,2 Nm», la tabla de energías del IK. Y en un caso es un **signo de multiplicar** —`Fuerza = 0,5 · 1,225 · área · 1,2 · v²`—: cambiarlo habría corrompido la fórmula.
+- En el **informe HTML**, que es el documento que sale del laboratorio y no la interfaz. Tiene dos tests que lo comprueban.
+- En «Acerca de», donde encabeza cada línea como viñeta.
+
+**Los rótulos de la portada no llevan punto final** (2026‑08‑06). «Abre una toma de notas», no «Abre una toma de notas.». Son rótulos, no frases. Los **avisos** de esa misma pantalla sí lo llevan: son oraciones completas, y varios encadenan dos.
 
 Los ficheros de plantilla conservan `origenExcel` en cada elemento para poder auditarlos contra el libro original. Ese campo no se usa en ejecución.
 
@@ -1162,7 +1240,7 @@ Solo **seis reglas** necesitan código a medida (`Predicados.cs`); el resto es c
 | `RotulosTests` | Cómo se identifica una toma de notas abierta: que cada familia tiene su propia pestaña y que el título lleva la norma **con su año**, que es lo que evita anotar contra la edición equivocada |
 | `ResumenDeFiltrosTests` | Que el botón «Filtros» delata cuántos están apartando trabajo, y que «En desarrollo» no cuenta como filtro activo pero sí se nombra |
 
-### Las nueve trampas de WPF
+### Las once trampas de WPF
 
 Cada una costó un rato y todas comparten el mismo carácter: **WPF no avisa**. No falla, no lanza nada, no escribe en ningún sitio — simplemente hace otra cosa. Van explicadas donde mordieron; esto es el índice, porque a estas alturas están repartidas por medio documento.
 
@@ -1177,10 +1255,22 @@ Cada una costó un rato y todas comparten el mismo carácter: **WPF no avisa**. 
 | 7 | `DataContext` y `Visibility` en el mismo elemento **se estorban** | La BBDD se dibujaba encima de las otras tres vistas |
 | 8 | Lo que se arrastra **no se puede recrear** mientras dura el gesto | Tren de tarjetas: el arrastre se cancelaba a mitad |
 | 9 | `RequestBringIntoView` atendido en el `ScrollViewer` **llega tarde** | La cabecera saltaba de lado al marcar una norma |
+| 10 | `TreeView.SelectedItem` es de **solo lectura**: no se le puede decir qué señalar, y el árbol solo avisa cuando la selección **cambia** | Tras pulsar «Planificación» no se podía volver a «Datos del proyecto»: el nodo seguía señalado, así que pulsarlo no cambiaba nada y no disparaba el evento |
+| 11 | El nombre accesible **solo se deduce de un contenido que sea cadena**; con una plantilla dentro, WPF llama a `ToString()` | El índice entero se anunciaba como `LumNotas.App.ViewModels.SeccionViewModel`, y los botones con panel dentro, sin nombre |
 
 Dos corolarios de la sexta, que valen por sí solos: dentro de un `ScrollViewer` horizontal **el ancho disponible es infinito**, así que `HorizontalAlignment="Stretch"` no estira y `MaxWidth` no acota; y por lo mismo `TextTrimming` **no pone puntos suspensivos** dentro de un `StackPanel` horizontal — el texto se corta a mitad de letra.
 
 Y un tercero, que salió al virtualizar (DD‑131): **una lista dentro de un `ScrollViewer` de fuera se mide con tamaño infinito, así que no puede virtualizar nunca**. Da igual poner `IsVirtualizing="True"`: si algo por encima le da alto infinito, la lista concluye que se ve entera y crea sus 250 filas. Para virtualizar, la lista tiene que ser **dueña de su propio desplazamiento**.
+
+### La trampa que no es de WPF: la caché del escaneo
+
+Merece sitio propio porque no se parece a las otras y volverá a morder.
+
+**Al añadir un campo al resumen del proyecto hay que subir `CacheDeResumenes.Formato`.** Si no, el tablero sirve resúmenes viejos —guardados con la forma anterior, sin el campo nuevo— y el dato sale en blanco. No falla nada: el cálculo está bien, los tests pasan, y la pantalla miente.
+
+Pasó el 2026‑08‑06 con el porcentaje ponderado (DD‑137), y en su versión más engañosa: la tarjeta enseñaba **las semanas sí y el porcentaje no**, porque las semanas se leen del fichero en cada escaneo y el porcentaje venía de la caché. Se sospechó del motor de reglas, se montó un programa aparte para medirlo y salió correcto — y el aviso llevaba meses escrito encima de la propia constante.
+
+Un comentario no bastó, así que ahora lo vigila un test: cuenta los campos guardados de `ResumenDeProyecto` y falla si aparece uno nuevo sin que la marca de forma suba. **Un aviso que hay que leer no es una salvaguarda; una que falla el build, sí.**
 
 ### Qué se midió y qué no
 
@@ -1245,10 +1335,12 @@ Debajo, **«Software de toma de notas primarias para ensayos y gestión de proye
 
 **Partida por la mitad** (DD‑80): a la izquierda la toma de notas, a la derecha gestionar.
 
+**Tres pesos y una primaria por zona** (DD‑135): relleno de color para la primera de cada mitad, contorno para lo frecuente, sin caja para lo esporádico. Recientes, normas y las cuatro vistas van en **rejillas de dos columnas**; las vistas llevan icono.
+
 | Toma de notas (izquierda) | Gestión (derecha) |
 |---|---|
 | **Abrir existente**, en azul | **Planificar nueva TdN**, en verde |
-| Los **cinco últimos abiertos**, bajo «RECIENTES» | **Tablero** · qué falta por rellenar |
+| Los **cuatro últimos abiertos**, bajo «RECIENTES», en dos por dos | **Tablero** · qué falta por rellenar |
 | «O crea una nueva con la norma que necesites» y **una tarjeta por norma instalada** — sale de `CatalogoDeNormas`, así que dejar caer un `plantilla-*.json` añade la suya sin tocar nada | **Calendario** · cuándo toca cada uno |
 | | **Carga** y **BBDD** |
 
@@ -1256,7 +1348,7 @@ Debajo, **«Software de toma de notas primarias para ensayos y gestión de proye
 
 Cada mitad tiene **un solo botón lleno de color** y es el que más se pulsa: azul a la izquierda, verde a la derecha, mismo tamaño y mismo redondeo.
 
-En la portada se enseñan **cinco** recientes, no todos, y **solo el nombre**: la carpeta se quitó de la fila —con dos líneas por fila, cinco filas no cabían en una pantalla de 800— y se quedó en el consejo emergente, que es donde se mira para desempatar dos servicios parecidos. `Archivo | Proyectos recientes` los sigue teniendo todos, que para eso hay que ir a buscarlo.
+En la portada se enseñan **cuatro** recientes, no todos, y **solo el nombre**: la carpeta se quitó de la fila —con dos líneas por fila, cinco filas no cabían en una pantalla de 800— y se quedó en el consejo emergente, que es donde se mira para desempatar dos servicios parecidos. `Archivo | Proyectos recientes` los sigue teniendo todos, que para eso hay que ir a buscarlo.
 
 **Las tarjetas de norma salen ordenadas por su título**, con luminarias primero por ser la de uso más frecuente; el resto queda «Grados IK», «Grados IP», «Módulos LED». No hay ninguna lista de orden escrita en el código **a propósito**: una lista fija habría que tocarla cada vez que entre una norma nueva, y lo que se quiere es que dejar caer un JSON baste. Si algún día el laboratorio quiere otro orden, el sitio es un campo en la propia plantilla, no el C#.
 
@@ -1319,17 +1411,59 @@ Pestaña propia, pensada para el responsable y no para el técnico. Tiene **cuat
 
 El tablero es lo primero que se construyó: **columnas = proyectos, tarjetas = secciones pendientes** (a lo Trello).
 
+**La cabecera de cada columna lleva los mismos dos iconos que la barra del calendario** (DD‑136, pedido el 2026‑08‑06): la **caja** cuando las muestras ya están en el laboratorio y el **candado** cuando las fechas están blindadas. Son los mismos `IconoCaja` e `IconoCandado`, dibujados como trazo para que tomen el color de donde se pongan — blancos sobre la barra de color, ámbar y gris sobre la tarjeta gris.
+
+Van aquí porque el tablero es donde se decide **qué se coge hoy**, y eso no depende solo de lo que quede por rellenar: un servicio al que le faltan doce apartados pero cuya muestra sigue en el transportista no se puede empezar. Sin el icono, ese dato había que ir a buscarlo al calendario.
+
+Los colores no son decorativos: **ámbar el que empuja a hacer algo** —las muestras están aquí— y **gris el que solo informa** —no muevas estas fechas—. Los dos pasan el 3:1 de contraste no textual sobre el fondo `#EEF0F3` (4,4 y 4,2). La ausencia es la señal contraria: no hay icono de «muestras aún sin llegar», porque dieciséis columnas con un icono tachado no dicen nada.
+
+> El rótulo va en una **rejilla** y no en un `StackPanel` horizontal. Dentro de un `StackPanel` el ancho es infinito y el código dejaría de envolver — es la misma trampa que ya estaba documentada en las barras del calendario.
+
+#### Las tres formas de contar el avance, y cuál manda
+
+El programa sabe medir lo hecho de tres maneras distintas, y las tres siguen existiendo porque contestan a preguntas distintas (DD‑137):
+
+| Cuenta | Se ve en | Contesta |
+|---|---|---|
+| **Peso** (`PorcentajePonderado`) | el `45 %` del tablero, del calendario y del informe | ¿cuánto trabajo queda? |
+| **Secciones** | el `7/16 secciones` de la tarjeta | ¿por dónde voy? |
+| **Apartados** | el `12/45 apartados` de la toma de notas y del informe | ¿cuántas casillas quedan? |
+
+**El porcentaje es siempre el ponderado.** No es una preferencia estética: es el que ya lleva impreso el informe que se firma, y dos porcentajes distintos con el mismo nombre serían peores que ninguno. Los pesos —3, 5, 10 y **100 para endurancia**— los declara la plantilla y salieron del Excel del laboratorio, así que **el programa no decide cuánto vale un ensayo**: lo lee.
+
+> Conviene saber cómo se mueve ese número antes de fiarse de él. Con endurancia valiendo 100 de 217, **el marcador se pasa media vida por debajo del 55 % y luego salta**. No está roto: endurancia dura semanas y el Excel lo ponderó así a conciencia (D‑18). Pero es la razón por la que la tarjeta sigue enseñando también `7/16 secciones`, que sí avanza a pasos regulares.
+
+Dos reglas que parecen detalles y no lo son:
+
+- **Nunca 100 % por redondeo.** Se trunca hacia abajo salvo cuando de verdad no queda peso. Un 99,6 % redondeado al alza pondría el cartel de acabado en un servicio al que le falta un ensayo, y eso se firma.
+- **Sin pesos, ningún número.** Nulo, no cero. Un cero fijo diría «0 %» hasta en un servicio terminado, y nadie sabría si es que no se ha hecho nada o que no se sabe.
+
+El renglón de la tarjeta —`3W | 45 % | 7/16 secciones`— lo arma el resumen, no cada vista, y **lo que no hay se cae**: sin fechas no hay `3W`, sin pesos no hay `%`.
+
+#### El porcentaje dentro de la barra del calendario
+
+En el calendario van los mismos dos datos detrás del código, **más apagados**, para que al estrecharse la barra lo que se pierda sea el añadido y no el nombre. Pero medido con 47 servicios reales, **no cabe casi nunca**: ni con el zoom al máximo entra `EDISO260909 | 3W | 100 %` en una barra de tres semanas.
+
+Por eso el porcentaje **se dice también con la forma**: lo hecho se aclara sobre el color del estado, al modo de un Gantt. Un relleno no gasta ancho —se lee igual en una barra de una semana que en una de seis— y sobrevive al recorte del texto. Va en columnas `*` y no en píxeles para que se reparta solo mientras se arrastra la barra, sin recalcular nada en cada latido del gesto.
+
+> **`W` es duración; `S` es número de semana.** El eje rotula `S32` —«entra en la S32»— y la barra rotula `3W` —«tres semanas de trabajo»—. Son dos cosas distintas y por eso llevan letras distintas.
+
 #### Qué proyectos se miran
 
-Un solo desplegable **«Mostrar»** para las tres vistas: el responsable decide una vez qué le interesa y el tablero, el calendario y la carga hablan de lo mismo. Por defecto, **«En desarrollo»** — ni terminado ni archivado.
+Un solo desplegable **«Mostrar»** para las cuatro vistas: el responsable decide una vez qué le interesa y el tablero, el calendario, la carga y la BBDD hablan de lo mismo. Por defecto, **«En desarrollo»** — todo menos lo archivado.
 
 | Opción | Qué enseña |
 |---|---|
-| **En desarrollo** | ni terminado ni archivado. Lo que se está trabajando |
+| **En desarrollo** | **todos los estados menos lo archivado**, terminados incluidos |
 | Un estado concreto | ese estado, **sin** lo archivado: quien busca «En curso» no quiere lo que se apartó |
 | Archivados | solo lo apartado de en medio |
+| Cualquier estado | todo a la vez, archivado incluido. Es lo que hace buscable la BBDD |
 
-**Lo cerrado se pide por su nombre** (DD‑79). Había una opción «Todos» que traía literalmente todo, y el laboratorio la quitó de en medio (2026‑08‑02): quien la elegía buscaba «los proyectos de todos los técnicos», no «también los de 2019». En la carga era peor que un estorbo visual — un servicio terminado seguía sumando sus días al mes, así que el porcentaje del técnico salía inflado con trabajo que ya nadie va a hacer. Ahora **ninguna opción general trae lo terminado ni lo archivado**; para verlos se eligen «Terminado» o «Archivados», que siguen ahí. Como sin lo cerrado «Todos» decía exactamente lo mismo que «En desarrollo», se dejó una sola entrada en vez de dos idénticas.
+> **Lo único que esconde es archivar.** Hasta el 2026‑08‑05 «En desarrollo» dejaba fuera también lo terminado, y se cambió porque escondía trabajo vivo: un servicio terminado la semana pasada se sigue mirando —hay que facturarlo, el cliente pregunta—. **El texto del diálogo se quedó atrás** y siguió diciendo «deja fuera lo terminado y lo archivado» durante dos días, hasta que el laboratorio lo cazó leyéndolo (2026‑08‑07). La misma frase estaba copiada en otros cuatro sitios. Cuando cambia una regla hay que buscar la frase, no solo el código.
+
+**Lo archivado se pide por su nombre** (DD‑79). Había una opción «Todos» que traía literalmente todo, y el laboratorio la quitó de en medio (2026‑08‑02): quien la elegía buscaba «los proyectos de todos los técnicos», no «también los de 2019». Como sin lo archivado «Todos» decía exactamente lo mismo que «En desarrollo», se dejó una sola entrada en vez de dos idénticas; el nombre viejo se sigue reconociendo para que quien lo tenga guardado no se encuentre el tablero en blanco.
+
+> Aquí decía que **ninguna opción general traía lo terminado**, y dejó de ser cierto tres días después (2026‑08‑05): lo terminado volvió a «En desarrollo» porque un servicio terminado la semana pasada se sigue mirando. **Y con ello volvió el problema que lo había sacado**: en la carga *«un servicio terminado seguía sumando sus días al mes, así que el porcentaje del técnico salía inflado con trabajo que ya nadie va a hacer»*. Se arrastró dos días hasta que el laboratorio lo cazó probando (DD‑142). Ya no lo arregla el filtro sino **el propio cálculo de carga**, que es donde tenía que estar: lo terminado se sigue viendo en el tablero, en el calendario y en la BBDD, y solo deja de contar donde la pregunta es «¿cabe?».
 
 **Manda el estado que puso la persona, no el que deduce el programa** (DD‑74). Antes «terminado» significaba dos cosas: el tablero usaba el calculado —todas las secciones rellenas— y el calendario el manual. Así, un servicio con todo relleno pero **esperando confirmación del cliente salía como terminado** sin que nadie lo hubiera dicho. Lo calculado se queda como lo que es: el avance, `12/16 secciones`.
 
@@ -1673,7 +1807,7 @@ La cuarta vista (DD‑109). Nació de algo que hoy se hace de viva voz: *«¿te 
 
 **Solo lee.** No hay fichero que mantener: sale del mismo escaneo que alimenta el tablero, el calendario y la carga. Pulsar el código abre esa toma de notas en una pestaña, y ahí se edita — aquí no.
 
-**Ignora el filtro compartido, y es a propósito.** Los otros tres arrancan en «En desarrollo», que deja fuera lo terminado y lo archivado; pero lo que se busca en la BBDD casi siempre está terminado. Con el filtro puesto, la vista nacería escondiendo justo lo que se viene a buscar.
+**Ignora el filtro compartido, y es a propósito.** Los otros tres arrancan en «En desarrollo», que deja fuera lo archivado; pero lo que se busca en la BBDD suele ser viejo y bastantes de esos servicios están apartados. Con el filtro puesto, la vista nacería escondiendo justo lo que se viene a buscar.
 
 **La caja busca en todas las columnas** —código, técnicos, norma, acreditación, laboratorio externo— porque quien recuerda un proyecto no sabe por cuál lo recuerda. Y los desplegables ofrecen **los valores que de verdad hay** en los proyectos leídos: una lista fija ofrecería grados que nadie ha ensayado y, peor, escondería los que sí.
 
@@ -1760,6 +1894,17 @@ Pedida el 2026‑08‑06. El tablero dice *qué falta*, el calendario *cuándo*,
 
 Verde por debajo del 85 %, ámbar hasta el 100 %, **rojo por encima**: ahí el técnico está sobrevendido. Un servicio de 10 000 € planificado entero en agosto sale al **155 %**, que es exactamente el aviso que se buscaba — medio laboratorio está de vacaciones.
 
+**Lo terminado no cuenta** (DD‑142). Es la única de las cuatro vistas que esconde algo por su cuenta, y tiene motivo: las otras tres contestan «qué hay» y esta contesta «¿cabe?». Un mes cerrado sale en blanco, y el panel de abajo lo dice para que nadie lo lea como un fallo.
+
+**Terminado y archivado no se esconden igual, y el panel lo explica** (reescrito por el laboratorio el 2026‑08‑07). Es una asimetría real y confunde si no se dice:
+
+| | Cómo se queda fuera | ¿Se puede ver su carga? |
+|---|---|---|
+| **Terminado** | en el **cálculo** | **nunca**, ni eligiendo el filtro |
+| **Archivado** | en el **filtro** | sí: eligiendo «Archivados» o «Cualquier estado» |
+
+El texto perdió a cambio la leyenda de colores —«verde por debajo del 85 %, ámbar hasta el 100 %, rojo por encima»— y el recordatorio de que agosto no da lo mismo que marzo. Se quitó a sabiendas: el umbral del 85 % no se adivina, pero el panel no daba para todo y el laboratorio prefirió explicar lo que confunde antes que lo que se intuye.
+
 **Dos cosas que conviene tener presentes:**
 
 - **El reparto supone esfuerzo uniforme**, y en un laboratorio no lo es: montaje, dos días en cámara sin tocar nada, medida. En un servicio suelto el reparto mensual es impreciso; sobre el conjunto de un técnico los errores se compensan y sirve para planificar, que es para lo que se usa. La alternativa —teclear días por mes a mano— no la rellenaría nadie.
@@ -1819,7 +1964,7 @@ Dos cosas que arrastra el cambio:
 Lo que se ve de un vistazo:
 
 - **línea roja vertical de «hoy»** y la semana en curso resaltada en la cabecera;
-- **barra en rojo** si la fecha de fin ya pasó y el servicio no está terminado — este es el valor de todo el invento, lo demás es decoración;
+- **la barra lleva el color de su estado, y solo el de su estado** (DD‑141). Estuvo pintándose de rojo cuando la fecha de fin ya había pasado y el servicio no estaba terminado, y el laboratorio lo quitó el 2026‑08‑07: el rojo **tapaba el estado**, que es lo único que la barra dice con el color, y un servicio en curso y otro pendiente de cliente se veían iguales por haberse pasado un día. Fuera de plazo se sigue diciendo donde no estorba — en el consejo emergente de la tarjeta y en el **«N fuera de plazo»** de la cabecera del técnico;
 - **icono de caja** en la barra si las muestras ya están en el laboratorio, y también en la banda de abajo —muestras aquí y todavía sin planificar es lo que corre prisa—. Va dibujado como trazo, no como imagen, para verse nítido a cualquier tamaño y tomar el color de donde se ponga;
 - los servicios **sin fechas** salen en una banda aparte, con un botón «Planificar», para que no se pierdan de vista.
 
@@ -1869,7 +2014,7 @@ Al llegar al borde de la vista, **el calendario se desplaza solo** mientras se a
 
 **La barra: una fila y nada más** (DD‑108). `Tablero · Calendario · Carga · + · Elegir carpeta… · Actualizar · Filtros`. El **«+»** es el alta rápida, con el verde de gestión y el rótulo entero en el consejo emergente. Los tres filtros —estado, técnico y norma— viven dentro de **«Filtros»**, que abre un diálogo donde además cabe explicar cada uno, cosa que en la barra no cabía. Siguen aplicándose **al elegirlos**, no al cerrar: son los mismos de siempre contra el mismo modelo, y meter un «Aceptar» sería cambiar cómo se comportan por haberlos movido de sitio.
 
-> **Un filtro escondido y mudo es peor que un filtro visible.** Al meterlos en el diálogo desaparecía de la barra la única pista de que el tablero no lo enseña todo. Por eso el botón dice **«Filtros (2)»** y se pinta de verde cuando alguno aparta trabajo, y su consejo emergente resume qué se está viendo. Lo decide `ResumenDeFiltros`, en el núcleo y con tests, y ahí está la regla fina: **«En desarrollo» no cuenta como filtro activo** —es lo que hay puesto al abrir, y contarlo dejaría el aviso encendido siempre hasta que nadie volviera a mirarlo—, pero **sí se nombra en el resumen**, porque tampoco lo enseña todo: deja fuera lo terminado y lo archivado.
+> **Un filtro escondido y mudo es peor que un filtro visible.** Al meterlos en el diálogo desaparecía de la barra la única pista de que el tablero no lo enseña todo. Por eso el botón dice **«Filtros (2)»** y se pinta de verde cuando alguno aparta trabajo, y su consejo emergente resume qué se está viendo. Lo decide `ResumenDeFiltros`, en el núcleo y con tests, y ahí está la regla fina: **«En desarrollo» no cuenta como filtro activo** —es lo que hay puesto al abrir, y contarlo dejaría el aviso encendido siempre hasta que nadie volviera a mirarlo—, pero **sí se nombra en el resumen**, porque tampoco lo enseña todo: deja fuera lo archivado.
 
 > **Séptima trampa de WPF: `DataContext` y `Visibility` en el mismo elemento se estorban.** El `DataContext` se aplica **al propio elemento**, no solo a sus hijos, así que también manda sobre sus ataduras. Poniendo `DataContext="{Binding Bbdd}"` y `Visibility="{Binding VistaBbdd}"` en el mismo `Grid`, la visibilidad pasa a buscar «VistaBbdd» **dentro de `BbddViewModel`**, donde no existe: la atadura falla **sin decir nada**, la visibilidad se queda en su valor de por defecto —visible— y la vista aparece encima de las otras tres. La solución es la que ya usaban el calendario y la carga: **dos `Grid` anidados**, el de fuera decide si se ve y el de dentro cambia el contexto.
 >
@@ -1956,9 +2101,10 @@ Sin esa segunda regla, el técnico que tuviera el proyecto abierto desde hacía 
 | Media | **Calibración de los equipos.** Ya se registra qué equipo se usó en cada apartado; si el catálogo llevara su fecha de calibración, el programa podría avisar de que un equipo estaba fuera de calibración el día del ensayo. Media función hecha y sin aprovechar — es la no conformidad que detecta el programa antes que el auditor |
 | Media | **Duplicar una toma de notas.** Un trabajo lleva varias familias y todas comparten cliente, código y técnicos. El alta rápida y el enlace por grupo alivian la mitad del problema; lo que falta es **arrancar una familia desde otra ya rellena**, sin repetir la cabecera cuatro veces |
 | Media | **Arrastrar la frontera entre dos familias** para mover su fecha de corte. Es **una sola fecha** —el fin de la familia de la izquierda; el inicio de la siguiente sale de la cadena (DD‑123)—, así que el dato es sencillo. Con el tren de tarjetas (DD‑119) la frontera ya es el **borde real** de un elemento real, así que lo que queda es que `ArrastreDeBarra` distinga ese borde del de fuera y escriba solo esa fecha. Se dejó aparte a propósito, para que si algo se rompe se sepa qué lo rompió |
-| Baja | **Exportar el calendario, la carga o el listado**, para enviarlos a quien no abre el programa. El exportador de HTML ya existe |
+| Media | **Editor de estados: cuatro más, con su color.** Diseño acordado con el laboratorio el 2026‑08‑07; **nadie lo ha pedido formalmente todavía**, se anota para no volver a decidirlo. Ver «Cómo sería el editor de estados» más abajo |
+| Baja | **Exportar el calendario o la carga**, para enviarlos a quien no abre el programa. El listado de la BBDD ya se exporta (DD‑140) y el exportador de HTML está hecho; lo que falta es decidir **qué es exportar un dibujo** — una línea de tiempo y una tabla de porcentajes no se llevan al papel escribiendo las mismas filas |
 | Baja | **Los selectores de fecha dicen «Select a date»**, en inglés: es el texto de fondo por defecto de WPF. Afecta a la planificación y al alta. Se arregla poniéndoles el idioma |
-| Baja | **Los botones de la zona de gestión de la portada no tienen nombre accesible.** Su contenido son dos líneas de texto en vez de una cadena, así que la automatización —y un lector de pantalla— ven un botón sin nombre. Con el ratón funcionan igual. Una línea por botón (`AutomationProperties.Name`) lo arregla. Detectado el 2026‑08‑06 al probar «Planificar nueva TdN», que hubo que pulsar por posición |
+| Baja | **Quedan controles sin nombre accesible en la toma de notas.** Medido el 2026‑08‑06 sobre un proyecto real: **38 botones de 46**, los **7 desplegables** y las **4 cajas de texto** se anuncian vacíos. Son dos fallos distintos: los botones repiten el de la portada (DD‑135) y el del índice (DD‑139) —contenido que es un panel, así que WPF no sabe cuál pieza es el nombre—; las cajas y los desplegables son otra cosa, **la etiqueta vive en otra celda de la rejilla y nada la ata al campo**, que es lo que resuelve `AutomationProperties.LabeledBy`. Falta repasar también las cuatro vistas de gestión. **No corre prisa mientras nadie use lector de pantalla ni control por voz**, pero encarece cada verificación: obliga a manejar el programa por posición en vez de por nombre |
 | Baja | **Arrastrar la frontera entre dos familias** de un mismo trabajo para mover su fecha de corte. Es **una sola fecha** —el fin de la de la izquierda; el inicio de la siguiente sale de la cadena (DD‑123)—, y desde el tren de tarjetas esa frontera ya es el **borde real** de un elemento real: lo que falta es que `ArrastreDeBarra` distinga ese borde del de fuera |
 | Baja | **Las tarjetas de clase, Ta y partes ‑2 siguen escritas a mano en el XAML.** Solo se muestran y se exigen donde la norma las declara, pero el asterisco de obligatorio es texto fijo. Se generalizó la cabecera entera el 2026‑08‑01 y **el laboratorio pidió revertirlo**: la pantalla de luminarias se da por buena y no se toca |
 | **Alta** | **`MainWindow.xaml` se ha hecho grande de verdad.** Ya son **cuatro** vistas de gestión —tablero, calendario, carga y BBDD— dentro del mismo fichero, además de la toma de notas y la portada. Toca partirlo en diccionarios de recursos, uno por vista. **Ha vuelto a subir de prioridad**: con la BBDD y el tren de tarjetas, encontrar dónde tocar cuesta ya más que el cambio en sí |
@@ -1970,9 +2116,36 @@ Sin esa segunda regla, el técnico que tuviera el proyecto abierto desde hacía 
 | Media | **Instalador** y asociación de la extensión `.lmnlab`. La recomendación es **ClickOnce** publicando a una carpeta de red —cada equipo instala una vez y **se actualiza solo al arrancar**—, con **Inno Setup** como plan B. Publicar **dependiente del framework** e instalar el *.NET Desktop Runtime* en cada equipo (DD‑107): son unos MB por actualización en vez de 130, y los parches del runtime llegan por Windows Update. SmartScreen avisará la primera vez por no estar firmado; firmar cuesta 200‑400 €/año. **No repartirlo hasta que el programa haya pasado un ensayo real completo**: sería repartir el mismo problema a seis ordenadores |
 | Baja | Con 30 muestras el informe A4 no cabe: habría que girar la tabla o partirla |
 
+#### Cómo sería el editor de estados
+
+Acordado con el laboratorio el 2026‑08‑07, sin escribir código. Se anota entero porque **la parte difícil no es el editor sino decidir qué puede tocarse**, y eso ya está decidido.
+
+**Cuatro estados más, y solo cuatro.** El tope no es pereza: en el calendario **el color de la barra es lo único que dice el estado** (DD‑141), y con doce colores no se distingue ninguno. Nueve ya es mucho.
+
+**El comportamiento no se pregunta, viene con el hueco.** De los cuatro, **dos no cuentan en la carga y dos sí**. Así el laboratorio elige metiendo el estado en un hueco o en otro, y nadie tiene que contestar «¿este ocupa al técnico?» cada vez — que es exactamente la pregunta que se contestó mal y costó DD‑142. **Los cuatro pueden estar fuera de plazo**: el único exento sigue siendo el que cuenta como acabado.
+
+| | Los cinco de ahora | Los cuatro nuevos |
+|---|---|---|
+| Borrar | **nunca** | no; se **desactivan** |
+| Renombrar y elegir color | sí | sí |
+| Cuenta en la carga | como hoy | dos sí, dos no |
+| Puede ir fuera de plazo | como hoy | los cuatro |
+
+**No se borra, se desactiva.** Es la regla que ya existe para los técnicos (`ConNombreSuelto`): un técnico que sale de la lista **se sigue ofreciendo en los proyectos que ya lo llevan**, para no dejarlos sin responsable. Igual aquí: un estado desactivado deja de ofrecerse para trabajo nuevo y los proyectos que lo tengan lo siguen enseñando. Con eso desaparece la pregunta incómoda de «¿qué hago con los quince proyectos que usaban el estado que acabo de borrar?».
+
+**Tres cosas hay que arreglar antes de empezar**, y las tres son deuda que ya existe:
+
+1. **El filtro compara por la etiqueta** (`FiltroDeEstado.Pasa` mira `EtiquetaDe(estado) == filtro`). En cuanto el nombre sea editable, renombrar un estado rompe el filtro en silencio. Tiene que comparar por identidad — el mismo cambio que se hizo con el desplegable de normas (DD‑134).
+2. **`Terminado` está escrito en siete sitios** donde significa algo: la carga, el aviso de retraso —dos veces—, el cierre al exportar, `YaEstaCerrado` y las fechas reales del ensayo. Eso pasa a ser una marca del estado («este cuenta como acabado») en vez de una comparación con una constante.
+3. **Hay que subir `CacheDeResumenes.Formato`.** Cambia la forma del resumen, y sin subirla el tablero enseñará estados en blanco durante días. Ya mordió una vez (DD‑137).
+
+**El color no puede ser libre del todo**: las barras llevan texto e iconos **blancos** encima. O paleta cerrada, o color libre con el texto ajustándose solo y un aviso cuando no llegue al contraste mínimo. Paleta cerrada es más rápido y no hay forma de estropearlo.
+
 ### Pendiente del laboratorio
 
 **D‑07** (`EQ-CERT` vs `EQ-SAFE`), **D‑13** (los dos criterios de carga estática), **D‑14** (`EN 60598-2-15`), **D‑21** (confirmar la corrección de 7.12) y **D‑22** (si deben validarse las casillas sin enlazar).
+
+**D‑23 — confirmar que el reparto de pesos sigue valiendo ahora que se ve en tres sitios.** No es que falten pesos: las cinco plantillas los declaran y son fielmente los del Excel —23 conceptos, 217 puntos en luminarias—. Lo que hay que confirmar es **la forma de la curva**, porque desde DD‑137 ese número sale del tablero y del calendario y no solo del informe. **Endurancia pesa 100 de 217**, casi la mitad (D‑18, que se cerró aceptándolo). Consecuencia práctica: un servicio con todo hecho menos endurancia enseñará **≈54 %**, y cerrar ese único ensayo lo sube de golpe a 100. En proyectos con pocas secciones aplicables endurancia puede ser el 70‑80 %. Es defendible —endurancia dura semanas— pero conviene que el laboratorio lo mire sabiendo que ahora es lo que ve el responsable de un vistazo. Es un campo del JSON: si se quiere cambiar, no hace falta tocar código.
 
 Además, la lista de normas que admite la **62031** (`meta.normasCompatibles`) la puse yo por deducción —IP e IK, porque no los lleva dentro— y **el laboratorio no la ha confirmado**.
 
@@ -2011,7 +2184,13 @@ Si los **562 tests** pasan, el motor y las cinco plantillas están sanos. La may
 | Un filtro nuevo del tablero | `GestionViewModel`, **no** en una vista: valen para las tres |
 | Algo compartido por el laboratorio | La carpeta compartida, y reflejado en `Configuración \| Carpetas…` |
 
-**Ninguno de los 449 tests toca la interfaz**, así que lo que se apoye en WPF hay que escribirlo de forma que la lógica quede fuera. No es purismo: en este equipo no se pueden automatizar los eventos de ratón, y sacar la lógica del gesto al núcleo fue la única manera de comprobar el arrastre del calendario.
+**Ninguno de los 562 tests toca la interfaz**, así que lo que se apoye en WPF hay que escribirlo de forma que la lógica quede fuera. No es purismo: sacar la lógica del gesto al núcleo fue la única manera de comprobar el arrastre del calendario.
+
+> Matiz al «no se puede automatizar el ratón» de DD‑57: **inyectar clics sí funciona**, pero solo si la ventana está en primer plano —si no, el clic se lo lleva la que esté encima y parece que la automatización está rota—. Aun así la regla de DD‑57 no cambia: la lógica del gesto sigue en el núcleo, porque un clic inyectado comprueba que el botón responde, no que la aritmética del arrastre sea correcta.
+
+> **Confirmado el 2026‑08‑07 por tercera vía.** Se montó un banco aparte —un WPF mínimo que abre una ventana propia y llama a `DialogoNuevoProyecto.Preguntar` con ella de dueña, el camino de verdad— y **el diálogo tampoco salió**: la ventana del banco sí, el modal no, y el programa se quedó dentro de `ShowDialog` esperando. **El bucle modal corre, la ventana no se materializa.** Es del entorno y no hay forma de rodearlo desde dentro del programa; lo que queda es comprobar el inventario —que compilar ya garantiza: un `x:Name` que desapareciera o un manejador que faltara son error de compilación— y pedirle al laboratorio que lo mire.
+
+> **Lo que la automatización no alcanza: los diálogos, en algunas sesiones.** El 2026‑08‑06, al probar la exportación del listado, ningún botón que abriera un diálogo hizo nada al accionarlo por UIA — ni el nuevo ni «Elegir carpeta», «Filtros» o «Abrir TdN existente», que funcionan a diario. Se comprobó que la ventana principal **seguía habilitada**, luego no había ningún modal abierto: el diálogo no llegaba a crearse. Los botones que solo cambian de vista sí respondían, y en la misma sesión `Add-Type` no podía escribir en `%TEMP%`. Es del entorno, no del programa. **Cuando pase, no hay que insistir**: se verifica el generador con tests y se produce el fichero por un programa aparte que llame al mismo código sin el diálogo — que es como se comprobó DD‑140 sobre los 233 proyectos reales.
 
 > **Lo que sí se puede comprobar a mano, y durante meses se dio por imposible.** **UI Automation sí acciona esta aplicación**: botones, menús y submenús, leyendo además si una entrada está marcada. Lo que fallaba no era la automatización sino dónde se buscaba: **los diálogos y los menús emergentes de WPF no cuelgan del árbol de la ventana principal**. Hay que buscarlos desde el escritorio (`AutomationElement.RootElement`) acotando por identificador de proceso, o enumerando ventanas con `EnumWindows`. Con eso se puede recorrer un menú, abrir un diálogo y fotografiarlo — que es como se han verificado los últimos cambios de pantalla.
 

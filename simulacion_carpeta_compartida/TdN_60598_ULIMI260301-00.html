@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<title>Toma de notas ULIMI2603</title>
+<style>@page { size: A4 portrait; margin: 16mm 14mm; }
+
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 10pt; color: #111827;
+       line-height: 1.45; margin: 0 auto; max-width: 195mm; padding: 14mm 12mm;
+       background: #fff; }
+
+header { border-bottom: 3px solid #111827; padding-bottom: 10px; margin-bottom: 22px; }
+h1 { font-size: 18pt; margin: 0 0 4px; letter-spacing: .3px; }
+h2 { font-size: 14pt; margin: 0 0 3px; }
+h3 { font-size: 11pt; margin: 22px 0 6px; padding-left: 9px;
+     border-left: 4px solid #9ca3af; color: #1f2937; }
+p { margin: 5px 0; }
+
+.sub { color: #6b7280; font-size: 9pt; margin-top: 0; }
+.nota { color: #6b7280; font-size: 8.5pt; font-style: italic; margin: 3px 0; }
+.condiciones { margin: 12px 0; padding: 7px 10px; background: #f9fafb;
+               border-left: 3px solid #d1d5db; }
+.check { margin: 7px 0; }
+
+table { border-collapse: collapse; width: 100%; margin: 10px 0 16px; }
+th, td { border: 1px solid #d1d5db; padding: 6px 8px; font-size: 9pt; text-align: left;
+         vertical-align: top; }
+thead th { background: #f3f4f6; }
+tbody tr:nth-child(even) { background: #fcfcfd; }
+.ficha { margin-bottom: 20px; }
+.ficha th { background: #f3f4f6; width: 34%; }
+
+/* La de muestras es estrecha: cinco columnas cortas estiradas al ancho de la
+   página quedarían separadas por un desierto. */
+.muestras { width: auto; min-width: 60%; margin-bottom: 20px; }
+.muestras th { background: #f3f4f6; }
+
+.datos .etq { width: 38%; }
+
+.aviso { background: #fef3c7; border: 1px solid #f59e0b; color: #92400e;
+         padding: 10px 12px; font-weight: bold; margin: 14px 0; }
+.falta { color: #92400e; font-weight: bold; margin-top: 18px;
+         padding: 8px 12px; background: #fef2f2; border-left: 4px solid #dc2626; }
+.na { font-weight: bold; margin-top: 16px; padding: 8px 12px;
+      background: #f3f4f6; border-left: 4px solid #9ca3af; }
+
+.comentarios { margin: 12px 0 4px; padding: 9px 12px; background: #f9fafb;
+               border: 1px solid #e5e7eb; white-space: pre-wrap; }
+
+/* Separación clara entre apartados en pantalla; en papel manda el salto de página. */
+.apartado { margin-top: 34px; padding-top: 22px; border-top: 2px solid #e5e7eb; }
+.apartado h2 { margin-top: 0; }
+
+@media print {
+    body { max-width: none; padding: 0; }
+    /* Cada apartado empieza en página nueva al imprimir (DD-15). */
+    .apartado { page-break-before: always; break-before: page;
+                margin-top: 0; padding-top: 0; border-top: none; }
+    tr, table { page-break-inside: avoid; break-inside: avoid; }
+    h3 { page-break-after: avoid; break-after: avoid; }
+}</style>
+</head><body>
+<header>
+<h1>TOMA DE NOTAS DE ENSAYOS</h1>
+<p class="sub">Luminarias — EN IEC 60598-1:2021 + A11:2022 y partes -2</p>
+</header>
+<table class="ficha">
+<tr><th>Código de la toma de notas</th><td>ULIMI260301-00</td></tr>
+<tr><th>Código de servicio</th><td>ULIMI2603</td></tr>
+<tr><th>Acreditación</th><td>ENAC</td></tr>
+<tr><th>Laboratorios externos</th><td>—</td></tr>
+<tr><th>Técnico 1</th><td>Daniel Pastor</td></tr>
+<tr><th>Técnico 2</th><td>Javier Ibor</td></tr>
+<tr><th>Nº de muestras</th><td>2</td></tr>
+<tr><th>Clase</th><td>I</td></tr>
+<tr><th>Ta</th><td>55</td></tr>
+<tr><th>Partes -2 aplicables</th><td>-2-3</td></tr>
+<tr><th>Normas y plantillas</th><td>Luminarias — EN IEC 60598-1:2021 + A11:2022 y partes -2 · plantilla 1.0.0</td></tr>
+<tr><th>Versión del programa</th><td>1.0.0</td></tr>
+<tr><th>Documento generado el</th><td>06-08-2026 23:12</td></tr>
+<tr><th>Estado</th><td>0% ponderado · 0/23 apartados completados</td></tr>
+</table>
+<h3>Muestras</h3>
+<table class="muestras"><thead><tr><th>Nº</th><th>Identificador</th><th>Clase</th><th>Grado IP</th><th>Grado IK</th></tr></thead><tbody>
+<tr><td>01</td><td>EBP_SAFEULIMI260301</td><td>I</td><td>IP20</td><td>—</td></tr>
+<tr><td>02</td><td>EBP_SAFEULIMI260302</td><td>I</td><td>IP20</td><td>—</td></tr>
+</tbody></table>
+<p class="aviso">ATENCIÓN: quedan apartados con datos pendientes. El detalle está en cada apartado.</p>
+<p class="sub">Este documento es el registro primario del ensayo. Se firma en papel una vez impreso.</p>
+<section class="apartado">
+<h2> · Ratings y otros datos generales</h2>
+<p class="sub">Ratings y otros datos generales</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<h3>Ratings y otros datos generales</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Verificación y medida de ratings (Tensión 1) · Tensión (V)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Verificación y medida de ratings (Tensión 1) · Corriente (A)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Verificación y medida de ratings (Tensión 1) · Potencia (W)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Verificación y medida de ratings (Tensión 1) · Fact. Pot (PF)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Verificación y medida de ratings (Tensión 2, si procede) · Tensión (V)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Verificación y medida de ratings (Tensión 2, si procede) · Corriente (A)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Verificación y medida de ratings (Tensión 2, si procede) · Potencia (W)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Verificación y medida de ratings (Tensión 2, si procede) · Fact. Pot (PF)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tamaño de las muestras · Alto (cm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tamaño de las muestras · Ancho (cm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tamaño de las muestras · Profundo (cm)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>Anexo A · Verificación de partes activas</h2>
+<p class="sub">Verificación partes activas</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<h3>Verificación de partes activas</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Medidas para determinar si es parte activa · Vac (V)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Medidas para determinar si es parte activa · Vdc (V)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Medidas para determinar si es parte activa · Uout (driver) (V)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>3 · Marcado</h2>
+<p class="sub">Sección 3 - Marcado</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Los datos pueden tomarse directamente sobre el TRF</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.4 · Portalámparas</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.6 y 4.7.2 · Bornes y conexiones</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<h3>Dimensiones del bloque de conexión</h3>
+<p class="nota">Si los datos son comunes a varias muestras puede anotarse sólo para una de ellas</p>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Bloque de conexión · Alto (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Bloque de conexión · Ancho (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Bloque de conexión · Profundo (mm)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.9 · Revestimientos y manguitos aislantes</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Aplica a revestimientos y manguitos con temperatura superior a la de la tabla 12.2</p>
+<h3>Revestimientos y manguitos aislantes</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Ensayo de humedad · inicio</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Ensayo de humedad · fin</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Permanencia en estufa · inicio</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Permanencia en estufa · fin</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.10 · Aislamiento doble o reforzado</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<h3>Aislamiento doble o reforzado</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Zonas aplicadas</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.12 · Tornillos, uniones y conexiones (mm)</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<h3>Tornillos</h3>
+<p class="nota">Si los datos son comunes a varias muestras pueden anotarse sólo en una de ellas</p>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Tornillo 1 · Parte</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 1 · Diám. (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 1 · No blando</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 1 · No aislante</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 2 · Parte</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 2 · Diám. (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 2 · No blando</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 2 · No aislante</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 3 · Parte</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 3 · Diám. (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 3 · No blando</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 3 · No aislante</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 4 · Parte</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 4 · Diám. (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 4 · No blando</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 4 · No aislante</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 5 · Parte</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 5 · Diám. (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 5 · No blando</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tornillo 5 · No aislante</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<h3>Uniones atornilladas</h3>
+<p class="nota">Si los datos son comunes a varias muestras pueden anotarse sólo en una de ellas</p>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Unión 1 · Parte</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Unión 1 · M (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Unión 2 · Parte</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Unión 2 · M (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Unión 3 · Parte</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Unión 3 · M (mm)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<h3>Prensaestopas</h3>
+<p class="nota">Si los datos son comunes a varias muestras pueden anotarse sólo en una de ellas</p>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Prensaestopa 1 · Material</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Prensaestopa 1 · Diám. (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Prensaestopa 2 · Material</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Prensaestopa 2 · Diám. (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Prensaestopa 3 · Material</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Prensaestopa 3 · Diám. (mm)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.13 · Resistencia mecánica (impacto)</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Compresión (mm) según la tabla 4.13 de la norma</p>
+<p class="nota">Los deterioros de acabados no se toman en consideración</p>
+<p class="nota">Los datos pueden tomarse directamente sobre el TRF</p>
+<h3>Resistencia mecánica (impacto)</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Parte frágil 1 · Compresión (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Parte frágil 2 · Compresión (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Parte frágil 3 · Compresión (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Otras partes 1 · Compresión (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Otras partes 2 · Compresión (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Otras partes 3 · Compresión (mm)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.14.1 · Suspensiones, fijaciones y ensayo de carga</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Los datos pueden tomarse directamente sobre el TRF</p>
+<h3>Suspensiones, fijaciones y ensayo de carga</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Peso de la luminaria (kg)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Peso de la parte (kg)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.18.1 · Resistencia a la corrosión</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Las tolerancias son informativas y no se validan (D-08)</p>
+<h3>Resistencia a la corrosión</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Tª de la solución [20 ± 5 ºC] (ºC)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tª del aire en la caja [20 ± 5 ºC] (ºC)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tª de la estufa [100 ± 5 ºC] (ºC)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.18.2 · Season cracking en cobre</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Ver el Anexo F de la norma</p>
+<p class="nota">Si los datos son comunes para todas las muestras puede indicarse sólo para una de ellas</p>
+<h3>Season cracking en cobre</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Preacondicionamiento (24 h)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">pH de la solución de NH₄Cl</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.24.2 · Riesgo retiniano por luz azul</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Los datos pueden estar en registros y cálculos adicionales propios del ensayo</p>
+<h3>Riesgo retiniano por luz azul</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">CCT (K)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Iluminancia RG1/RG2 (Eth) (lux)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">d mín. (m)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.28 · Fijación de los dispositivos de control sensibles a la temperatura</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Si los datos y resultados son comunes para varias muestras pueden rellenarse sólo para una de ellas</p>
+<h3>Fijación de los dispositivos de control sensibles a la temperatura</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Tª superior (ºC)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tª inferior [0 ºC] (ºC)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Nº de ciclos [100]</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tiempo de exposición [30 min] (min)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tiempo de transferencia (min)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Número de ciclos realizados</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.33 · Luminaria alimentada por cableado de comunicación</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.35 · Protección contra las aspas de un ventilador</h2>
+<p class="sub">Sección 4 - Construcción</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>3.6.3.1 · Carga estática (-2-3)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Fuerza (N) = 0,5 · 1,225 · área · 1,2 · v², con v = 45 / 52 / 57 m/s según la altura de montaje</p>
+<h3>Carga estática (-2-3)</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Área (m²)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Fuerza (N)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>3.6.5.1 · Rotura del cristal en fragmentos pequeños (-2-3)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Los datos pueden tomarse directamente sobre el TRF</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>3.6.5.2 · Cristal de gran resistencia al impacto (-2-3)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Los datos pueden tomarse directamente sobre el TRF</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>3.6.8 · Puerta de acceso de luminaria integrada en columna (-2-3)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Los datos pueden tomarse directamente sobre el TRF</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>4.7.3 · Estabilidad en plano inclinado 6º y 15º (-2-4)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Los datos pueden tomarse directamente sobre el TRF</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>5.6.5 · Carga estática (-2-5)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Fuerza (N) = área × 2400. Criterio distinto al de la parte -2-3 (D-13, pendiente de confirmar)</p>
+<h3>Carga estática (-2-5)</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Área (m²)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Fuerza (N)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>5.6.8.1 · Rotura del cristal en fragmentos pequeños (-2-5)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>5.6.8.2 · Cristal de gran resistencia al impacto (-2-5)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>10.6.2 · Estabilidad 15º (-2-10)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>10.6.3 · Resistencia al impacto y a la caída (-2-10)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>13.6.1 · Resistencia a la carga estática (-2-13)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>18.7.2 · Impacto mecánico (-2-18)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>18.7.3 · Corrosión (-2-18)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<h3>Corrosión (-2-18)</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Solución utilizada</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>22.17.3 · Mantenimiento del nivel de iluminación (-2-22)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Se realiza la carga durante 24 h o el tiempo declarado por el fabricante</p>
+<h3>Mantenimiento del nivel de iluminación (-2-22)</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Tiempo de duración de la batería asignada (h)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Iluminancia 5 s después del fallo (lux)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Iluminancia 60 s después del fallo (lux)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Iluminancia tras el tiempo de duración de la batería (lux)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>22.19 · Funcionamiento a alta temperatura (-2-22)</h2>
+<p class="sub">Sección 4 - Construcción y especificaciones partes -2</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Se realiza la carga durante 24 h o el tiempo declarado por el fabricante</p>
+<h3>Funcionamiento a alta temperatura (-2-22)</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Iluminancia a Ta, 60 s después de la desconexión (lux)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Iluminancia a 70 ºC, 60 s después de la desconexión (lux)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Iluminancia a 70 ºC, 30 min después de la desconexión (lux)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>11.2 · LF y DA</h2>
+<p class="sub">Sección 11 - Líneas de fuga y distancias en el aire</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Los datos pueden tomarse directamente sobre el TRF</p>
+<h3>Frecuencia &lt; 30 kHz</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 1 · Parte medida</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 1 · Distancia (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 2 · Parte medida</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 2 · Distancia (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 3 · Parte medida</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 3 · Distancia (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 4 · Parte medida</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 4 · Distancia (mm)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<h3>Frecuencia &gt; 30 kHz</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 1 · Parte medida</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 1 · Distancia (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 2 · Parte medida</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 2 · Distancia (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 3 · Parte medida</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 3 · Distancia (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 4 · Parte medida</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Líneas de fuga y distancias en el aire 4 · Distancia (mm)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>7.2.1 y 7.2.3 · Resistencia de puesta a tierra</h2>
+<p class="sub">Sección 7 - Tierra</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Los datos pueden tomarse directamente sobre el TRF</p>
+<p class="nota">Condiciones del ensayo: corriente 10 A durante 1 min</p>
+<h3>Resistencia de puesta a tierra</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Valor (Ω)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>5 · Cableado externo e interno</h2>
+<p class="sub">Sección 5 - Cableado</p>
+<h3>Dispositivo de anclaje</h3>
+<p class="nota">Puede obtenerse multiplicando la sección de conductores por el número de conductores (datos del TRF y fotos)</p>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Dispositivo 1 · Sección nominal total (mm²)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Dispositivo 2 · Sección nominal total (mm²)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Dispositivo 3 · Sección nominal total (mm²)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>8 · Protección contra choque eléctrico</h2>
+<p class="sub">Sección 8 - Protección contra choque eléctrico</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Los datos pueden tomarse directamente sobre el TRF</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>12 · Calentamiento y endurancia</h2>
+<p class="sub">Sección 12 - Calentamiento y endurancia</p>
+<p class="nota">Algunos datos pueden tomarse directamente sobre el TRF</p>
+<p class="nota">Los registros primarios de estos apartados están en los excel de calentamiento (fuera de la aplicación, DD-12)</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>9 · IP / Humedad</h2>
+<p class="sub">Sección 9 - IP y humedad</p>
+<h3>IP / Humedad</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Clasificación IP de las muestras (1)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Clasificación IP de las muestras (2)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<h3>Ensayo de humedad 48 h</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Inicio del ensayo</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Fin del ensayo</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>10 · Aislamiento, rigidez y corrientes de fuga</h2>
+<p class="sub">Sección 10 - Resistencia de aislamiento, rigidez dieléctrica y corrientes de fuga</p>
+<p class="nota">Los puntos de aplicación de la rigidez son los mismos que los de resistencia de aislamiento</p>
+<p class="nota">Para partes SELV/PELV se asume que la polaridad diferente son los polos 1 y 2 (secundario)</p>
+<p class="nota">Para el resto de partes activas se asume L1-N (o L1, L2, L3 y N con más de una fase)</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>13.2.1 · Resistencia al calor (ensayo de bola)</h2>
+<p class="sub">Sección 13 - Resistencia al fuego</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Los datos de resultados pueden tomarse directamente sobre el TRF.</p>
+<p class="nota">Si el material de todas las muestras es idéntico puede rellenarse sólo el de la primera.</p>
+<p class="nota">El espesor debe ser de al menos 2,5 mm; pueden apilarse varias muestras para alcanzarlo. Largo y ancho deben ser de al menos 10 mm.</p>
+<p class="nota">El termopar de verificación se sitúa a un máximo de 50 mm de la muestra. Tolerancia entre temperatura medida y consigna: ±2 ºC.</p>
+<h3>Resistencia al calor (ensayo de bola)</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Nº de capas</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Inicio del acondicionamiento previo (24 h)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Fin del acondicionamiento previo (24 h)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Espesor (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Largo (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Ancho (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Temperatura del termopar (ºC)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Inicio del acondicionamiento en horno</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Fin del acondicionamiento en horno</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Inicio del ensayo</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Fin del ensayo</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Temperatura del agua (ºC)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tiempo en agua (min)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Tamaño de la huella (mm)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>13.3.1 · Resistencia a la llama (llama de aguja)</h2>
+<p class="sub">Sección 13 - Resistencia al fuego</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Prescripciones de la norma: tiempo de aplicación 10 s, muestra cortada del EBP, ensayo sobre una única muestra</p>
+<p class="nota">Criterio de aceptación: no hay inflamación de la capa de papel y, tras retirar la llama, no hay llamas ni incandescencia; o se extinguen en menos de 30 s</p>
+<p class="nota">Si el material de todas las muestras es el mismo puede rellenarse sólo la primera</p>
+<h3>Resistencia a la llama (llama de aguja)</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Acondicionamiento 24 h · inicio</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Acondicionamiento 24 h · fin</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Duración de la combustión (tb) (s)</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>13.3.2 · Hilo incandescente</h2>
+<p class="sub">Sección 13 - Resistencia al fuego</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">El resto de los datos de resultados pueden tomarse directamente sobre el TRF</p>
+<h3>Hilo incandescente</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Diámetro en el extremo del hilo [4 ± 0,07 mm] (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Espesor de la muestra (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Ancho de la muestra (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Largo de la muestra (mm)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Acondicionamiento 24 h · inicio</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Acondicionamiento 24 h · fin</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>13.4 · Formación de caminos conductores</h2>
+<p class="sub">Sección 13 - Resistencia al fuego</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>16 · Bornes de tornillo</h2>
+<p class="sub">Sección 16 - Bornes con tornillos</p>
+<p class="nota">Los datos de resultados pueden tomarse directamente sobre el TRF</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>17 · Bornes sin tornillo y conexiones eléctricas</h2>
+<p class="sub">Sección 17 - Bornes sin tornillo</p>
+<p class="nota">Los datos de resultados pueden tomarse directamente sobre el TRF</p>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+<section class="apartado">
+<h2>IK · Resistencia a los impactos mecánicos externos</h2>
+<p class="sub">Ensayo de IK - EN/IEC 62262</p>
+<p class="condiciones"><b>Condiciones:</b> T — ºC · H — % · Fecha —</p>
+<p class="nota">Si el ensayo es IK01 a IK06 se utiliza por defecto el método de martillo de resorte (Ehb).</p>
+<p class="nota">No se aplican más de tres golpes en las inmediaciones de un mismo punto, salvo que se indique lo contrario en la toma de notas.</p>
+<p class="nota">La muestra se fija de manera que quede pegada a la superficie de ensayo para que no se desplace con el impacto.</p>
+<p class="nota">Energía por código: IK01=0,14J · IK02=0,20J · IK03=0,35J · IK04=0,50J · IK05=0,70J · IK06=1J · IK07=2J · IK08=5J · IK09=10J · IK10=20J · IK11=50J.</p>
+<h3>Resistencia a los impactos mecánicos externos</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Grado IK alcanzado (1)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Grado IK alcanzado (2)</td><td>—</td><td>—</td></tr>
+<tr><td class="etq">Veredicto</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<h3>Puntos de aplicación de los impactos</h3>
+<table class="datos"><thead><tr><th>Dato</th>
+<th>01</th>
+<th>02</th>
+</tr></thead><tbody>
+<tr><td class="etq">Puntos de aplicación 1 · Descripción</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 1 · Nº impactos</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 2 · Descripción</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 2 · Nº impactos</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 3 · Descripción</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 3 · Nº impactos</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 4 · Descripción</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 4 · Nº impactos</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 5 · Descripción</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 5 · Nº impactos</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 6 · Descripción</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 6 · Nº impactos</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 7 · Descripción</td><td colspan="2">—</td></tr>
+<tr><td class="etq">Puntos de aplicación 7 · Nº impactos</td><td colspan="2">—</td></tr>
+</tbody></table>
+<p class="falta">FALTAN DATOS EN ESTE APARTADO</p>
+</section>
+</body></html>

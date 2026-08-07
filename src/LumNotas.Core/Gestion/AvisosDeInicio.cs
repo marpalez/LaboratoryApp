@@ -72,7 +72,7 @@ public static class AvisosDeInicio
         {
             avisos.Add(new AvisoDeInicio(
                 NivelDeAviso.Problema,
-                "No hay carpeta de proyectos elegida.",
+                "No hay carpeta de tomas de notas elegida.",
                 "El tablero, el calendario y la carga están vacíos hasta que se elija.",
                 AccionDeAviso.ElegirCarpetas, "Elegir carpetas"));
         }
@@ -80,7 +80,7 @@ public static class AvisosDeInicio
         {
             avisos.Add(new AvisoDeInicio(
                 NivelDeAviso.Problema,
-                "No se puede llegar a la carpeta de proyectos. Comprueba que OneDrive esté sincronizado.",
+                "No se puede llegar a la carpeta de tomas de notas. Comprueba que OneDrive esté sincronizado.",
                 estado.CarpetaDeProyectos,
                 AccionDeAviso.ElegirCarpetas, "Elegir carpetas"));
         }

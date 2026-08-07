@@ -62,8 +62,8 @@ public partial class DialogoCarpeta : Window
             var cuantos = RepositorioDeProyectos.Patrones
                 .Sum(p => Directory.EnumerateFiles(carpeta, p, SearchOption.AllDirectories).Count());
 
-            RutaProyectos.Text = $"{carpeta}\n{cuantos} proyecto{(cuantos == 1 ? "" : "s")} encontrado"
-                                 + (cuantos == 1 ? "" : "s");
+            RutaProyectos.Text = $"{carpeta}\n{cuantos} toma{(cuantos == 1 ? "" : "s")} de notas "
+                                 + (cuantos == 1 ? "encontrada" : "encontradas");
         }
         else if (!string.IsNullOrWhiteSpace(carpeta))
         {
@@ -74,7 +74,7 @@ public partial class DialogoCarpeta : Window
         else
         {
             Pintar(EstadoProyectos, Ambar);
-            TituloProyectos.Text = "Todavía no hay carpeta de proyectos";
+            TituloProyectos.Text = "Todavía no hay carpeta de tomas de notas";
             RutaProyectos.Text = "El tablero y el calendario estarán vacíos hasta que la elijas.";
         }
     }
@@ -101,7 +101,7 @@ public partial class DialogoCarpeta : Window
         else if (enUso is not null)
         {
             Pintar(EstadoCompartida, Ambar);
-            TituloCompartida.Text = "Sin elegir: se está usando la de proyectos";
+            TituloCompartida.Text = "Sin elegir: se está usando la de tomas de notas";
             RutaCompartida.Text = enUso;
         }
         else
@@ -140,7 +140,7 @@ public partial class DialogoCarpeta : Window
 
     private void AlElegirProyectos(object remitente, RoutedEventArgs args)
     {
-        if (Elegir("Carpeta que contiene todos los proyectos", ServicioDeCarpetas.Proyectos) is not { } carpeta)
+        if (Elegir("Carpeta que contiene todas las tomas de notas", ServicioDeCarpetas.Proyectos) is not { } carpeta)
             return;
 
         _aplicarProyectos?.Invoke(carpeta);

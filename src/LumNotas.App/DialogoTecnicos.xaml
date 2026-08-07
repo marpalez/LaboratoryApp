@@ -22,10 +22,10 @@
             <Button Content="Añadir" Click="AlAnadir" Padding="14,5" Margin="8,0,0,0" Cursor="Hand"/>
             <Button x:Name="BotonRenombrar" Content="Corregir" Click="AlRenombrar" Padding="14,5"
                     Margin="6,0,0,0" Cursor="Hand" IsEnabled="False"
-                    ToolTip="Corrige el nombre del técnico seleccionado, también en sus proyectos"/>
+                    ToolTip="Corrige el nombre del técnico seleccionado, también en sus tomas de notas"/>
             <Button x:Name="BotonQuitar" Content="Quitar" Click="AlQuitar" Padding="14,5"
                     Margin="6,0,0,0" Cursor="Hand" IsEnabled="False"
-                    ToolTip="Lo saca de la lista; los proyectos que ya lo llevan no cambian"/>
+                    ToolTip="Lo saca de la lista; las tomas de notas que ya lo llevan no cambian"/>
         </StackPanel>
 
         <TextBlock x:Name="Aviso" Foreground="#B45309" FontSize="12" TextWrapping="Wrap"
@@ -34,7 +34,7 @@
         <Border Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8"
                 Padding="14,10" Margin="0,16,0,0">
             <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="#4B5563"
-                       Text="Quitar a un técnico no cambia ningún proyecto: el ensayo lo hizo esa persona. Corregir su nombre sí se aplica a los proyectos que lo lleven, porque una errata no es una persona distinta."/>
+                       Text="Quitar a un técnico no cambia ninguna toma de notas: el ensayo lo hizo esa persona. Corregir su nombre sí se aplica a las tomas de notas que lo lleven, porque una errata no es una persona distinta."/>
         </Border>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">

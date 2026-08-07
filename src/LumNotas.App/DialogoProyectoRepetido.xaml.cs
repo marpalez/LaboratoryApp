@@ -29,8 +29,8 @@ public partial class DialogoProyectoRepetido : Window
         var dialogo = new DialogoProyectoRepetido { Owner = propietario };
 
         dialogo.Titulo.Text = existentes.Count == 1
-            ? $"Ya hay un proyecto «{codigo}»"
-            : $"Ya hay {existentes.Count} proyectos «{codigo}»";
+            ? $"Ya hay una toma de notas «{codigo}»"
+            : $"Ya hay {existentes.Count} tomas de notas «{codigo}»";
 
         dialogo.Existentes.ItemsSource = existentes;
 

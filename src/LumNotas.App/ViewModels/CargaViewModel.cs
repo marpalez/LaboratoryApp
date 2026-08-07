@@ -43,7 +43,7 @@ public sealed class CargaViewModel : ObservableObject
             .Where(p => p.Planificacion.HayFechas)
             .Select(p => new ServicioPlanificado(
                 p.Tecnico, p.Planificacion.Inicio!.Value, p.Planificacion.FinEfectivo!.Value,
-                p.Planificacion.Importe))
+                p.Planificacion.Importe, p.Planificacion.Estado))
             .ToList();
 
         var (meses, filas) = CargaPorTecnico.Calcular(servicios, capacidad);
@@ -55,7 +55,7 @@ public sealed class CargaViewModel : ObservableObject
         Mensaje = servicios.Count == 0
             ? "No hay servicios con fechas que repartir."
             : $"Importe ÷ {capacidad.EurosPorHora:0.##} × {capacidad.Factor:0.###} = horas"
-              + $"  |  {capacidad.HorasPorDia:0.##} h por jornada"
+              + $"  |  {capacidad.HorasPorDia:0.##} h por día"
               + (sinImporte == 0 ? "" : $"  |  {sinImporte} servicio{(sinImporte == 1 ? "" : "s")} sin importe");
 
         Notificar(nameof(HayDatos));

@@ -26,6 +26,19 @@ public static class AltaDeProyecto
     public const string CampoNorma = "Norma";
 
     /// <summary>
+    /// Cómo se llama en el índice el apartado donde viven estos campos.
+    /// <para>
+    /// Está aquí, en el núcleo, porque lo dicen <b>dos sitios que no se ven entre sí</b>:
+    /// el rótulo del nodo, que lo pone la ventana, y el aviso de que no se puede guardar
+    /// (<see cref="RequisitosParaGuardar"/>), que lo redacta el núcleo. Escrito dos veces
+    /// se quedó desfasado a la primera: el nodo pasó a llamarse «Datos de la TdN» con el
+    /// glosario (DD‑145) y el aviso siguió mandando a «Datos del proyecto», que ya no
+    /// existía en ninguna pantalla.
+    /// </para>
+    /// </summary>
+    public const string SeccionDeDatos = "Datos de la TdN";
+
+    /// <summary>
     /// Lo que ocupa un código completo: <c>TECNO260201-00</c>. Cinco del cliente, cuatro
     /// de año y mes, dos de familia, el guion y dos de edición.
     /// <para>

@@ -14,7 +14,7 @@
   "planificacion": {
     "inicio": "2026-09-05T00:00:00",
     "fin": "2026-09-26T00:00:00",
-    "estado": "planificado",
+    "estado": "pendienteCliente",
     "archivado": false,
     "importe": 4103,
     "fechasBloqueadas": false

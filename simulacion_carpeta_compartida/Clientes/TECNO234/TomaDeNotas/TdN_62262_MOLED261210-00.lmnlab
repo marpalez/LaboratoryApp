@@ -14,7 +14,7 @@
   "planificacion": {
     "inicio": "2026-12-12T00:00:00",
     "fin": "2026-12-18T00:00:00",
-    "estado": "planificado",
+    "estado": "terminado",
     "recepcionMuestras": "2026-12-05T00:00:00",
     "archivado": false,
     "importe": 2893,

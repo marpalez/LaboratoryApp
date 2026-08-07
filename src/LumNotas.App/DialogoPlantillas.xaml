@@ -58,7 +58,7 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
             <Button x:Name="BotonPublicar" Content="Publicar en la carpeta compartida"
                     Click="AlPublicar" Padding="14,9" Margin="0,0,10,0" Cursor="Hand"
-                    ToolTip="Copia las normas de este equipo a la carpeta de proyectos, para que las use todo el laboratorio"/>
+                    ToolTip="Copia las normas de este equipo a la carpeta compartida, para que las use todo el laboratorio"/>
             <Button Content="Cerrar" Click="AlCerrar" IsDefault="True" IsCancel="True"
                     Padding="18,9" Cursor="Hand"
                     Background="#2563EB" Foreground="White" BorderThickness="0"/>

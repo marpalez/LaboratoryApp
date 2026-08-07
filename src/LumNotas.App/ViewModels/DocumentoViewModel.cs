@@ -253,7 +253,7 @@ public sealed class DocumentoViewModel : ObservableObject
     }
 
     public string Ubicacion => _ruta is null
-        ? "El proyecto todavía no se ha guardado en ningún sitio"
+        ? "La toma de notas todavía no se ha guardado en ningún sitio"
         : Path.GetDirectoryName(_ruta) ?? "";
 
     /// <summary>Apartados completados sobre aplicables, sumando todas las normas.</summary>
@@ -291,9 +291,42 @@ public sealed class DocumentoViewModel : ObservableObject
             if (!Establecer(ref _panelActual, value)) return;
             _idApartadoActual = (value as BloqueViewModel)?.Codigo;
 
+            SenalarEnElIndice(value);
+
             // Al entrar se relee del disco: el responsable puede haber movido las fechas
             // desde el calendario mientras esta pestaña llevaba media hora abierta.
             if (value is PlanificacionViewModel plan) plan.Recargar();
+        }
+    }
+
+    /// <summary>
+    /// Deja señalado en el índice el panel que se está viendo, y <b>nada</b> cuando el panel
+    /// no está en el índice.
+    /// <para>
+    /// Lo segundo es lo que arregla el fallo: «Planificación» se alcanza por su botón de la
+    /// barra y no cuelga del árbol, así que al pulsarlo el índice se quedaba señalando
+    /// «Datos del proyecto». Aparte de mentir sobre dónde estabas, dejaba el nodo
+    /// <b>ya señalado</b>, y volver a pulsarlo no avisaba de nada —el árbol solo avisa
+    /// cuando la selección cambia—, de modo que no había manera de volver.
+    /// </para>
+    /// <para>
+    /// Solo hace falta apagar: al encender uno, el propio árbol apaga el que estuviera
+    /// señalado, porque no deja marcar dos a la vez.
+    /// </para>
+    /// </summary>
+    private void SenalarEnElIndice(object? panel)
+    {
+        if (panel is INodoDelIndice nodo)
+        {
+            nodo.Seleccionado = true;
+            return;
+        }
+
+        foreach (var rama in Arbol)
+        {
+            if (rama is INodoDelIndice suelto) suelto.Seleccionado = false;
+            if (rama is SeccionViewModel seccion)
+                foreach (var apartado in seccion.Apartados) apartado.Seleccionado = false;
         }
     }
 

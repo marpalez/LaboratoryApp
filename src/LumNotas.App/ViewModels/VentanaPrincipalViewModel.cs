@@ -426,11 +426,16 @@ public sealed class VentanaPrincipalViewModel : ObservableObject
     /// hay que ir a buscarlo.
     /// </summary>
     /// <summary>
-    /// Cuántas tomas de notas recientes salen en la portada. Cinco desde el 2026‑08‑06:
-    /// con tres no llegaba a cubrir un día de trabajo con varias abiertas, y el sitio ya
-    /// estaba ahí. La lista completa sigue en <c>Archivo</c>.
+    /// Cuántas tomas de notas recientes salen en la portada: <b>cuatro</b>, en dos columnas
+    /// de dos. La lista completa sigue en <c>Archivo</c>.
+    /// <para>
+    /// <b>Tiene que ser múltiplo del número de columnas.</b> Con cinco quedaba una fila a
+    /// medias y un hueco a la vista; es lo único que decide este número, más que cuántas
+    /// recientes convenga ofrecer. Si algún día la rejilla pasa a una columna o a tres,
+    /// hay que volver a cuadrarlo o reaparece el hueco.
+    /// </para>
     /// </summary>
-    private const int RecientesEnPortada = 5;
+    private const int RecientesEnPortada = 4;
 
     private void RefrescarRecientes()
     {
