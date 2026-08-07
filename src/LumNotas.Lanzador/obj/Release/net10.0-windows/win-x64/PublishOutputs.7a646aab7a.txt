@@ -1,0 +1,7 @@
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\entrega\salida\lanzador\LumenLab.Lanzador.exe
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\entrega\salida\lanzador\LumenLab.Lanzador.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\entrega\salida\lanzador\LumenLab.Lanzador.deps.json
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\entrega\salida\lanzador\LumenLab.Lanzador.runtimeconfig.json
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\entrega\salida\lanzador\LumenLab.Lanzador.pdb
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\entrega\salida\lanzador\LumNotas.Core.dll
+C:\Users\Invitado\Desktop\Archivos windows\Desarrollo de aplicaciones\AplicacionTomaNotas\entrega\salida\lanzador\LumNotas.Core.pdb

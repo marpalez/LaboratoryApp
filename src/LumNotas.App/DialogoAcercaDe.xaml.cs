@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using LumNotas.App.ViewModels;
 using LumNotas.Core.Plantilla;
@@ -78,25 +79,34 @@ public partial class DialogoAcercaDe : Window
     {
         var respuesta = MessageBox.Show(
             $"¿Publicar la versión {ServicioDeVersion.EnEjecucion} como la del laboratorio?\n\n"
-            + "Los equipos que sigan con una anterior verán un aviso al arrancar.",
+            + "Se copia el programa entero a la carpeta compartida. Los demás equipos se "
+            + "pondrán al día solos la próxima vez que lo abran.",
             "Publicar versión", MessageBoxButton.OKCancel, MessageBoxImage.Question);
 
         if (respuesta != MessageBoxResult.OK) return;
 
         try
         {
-            if (!ServicioDeVersion.PublicarEsta(Notas.Text))
+            // Copiar el programa entero tarda lo suyo: sin el reloj de espera parece
+            // colgado, y publicar es de las cosas que no se repiten «por si acaso».
+            Mouse.OverrideCursor = Cursors.Wait;
+
+            if (ServicioDeVersion.PublicarEsta(Notas.Text) is not { } ficheros)
             {
-                Avisar("No hay carpeta de tomas de notas donde publicarla.", error: true);
+                Avisar("No hay carpeta compartida donde publicarla.", error: true);
                 return;
             }
 
             Refrescar();
-            Avisar($"Publicada la {ServicioDeVersion.EnEjecucion}.", error: false);
+            Avisar($"Publicada la {ServicioDeVersion.EnEjecucion}: {ficheros} ficheros copiados.", error: false);
         }
         catch (Exception ex)
         {
             Avisar("No se pudo publicar: " + ex.Message, error: true);
+        }
+        finally
+        {
+            Mouse.OverrideCursor = null;
         }
     }
 

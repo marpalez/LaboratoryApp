@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using LumNotas.App.ViewModels;
+using LumNotas.Core.Despliegue;
 using LumNotas.Core.Gestion;
 using LumNotas.Core.Plantilla;
 using LumNotas.Storage;

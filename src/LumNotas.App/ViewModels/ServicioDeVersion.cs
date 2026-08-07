@@ -1,6 +1,6 @@
 using System.IO;
 using System.Reflection;
-using LumNotas.Core.Plantilla;
+using LumNotas.Core.Despliegue;
 
 namespace LumNotas.App.ViewModels;
 
@@ -30,16 +30,28 @@ public static class ServicioDeVersion
         ?? "desconocida";
 
     private static VersionPublicada? _publicada;
-    private static bool _leida;
+    private static DateTime _leidaA = DateTime.MinValue;
+
+    /// <summary>
+    /// Cada cuánto se vuelve a mirar la carpeta compartida. No se guardaba y se leía una
+    /// sola vez por sesión: en el laboratorio hay quien no cierra el programa en toda la
+    /// semana, y a ese «Acerca de» le seguía diciendo el lunes lo del lunes anterior.
+    /// <para>
+    /// Media hora y no cada vez, porque esto lo pide la portada al pintarse y la
+    /// compartida está en OneDrive: preguntar por un fichero de red a cada repintado se
+    /// nota.
+    /// </para>
+    /// </summary>
+    private static readonly TimeSpan CadaCuanto = TimeSpan.FromMinutes(30);
 
     /// <summary>La que el laboratorio ha publicado, si hay carpeta compartida.</summary>
     public static VersionPublicada? Publicada
     {
         get
         {
-            if (_leida) return _publicada;
+            if (DateTime.Now - _leidaA < CadaCuanto) return _publicada;
 
-            _leida = true;
+            _leidaA = DateTime.Now;
             _publicada = ServicioDeCarpetas.Compartida() is { } carpeta ? ControlDeVersion.Leer(carpeta) : null;
             return _publicada;
         }
@@ -47,18 +59,28 @@ public static class ServicioDeVersion
 
     public static bool HayMasNueva => ControlDeVersion.HayMasNueva(EnEjecucion, Publicada);
 
-    /// <summary>Marca esta versión como la del laboratorio. Devuelve si se pudo.</summary>
-    public static bool PublicarEsta(string? notas)
+    /// <summary>
+    /// Sube <b>esta instalación</b> a la carpeta compartida y la marca como la buena.
+    /// Devuelve cuántos ficheros se han copiado, o <c>null</c> si no hay compartida.
+    /// <para>
+    /// Se copia la carpeta desde la que se está ejecutando, que es exactamente lo que hace
+    /// «Publicar las normas»: no hace falta ninguna máquina de compilación ni volver a
+    /// generar nada — se reparte lo que este equipo ya está usando y funciona.
+    /// </para>
+    /// </summary>
+    public static int? PublicarEsta(string? notas)
     {
-        if (ServicioDeCarpetas.Compartida() is not { } carpeta) return false;
+        if (ServicioDeCarpetas.Compartida() is not { } carpeta) return null;
 
-        ControlDeVersion.Publicar(carpeta, EnEjecucion, notas, Environment.UserName);
-        _leida = false;
-        return true;
+        var manifiesto = RepartoDelPrograma.Publicar(
+            AppContext.BaseDirectory, carpeta, EnEjecucion, notas, Environment.UserName);
+
+        _leidaA = DateTime.MinValue;
+        return manifiesto.Ficheros.Count;
     }
 
     public static bool HayCarpetaCompartida => ServicioDeCarpetas.HayCompartida;
 
     /// <summary>Al cambiar de carpeta, la versión publicada es otra.</summary>
-    public static void Olvidar() => _leida = false;
+    public static void Olvidar() => _leidaA = DateTime.MinValue;
 }

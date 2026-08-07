@@ -138,7 +138,18 @@ public sealed class CacheDeResumenes
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(_ruta)!);
-            File.WriteAllText(_ruta, JsonSerializer.Serialize(_entradas.Values, Opciones));
+
+            // A un temporal y reemplazar, como el .lmnlab. Escribiendo encima, dos
+            // ventanas del programa a la vez —o un apagón a media escritura— dejaban un
+            // fichero cortado. No se pierde nada: al leerlo se tira y se rehace. Pero se
+            // rehace escaneando los 250 proyectos, y ese es justo el segundo y pico que
+            // esta caché existe para ahorrar.
+            var temporal = _ruta + ".escribiendo";
+            File.WriteAllText(temporal, JsonSerializer.Serialize(_entradas.Values, Opciones));
+
+            if (File.Exists(_ruta)) File.Replace(temporal, _ruta, destinationBackupFileName: null);
+            else File.Move(temporal, _ruta);
+
             _sucia = false;
         }
         catch

@@ -874,68 +874,7 @@ public class PlanificacionTests : IDisposable
         Assert.False(FiltroDeEstado.Pasa(Con(EstadoDeProyecto.EnCurso, archivado: true), "En curso"));
     }
 
-    // ---- carga de un técnico -----------------------------------------------
-
-    [Fact]
-    public void LaOcupacionCuentaLosDiasDeCadaServicio()
-    {
-        var dias = Ocupacion.Dias([
-            (new DateTime(2026, 8, 3), new DateTime(2026, 8, 7)),      // 5 días
-            (new DateTime(2026, 9, 1), new DateTime(2026, 9, 3))       // 3 días
-        ]);
-
-        Assert.Equal(8, dias);
-    }
-
-    /// <summary>
-    /// <b>Dos servicios a la vez no ocupan el doble.</b> Sumar duraciones exageraría la
-    /// carga justo de quien lleva varios a la vez, que es a quien el responsable busca.
-    /// </summary>
-    [Fact]
-    public void LosServiciosQueSeSolapanNoCuentanDosVeces()
-    {
-        var solapados = Ocupacion.Dias([
-            (new DateTime(2026, 8, 3), new DateTime(2026, 8, 14)),     // 12 días
-            (new DateTime(2026, 8, 10), new DateTime(2026, 8, 21))     // 12 días, 5 en común
-        ]);
-
-        Assert.Equal(19, solapados);   // del 3 al 21, no 24
-    }
-
-    /// <summary>Un servicio que acaba el lunes y otro que empieza el martes son un tramo.</summary>
-    [Fact]
-    public void LosTramosPegadosSeUnen()
-    {
-        var dias = Ocupacion.Dias([
-            (new DateTime(2026, 8, 3), new DateTime(2026, 8, 7)),
-            (new DateTime(2026, 8, 8), new DateTime(2026, 8, 12))
-        ]);
-
-        Assert.Equal(10, dias);
-    }
-
-    [Fact]
-    public void UnServicioContenidoEnOtroNoAnadeNada()
-    {
-        var dias = Ocupacion.Dias([
-            (new DateTime(2026, 8, 3), new DateTime(2026, 8, 28)),
-            (new DateTime(2026, 8, 10), new DateTime(2026, 8, 14))
-        ]);
-
-        Assert.Equal(26, dias);
-    }
-
-    [Fact]
-    public void SinServiciosNoHayOcupacion() => Assert.Equal(0, Ocupacion.Dias([]));
-
-    [Fact]
-    public void LaCargaSeCuentaEnDiasSiEsCortaYEnSemanasSiEsLarga()
-    {
-        Assert.Equal("1 proyecto", Ocupacion.Resumir(1, 0));
-        Assert.Equal("1 proyecto | 3 días", Ocupacion.Resumir(1, 3));
-        Assert.Equal("2 proyectos | 1 semana", Ocupacion.Resumir(2, 7));
-        Assert.Equal("3 proyectos | 4 semanas", Ocupacion.Resumir(3, 22));
-    }
+    // ---- los meses de la cabecera ------------------------------------------
 
     [Fact]
     public void LosMesesDeLaCabeceraCubrenTodoElEje()

@@ -64,12 +64,23 @@ public sealed class RepositorioDeProyectos
 
     public void Guardar(DatosProyecto datos, string ruta, string versionPlantilla)
     {
+        // Lo que ya hay en el disco, de una sola lectura. Hacen falta tres cosas de ahí y
+        // ninguna está en memoria: la marca de formato, la planificación y los campos que
+        // esta versión no conoce.
+        var anterior = LeerCrudo(ruta);
+
+        FormatoDeFichero.ExigirQueSePuedaEscribir(anterior?.Formato, ruta);
+
         var documento = new DocumentoProyecto
         {
+            // Lo que trajera el fichero y aquí no se entienda vuelve tal cual. Sin esto,
+            // guardar desde un equipo con la versión de antes borra lo que hubiera escrito
+            // la de después, en silencio.
+            Desconocido = anterior?.Desconocido,
             // La planificación no la escribe la toma de notas: se conserva la que haya
             // en el disco. Si no, un técnico con el proyecto abierto desde hace media
             // hora borraría al guardar las fechas que otro acaba de mover en el calendario.
-            Planificacion = SoloSiTieneAlgo(LeerPlanificacion(ruta)),
+            Planificacion = SoloSiTieneAlgo(anterior?.Planificacion ?? new Planificacion()),
             VersionPlantilla = versionPlantilla,
             GuardadoEl = DateTime.Now,
             CodigoTomaDeNotas = datos.CodigoTomaDeNotas,
@@ -88,7 +99,10 @@ public sealed class RepositorioDeProyectos
                 Campo = v.Campo,
                 Muestra = v.Muestra,
                 Tipo = TipoDe(v.Valor),
-                Valor = ATexto(v.Valor)
+                Valor = ATexto(v.Valor),
+                // Cada valor se reconstruye desde memoria, así que lo que trajera de una
+                // versión posterior hay que ir a buscarlo al fichero anterior.
+                Desconocido = DesconocidoDe(anterior, v.Ambito, v.Campo, v.Muestra)
             })],
             Na = datos.VolcarNa().Where(n => n.Valor).Select(n => n.Ambito).ToList(),
             Checklists = datos.VolcarChecklists().Where(c => c.Valor).Select(c => c.Ruta).ToList()
@@ -231,16 +245,36 @@ public sealed class RepositorioDeProyectos
     /// aquí no puede impedir guardar el trabajo del técnico.
     /// </summary>
     public Planificacion LeerPlanificacion(string ruta)
+        => LeerCrudo(ruta)?.Planificacion ?? new Planificacion();
+
+    /// <summary>
+    /// Lo que ese valor de ensayo traía en el fichero y esta versión no entiende. Se
+    /// empareja por ámbito, campo y muestra, que es lo que identifica una casilla.
+    /// </summary>
+    private static Dictionary<string, JsonElement>? DesconocidoDe(
+        DocumentoProyecto? anterior, string ambito, string campo, int muestra)
+        => anterior?.Valores.FirstOrDefault(v =>
+               v.Muestra == muestra
+               && string.Equals(v.Ambito, ambito, StringComparison.OrdinalIgnoreCase)
+               && string.Equals(v.Campo, campo, StringComparison.OrdinalIgnoreCase))
+           ?.Desconocido;
+
+    /// <summary>
+    /// El documento tal cual está en el disco, o <c>null</c> si no hay o no se puede leer.
+    /// Nunca lanza: lo usan los caminos de guardado, y no poder leer lo de antes no puede
+    /// impedir escribir el trabajo del técnico.
+    /// </summary>
+    private static DocumentoProyecto? LeerCrudo(string ruta)
     {
         try
         {
-            if (!File.Exists(ruta)) return new Planificacion();
-            var documento = JsonSerializer.Deserialize<DocumentoProyecto>(File.ReadAllText(ruta), Opciones);
-            return documento?.Planificacion ?? new Planificacion();
+            return File.Exists(ruta)
+                ? JsonSerializer.Deserialize<DocumentoProyecto>(File.ReadAllText(ruta), Opciones)
+                : null;
         }
         catch
         {
-            return new Planificacion();
+            return null;
         }
     }
 
@@ -253,6 +287,14 @@ public sealed class RepositorioDeProyectos
     {
         var documento = JsonSerializer.Deserialize<DocumentoProyecto>(File.ReadAllText(ruta), Opciones)
                         ?? throw new InvalidOperationException($"La toma de notas '{ruta}' no se pudo leer.");
+
+        // Este es el camino peligroso de los dos: reescribe el documento entero de un
+        // fichero que <b>nadie tiene abierto</b>, por arrastrar una barra en el calendario.
+        FormatoDeFichero.ExigirQueSePuedaEscribir(documento.Formato, ruta);
+
+        // Lo que trajera la planificación de una versión posterior viaja con ella. La que
+        // llega puede venir de un diálogo, que la reconstruye desde cero.
+        planificacion.Desconocido ??= documento.Planificacion?.Desconocido;
 
         documento.Planificacion = SoloSiTieneAlgo(planificacion);
         EscribirDeFormaAtomica(ruta, JsonSerializer.Serialize(documento, Opciones));
@@ -313,9 +355,19 @@ public sealed class RepositorioDeProyectos
 
     private sealed class DocumentoProyecto
     {
-        // Marca de formato para quien abra el fichero con el Bloc de notas. No la lee
-        // nadie: los ficheros con la marca anterior («lumproj/1») se siguen leyendo igual.
-        public string Formato { get; init; } = "lmnlab/1";
+        /// <summary>
+        /// Marca de formato. La lee <see cref="FormatoDeFichero"/> antes de escribir, para
+        /// no dejar que una versión vieja del programa reescriba un fichero nacido de una
+        /// nueva. Los ficheros con la marca anterior («lumproj/1») se siguen leyendo igual.
+        /// </summary>
+        public string Formato { get; set; } = FormatoDeFichero.Actual;
+
+        /// <summary>
+        /// Lo que trae el fichero y esta versión no conoce. <b>No se lee: se conserva para
+        /// devolverlo tal cual.</b> Ver el comentario de <see cref="Planificacion.Desconocido"/>.
+        /// </summary>
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement>? Desconocido { get; set; }
         public string VersionPlantilla { get; init; } = "";
         public DateTime GuardadoEl { get; init; }
         /// <summary>Admite nulo: los ficheros anteriores a este campo no lo traen.</summary>
@@ -365,5 +417,17 @@ public sealed class RepositorioDeProyectos
         public int Muestra { get; init; }
         public string Tipo { get; init; } = "texto";
         public string? Valor { get; init; }
+
+        /// <summary>
+        /// Lo que una versión posterior haya añadido a cada valor de ensayo —una
+        /// incertidumbre, quién lo midió, con qué equipo— y aquí no se entienda.
+        /// <para>
+        /// <b>Aquí no basta con declararlo</b>: los valores se reconstruyen desde memoria
+        /// al guardar, así que además hay que rescatarlos del fichero anterior. Lo hace
+        /// <see cref="Guardar"/> emparejando por ámbito, campo y muestra.
+        /// </para>
+        /// </summary>
+        [JsonExtensionData]
+        public Dictionary<string, JsonElement>? Desconocido { get; set; }
     }
 }

@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\LumNotas.Core\LumNotas.Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!--
+      WinExe y no Exe: con Exe, Windows abre una consola negra un instante antes del
+      programa cada vez que alguien pulsa el acceso directo.
+    -->
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Para el aviso cuando algo va mal. No monta ninguna ventana propia. -->
+    <UseWPF>true</UseWPF>
+
+    <AssemblyName>LumenLab.Lanzador</AssemblyName>
+    <AssemblyTitle>LumenLab (lanzador)</AssemblyTitle>
+    <ApplicationIcon>..\LumNotas.App\LumenLab.ico</ApplicationIcon>
+    <Copyright>© 2026 David Martínez Palomares (DMP) · davidmarpalez.com</Copyright>
+    <Product>LumenLab</Product>
+    <Company>David Martínez Palomares (DMP)</Company>
+
+    <!--
+      ESTE NÚMERO CASI NUNCA SUBE, Y ES LO QUE SE PRETENDE.
+      El lanzador es la parte que instala el instalador y que luego nadie vuelve a tocar:
+      es lo único que hay que repartir a mano por los seis equipos. Cambiarlo obliga a dar
+      esa vuelta otra vez, así que aquí solo entra lo que de verdad no puede vivir dentro
+      del programa.
+    -->
+    <Version>1.0.0</Version>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+</Project>

@@ -20,6 +20,28 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+
+    <!--
+      El ejecutable se llama como el programa, no como el proyecto. Se llamaba
+      «LumNotas.App.exe» y eso es lo que veía el técnico en la barra de tareas, en el
+      acceso directo y en el administrador de tareas.
+    -->
+    <AssemblyName>LumenLab</AssemblyName>
+    <ApplicationIcon>LumenLab.ico</ApplicationIcon>
+
+    <!--
+      Lo que Windows enseña en «Propiedades» del fichero. Sin esto, la descripción era
+      «LumNotas.App» —el nombre del proyecto— y el copyright iba en blanco.
+    -->
+    <AssemblyTitle>LumenLab</AssemblyTitle>
+    <Copyright>© 2026 David Martínez Palomares (DMP) · davidmarpalez.com</Copyright>
+
+    <!--
+      El día que esto entre en git, .NET añadiría el identificador del commit a la versión
+      informativa —«1.0.0+a3f9c1»— y el programa la enseña cruda en la portada y en «Acerca
+      de». La comparación con la publicada sí sabe limpiarla; el cartel no.
+    -->
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <!--
@@ -36,7 +58,14 @@
       tomar notas de ensayo y gestionar los proyectos.
     -->
     <Product>LumenLab</Product>
-    <Company>Laboratorio de ensayos de luminarias</Company>
+
+    <!--
+      Quien lo firma, no quien lo usa. Windows enseña esto como «Empresa» en las
+      propiedades del fichero, que es el sitio donde se mira de dónde salió un ejecutable:
+      ahí tiene que estar el autor. El laboratorio es el destinatario, y eso ya se ve en
+      todo lo demás.
+    -->
+    <Company>David Martínez Palomares (DMP)</Company>
   </PropertyGroup>
 
 </Project>

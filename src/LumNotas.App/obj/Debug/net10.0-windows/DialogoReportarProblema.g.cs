@@ -99,7 +99,7 @@ namespace LumNotas.App {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/LumNotas.App;component/dialogoreportarproblema.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/LumenLab;component/dialogoreportarproblema.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\DialogoReportarProblema.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

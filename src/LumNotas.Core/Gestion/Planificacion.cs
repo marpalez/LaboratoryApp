@@ -118,19 +118,43 @@ public sealed class Planificacion
     /// </summary>
     public bool FechasBloqueadas { get; set; }
 
+    /// <summary>
+    /// Lo que trae la planificación guardada y esta versión del programa no conoce.
+    /// <b>No se lee ni se usa: se conserva para poder devolverlo al fichero tal cual.</b>
+    /// <para>
+    /// Sin esto, un equipo con la versión de antes borraba en silencio los campos que
+    /// hubiera añadido la versión de después — y lo hacía <b>arrastrando una barra del
+    /// calendario</b>, sobre ficheros que ni siquiera tenía abiertos. Comprobado el
+    /// 2026‑08‑07 con un fichero que traía dos campos nuevos: desaparecieron los dos, sin
+    /// error y sin aviso. Mientras el laboratorio tenga seis equipos, habrá días con dos
+    /// versiones conviviendo, así que esto no es previsión sino la situación normal.
+    /// </para>
+    /// </summary>
+    [JsonExtensionData]
+    public Dictionary<string, System.Text.Json.JsonElement>? Desconocido { get; set; }
+
     // Lo que sigue se calcula, no se guarda: sin [JsonIgnore] el .lmnlab acababa con
     // campos como «hayFechas» o «esVacia», que además mentirían al releerlos.
 
     [JsonIgnore]
     public bool HayFechas => Inicio is not null && Fin is not null;
 
-    /// <summary>Sin planificar todavía. Los proyectos anteriores al calendario están así.</summary>
+    /// <summary>
+    /// Sin planificar todavía. Los proyectos anteriores al calendario están así.
+    /// <para>
+    /// <b>Lo desconocido cuenta como contenido</b>, aunque esta versión no sepa qué es:
+    /// quien escribe el fichero se salta la planificación cuando está vacía, y sin esta
+    /// condición una planificación que solo trajera campos de una versión posterior se
+    /// leería como vacía y se tiraría entera — que es exactamente lo que se está evitando.
+    /// </para>
+    /// </summary>
     [JsonIgnore]
     public bool EsVacia => Inicio is null && Fin is null && RecepcionMuestras is null
                            && Estado == EstadoDeProyecto.PorHacer && !Archivado && Importe is null
                            && string.IsNullOrWhiteSpace(Grupo)
                            && EnsayoDesde is null && EnsayoHasta is null
-                           && !FechasBloqueadas;
+                           && !FechasBloqueadas
+                           && Desconocido is not { Count: > 0 };
 
     /// <summary>Fin corregido: una fecha de fin anterior al inicio dibujaría al revés.</summary>
     [JsonIgnore]

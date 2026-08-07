@@ -75,7 +75,7 @@ namespace LumNotas.App {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/LumNotas.App;component/dialogoproyectorepetido.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/LumenLab;component/dialogoproyectorepetido.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\DialogoProyectoRepetido.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

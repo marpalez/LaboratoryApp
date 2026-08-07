@@ -67,7 +67,7 @@ namespace LumNotas.App {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/LumNotas.App;component/dialogocambiossinguardar.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/LumenLab;component/dialogocambiossinguardar.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\DialogoCambiosSinGuardar.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

@@ -260,7 +260,7 @@ namespace LumNotas.App {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/LumNotas.App;component/dialogonuevoproyecto.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/LumenLab;component/dialogonuevoproyecto.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\DialogoNuevoProyecto.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

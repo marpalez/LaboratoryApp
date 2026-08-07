@@ -17,6 +17,19 @@ public sealed class Colaborador
     public string EnsayoYMotivo { get; set; } = "";
 
     /// <summary>
+    /// Lo que traiga el fichero de una versión posterior y aquí no se entienda. Ver
+    /// <see cref="FormatoDeFichero"/>: sin esto, un equipo con la versión de antes borra
+    /// los campos nuevos <b>de dentro de cada colaborador</b> al guardar.
+    /// <para>
+    /// Hace falta uno por cada objeto anidado, no basta con el de la raíz. Se descubrió
+    /// midiéndolo: la primera versión de la protección cubría el documento y la
+    /// planificación, y lo de dentro de las listas se seguía perdiendo.
+    /// </para>
+    /// </summary>
+    [System.Text.Json.Serialization.JsonExtensionData]
+    public Dictionary<string, System.Text.Json.JsonElement>? Desconocido { get; set; }
+
+    /// <summary>
     /// Si tiene algo escrito. Una fila recién añadida y sin rellenar no se guarda: el
     /// técnico pulsa el botón, se lo piensa y se va — y eso no es un colaborador.
     /// </summary>

@@ -123,7 +123,7 @@ namespace LumNotas.App {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/LumNotas.App;component/dialogoplantillas.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/LumenLab;component/dialogoplantillas.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\DialogoPlantillas.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
